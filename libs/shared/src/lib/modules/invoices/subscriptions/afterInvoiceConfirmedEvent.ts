@@ -1,4 +1,3 @@
-import { NoOpUseCase } from '../../../core/domain/NoOpUseCase';
 import { PayloadBuilder } from '../../../infrastructure/message-queues/payloadBuilder';
 import { SchedulerContract } from '../../../infrastructure/scheduler/Scheduler';
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
@@ -26,7 +25,6 @@ import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
 import { InvoiceItemRepoContract } from '../repos';
 
-// import { PublishInvoiceToErpUsecase } from '../usecases/ERP/publishInvoiceToErp/publishInvoiceToErp';
 import { PublishInvoiceConfirmedUsecase } from '../usecases/publishEvents/publishInvoiceConfirmed';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
 
@@ -39,8 +37,6 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
     private addressRepo: AddressRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private publishInvoiceConfirmed: PublishInvoiceConfirmedUsecase,
-    // private invoiceToSageUsecase: PublishInvoiceToErpUsecase | NoOpUseCase,
-    // private invoiceToNetsuiteUsecase: PublishInvoiceToErpUsecase | NoOpUseCase,
     private scheduler: SchedulerContract,
     private loggerService: LoggerContract,
     private creditControlReminderDelay: number,
@@ -83,27 +79,41 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
           );
         }
 
-        invoiceItems = resp.value.getValue();
+        invoiceItems = resp.value;
       }
 
-      const payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
-      if (!payer) {
+      const maybePayer = await this.payerRepo.getPayerByInvoiceId(
+        invoice.invoiceId
+      );
+      if (maybePayer.isLeft()) {
         throw new Error(`Invoice ${invoice.id.toString()} has no payers.`);
       }
 
-      const billingAddress = await this.addressRepo.findById(
+      const payer = maybePayer.value;
+
+      const maybeBillingAddress = await this.addressRepo.findById(
         payer.billingAddressId
       );
 
-      const manuscript = await this.manuscriptRepo.findById(
+      if (maybeBillingAddress.isLeft()) {
+        throw new Error(
+          `address not found for invoice ${invoice.id.toString()}`
+        );
+      }
+
+      const billingAddress = maybeBillingAddress.value;
+
+      const maybeManuscript = await this.manuscriptRepo.findById(
         invoiceItems[0].manuscriptId
       );
 
-      if (!manuscript) {
+      if (maybeManuscript.isLeft()) {
         throw new Error(
           `Invoice ${invoice.id.toString()} has no manuscripts associated.`
         );
       }
+
+      const manuscript = maybeManuscript.value;
 
       const publishResult = await this.publishInvoiceConfirmed.execute({
         billingAddress,
@@ -114,7 +124,7 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
       });
 
       if (publishResult.isLeft()) {
-        throw publishResult.value.errorValue();
+        throw publishResult.value;
       }
 
       this.loggerService.info(

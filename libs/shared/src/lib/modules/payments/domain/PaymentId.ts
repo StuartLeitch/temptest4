@@ -1,6 +1,5 @@
-import { Result } from './../../../core/logic/Result';
-import { Entity } from '../../../core/domain/Entity';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { Entity } from '../../../core/domain/Entity';
 
 export class PaymentId extends Entity<any> {
   get id(): UniqueEntityID {
@@ -11,8 +10,8 @@ export class PaymentId extends Entity<any> {
     super(null, id);
   }
 
-  public static create(id?: UniqueEntityID): Result<PaymentId> {
-    return Result.ok<PaymentId>(new PaymentId(id));
+  public static create(id?: UniqueEntityID): PaymentId {
+    return new PaymentId(id);
   }
 
   toString(): string {

@@ -1,44 +1,59 @@
 import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
+import { Either, right, left } from '../../../../core/logic/Either';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
+
+import { RepoError } from '../../../../infrastructure/RepoError';
+
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
+import { PayerId } from '../../domain/PayerId';
+import { Payer } from '../../domain/Payer';
 
 import { PayerRepoContract } from '../payerRepo';
-import { Payer } from '../../domain/Payer';
-import { PayerId } from '../../domain/PayerId';
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-// import {TransactionId} from '../../../transactions/domain/TransactionId';
 
-export class MockPayerRepo extends BaseMockRepo<Payer>
+export class MockPayerRepo
+  extends BaseMockRepo<Payer>
   implements PayerRepoContract {
   constructor() {
     super();
   }
 
-  public async getPayerById(payerId: PayerId): Promise<Payer> {
-    const matches = this._items.filter(p => p.payerId.equals(payerId));
+  public async getPayerById(
+    payerId: PayerId
+  ): Promise<Either<GuardFailure | RepoError, Payer>> {
+    const matches = this._items.filter((p) => p.payerId.equals(payerId));
     if (matches.length !== 0) {
-      return matches[0];
+      return right(matches[0]);
     } else {
-      return null;
+      return right(null);
     }
   }
 
-  public async getPayerByInvoiceId(invoiceId: InvoiceId): Promise<Payer> {
-    const matches = this._items.filter(p => p.invoiceId.equals(invoiceId));
+  public async getPayerByInvoiceId(
+    invoiceId: InvoiceId
+  ): Promise<Either<GuardFailure | RepoError, Payer>> {
+    const matches = this._items.filter((p) => p.invoiceId.equals(invoiceId));
     if (matches.length !== 0) {
-      return matches[0];
+      return right(matches[0]);
     } else {
-      return null;
+      return right(null);
     }
   }
 
-  public async getCollection() {
-    return this._items;
-  }
+  public async update(
+    payer: Payer
+  ): Promise<Either<GuardFailure | RepoError, Payer>> {
+    const maybeAlreadyExists = await this.exists(payer);
 
-  public async update(payer: Payer): Promise<Payer> {
-    const alreadyExists = await this.exists(payer);
+    if (maybeAlreadyExists.isLeft()) {
+      return left(
+        RepoError.fromDBError(new Error(maybeAlreadyExists.value.message))
+      );
+    }
+
+    const alreadyExists = maybeAlreadyExists.value;
 
     if (alreadyExists) {
-      this._items.map(p => {
+      this._items.map((p) => {
         if (this.compareMockItems(p, payer)) {
           return payer;
         } else {
@@ -47,14 +62,24 @@ export class MockPayerRepo extends BaseMockRepo<Payer>
       });
     }
 
-    return payer;
+    return right(payer);
   }
 
-  public async save(payer: Payer): Promise<Payer> {
-    const alreadyExists = await this.exists(payer);
+  public async save(
+    payer: Payer
+  ): Promise<Either<GuardFailure | RepoError, Payer>> {
+    const maybeAlreadyExists = await this.exists(payer);
+
+    if (maybeAlreadyExists.isLeft()) {
+      return left(
+        RepoError.fromDBError(new Error(maybeAlreadyExists.value.message))
+      );
+    }
+
+    const alreadyExists = maybeAlreadyExists.value;
 
     if (alreadyExists) {
-      this._items.map(p => {
+      this._items.map((p) => {
         if (this.compareMockItems(p, payer)) {
           return payer;
         } else {
@@ -65,16 +90,14 @@ export class MockPayerRepo extends BaseMockRepo<Payer>
       this._items.push(payer);
     }
 
-    return payer;
+    return right(payer);
   }
 
-  public async delete(payer: Payer): Promise<boolean> {
-    return true;
-  }
-
-  public async exists(payer: Payer): Promise<boolean> {
-    const found = this._items.filter(p => this.compareMockItems(p, payer));
-    return found.length !== 0;
+  public async exists(
+    payer: Payer
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
+    const found = this._items.filter((p) => this.compareMockItems(p, payer));
+    return right(found.length !== 0);
   }
 
   public compareMockItems(a: Payer, b: Payer): boolean {

@@ -1,8 +1,10 @@
 // * Core domain
-import { AggregateRoot } from '../../../core/domain/AggregateRoot';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
-import { Result } from '../../../core/logic/Result';
-import { ManuscriptId } from '../../invoices/domain/ManuscriptId';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either, right } from '../../../core/logic/Either';
+
+import { ManuscriptId } from '../../manuscripts/domain/ManuscriptId';
 
 interface ArticleProps {
   journalId?: string;
@@ -16,6 +18,7 @@ interface ArticleProps {
   authorFirstName?: string;
   datePublished?: Date;
   preprintValue?: string;
+  journalTitle?: string;
 }
 
 export class Article extends AggregateRoot<ArticleProps> {
@@ -24,7 +27,7 @@ export class Article extends AggregateRoot<ArticleProps> {
   }
 
   get manuscriptId(): ManuscriptId {
-    return ManuscriptId.create(this._id).getValue();
+    return ManuscriptId.create(this._id);
   }
 
   get authorSurname(): string {
@@ -83,6 +86,14 @@ export class Article extends AggregateRoot<ArticleProps> {
     this.props.journalId = journalId;
   }
 
+  get journalTitle(): string {
+    return this.props.journalTitle;
+  }
+
+  set journalTitle(journalTitle) {
+    this.props.journalTitle = journalTitle;
+  }
+
   get customId(): string {
     return this.props.customId;
   }
@@ -118,7 +129,7 @@ export class Article extends AggregateRoot<ArticleProps> {
   public static create(
     props: ArticleProps,
     id?: UniqueEntityID
-  ): Result<Article> {
+  ): Either<GuardFailure, Article> {
     const article = new Article(
       {
         ...props,
@@ -127,7 +138,7 @@ export class Article extends AggregateRoot<ArticleProps> {
       id
     );
 
-    return Result.ok<Article>(article);
+    return right(article);
   }
 
   public markAsPublished(published?: string): void {

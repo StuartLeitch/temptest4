@@ -1,12 +1,7 @@
 import { UseCaseError } from '../../../../core/logic/UseCaseError';
-import { Result } from '../../../../core/logic/Result';
 
-export namespace MarkManuscriptAsPublishedErrors {
-  export class ManuscriptFoundError extends Result<UseCaseError> {
-    constructor(manuscriptId: string) {
-      super(false, {
-        message: `Couldn't find a Manuscript for id = {${manuscriptId}}.`
-      } as UseCaseError);
-    }
+export class ManuscriptFoundError extends UseCaseError {
+  constructor(manuscriptId: string) {
+    super(`Couldn't find a Manuscript for id = {${manuscriptId}}.`);
   }
 }

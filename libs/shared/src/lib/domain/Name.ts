@@ -1,5 +1,6 @@
+import { Either, right, left } from '../core/logic/Either';
+import { GuardFailure } from '../core/logic/GuardFailure';
 import { ValueObject } from '../core/domain/ValueObject';
-import { Result } from '../core/logic/Result';
 import { Guard } from '../core/logic/Guard';
 
 interface NameProps {
@@ -15,14 +16,14 @@ export class Name extends ValueObject<NameProps> {
     super(props);
   }
 
-  public static create(props: NameProps): Result<Name> {
+  public static create(props: NameProps): Either<GuardFailure, Name> {
     const nullGuardResult = Guard.againstNullOrUndefined(props.value, 'name');
 
     if (!nullGuardResult.succeeded) {
-      return Result.fail<Name>(nullGuardResult.message);
+      return left(new GuardFailure(nullGuardResult.message));
     }
 
-    return Result.ok<Name>(new Name(props));
+    return right(new Name(props));
   }
 
   toString(): string {

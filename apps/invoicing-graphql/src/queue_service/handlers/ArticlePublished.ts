@@ -79,8 +79,8 @@ export const ArticlePublishedHandler: EventHandler<ArticlePublished> = {
       });
 
       if (result.isLeft()) {
-        logger.error(result.value.errorValue().message, { correlationId });
-        throw result.value.error;
+        logger.error(result.value.message, { correlationId });
+        throw result.value;
       }
     };
   },

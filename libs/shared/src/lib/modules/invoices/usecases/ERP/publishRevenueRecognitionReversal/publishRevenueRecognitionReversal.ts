@@ -1,48 +1,47 @@
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
-import { right, left } from '../../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
+import { right, left } from '../../../../../core/logic/Either';
 import { UseCase } from '../../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import {
-  UsecaseAuthorizationContext,
+  UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
   AccessControlContext,
 } from '../../../../../domain/authorization';
 
 import { JournalId } from '../../../../journals/domain/JournalId';
 
-import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
-import { PayerRepoContract } from '../../../../payers/repos/payerRepo';
+import { ErpReferenceMap } from './../../../../vendors/mapper/ErpReference';
+
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
-import { CouponRepoContract } from '../../../../coupons/repos';
-import { WaiverRepoContract } from '../../../../waivers/repos';
 import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
+import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
+import { InvoiceItemRepoContract } from './../../../repos/invoiceItemRepo';
+import { PayerRepoContract } from '../../../../payers/repos/payerRepo';
+import { PublisherRepoContract } from '../../../../publishers/repos';
+import { ErpReferenceRepoContract } from '../../../../vendors/repos';
 import { ArticleRepoContract } from '../../../../manuscripts/repos';
 import { InvoiceRepoContract } from './../../../repos/invoiceRepo';
 import { CatalogRepoContract } from '../../../../journals/repos';
-import { PublisherRepoContract } from '../../../../publishers/repos';
-import { InvoiceItemRepoContract } from './../../../repos/invoiceItemRepo';
-import { ErpReferenceRepoContract } from '../../../../vendors/repos';
+import { CouponRepoContract } from '../../../../coupons/repos';
+import { WaiverRepoContract } from '../../../../waivers/repos';
 
-import * as Errors from './publishRevenueRecognitionReversal.errors';
-import { GetAddressUseCase } from '../../../../addresses/usecases/getAddress/getAddress';
-import { GetInvoiceDetailsUsecase } from '../../getInvoiceDetails/getInvoiceDetails';
-import { GetItemsForInvoiceUsecase } from '../../getItemsForInvoice/getItemsForInvoice';
-import { GetPublisherCustomValuesUsecase } from '../../../../publishers/usecases/getPublisherCustomValues';
-import { GetPayerDetailsByInvoiceIdUsecase } from '../../../../payers/usecases/getPayerDetailsByInvoiceId';
 import { GetManuscriptByManuscriptIdUsecase } from './../../../../manuscripts/usecases/getManuscriptByManuscriptId';
-import { PublishRevenueRecognitionReversalDTO as DTO } from './publishRevenueRecognitionReversal.dto';
+import { GetPayerDetailsByInvoiceIdUsecase } from '../../../../payers/usecases/getPayerDetailsByInvoiceId';
+import { GetPublisherCustomValuesUsecase } from '../../../../publishers/usecases/getPublisherCustomValues';
+import { GetAddressUsecase } from '../../../../addresses/usecases/getAddress/getAddress';
+import { GetItemsForInvoiceUsecase } from '../../getItemsForInvoice/getItemsForInvoice';
+import { GetInvoiceDetailsUsecase } from '../../getInvoiceDetails/getInvoiceDetails';
+
 import { PublishRevenueRecognitionReversalResponse as Response } from './publishRevenueRecognitionReversal.response';
-import { ErpReferenceMap } from './../../../../vendors/mapper/ErpReference';
+import { PublishRevenueRecognitionReversalDTO as DTO } from './publishRevenueRecognitionReversal.dto';
+import * as Errors from './publishRevenueRecognitionReversal.errors';
+
 export class PublishRevenueRecognitionReversalUsecase
   implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -62,10 +61,7 @@ export class PublishRevenueRecognitionReversalUsecase
     return {};
   }
 
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const invoiceId = request.invoiceId;
     const getItemsUsecase = new GetItemsForInvoiceUsecase(
       this.invoiceItemRepo,
@@ -78,7 +74,7 @@ export class PublishRevenueRecognitionReversalUsecase
       this.payerRepo,
       this.loggerService
     );
-    const getAddress = new GetAddressUseCase(this.addressRepo);
+    const getAddress = new GetAddressUsecase(this.addressRepo);
     const getManuscript = new GetManuscriptByManuscriptIdUsecase(
       this.manuscriptRepo
     );
@@ -97,7 +93,7 @@ export class PublishRevenueRecognitionReversalUsecase
       if (maybeInvoice.isLeft()) {
         return left(new Errors.InvoiceNotFoundError(invoiceId));
       }
-      const invoice = maybeInvoice.value.getValue();
+      const invoice = maybeInvoice.value;
 
       //Get Invoice Items
       const maybeItems = await getItemsUsecase.execute(
@@ -111,7 +107,7 @@ export class PublishRevenueRecognitionReversalUsecase
         return left(new Errors.InvoiceItemsNotFoundError(invoiceId));
       }
 
-      const invoiceItems = maybeItems.value.getValue();
+      const invoiceItems = maybeItems.value;
       if (invoiceItems.length === 0) {
         return left(new Errors.InvoiceItemsNotFoundError(invoiceId));
       }
@@ -123,7 +119,7 @@ export class PublishRevenueRecognitionReversalUsecase
       if (maybePayer.isLeft()) {
         return left(new Errors.InvoicePayersNotFoundError(invoiceId));
       }
-      const payer = maybePayer.value.getValue();
+      const payer = maybePayer.value;
       const addressId = payer.billingAddressId.id.toString();
 
       //Get Billing address
@@ -147,19 +143,21 @@ export class PublishRevenueRecognitionReversalUsecase
         return left(new Errors.InvoiceManuscriptNotFoundError(invoiceId));
       }
 
-      const manuscript = maybeManuscript.value.getValue();
+      const manuscript = maybeManuscript.value;
       if (!manuscript.datePublished) {
         return right(null);
       }
 
       // * Get catalog
-      const catalog = await this.catalogRepo.getCatalogItemByJournalId(
-        JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
+      const maybeCatalog = await this.catalogRepo.getCatalogItemByJournalId(
+        JournalId.create(new UniqueEntityID(manuscript.journalId))
       );
 
-      if (!catalog) {
+      if (maybeCatalog.isLeft()) {
         return left(new Errors.InvoiceCatalogNotFoundError(invoiceId));
       }
+
+      const catalog = maybeCatalog.value;
 
       // * Get publisher custom values
       const maybePublisherCustomValue = await getPublisherCustomValue.execute(
@@ -172,7 +170,7 @@ export class PublishRevenueRecognitionReversalUsecase
       if (maybePublisherCustomValue.isLeft()) {
         return left(new Errors.InvoiceCatalogNotFoundError(invoiceId));
       }
-      const publisherCustomValues = maybePublisherCustomValue.value.getValue();
+      const publisherCustomValues = maybePublisherCustomValue.value;
 
       const invoiceTotal = invoice.invoiceNetTotal;
 
@@ -206,7 +204,14 @@ export class PublishRevenueRecognitionReversalUsecase
             'revenueRecognitionReversal',
           value: String(erpResponse?.journal?.id),
         });
-        await this.erpReferenceRepo.save(erpReference);
+
+        if (erpReference.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(erpReference.value.message))
+          );
+        }
+
+        await this.erpReferenceRepo.save(erpReference.value);
 
         this.loggerService.info(
           `ERP Revenue Recognized Invoice ${invoice.id.toString()}: Saved ERP reference -> ${JSON.stringify(

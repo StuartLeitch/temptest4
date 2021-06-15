@@ -31,6 +31,14 @@ export class MockBraintreeService implements BraintreeServiceContract {
   async generateClientToken(): Promise<
     Either<UnsuccessfulTokenGeneration | UnexpectedError, PaymentClientToken>
   > {
-    return right(PaymentClientToken.create(uuidv4()).getValue());
+    const maybeClientToken = PaymentClientToken.create(uuidv4());
+
+    if (maybeClientToken.isLeft()) {
+      return left(
+        new UnexpectedError(new Error(maybeClientToken.value.message))
+      );
+    }
+
+    return right(maybeClientToken.value);
   }
 }

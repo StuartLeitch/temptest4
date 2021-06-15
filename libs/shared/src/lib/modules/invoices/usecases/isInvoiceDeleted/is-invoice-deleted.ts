@@ -1,14 +1,14 @@
 // * Core Domain
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { Either, right, left } from '../../../../core/logic/Result';
+import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  UsecaseAuthorizationContext,
   AccessControlledUsecase,
   AccessControlContext,
   Authorize,
@@ -22,8 +22,6 @@ import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 import { IsInvoiceDeletedResponse as Response } from './is-invoice-deleted.response';
 import type { IsInvoiceDeletedDTO as DTO } from './is-invoice-deleted.dto';
 import * as Errors from './is-invoice-deleted.errors';
-
-type Context = UsecaseAuthorizationContext;
 
 interface WithInvoiceId {
   invoiceId: string;
@@ -73,11 +71,16 @@ export class IsInvoiceDeletedUsecase
     request: T
   ): Promise<Either<Errors.InvoiceCheckDbError, T & { isDeleted: boolean }>> {
     const uuid = new UniqueEntityID(request.invoiceId);
-    const invoiceId = InvoiceId.create(uuid).getValue();
+    const invoiceId = InvoiceId.create(uuid);
 
     try {
       const rsp = await this.invoiceRepo.isInvoiceDeleted(invoiceId);
-      return right({ ...request, isDeleted: rsp });
+
+      if (rsp.isLeft()) {
+        return left(new UnexpectedError(new Error(rsp.value.message)));
+      }
+
+      return right({ ...request, isDeleted: rsp.value });
     } catch (err) {
       return left(new Errors.InvoiceCheckDbError(err));
     }

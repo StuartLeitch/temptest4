@@ -1,10 +1,12 @@
-import { Either, Result } from '../../../../core/logic/Result';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
-import { CouponNotFoundError } from './getCouponDetailsByCodeErrors';
 import { Coupon } from '../../domain/Coupon';
 
+import { CouponNotFoundError } from './getCouponDetailsByCodeErrors';
+
 export type GetCouponDetailsByCodeResponse = Either<
-  CouponNotFoundError | UnexpectedError,
-  Result<Coupon>
+  CouponNotFoundError | UnexpectedError | GuardFailure,
+  Coupon
 >;

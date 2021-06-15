@@ -1,10 +1,16 @@
 import { StrategyError } from '../../../../../../core/logic/strategy-error';
-import { Either } from '../../../../../../core/logic/Either';
+import { Either, left } from '../../../../../../core/logic/Either';
 
 import { BraintreeServiceContract } from '../../../../../../domain/services/payment/braintree-service';
 import { PaymentClientToken } from '../../../../../../domain/PaymentClientToken';
 
 import { ClientTokenBehavior } from './client-token-behavior';
+
+export class BraintreeClientTokenError extends StrategyError {
+  constructor(msg: string) {
+    super(msg, 'Braintree.generateClientToken');
+  }
+}
 
 export class BraintreeClientToken extends ClientTokenBehavior {
   constructor(private braintreeService: BraintreeServiceContract) {
@@ -12,8 +18,14 @@ export class BraintreeClientToken extends ClientTokenBehavior {
   }
 
   async createClientToken(): Promise<
-    Either<StrategyError, PaymentClientToken>
+    Either<BraintreeClientTokenError, PaymentClientToken>
   > {
-    return this.braintreeService.generateClientToken();
+    const maybeResult = await this.braintreeService.generateClientToken();
+
+    if (maybeResult.isLeft()) {
+      return left(new BraintreeClientTokenError(maybeResult.value.toString()));
+    }
+
+    return maybeResult;
   }
 }

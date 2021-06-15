@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-inferrable-types */
-
 import { cloneDeep } from 'lodash';
 
 // * Core Domain
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 import { AggregateRoot } from '../../../core/domain/AggregateRoot';
-import { Result } from '../../../core/logic/Result';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either, right } from '../../../core/logic/Either';
 import { Amount } from '../../../domain/Amount';
 
 // * Subdomain
@@ -41,7 +40,7 @@ export class Payment extends AggregateRoot<PaymentProps> {
   }
 
   get paymentId(): PaymentId {
-    return PaymentId.create(this._id).getValue();
+    return PaymentId.create(this._id);
   }
 
   get invoiceId(): InvoiceId {
@@ -95,7 +94,7 @@ export class Payment extends AggregateRoot<PaymentProps> {
   public static create(
     props: PaymentProps,
     id?: UniqueEntityID
-  ): Result<Payment> {
+  ): Either<GuardFailure, Payment> {
     const payment = new Payment(
       {
         ...props,
@@ -103,7 +102,7 @@ export class Payment extends AggregateRoot<PaymentProps> {
       id
     );
 
-    return Result.ok<Payment>(payment);
+    return right(payment);
   }
 
   public markAsFailed(): void {

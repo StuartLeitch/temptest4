@@ -1,7 +1,6 @@
 import { cloneDeep } from 'lodash';
 
-import { Either, right } from './Result';
-import { Right } from './Right';
+import { Either, Right, right } from './Either';
 
 type MutationFunction = (r: any) => any;
 

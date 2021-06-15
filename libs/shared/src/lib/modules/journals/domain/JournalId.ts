@@ -1,6 +1,5 @@
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
-import {Result} from '../../../core/logic/Result';
-import {Entity} from '../../../core/domain/Entity';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { Entity } from '../../../core/domain/Entity';
 
 export class JournalId extends Entity<any> {
   get id(): UniqueEntityID {
@@ -11,7 +10,11 @@ export class JournalId extends Entity<any> {
     super(null, id);
   }
 
-  public static create(id?: UniqueEntityID): Result<JournalId> {
-    return Result.ok<JournalId>(new JournalId(id));
+  public static create(id?: UniqueEntityID): JournalId {
+    return new JournalId(id);
+  }
+
+  toString(): string {
+    return this._id.toString();
   }
 }

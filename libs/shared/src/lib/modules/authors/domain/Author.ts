@@ -1,7 +1,8 @@
 // * Core Domain
-import {AggregateRoot} from '../../../core/domain/AggregateRoot';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
-import {Result} from '../../../core/logic/Result';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either, right } from '../../../core/logic/Either';
 
 interface AuthorProps {
   name: string;
@@ -23,13 +24,13 @@ export class Author extends AggregateRoot<AuthorProps> {
   public static create(
     props: AuthorProps,
     id?: UniqueEntityID
-  ): Result<Author> {
+  ): Either<GuardFailure, Author> {
     const author = new Author(
       {
-        ...props
+        ...props,
       },
       id
     );
-    return Result.ok<Author>(author);
+    return right(author);
   }
 }

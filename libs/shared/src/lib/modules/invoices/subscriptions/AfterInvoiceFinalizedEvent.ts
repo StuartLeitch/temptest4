@@ -20,6 +20,7 @@ import { InvoiceItemRepoContract } from '../repos';
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods/GetPaymentMethods';
 import { PublishInvoiceFinalizedUsecase } from '../usecases/publishEvents/publishInvoiceFinalized';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
+import { Payer } from '../../payers/domain/Payer';
 
 export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
   constructor(
@@ -72,33 +73,46 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
           );
         }
 
-        invoiceItems = resp.value.getValue();
+        invoiceItems = resp.value;
       }
 
-      let payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
-      if (!payer) {
+      let payer: Payer;
+      let maybePayer = await this.payerRepo.getPayerByInvoiceId(
+        invoice.invoiceId
+      );
+      if (maybePayer.isLeft()) {
         if (invoice.cancelledInvoiceReference) {
           const invoiceId = InvoiceId.create(
             new UniqueEntityID(invoice.cancelledInvoiceReference)
-          ).getValue();
-          payer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
-          if (!payer) {
+          );
+          maybePayer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
+          if (maybePayer.isLeft()) {
             throw new Error(`Invoice ${invoice.id.toString()} has no payers.`);
+          } else {
+            payer = maybePayer.value;
           }
         } else {
           throw new Error(`Invoice ${invoice.id.toString()} has no payers.`);
         }
+      } else {
+        payer = maybePayer.value;
       }
 
       const billingAddress = await this.addressRepo.findById(
         payer.billingAddressId
       );
 
+      if (billingAddress.isLeft()) {
+        throw new Error(
+          `Billing address could not be accessed: ${billingAddress.value.message}`
+        );
+      }
+
       const manuscript = await this.manuscriptRepo.findById(
         invoiceItems[0].manuscriptId
       );
 
-      if (!manuscript) {
+      if (manuscript.isLeft()) {
         throw new Error(
           `Invoice ${invoice.id.toString()} has no manuscripts associated.`
         );
@@ -112,9 +126,7 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
 
       if (paymentMethods.isLeft()) {
         throw new Error(
-          `Payment methods could not be accessed: ${
-            paymentMethods.value.errorValue().message
-          }`
+          `Payment methods could not be accessed: ${paymentMethods.value.message}`
         );
       }
 
@@ -122,18 +134,24 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
         invoice.invoiceId
       );
 
+      if (payments.isLeft()) {
+        throw new Error(
+          `Payments could not be accessed: ${payments.value.message}`
+        );
+      }
+
       const publishResult = await this.publishInvoiceFinalized.execute({
-        paymentMethods: paymentMethods.value.getValue(),
-        billingAddress,
+        paymentMethods: paymentMethods.value,
+        billingAddress: billingAddress.value,
+        manuscript: manuscript.value,
+        payments: payments.value,
         invoiceItems,
-        manuscript,
-        payments,
         invoice,
         payer,
       });
 
       if (publishResult.isLeft()) {
-        throw publishResult.value.errorValue();
+        throw publishResult.value;
       }
 
       this.loggerService.info(

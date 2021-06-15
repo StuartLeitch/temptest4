@@ -1,25 +1,20 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { AsyncEither } from '../../../../core/logic/AsyncEither';
+import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../domain/authorization';
-
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
-import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 
 import { NotificationPause } from '../../domain/NotificationPause';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { NotificationType } from '../../domain/Notification';
+
+import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
+
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
 // * Usecase specific
 import { AreNotificationsPausedResponse as Response } from './areNotificationsPausedResponse';
@@ -38,13 +33,7 @@ const notificationTypeToPause: TypeToPauseMap = {
 };
 
 export class AreNotificationsPausedUsecase
-  implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
     private loggerService: LoggerContract
@@ -54,22 +43,14 @@ export class AreNotificationsPausedUsecase
     this.getPauseStatus = this.getPauseStatus.bind(this);
   }
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  // @Authorize('invoice:read')
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      const execution = new AsyncEither(request)
+      const execution = await new AsyncEither(request)
         .then(this.validateRequest)
         .then(this.fetchNotificationPauses)
         .map(this.getPauseStatus(request))
-        .map((val) => Result.ok(val));
-      return execution.execute();
+        .execute();
+      return execution;
     } catch (e) {
       return left(new UnexpectedError(e));
     }
@@ -112,15 +93,25 @@ export class AreNotificationsPausedUsecase
     );
 
     const uuid = new UniqueEntityID(request.invoiceId);
-    const invoiceId = InvoiceId.create(uuid).getValue();
+    const invoiceId = InvoiceId.create(uuid);
 
     try {
       const result = await this.pausedReminderRepo.getNotificationPausedStatus(
         invoiceId
       );
-      return right(result);
+
+      if (result.isLeft()) {
+        return left(
+          new Errors.EncounteredDbError(
+            invoiceId.toString(),
+            new Error(result.value.message)
+          )
+        );
+      }
+
+      return right(result.value);
     } catch (e) {
-      return left(new Errors.EncounteredDbError(invoiceId.id.toString(), e));
+      return left(new Errors.EncounteredDbError(invoiceId.toString(), e));
     }
   }
 

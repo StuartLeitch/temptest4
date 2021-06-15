@@ -18,7 +18,7 @@ function makeNotificationData(
   invoiceId: string,
   overwrites?: any
 ): Notification {
-  return NotificationMap.toDomain({
+  const notification = NotificationMap.toDomain({
     recipientEmail: 'test-email',
     dateSent: new Date(),
     type: NotificationType.REMINDER_CONFIRMATION,
@@ -26,6 +26,12 @@ function makeNotificationData(
     invoiceId,
     ...overwrites,
   });
+
+  if (notification.isLeft()) {
+    throw notification.value;
+  }
+
+  return notification.value;
 }
 
 let mockSentNotificationRepo: MockSentNotificationRepo = null;
@@ -45,7 +51,13 @@ Given(
   /^a notification with the id "([\w-]+)" and invoice id "([\w-]+)"$/,
   async (testNotificationId: string, testInvoiceId: string) => {
     notification = makeNotificationData(testNotificationId, testInvoiceId);
-    notification = await mockSentNotificationRepo.save(notification);
+    const maybeNotification = await mockSentNotificationRepo.save(notification);
+
+    if (maybeNotification.isLeft()) {
+      throw maybeNotification.value;
+    }
+
+    notification = maybeNotification.value;
   }
 );
 
@@ -54,10 +66,17 @@ When(
   async (testNotificationId: string) => {
     const notificationId = NotificationId.create(
       new UniqueEntityID(testNotificationId)
-    ).getValue();
-    foundNotification = await mockSentNotificationRepo.getNotificationById(
+    );
+
+    const maybeFoundNotification = await mockSentNotificationRepo.getNotificationById(
       notificationId
     );
+
+    if (maybeFoundNotification.isLeft()) {
+      throw maybeFoundNotification.value;
+    }
+
+    foundNotification = maybeFoundNotification.value;
   }
 );
 
@@ -71,12 +90,17 @@ Then(
 When(
   /^we call getNotificationsByInvoiceId with "([\w-]+)"$/,
   async (testInvoiceId: string) => {
-    const invoiceId = InvoiceId.create(
-      new UniqueEntityID(testInvoiceId)
-    ).getValue();
-    notificationList = await mockSentNotificationRepo.getNotificationsByInvoiceId(
+    const invoiceId = InvoiceId.create(new UniqueEntityID(testInvoiceId));
+
+    const maybeNotificationList = await mockSentNotificationRepo.getNotificationsByInvoiceId(
       invoiceId
     );
+
+    if (maybeNotificationList.isLeft()) {
+      throw maybeNotificationList.value;
+    }
+
+    notificationList = maybeNotificationList.value;
   }
 );
 
@@ -88,15 +112,21 @@ Then(
 );
 
 Then(/^getNotificationsByInvoiceId returns null/, async () => {
-  expect(notificationList).to.equal(null);
+  expect(notificationList.length).to.equal(0);
 });
 
 When(
   /^we call getNotificationsByRecipient with "([\w-]+)"$/,
   async (testEmail: string) => {
-    notificationList = await mockSentNotificationRepo.getNotificationsByRecipient(
+    const maybeNotificationList = await mockSentNotificationRepo.getNotificationsByRecipient(
       testEmail
     );
+
+    if (maybeNotificationList.isLeft()) {
+      throw maybeNotificationList.value;
+    }
+
+    notificationList = maybeNotificationList.value;
   }
 );
 
@@ -108,16 +138,22 @@ Then(
 );
 
 Then(/^getNotificationsByRecipient returns null/, async () => {
-  expect(notificationList).to.equal(null);
+  expect(notificationList.length).to.equal(0);
 });
 
 When(
   /^we call getNotificationsByType with "([\w-]+)"$/,
   async (testType: string) => {
     if (testType === NotificationType.REMINDER_CONFIRMATION) {
-      notificationList = await mockSentNotificationRepo.getNotificationsByType(
+      const maybeNotificationList = await mockSentNotificationRepo.getNotificationsByType(
         NotificationType.REMINDER_CONFIRMATION
       );
+
+      if (maybeNotificationList.isLeft()) {
+        throw maybeNotificationList.value;
+      }
+
+      notificationList = maybeNotificationList.value;
     } else {
       notificationList = null;
     }
@@ -140,9 +176,17 @@ When(/^we call addNotification with a new notification/, async () => {
     'new-test-notification',
     'new-test-id'
   );
-  addedNotification = await mockSentNotificationRepo.addNotification(
+
+  const maybeAddedNotification = await mockSentNotificationRepo.addNotification(
     newNotification
   );
+
+  if (maybeAddedNotification.isLeft()) {
+    throw maybeAddedNotification.value;
+  }
+
+  addedNotification = maybeAddedNotification.value;
+
   notificationList.push(addedNotification);
 });
 

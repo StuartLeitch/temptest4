@@ -3,7 +3,7 @@
 
 import { JournalUpdated } from '@hindawi/phenom-events';
 
-import { UpdateCatalogItemToCatalogUseCase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/updateCatalogItem/updateCatalogItem';
+import { UpdateCatalogItemToCatalogUseCase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/updateCatalogItemToCatalog';
 
 import { Context } from '../../builders';
 
@@ -41,8 +41,8 @@ export const JournalUpdatedHandler: EventHandler<JournalUpdated> = {
       });
 
       if (result.isLeft()) {
-        logger.error(result.value.errorValue().message);
-        throw result.value.error;
+        logger.error(result.value.message);
+        throw result.value;
       }
     };
   },

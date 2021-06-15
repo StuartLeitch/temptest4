@@ -3,13 +3,7 @@
 import { expect } from 'chai';
 import { Given, When, Then, Before } from '@cucumber/cucumber';
 
-import {
-  // UniqueEntityID,
-  // JournalId,
-  CatalogMap,
-  MockLogger,
-  MockCatalogRepo,
-} from '@hindawi/shared';
+import { CatalogMap, MockLogger, MockCatalogRepo } from '@hindawi/shared';
 import { MockPublisherRepo } from '../../../../../libs/shared/src/lib/modules/publishers/repos/mocks/mockPublisherRepo';
 import { PublisherMap } from '../../../../../libs/shared/src/lib/modules/publishers/mappers/PublisherMap';
 
@@ -39,12 +33,18 @@ const defaultPublisher = {
   name: 'Hindawi',
 };
 
-Before(() => {
+Before({ tags: '@ValidateJournalAdded' }, () => {
   mockLogger = new MockLogger();
   mockCatalogRepo = new MockCatalogRepo();
   mockPublisherRepo = new MockPublisherRepo();
 
-  mockPublisherRepo.addMockItem(PublisherMap.toDomain(defaultPublisher));
+  const publisher = PublisherMap.toDomain(defaultPublisher);
+
+  if (publisher.isLeft()) {
+    throw publisher.value;
+  }
+
+  mockPublisherRepo.addMockItem(publisher.value);
 
   context = {
     repos: {
@@ -65,7 +65,12 @@ Given(/^There is no Journal registered$/, async () => {
     apc: 666,
     publisherId: 'Hindawi',
   });
-  await mockCatalogRepo.save(testJournal);
+
+  if (testJournal.isLeft()) {
+    throw testJournal.value;
+  }
+
+  await mockCatalogRepo.save(testJournal.value);
 });
 
 When('JournalAdded event is being published', async () => {
@@ -77,13 +82,5 @@ When('JournalAdded event is being published', async () => {
 });
 
 Then(/^The journal repo should have 1 entry$/, async () => {
-  // const rawJournalId = JournalAddedData.id;
-  // const journalId = JournalId.create(new UniqueEntityID(rawJournalId));
-
-  // const journal = await mockCatalogRepo.getCatalogItemById(
-  //   journalId.getValue().id
-  // );
-
-  // expect(journal.amount).to.equal(JournalAddedData.apc);
   expect(true).equals(true);
 });

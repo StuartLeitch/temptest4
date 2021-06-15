@@ -2,6 +2,7 @@ Feature: Journal Added Event Handler
   # On Phenom JournalAdded event
   # It should add the Journal provided by event data
 
+  @ValidateJournalAdded
   Scenario: Journal Added
     Given There is no Journal registered
     When JournalAdded event is being published

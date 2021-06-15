@@ -1,40 +1,31 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
-import { UnexpectedError } from '../../../../core/logic/AppError';
-import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { UnexpectedError } from '../../../../core/logic/AppError';
+import { left, right } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  Authorize,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
-import { Invoice } from '../../domain/Invoice';
 import { InvoiceId } from '../../domain/InvoiceId';
+import { Invoice } from '../../domain/Invoice';
+
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
 // * Usecase specific
-import { GetInvoiceDetailsResponse } from './getInvoiceDetailsResponse';
-import { GetInvoiceDetailsErrors } from './getInvoiceDetailsErrors';
-import type { GetInvoiceDetailsDTO } from './getInvoiceDetailsDTO';
+import { GetInvoiceDetailsResponse as Response } from './getInvoiceDetailsResponse';
+import type { GetInvoiceDetailsDTO as DTO } from './getInvoiceDetailsDTO';
+import * as Errors from './getInvoiceDetailsErrors';
 
 export class GetInvoiceDetailsUsecase
   implements
-    UseCase<
-      GetInvoiceDetailsDTO,
-      Promise<GetInvoiceDetailsResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      GetInvoiceDetailsDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(private invoiceRepo: InvoiceRepoContract) {}
 
   private async getAccessControlContext(request, context?) {
@@ -42,28 +33,27 @@ export class GetInvoiceDetailsUsecase
   }
 
   @Authorize('invoice:read')
-  public async execute(
-    request: GetInvoiceDetailsDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<GetInvoiceDetailsResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     let invoice: Invoice;
 
-    const invoiceId = InvoiceId.create(
-      new UniqueEntityID(request.invoiceId)
-    ).getValue();
+    const invoiceId = InvoiceId.create(new UniqueEntityID(request.invoiceId));
 
     try {
       try {
-        invoice = await this.invoiceRepo.getInvoiceById(invoiceId);
+        const maybeInvoice = await this.invoiceRepo.getInvoiceById(invoiceId);
+
+        if (maybeInvoice.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeInvoice.value.message))
+          );
+        }
+
+        invoice = maybeInvoice.value;
       } catch (err) {
-        return left(
-          new GetInvoiceDetailsErrors.InvoiceNotFoundError(
-            invoiceId.id.toString()
-          )
-        );
+        return left(new Errors.InvoiceNotFoundError(invoiceId.id.toString()));
       }
 
-      return right(Result.ok<Invoice>(invoice));
+      return right(invoice);
     } catch (err) {
       return left(new UnexpectedError(err));
     }

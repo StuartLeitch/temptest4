@@ -1,9 +1,13 @@
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either } from '../../../core/logic/Either';
+
 import { Mapper } from '../../../infrastructure/Mapper';
+
 import { Manuscript } from '../domain/Manuscript';
 
 export class ManuscriptMap extends Mapper<Manuscript> {
-  public static toDomain(raw: any): Manuscript {
+  public static toDomain(raw: any): Either<GuardFailure, Manuscript> {
     const manuscriptOrError = Manuscript.create(
       {
         title: raw.title,
@@ -20,9 +24,7 @@ export class ManuscriptMap extends Mapper<Manuscript> {
       new UniqueEntityID(raw.id)
     );
 
-    manuscriptOrError.isFailure ? console.log(manuscriptOrError) : '';
-
-    return manuscriptOrError.isSuccess ? manuscriptOrError.getValue() : null;
+    return manuscriptOrError;
   }
 
   public static toPersistence(manuscript: Manuscript): any {

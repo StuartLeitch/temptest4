@@ -5,41 +5,49 @@ Feature: Confirm invoice
   # - when an article is published
   # - deprecated (hopefully): when migrating an invoice
 
+  @ValidateConfirmInvoice
   Scenario: Invoice is confirmed successfully
     Given There is an Invoice with the ID "normal-invoice"
     When The Payer "John" from "GB" confirms the invoice with the ID "normal-invoice"
     Then The result is successful
 
+  @ValidateConfirmInvoice
   Scenario: Invoice status is changed to ACTIVE after confirmation
     Given There is an Invoice with the ID "normal-invoice"
     When The Payer "John" from "GB" confirms the invoice with the ID "normal-invoice"
     Then The invoice "normal-invoice" is successfully updated to status "ACTIVE"
 
+  @ValidateConfirmInvoice
   Scenario: Payer is saved successfully
     Given There is an Invoice with the ID "normal-invoice"
     When The Payer "John" from "GB" confirms the invoice with the ID "normal-invoice"
     Then The Payer "John" is saved successfully for the invoice with the ID "normal-invoice"
 
+  @ValidateConfirmInvoice
   Scenario: Vat is applied successfully
     Given There is an Invoice with the ID "vat-invoice"
     When The Payer "John" from "GB" confirms the invoice with the ID "vat-invoice"
     Then The Invoice "vat-invoice" has vat amount greater than 0
 
+  @ValidateConfirmInvoice
   Scenario: Fully discounted invoice is marked as final
     Given There is a fully discounted Invoice with the ID "fully-discounted"
     When The Payer "John" from "GB" confirms the invoice with the ID "fully-discounted"
     Then The invoice "fully-discounted" is successfully updated to status "FINAL"
 
+  @ValidateConfirmInvoice
   Scenario: Payer from sanctioned country is not allowed to pay
     Given There is an Invoice with the ID "sanctioned-country-invoice"
     When The Payer "Fidel" from "CU" confirms the invoice with the ID "sanctioned-country-invoice"
     Then The invoice "sanctioned-country-invoice" is successfully updated to status "PENDING"
 
+  @ValidateConfirmInvoice
   Scenario: Invoice email is sent for sanctioned country
     Given There is an Invoice with the ID "email-invoice"
     When The Payer "Fidel" from "CU" confirms the invoice with the ID "email-invoice"
     Then The Invoice for "email-invoice" is sent by email
 
+  @ValidateConfirmInvoice
   Scenario: Invoice is confirmed on DRAFT transaction
     Given There is an Invoice with the ID "draft-transaction"
     Given The transaction has status "DRAFT"
@@ -47,6 +55,7 @@ Feature: Confirm invoice
     Then The invoice "draft-transaction" is successfully updated to status "DRAFT"
     And The response is error "ManuscriptNotAcceptedError"
 
+  @ValidateConfirmInvoice
   Scenario: Invoice is confirmed for the seccond time
     Given There is an Invoice with the ID "multiple-confirmations"
     When The Payer "John-one" from "RO" confirms the invoice with the ID "multiple-confirmations"

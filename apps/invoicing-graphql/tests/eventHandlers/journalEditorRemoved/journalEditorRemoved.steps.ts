@@ -46,7 +46,7 @@ let eventData = null;
 let journalId = null;
 let journalEditors = [];
 
-Before(function () {
+Before({ tags: '@ValidateJournalEditorRemoved' }, function () {
   mockLogger = new MockLogger();
   mockEditorRepo = new MockEditorRepo();
   mockCatalogRepo = new MockCatalogRepo();
@@ -62,41 +62,49 @@ Before(function () {
   };
 });
 
-After(function () {
+After({ tags: '@ValidateJournalEditorRemoved' }, function () {
   journalEditors = [];
 });
 
-Given(/^There are (\d+) editors in the Journal "([\w-]+)"$/, async function (
-  editorsLength: number,
-  testJournalId: string
-) {
-  journalId = testJournalId;
+Given(
+  /^There are (\d+) editors in the Journal "([\w-]+)"$/,
+  async function (editorsLength: number, testJournalId: string) {
+    journalId = testJournalId;
 
-  await mockCatalogRepo.save(
-    CatalogMap.toDomain({
+    const catalog = CatalogMap.toDomain({
       journalId,
       type: 'mock',
       amount: 666,
-    })
-  );
+    });
+    if (catalog.isLeft()) {
+      throw catalog.value;
+    }
 
-  await Promise.all(
-    [...new Array(+editorsLength)].map(async (curr: any, idx: number) => {
-      const rawEditor = {
-        editorId: `${testJournalId}-${idx}-editor`,
-        journalId: `${testJournalId}`,
-        name: `${idx}-editor-name`,
-        email: `email${idx}@editor.com`,
-        roleType: `${idx}-role-type`,
-        roleLabel: `${idx}-role-label`,
-      };
+    await mockCatalogRepo.save(catalog.value);
 
-      const editor = EditorMap.toDomain(rawEditor);
-      await mockEditorRepo.save(editor);
-      journalEditors.push(editor);
-    })
-  );
-});
+    await Promise.all(
+      [...new Array(+editorsLength)].map(async (curr: any, idx: number) => {
+        const rawEditor = {
+          editorId: `${testJournalId}-${idx}-editor`,
+          journalId: `${testJournalId}`,
+          name: `${idx}-editor-name`,
+          email: `email${idx}@editor.com`,
+          roleType: `${idx}-role-type`,
+          roleLabel: `${idx}-role-label`,
+        };
+
+        const editor = EditorMap.toDomain(rawEditor);
+
+        if (editor.isLeft()) {
+          throw editor.value;
+        }
+
+        await mockEditorRepo.save(editor.value);
+        journalEditors.push(editor);
+      })
+    );
+  }
+);
 
 Given(
   /^All editors list from event data contains (\d+) entries only$/,

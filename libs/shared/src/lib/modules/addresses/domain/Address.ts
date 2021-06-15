@@ -1,7 +1,8 @@
 // * Core Domain
-import { AggregateRoot } from '../../../core/domain/AggregateRoot';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
-import { Result } from '../../../core/logic/Result';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either, right } from '../../../core/logic/Either';
 
 // * Subdomain
 import { AddressId } from './AddressId';
@@ -62,24 +63,13 @@ export class Address extends AggregateRoot<AddressProps> {
   public static create(
     props: AddressProps,
     id?: UniqueEntityID
-  ): Result<Address> {
-    // const guardResult = Guard.againstNullOrUndefinedBulk([
-    //   {argument: props.email, argumentName: 'email'},
-    //   {argument: props.password, argumentName: 'password'}
-    // ]);
-    // if (!guardResult.succeeded) {
-    //   return Result.fail<User>(guardResult.message);
-    // } else {
+  ): Either<GuardFailure, Address> {
     const address = new Address(
       {
-        ...props
+        ...props,
       },
       id
     );
-    // const idWasProvided = !!id;
-    // if (!idWasProvided) {
-    //   user.addDomainEvent(new UserCreatedEvent(user));
-    // }
-    return Result.ok<Address>(address);
+    return right(address);
   }
 }

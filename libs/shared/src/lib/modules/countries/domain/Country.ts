@@ -1,8 +1,8 @@
 // * Core Domain
-import {AggregateRoot} from '../../../core/domain/AggregateRoot';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
-import {Result} from '../../../core/logic/Result';
-// import {Guard} from '../../core/Guard';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either, right } from '../../../core/logic/Either';
 
 interface CountryProps {
   name: string;
@@ -31,24 +31,13 @@ export class Country extends AggregateRoot<CountryProps> {
   public static create(
     props: CountryProps,
     id?: UniqueEntityID
-  ): Result<Country> {
-    // const guardResult = Guard.againstNullOrUndefinedBulk([
-    //   {argument: props.email, argumentName: 'email'},
-    //   {argument: props.password, argumentName: 'password'}
-    // ]);
-    // if (!guardResult.succeeded) {
-    //   return Result.fail<User>(guardResult.message);
-    // } else {
+  ): Either<GuardFailure, Country> {
     const country = new Country(
       {
-        ...props
+        ...props,
       },
       id
     );
-    // const idWasProvided = !!id;
-    // if (!idWasProvided) {
-    //   user.addDomainEvent(new UserCreatedEvent(user));
-    // }
-    return Result.ok<Country>(country);
+    return right(country);
   }
 }

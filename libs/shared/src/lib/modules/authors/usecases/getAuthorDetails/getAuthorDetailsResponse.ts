@@ -1,12 +1,15 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../.././core/logic/AppError';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
+import { Either } from '../../../../core/logic/Either';
 
-import { GetAuthorDetailsErrors } from './getAuthorDetailsErrors';
 import { Author } from './../../domain/Author';
 
+import * as Errors from './getAuthorDetailsErrors';
+
 export type GetAuthorDetailsResponse = Either<
-  | GetAuthorDetailsErrors.AuthorNotFoundError
-  | GetAuthorDetailsErrors.NoArticleForAuthor
-  | UnexpectedError,
-  Result<Author>
+  | Errors.AuthorNotFoundError
+  | Errors.NoArticleForAuthor
+  | UnexpectedError
+  | GuardFailure,
+  Author
 >;

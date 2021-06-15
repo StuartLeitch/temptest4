@@ -19,10 +19,16 @@ export class WaivedMigrationRule implements ReductionRuleContract<Waiver> {
 
   getReduction(): Waiver {
     if (this.mtsStatus in WaivedMtsStatus) {
-      return Waiver.create({
+      const waiver = Waiver.create({
         reduction: 100,
         waiverType: WaiverType.WAIVED_MIGRATION,
-      }).getValue();
+      });
+
+      if (waiver.isLeft()) {
+        throw waiver.value;
+      }
+
+      return waiver.value;
     }
   }
 }

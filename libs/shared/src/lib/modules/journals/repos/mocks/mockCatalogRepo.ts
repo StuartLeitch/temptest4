@@ -1,61 +1,82 @@
-import { UniqueEntityID } from './../../../../core/domain/UniqueEntityID';
-// import {shallowEqual} from 'shallow-equal-object';
 import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { Either, right, left } from '../../../../core/logic/Either';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
-import { CatalogRepoContract } from '../catalogRepo';
+import { RepoError } from '../../../../infrastructure/RepoError';
+
 import { CatalogItem } from '../../domain/CatalogItem';
 import { JournalId } from '../../domain/JournalId';
 
-export class MockCatalogRepo extends BaseMockRepo<CatalogItem>
+import { CatalogRepoContract } from '../catalogRepo';
+
+export class MockCatalogRepo
+  extends BaseMockRepo<CatalogItem>
   implements CatalogRepoContract {
   constructor() {
     super();
   }
 
-  public async getCatalogItemByType(type: string): Promise<CatalogItem> {
-    const match = this._items.find((i) => i.type === type);
-    return match ? match : null;
-  }
-
   public async getCatalogItemByJournalId(
     journalId: JournalId
-  ): Promise<CatalogItem> {
+  ): Promise<Either<GuardFailure | RepoError, CatalogItem>> {
     const match = this._items.find((i) => i.journalId.equals(journalId));
-    return match ? match : null;
+    return right(match);
   }
 
   public async getCatalogItemById(
     catalogId: UniqueEntityID
-  ): Promise<CatalogItem> {
+  ): Promise<Either<GuardFailure | RepoError, CatalogItem>> {
     const match = this._items.find((i) => i.id.equals(catalogId));
-    return match ? match : null;
+    return right(match);
   }
 
-  public async getCatalogCollection(): Promise<CatalogItem[]> {
-    return this._items;
+  public async getCatalogCollection(): Promise<
+    Either<GuardFailure | RepoError, CatalogItem[]>
+  > {
+    return right(this._items);
   }
 
   public async updateCatalogItem(
     catalogItem: CatalogItem
-  ): Promise<CatalogItem> {
-    if (await this.exists(catalogItem)) {
-      return await this.save(catalogItem);
+  ): Promise<Either<GuardFailure | RepoError, CatalogItem>> {
+    const maybeExists = await this.exists(catalogItem);
+
+    if (maybeExists.isLeft()) {
+      return left(maybeExists.value);
     }
 
-    return null;
+    if (maybeExists.value) {
+      return this.save(catalogItem);
+    } else {
+      return left(
+        RepoError.createEntityNotFoundError(
+          'catalogItem',
+          catalogItem.id.toString()
+        )
+      );
+    }
   }
 
-  public async exists(catalogItem: CatalogItem): Promise<boolean> {
+  public async exists(
+    catalogItem: CatalogItem
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     const found = this._items.filter((i) =>
       this.compareMockItems(i, catalogItem)
     );
-    return found.length !== 0;
+    return right(found.length !== 0);
   }
 
-  public async save(catalogItem: CatalogItem): Promise<CatalogItem> {
-    const alreadyExists = await this.exists(catalogItem);
+  public async save(
+    catalogItem: CatalogItem
+  ): Promise<Either<GuardFailure | RepoError, CatalogItem>> {
+    const maybeAlreadyExists = await this.exists(catalogItem);
 
-    if (alreadyExists) {
+    if (maybeAlreadyExists.isLeft()) {
+      return left(maybeAlreadyExists.value);
+    }
+
+    if (maybeAlreadyExists.value) {
       this._items.map((i, idx) => {
         if (this.compareMockItems(i, catalogItem)) {
           this._items[idx] = catalogItem;
@@ -68,7 +89,7 @@ export class MockCatalogRepo extends BaseMockRepo<CatalogItem>
       this._items.push(catalogItem);
     }
 
-    return catalogItem;
+    return right(catalogItem);
   }
 
   public compareMockItems(a: CatalogItem, b: CatalogItem): boolean {

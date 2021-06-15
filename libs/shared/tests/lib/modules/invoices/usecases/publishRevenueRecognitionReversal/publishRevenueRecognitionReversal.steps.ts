@@ -58,7 +58,7 @@ const context: UsecaseAuthorizationContext = {
 
 const testInvoiceId = 'testing-invoice';
 
-Before(function () {
+Before({ tags: '@ValidatePublishRevRecReversalToErp' }, function () {
   invoice = null;
 
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
@@ -93,36 +93,67 @@ Before(function () {
 });
 
 Given(/A regular invoice/, async function () {
-  const transaction = TransactionMap.toDomain({
+  const maybeTransaction = TransactionMap.toDomain({
     status: TransactionStatus.ACTIVE,
     deleted: 0,
     dateCreated: new Date(),
     dateUpdated: new Date(),
   });
-  invoice = InvoiceMap.toDomain({
+
+  if (maybeTransaction.isLeft()) {
+    throw maybeTransaction.value;
+  }
+
+  const transaction = maybeTransaction.value;
+
+  const maybeInvoice = InvoiceMap.toDomain({
     transactionId: transaction.id.toValue(),
     dateCreated: new Date(),
     id: testInvoiceId,
   });
 
-  const publisher = PublisherMap.toDomain({
+  if (maybeInvoice.isLeft()) {
+    throw maybeInvoice.value;
+  }
+
+  invoice = maybeInvoice.value;
+
+  const maybePublisher = PublisherMap.toDomain({
     id: 'testingPublisher',
     customValues: {},
   } as any);
 
-  const catalog = CatalogMap.toDomain({
+  if (maybePublisher.isLeft()) {
+    throw maybePublisher.value;
+  }
+
+  const publisher = maybePublisher.value;
+
+  const maybeCatalog = CatalogMap.toDomain({
     publisherId: publisher.publisherId.id.toString(),
     isActive: true,
     journalId: 'testingJournal',
   });
 
-  const manuscript = ArticleMap.toDomain({
+  if (maybeCatalog.isLeft()) {
+    throw maybeCatalog.value;
+  }
+
+  const catalog = maybeCatalog.value;
+
+  const maybeManuscript = ArticleMap.toDomain({
     customId: '8888',
     journalId: catalog.journalId.id.toValue(),
     datePublished: new Date(),
   });
 
-  const invoiceItem = InvoiceItemMap.toDomain({
+  if (maybeManuscript.isLeft()) {
+    throw maybeManuscript.value;
+  }
+
+  const manuscript = maybeManuscript.value;
+
+  const maybeInvoiceItem = InvoiceItemMap.toDomain({
     invoiceId: testInvoiceId,
     id: 'invoice-item',
     manuscriptId: manuscript.manuscriptId.id.toValue().toString(),
@@ -130,7 +161,13 @@ Given(/A regular invoice/, async function () {
     vat: 20,
   });
 
-  const erpReference = ErpReferenceMap.toDomain({
+  if (maybeInvoiceItem.isLeft()) {
+    throw maybeInvoiceItem.value;
+  }
+
+  const invoiceItem = maybeInvoiceItem.value;
+
+  const maybeErpReference = ErpReferenceMap.toDomain({
     entity_id: testInvoiceId,
     entity_type: 'invoice',
     vendor: 'testVendor',
@@ -138,15 +175,34 @@ Given(/A regular invoice/, async function () {
     value: 'FOO',
   });
 
-  const address = AddressMap.toDomain({
+  if (maybeErpReference.isLeft()) {
+    throw maybeErpReference.value;
+  }
+
+  const erpReference = maybeErpReference.value;
+
+  const maybeAddress = AddressMap.toDomain({
     country: 'RO',
   });
-  const payer = PayerMap.toDomain({
+
+  if (maybeAddress.isLeft()) {
+    throw maybeAddress.value;
+  }
+
+  const address = maybeAddress.value;
+
+  const maybePayer = PayerMap.toDomain({
     name: 'Silvestru',
     addressId: address.id.toValue(),
     invoiceId: invoice.invoiceId.id.toValue(),
     type: PayerType.INDIVIDUAL,
   });
+
+  if (maybePayer.isLeft()) {
+    throw maybePayer.value;
+  }
+
+  const payer = maybePayer.value;
 
   mockPayerRepo.addMockItem(payer);
   mockAddressRepo.addMockItem(address);
@@ -169,16 +225,21 @@ When(/Reversal usecase executes for Invoice/, async function () {
 });
 
 Then(/Reversal created in Netsuite for Invoice/, async function () {
-  // tslint:disable-next-line: no-unused-expression
   expect(response.isRight()).to.be.true;
 
   const revenueData = mockNetsuiteService.getRevenue(testInvoiceId);
-  // tslint:disable-next-line: no-unused-expression
+
   expect(!!revenueData).to.be.true;
 
-  const testInvoice = await mockInvoiceRepo.getInvoiceById(
-    InvoiceId.create(new UniqueEntityID(testInvoiceId)).getValue()
+  const maybeTestInvoice = await mockInvoiceRepo.getInvoiceById(
+    InvoiceId.create(new UniqueEntityID(testInvoiceId))
   );
+
+  if (maybeTestInvoice.isLeft()) {
+    throw maybeTestInvoice.value;
+  }
+
+  const testInvoice = maybeTestInvoice.value;
 
   const erpReferences = testInvoice.getErpReferences().getItems();
 

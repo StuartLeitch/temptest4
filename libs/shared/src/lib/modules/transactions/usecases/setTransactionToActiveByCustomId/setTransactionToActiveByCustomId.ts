@@ -1,48 +1,34 @@
-// import { InvoiceItems } from './../../../invoices/domain/InvoiceItems';
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
-import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { right, left } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 
-import { CatalogRepoContract } from '../../../journals/repos';
+import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { CatalogItem } from '../../../journals/domain/CatalogItem';
+import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
 import { JournalId } from '../../../journals/domain/JournalId';
 import { Invoice } from '../../../invoices/domain/Invoice';
-import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
-import { TransactionRepoContract } from '../../repos/transactionRepo';
-import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
-import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
 import { Transaction } from '../../domain/Transaction';
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
+
+import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
+import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
+import { TransactionRepoContract } from '../../repos/transactionRepo';
+import { CatalogRepoContract } from '../../../journals/repos';
 
 // * Usecase specifics
-import { SetTransactionToActiveByCustomIdResponse } from './setTransactionToActiveByCustomIdResponse';
-import { SetTransactionToActiveByCustomIdErrors } from './setTransactionToActiveByCustomIdErrors';
-import { SetTransactionToActiveByCustomIdDTO } from './setTransactionToActiveByCustomIdDTO';
+import { SetTransactionToActiveByCustomIdResponse as Response } from './setTransactionToActiveByCustomIdResponse';
+import { SetTransactionToActiveByCustomIdDTO as DTO } from './setTransactionToActiveByCustomIdDTO';
+import * as Errors from './setTransactionToActiveByCustomIdErrors';
 
 export class SetTransactionToActiveByCustomIdUsecase
-  implements
-    UseCase<
-      SetTransactionToActiveByCustomIdDTO,
-      Promise<SetTransactionToActiveByCustomIdResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      SetTransactionToActiveByCustomIdDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private catalogRepo: CatalogRepoContract,
     private transactionRepo: TransactionRepoContract,
@@ -51,14 +37,7 @@ export class SetTransactionToActiveByCustomIdUsecase
     private articleRepo: ArticleRepoContract
   ) {}
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  public async execute(
-    request: SetTransactionToActiveByCustomIdDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<SetTransactionToActiveByCustomIdResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     let transaction: Transaction;
     let invoice: Invoice;
     let invoiceItem: InvoiceItem;
@@ -68,13 +47,19 @@ export class SetTransactionToActiveByCustomIdUsecase
     try {
       try {
         // * System identifies manuscript by custom Id
-        manuscript = await this.articleRepo.findByCustomId(request.customId);
-      } catch (err) {
-        return left(
-          new SetTransactionToActiveByCustomIdErrors.ManuscriptNotFoundError(
-            request.customId
-          )
+        const maybeManuscript = await this.articleRepo.findByCustomId(
+          request.customId
         );
+
+        if (maybeManuscript.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeManuscript.value.message))
+          );
+        }
+
+        manuscript = maybeManuscript.value;
+      } catch (err) {
+        return left(new Errors.ManuscriptNotFoundError(request.customId));
       }
 
       // * get a proper ManuscriptId
@@ -82,52 +67,76 @@ export class SetTransactionToActiveByCustomIdUsecase
 
       try {
         // * System identifies invoice item by manuscript Id
-        [invoiceItem] = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
+        const maybeInvoiceItems = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
           manuscriptId
         );
+
+        if (maybeInvoiceItems.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeInvoiceItems.value.message))
+          );
+        }
+
+        invoiceItem = maybeInvoiceItems.value[0];
       } catch (err) {
         return left(
-          new SetTransactionToActiveByCustomIdErrors.InvoiceItemNotFoundError(
-            manuscriptId.id.toString()
-          )
+          new Errors.InvoiceItemNotFoundError(manuscriptId.id.toString())
         );
       }
 
       try {
         // * System identifies invoice by invoice item Id
-        invoice = await this.invoiceRepo.getInvoiceById(invoiceItem.invoiceId);
+        const maybeInvoice = await this.invoiceRepo.getInvoiceById(
+          invoiceItem.invoiceId
+        );
+
+        if (maybeInvoice.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeInvoice.value.message))
+          );
+        }
+
+        invoice = maybeInvoice.value;
       } catch (err) {
         return left(
-          new SetTransactionToActiveByCustomIdErrors.InvoiceNotFoundError(
-            invoiceItem.invoiceId.id.toString()
-          )
+          new Errors.InvoiceNotFoundError(invoiceItem.invoiceId.id.toString())
         );
       }
 
       try {
         // * System looks-up the transaction
-        transaction = await this.transactionRepo.getTransactionById(
+        const maybeTransaction = await this.transactionRepo.getTransactionById(
           invoice.transactionId
         );
+
+        if (maybeTransaction.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeTransaction.value.message))
+          );
+        }
+
+        transaction = maybeTransaction.value;
       } catch (err) {
         return left(
-          new SetTransactionToActiveByCustomIdErrors.TransactionNotFoundError(
-            invoice.invoiceId.id.toString()
-          )
+          new Errors.TransactionNotFoundError(invoice.invoiceId.id.toString())
         );
       }
 
       try {
         // * System looks-up the catalog item for the manuscript
-        catalogItem = await this.catalogRepo.getCatalogItemByJournalId(
-          JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
+        const maybeCatalogItem = await this.catalogRepo.getCatalogItemByJournalId(
+          JournalId.create(new UniqueEntityID(manuscript.journalId))
         );
+
+        if (maybeCatalogItem.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeCatalogItem.value.message))
+          );
+        }
+
+        catalogItem = maybeCatalogItem.value;
       } catch (err) {
-        return left(
-          new SetTransactionToActiveByCustomIdErrors.CatalogItemNotFoundError(
-            manuscript.journalId
-          )
-        );
+        return left(new Errors.CatalogItemNotFoundError(manuscript.journalId));
       }
 
       // * Mark transaction as ACTIVE
@@ -139,7 +148,7 @@ export class SetTransactionToActiveByCustomIdUsecase
       invoice.generateCreatedEvent();
       DomainEvents.dispatchEventsForAggregate(invoice.id);
 
-      return right(Result.ok<Transaction>(transaction));
+      return right(transaction);
     } catch (err) {
       return left(new UnexpectedError(err));
     }

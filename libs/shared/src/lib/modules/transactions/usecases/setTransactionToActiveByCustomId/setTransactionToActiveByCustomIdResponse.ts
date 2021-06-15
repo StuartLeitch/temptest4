@@ -1,11 +1,11 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../.././core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
-import { SetTransactionToActiveByCustomIdErrors } from './setTransactionToActiveByCustomIdErrors';
 import { Transaction } from './../../domain/Transaction';
 
+import * as Errors from './setTransactionToActiveByCustomIdErrors';
+
 export type SetTransactionToActiveByCustomIdResponse = Either<
-  | SetTransactionToActiveByCustomIdErrors.ManuscriptNotFoundError
-  | UnexpectedError,
-  Result<Transaction>
+  Errors.ManuscriptNotFoundError | UnexpectedError,
+  Transaction
 >;

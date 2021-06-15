@@ -24,10 +24,16 @@ const payerData = {
 };
 
 function makePayerData(overwrites?: any): Payer {
-  return PayerMap.toDomain({
+  const payer = PayerMap.toDomain({
     ...payerData,
     ...overwrites,
   });
+
+  if (payer.isLeft()) {
+    throw payer.value;
+  }
+
+  return payer.value;
 }
 
 let mockPayerRepo: MockPayerRepo;
@@ -36,18 +42,31 @@ let payerExists: boolean;
 let savePayer: Payer;
 let foundPayer: Payer;
 
-Before(async () => {
+Before({ tags: '@ValidateKnexPayerRepo' }, async () => {
   mockPayerRepo = new MockPayerRepo();
 });
 
 Given(/^a payer with the id "([\w-]+)"$/, async (payerId: string) => {
   payer = makePayerData({ id: payerId });
-  payer = await mockPayerRepo.save(payer);
+
+  const maybePayer = await mockPayerRepo.save(payer);
+
+  if (maybePayer.isLeft()) {
+    throw maybePayer.value;
+  }
+
+  payer = maybePayer.value;
 });
 
 When(/^we call getPayerById for "([\w-]+)"$/, async (payerId: string) => {
   const payerIdObj = PayerId.create(new UniqueEntityID(payerId));
-  foundPayer = await mockPayerRepo.getPayerById(payerIdObj);
+  const maybeFoundPayer = await mockPayerRepo.getPayerById(payerIdObj);
+
+  if (maybeFoundPayer.isLeft()) {
+    throw maybeFoundPayer.value;
+  }
+
+  foundPayer = maybeFoundPayer.value;
 });
 
 Then('getPayerById returns the payer', async () => {
@@ -58,7 +77,13 @@ When(
   /^we call getPayerById for an un-existent payer "([\w-]+)"$/,
   async (wrongPayerId: string) => {
     const id = PayerId.create(new UniqueEntityID(wrongPayerId));
-    foundPayer = await mockPayerRepo.getPayerById(id);
+    const maybeFoundPayer = await mockPayerRepo.getPayerById(id);
+
+    if (maybeFoundPayer.isLeft()) {
+      throw maybeFoundPayer.value;
+    }
+
+    foundPayer = maybeFoundPayer.value;
   }
 );
 
@@ -68,11 +93,25 @@ Then('getPayerById returns null', async () => {
 
 When(/^we call exists for ([\w-]+) payer id$/, async (payerId: string) => {
   const id = PayerId.create(new UniqueEntityID(payerId));
-  foundPayer = await mockPayerRepo.getPayerById(id);
+  const maybeFoundPayer = await mockPayerRepo.getPayerById(id);
+
+  if (maybeFoundPayer.isLeft()) {
+    throw maybeFoundPayer.value;
+  }
+
+  foundPayer = maybeFoundPayer.value;
+
   if (!foundPayer) {
     foundPayer = await makePayerData({ id: payerId });
   }
-  payerExists = await mockPayerRepo.exists(foundPayer);
+
+  const maybePayerExists = await mockPayerRepo.exists(foundPayer);
+
+  if (maybePayerExists.isLeft()) {
+    throw maybePayerExists.value;
+  }
+
+  payerExists = maybePayerExists.value;
 });
 
 Then(/^Payer.exists returns (.*)$/, async (exists: string) => {
@@ -87,7 +126,13 @@ Given(
 );
 
 When('we call Payer.save on the payer object', async () => {
-  savePayer = await mockPayerRepo.save(payer);
+  const maybeSavePayer = await mockPayerRepo.save(payer);
+
+  if (maybeSavePayer.isLeft()) {
+    throw maybeSavePayer.value;
+  }
+
+  savePayer = maybeSavePayer.value;
 });
 
 Then('the payer object should be saved', async () => {

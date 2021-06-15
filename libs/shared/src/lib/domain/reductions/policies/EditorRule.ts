@@ -9,9 +9,15 @@ export class EditorRule implements ReductionRuleContract<Waiver> {
   ) {}
 
   public getReduction(): Waiver {
-    return Waiver.create({
+    const waiver = Waiver.create({
       reduction: 50,
       waiverType: WaiverType.EDITOR_DISCOUNT,
-    }).getValue();
+    });
+
+    if (waiver.isLeft()) {
+      throw waiver.value;
+    }
+
+    return waiver.value;
   }
 }

@@ -13,7 +13,7 @@ import {
 } from '../../../../../../src/lib/shared';
 
 function makeCouponData(id: string, code: string, overwrites?: any): Coupon {
-  return CouponMap.toDomain({
+  const coupon = CouponMap.toDomain({
     id,
     code,
     status: 'ACTIVE',
@@ -23,6 +23,12 @@ function makeCouponData(id: string, code: string, overwrites?: any): Coupon {
     name: 'test-coupon',
     ...overwrites,
   });
+
+  if (coupon.isLeft()) {
+    throw coupon.value;
+  }
+
+  return coupon.value;
 }
 
 const context: UsecaseAuthorizationContext = {
@@ -48,7 +54,13 @@ Given(
   /^I have a coupon "([\w-]+)" with code "([\w-]+)"/,
   async (testId: string, testCode: string) => {
     coupon = makeCouponData(testId, testCode);
-    coupon = await mockCouponRepo.save(coupon);
+    const maybeCoupon = await mockCouponRepo.save(coupon);
+
+    if (maybeCoupon.isLeft()) {
+      throw maybeCoupon.value;
+    }
+
+    coupon = maybeCoupon.value;
   }
 );
 

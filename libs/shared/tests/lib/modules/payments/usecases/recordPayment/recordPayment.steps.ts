@@ -44,7 +44,7 @@ const testManuscriptCustomId = '88888';
 const testInvoiceId = 'test-invoice';
 const testPayerId = 'test-payer';
 
-Before(async function () {
+Before({ tags: '@ValidateRecordPayment' }, async function () {
   context = buildMockContext();
   const {
     repos: {
@@ -71,26 +71,54 @@ Before(async function () {
     logger
   );
 
-  const invoice = InvoiceMap.toDomain({
+  const maybeInvoice = InvoiceMap.toDomain({
     transactionId: 'transaction-id',
     dateCreated: new Date(),
     id: testInvoiceId,
     status: 'ACTIVE',
   });
-  const invoiceItem = InvoiceItemMap.toDomain({
+
+  if (maybeInvoice.isLeft()) {
+    throw maybeInvoice.value;
+  }
+
+  const invoice = maybeInvoice.value;
+
+  const maybeInvoiceItem = InvoiceItemMap.toDomain({
     invoiceId: testInvoiceId,
     manuscriptId: testManuscriptCustomId,
     price: 1000,
   });
-  const article = ArticleMap.toDomain({
+
+  if (maybeInvoiceItem.isLeft()) {
+    throw maybeInvoiceItem.value;
+  }
+
+  const invoiceItem = maybeInvoiceItem.value;
+
+  const maybeArticle = ArticleMap.toDomain({
     id: testManuscriptCustomId,
     customId: testManuscriptCustomId,
   });
-  const payer = PayerMap.toDomain({
+
+  if (maybeArticle.isLeft()) {
+    throw maybeArticle.value;
+  }
+
+  const article = maybeArticle.value;
+
+  const maybePayer = PayerMap.toDomain({
     invoiceId: testInvoiceId,
     name: 'Belzebut',
     id: testPayerId,
   });
+
+  if (maybePayer.isLeft()) {
+    throw maybePayer.value;
+  }
+
+  const payer = maybePayer.value;
+
   await context.repos.invoice.save(invoice);
   await context.repos.invoiceItem.save(invoiceItem);
   await context.repos.payer.save(payer);
@@ -102,7 +130,7 @@ Before(async function () {
   );
 });
 
-After(function () {
+After({ tags: '@ValidateRecordPayment' }, function () {
   DomainEvents.clearHandlers();
   DomainEvents.clearMarkedAggregates();
 });
@@ -125,13 +153,17 @@ When(
       datePaid: '2021-02-12',
     };
 
-    await context.repos.paymentMethod.save(
-      PaymentMethodMap.toDomain({
-        id: testPaymentId,
-        name: testPaymentId,
-        isActive: true,
-      })
-    );
+    const maybePaymentMethod = PaymentMethodMap.toDomain({
+      id: testPaymentId,
+      name: testPaymentId,
+      isActive: true,
+    });
+
+    if (maybePaymentMethod.isLeft()) {
+      throw maybePaymentMethod.value;
+    }
+
+    await context.repos.paymentMethod.save(maybePaymentMethod.value);
     response = await usecase.execute(request, authContext);
   }
 );
@@ -143,13 +175,17 @@ When(/^1 PayPal payment is applied$/, async function () {
     datePaid: '2021-02-12',
   };
 
-  await context.repos.paymentMethod.save(
-    PaymentMethodMap.toDomain({
-      id: testPaymentId,
-      name: testPaymentId,
-      isActive: true,
-    })
-  );
+  const maybePaymentMethod = PaymentMethodMap.toDomain({
+    id: testPaymentId,
+    name: testPaymentId,
+    isActive: true,
+  });
+
+  if (maybePaymentMethod.isLeft()) {
+    throw maybePaymentMethod.value;
+  }
+
+  await context.repos.paymentMethod.save(maybePaymentMethod.value);
   response = await usecase.execute(request, authContext);
 });
 
@@ -161,33 +197,58 @@ When(/^1 Credit Card payment is applied$/, async function () {
     datePaid: '2021-02-12',
   };
 
-  await context.repos.paymentMethod.save(
-    PaymentMethodMap.toDomain({
-      id: testPaymentId,
-      name: testPaymentId,
-      isActive: true,
-    })
-  );
+  const maybePaymentMethod = PaymentMethodMap.toDomain({
+    id: testPaymentId,
+    name: testPaymentId,
+    isActive: true,
+  });
+
+  if (maybePaymentMethod.isLeft()) {
+    throw maybePaymentMethod.value;
+  }
+
+  await context.repos.paymentMethod.save(maybePaymentMethod.value);
   response = await usecase.execute(request, authContext);
 });
 
 Then(/^The payment amount is (\d+)$/, async (amount: number) => {
   expect(response.isRight()).to.eq(true);
-  const payments = await context.repos.payment.getPaymentsByInvoiceId(
-    InvoiceId.create(new UniqueEntityID(testInvoiceId)).getValue()
+  const maybePayments = await context.repos.payment.getPaymentsByInvoiceId(
+    InvoiceId.create(new UniqueEntityID(testInvoiceId))
   );
+
+  if (maybePayments.isLeft()) {
+    throw maybePayments.value;
+  }
+
+  const payments = maybePayments.value;
+
   const expectedAmount = payments.reduce((acc, p) => acc + p.amount.value, 0);
   expect(expectedAmount).to.equal(amount);
 });
 
 Then(/^The payments are of type "Bank Transfer"$/, async () => {
   expect(response.isRight()).to.eq(true);
-  const payments = await context.repos.payment.getPaymentsByInvoiceId(
-    InvoiceId.create(new UniqueEntityID(testInvoiceId)).getValue()
+  const maybePayments = await context.repos.payment.getPaymentsByInvoiceId(
+    InvoiceId.create(new UniqueEntityID(testInvoiceId))
   );
-  const paymentMethod = await context.repos.paymentMethod.getPaymentMethodByName(
+
+  if (maybePayments.isLeft()) {
+    throw maybePayments.value;
+  }
+
+  const payments = maybePayments.value;
+
+  const maybePaymentMethod = await context.repos.paymentMethod.getPaymentMethodByName(
     'Bank Transfer'
   );
+
+  if (maybePaymentMethod.isLeft()) {
+    throw maybePaymentMethod.value;
+  }
+
+  const paymentMethod = maybePaymentMethod.value;
+
   for (const payment of payments) {
     expect(payment.paymentMethodId.toString()).to.equal(
       paymentMethod.id.toString()
@@ -197,9 +258,16 @@ Then(/^The payments are of type "Bank Transfer"$/, async () => {
 
 Then(/^The paid invoice has the status "([\w-]+)"$/, async (status: string) => {
   expect(response.isRight()).to.eq(true);
-  const invoice = await context.repos.invoice.getInvoiceById(
-    InvoiceId.create(new UniqueEntityID(testInvoiceId)).getValue()
+  const maybeInvoice = await context.repos.invoice.getInvoiceById(
+    InvoiceId.create(new UniqueEntityID(testInvoiceId))
   );
+
+  if (maybeInvoice.isLeft()) {
+    throw maybeInvoice.value;
+  }
+
+  const invoice = maybeInvoice.value;
+
   expect(invoice.status).to.equal(status);
 });
 
@@ -223,16 +291,26 @@ Given(
       status: status,
     });
 
-    await context.repos.payment.save(payment);
+    if (payment.isLeft()) {
+      throw payment.value;
+    }
+
+    await context.repos.payment.save(payment.value);
   }
 );
 
 Then(
   /^There is only one payment with the payment proof not equal to "([\w-]+)"$/,
   async (orderId) => {
-    const payments = await context.repos.payment.getPaymentsByInvoiceId(
-      InvoiceId.create(new UniqueEntityID(testInvoiceId)).getValue()
+    const maybePayments = await context.repos.payment.getPaymentsByInvoiceId(
+      InvoiceId.create(new UniqueEntityID(testInvoiceId))
     );
+
+    if (maybePayments.isLeft()) {
+      throw maybePayments.value;
+    }
+
+    const payments = maybePayments.value;
 
     expect(payments.length).to.equal(1);
     expect(payments[0].foreignPaymentId).to.not.equal(orderId);
@@ -244,9 +322,15 @@ Then(/^The payment recording fails$/, () => {
 });
 
 Given(/^There is an invoice with status "([\w]+)"$/, async (status: string) => {
-  const invoice = await context.repos.invoice.getInvoiceById(
-    InvoiceId.create(new UniqueEntityID('test-invoice')).getValue()
+  const maybeInvoice = await context.repos.invoice.getInvoiceById(
+    InvoiceId.create(new UniqueEntityID('test-invoice'))
   );
+
+  if (maybeInvoice.isLeft()) {
+    throw maybeInvoice.value;
+  }
+
+  const invoice = maybeInvoice.value;
 
   invoice.props.status = InvoiceStatus[status];
 

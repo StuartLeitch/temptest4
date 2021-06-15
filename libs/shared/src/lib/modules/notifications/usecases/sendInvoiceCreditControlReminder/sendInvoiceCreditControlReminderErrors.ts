@@ -1,91 +1,66 @@
 import { UseCaseError } from '../../../../core/logic/UseCaseError';
-import { Result } from '../../../../core/logic/Result';
 
-export class ManuscriptNotFound extends Result<UseCaseError> {
+export class ManuscriptNotFound extends UseCaseError {
   constructor(customId: string) {
-    super(false, {
-      message: `No manuscript with custom id {${customId}} was found.`,
-    });
+    super(`No manuscript with custom id {${customId}} was found.`);
   }
 }
 
-export class InvoiceNotFoundError extends Result<UseCaseError> {
+export class InvoiceNotFoundError extends UseCaseError {
   constructor(id: string) {
-    super(false, {
-      message: `No invoice with id {${id}} exists.`,
-    });
+    super(`No invoice with id {${id}} exists.`);
   }
 }
-export class InvoiceIdRequiredError extends Result<UseCaseError> {
+export class InvoiceIdRequiredError extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Invoice id is required.`,
-    });
+    super(`Invoice id is required.`);
   }
 }
 
-export class RecipientEmailRequiredError extends Result<UseCaseError> {
+export class RecipientEmailRequiredError extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Recipient email is required.`,
-    });
+    super(`Recipient email is required.`);
   }
 }
 
-export class RecipientNameRequiredError extends Result<UseCaseError> {
+export class RecipientNameRequiredError extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Recipient name is required.`,
-    });
+    super(`Recipient name is required.`);
   }
 }
 
-export class SenderEmailRequiredError extends Result<UseCaseError> {
+export class SenderEmailRequiredError extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Sender Email is required.`,
-    });
+    super(`Sender Email is required.`);
   }
 }
 
-export class SenderNameRequiredError extends Result<UseCaseError> {
+export class SenderNameRequiredError extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Sender name is required.`,
-    });
+    super(`Sender name is required.`);
   }
 }
 
-export class NotificationDisabledSettingRequiredError extends Result<
-  UseCaseError
-> {
+export class NotificationDisabledSettingRequiredError extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Notification disabled setting is required.`,
-    });
+    super(`Notification disabled setting is required.`);
   }
 }
 
-export class EmailSendingFailure extends Result<UseCaseError> {
+export class EmailSendingFailure extends UseCaseError {
   constructor(err: Error) {
-    super(false, {
-      message: `Email sending has failed with error {${err}}`,
-    });
+    super(`Email sending has failed with error {${err}}`);
   }
 }
 
-export class NotificationDbSaveError extends Result<UseCaseError> {
+export class NotificationDbSaveError extends UseCaseError {
   constructor(err: Error) {
-    super(false, {
-      message: `Failed to save the notification send in the DB with error {${err}}`,
-    });
+    super(`Failed to save the notification send in the DB with error {${err}}`);
   }
 }
 
-export class RescheduleTaskFailed extends Result<UseCaseError> {
+export class RescheduleTaskFailed extends UseCaseError {
   constructor(err: Error) {
-    super(false, {
-      message: `Failed to reschedule the notification task with error {${err}}`,
-    });
+    super(`Failed to reschedule the notification task with error {${err}}`);
   }
 }

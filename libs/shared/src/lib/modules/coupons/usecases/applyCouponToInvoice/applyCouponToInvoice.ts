@@ -1,17 +1,13 @@
 import { UniqueEntityID } from '../../../../../lib/core/domain/UniqueEntityID';
-import { UseCase } from '../../../../core/domain/UseCase';
-import { UnexpectedError } from '../../../../core/logic/AppError';
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
-import { left, right, Result } from '../../../../core/logic/Result';
+import { UnexpectedError } from '../../../../core/logic/AppError';
+import { right, left } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
-import {
-  AccessControlledUsecase,
-  AccessControlContext,
-  Roles,
-} from '../../../../domain/authorization';
+import { Roles } from '../../../../domain/authorization';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { EmailService } from '../../../../infrastructure/communication-channels';
@@ -29,7 +25,7 @@ import { TransactionRepoContract } from '../../../transactions/repos';
 import { AddressMap } from '../../../addresses/mappers/AddressMap';
 import { PayerMap } from '../../../payers/mapper/Payer';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
+import { ManuscriptId } from '../../../manuscripts/domain/ManuscriptId';
 import { PayerType } from '../../../payers/domain/Payer';
 
 import { ConfirmInvoiceUsecase } from '../../../invoices/usecases/confirmInvoice/confirmInvoice';
@@ -65,11 +61,6 @@ export class ApplyCouponToInvoiceUsecase
       ApplyCouponToInvoiceDTO,
       Promise<ApplyCouponToInvoiceResponse>,
       UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      ApplyCouponToInvoiceDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
     > {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
@@ -90,22 +81,18 @@ export class ApplyCouponToInvoiceUsecase
     context?: UsecaseAuthorizationContext
   ): Promise<ApplyCouponToInvoiceResponse> {
     const {
-      // manuscriptRepo,
       invoiceItemRepo,
       transactionRepo,
       invoiceRepo,
       addressRepo,
       payerRepo,
       couponRepo,
-      // transactionRepo,
       waiverRepo,
       emailService,
       vatService,
       loggerService,
     } = this;
     const {
-      // customId,
-      // published,
       sanctionedCountryNotificationReceiver,
       sanctionedCountryNotificationSender,
     } = request;
@@ -126,12 +113,15 @@ export class ApplyCouponToInvoiceUsecase
 
       const coupon = couponResult as Coupon;
 
-      const invoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
+      const maybeInvoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
         invoice.invoiceId
       );
-      if (!invoiceItems) {
+
+      if (maybeInvoiceItems.isLeft()) {
         return left(new InvoiceNotFoundError(request.invoiceId));
       }
+
+      const invoiceItems = maybeInvoiceItems.value;
 
       // * Associate the Invoice Items instances to the Invoice instance
       invoiceItems.forEach((ii) => invoice.addInvoiceItem(ii));
@@ -142,9 +132,16 @@ export class ApplyCouponToInvoiceUsecase
           continue;
         }
 
-        const existingCoupons = await this.couponRepo.getCouponsByInvoiceItemId(
+        const maybeExistingCoupons = await this.couponRepo.getCouponsByInvoiceItemId(
           invoiceItem.invoiceItemId
         );
+
+        if (maybeExistingCoupons.isLeft()) {
+          return left(maybeExistingCoupons.value);
+        }
+
+        const existingCoupons = maybeExistingCoupons.value;
+
         if (
           existingCoupons.coupons.some((c) =>
             c.couponId.equals(coupon.couponId)
@@ -180,13 +177,8 @@ export class ApplyCouponToInvoiceUsecase
 
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (total <= 0) {
-        const manuscriptId = ManuscriptId.create(
-          new UniqueEntityID(
-            [...invoice.invoiceItems.getItems()]
-              .shift()
-              .manuscriptId.id.toString()
-          )
-        ).getValue();
+        const manuscriptId = [...invoice.invoiceItems.getItems()].shift()
+          .manuscriptId;
 
         const manuscriptResult = await this.getManuscript(manuscriptId);
         if (manuscriptResult instanceof Error) {
@@ -210,12 +202,18 @@ export class ApplyCouponToInvoiceUsecase
         );
 
         // * create new address
-        const newAddress = AddressMap.toDomain({
+        const maybeAddress = AddressMap.toDomain({
           country: manuscript.authorCountry,
         });
 
+        if (maybeAddress.isLeft()) {
+          return left(maybeAddress.value);
+        }
+
+        const newAddress = maybeAddress.value;
+
         // * create new payer
-        const newPayer = PayerMap.toDomain({
+        const maybeNewPayer = PayerMap.toDomain({
           // * associate new payer to the invoice
           invoiceId: invoice.invoiceId.id.toString(),
           name: `${manuscript.authorFirstName} ${manuscript.authorSurname}`,
@@ -224,6 +222,12 @@ export class ApplyCouponToInvoiceUsecase
           organization: ' ',
           type: PayerType.INDIVIDUAL,
         });
+
+        if (maybeNewPayer.isLeft()) {
+          return left(maybeNewPayer.value);
+        }
+
+        const newPayer = maybeNewPayer.value;
 
         const confirmInvoiceArgs: ConfirmInvoiceDTO = {
           payer: {
@@ -249,9 +253,7 @@ export class ApplyCouponToInvoiceUsecase
             );
 
             if (result.isLeft()) {
-              return left(
-                new InvoiceConfirmationFailed(result.value.errorValue().message)
-              );
+              return left(new InvoiceConfirmationFailed(result.value.message));
             }
           } catch (err) {
             console.error(err);
@@ -264,7 +266,7 @@ export class ApplyCouponToInvoiceUsecase
       invoice.generateInvoiceDraftAmountUpdatedEvent();
       DomainEvents.dispatchEventsForAggregate(invoice.id);
 
-      return right(Result.ok(coupon));
+      return right(coupon);
     } catch (error) {
       return left(new UnexpectedError(error));
     }
@@ -280,11 +282,11 @@ export class ApplyCouponToInvoiceUsecase
       roles: [Roles.SUPER_ADMIN],
     } as UsecaseAuthorizationContext);
 
-    if (result.isFailure) {
-      return new Error(result.error as any);
+    if (result.isLeft()) {
+      return new Error(result.value.message);
     }
 
-    return result.getValue();
+    return result.value;
   }
 
   private async getManuscript(manuscriptId: ManuscriptId) {
@@ -303,24 +305,25 @@ export class ApplyCouponToInvoiceUsecase
       } as UsecaseAuthorizationContext
     );
 
-    if (result.value.isFailure) {
-      return new Error(result.value.errorValue as any);
+    if (result.isLeft()) {
+      return new Error(result.value.message);
     }
 
-    return result.value.getValue();
+    return result.value;
   }
 
   private async getInvoice(request: Record<string, any>) {
     const { invoiceRepo } = this;
 
-    const invoiceId = InvoiceId.create(
-      new UniqueEntityID(request.invoiceId)
-    ).getValue();
+    const invoiceId = InvoiceId.create(new UniqueEntityID(request.invoiceId));
 
-    const invoice = await invoiceRepo.getInvoiceById(invoiceId);
-    if (!invoice) {
-      return new InvoiceNotFoundError(invoiceId.id.toString());
+    const maybeInvoice = await invoiceRepo.getInvoiceById(invoiceId);
+
+    if (maybeInvoice.isLeft()) {
+      return maybeInvoice.value;
     }
+
+    const invoice = maybeInvoice.value;
 
     if (invoice.status !== InvoiceStatus.DRAFT) {
       return new InvoiceStatusInvalidError(
@@ -336,16 +339,19 @@ export class ApplyCouponToInvoiceUsecase
     const { couponRepo } = this;
 
     request.couponCode = request.couponCode.toUpperCase().trim();
-    const couponCodeResult = CouponCode.create(request.couponCode);
+    const maybeCouponCode = CouponCode.create(request.couponCode);
+    if (maybeCouponCode.isLeft()) {
+      return maybeCouponCode.value;
+    }
+    const couponCode = maybeCouponCode.value;
 
-    let couponCode;
-    if (couponCodeResult.isSuccess) {
-      couponCode = couponCodeResult.getValue();
-    } else {
-      return new CouponNotFoundError(request.couponCode);
+    const maybeCoupon = await couponRepo.getCouponByCode(couponCode);
+
+    if (maybeCoupon.isLeft()) {
+      return maybeCoupon.value;
     }
 
-    const coupon = await couponRepo.getCouponByCode(couponCode);
+    const coupon = maybeCoupon.value;
 
     if (!coupon) {
       return new CouponNotFoundError(request.couponCode);

@@ -1,10 +1,16 @@
 import Knex from 'knex';
 
-import { AbstractBaseDBRepo } from 'libs/shared/src/lib/infrastructure/AbstractBaseDBRepo';
+import { Either, left } from '../../../../core/logic/Either';
+
+import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
+import { RepoError } from '../../../../infrastructure/RepoError';
+
 import { Event } from '../../domain/Event';
+
 import { EventsRepoContract } from '../EventsRepo';
 
-export class KnexEventsRepo extends AbstractBaseDBRepo<Knex, Event>
+export class KnexEventsRepo
+  extends AbstractBaseDBRepo<Knex, Event>
   implements EventsRepoContract {
   async upsertEvents(table: string, events: Event[]): Promise<number> {
     if (events.length === 0) {
@@ -13,27 +19,27 @@ export class KnexEventsRepo extends AbstractBaseDBRepo<Knex, Event>
     const updateQuery = [
       'INSERT INTO ?? (id, time, type, payload) VALUES',
       events.map(() => '(?, to_timestamp(?), ?, ?)').join(','),
-      'ON CONFLICT (id) DO UPDATE SET time = EXCLUDED.time, type = EXCLUDED.type, payload = EXCLUDED.payload'
+      'ON CONFLICT (id) DO UPDATE SET time = EXCLUDED.time, type = EXCLUDED.type, payload = EXCLUDED.payload',
     ].join(' ');
 
     const values = [table];
-    events.forEach(ev => {
+    events.forEach((ev) => {
       values.push(
         ...[
           ev.id.toString(),
           ev.time ? ((ev.time.getTime() / 1000) as any) : null,
           ev.type,
-          ev.payload
+          ev.payload,
         ]
       );
     });
 
     return this.db.raw(updateQuery, values);
   }
-  exists(e: Event): Promise<boolean> {
-    throw new Error('Method not implemented.');
+  async exists(e: Event): Promise<Either<RepoError, boolean>> {
+    return left(RepoError.methodNotImplemented('KnexEventsRepo.exists'));
   }
-  save(e: Event): Promise<Event> {
-    throw new Error('Method not implemented.');
+  async save(e: Event): Promise<Either<RepoError, Event>> {
+    return left(RepoError.methodNotImplemented('KnexEventsRepo.save'));
   }
 }

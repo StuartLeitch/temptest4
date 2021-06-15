@@ -1,10 +1,11 @@
-import {Entity} from '../../../core/domain/Entity';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
-import {Result} from '../../../core/logic/Result';
-import {Guard} from '../../../core/logic/Guard';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { Either, right, left } from '../../../core/logic/Either';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Entity } from '../../../core/domain/Entity';
+import { Guard } from '../../../core/logic/Guard';
 
-import {PriceValue} from './PriceValue';
-import {PriceId} from './PriceId';
+import { PriceValue } from './PriceValue';
+import { PriceId } from './PriceId';
 
 interface PriceProps {
   value: PriceValue;
@@ -29,18 +30,21 @@ export class Price extends Entity<PriceProps> {
     super(props, id);
   }
 
-  public static create(props: PriceProps, id?: UniqueEntityID): Result<Price> {
+  public static create(
+    props: PriceProps,
+    id?: UniqueEntityID
+  ): Either<GuardFailure, Price> {
     const guardResult = Guard.againstNullOrUndefinedBulk([
-      {argument: props.value, argumentName: 'value'}
+      { argument: props.value, argumentName: 'value' },
     ]);
 
     if (!guardResult.succeeded) {
-      return Result.fail<Price>(guardResult.message);
+      return left(new GuardFailure(guardResult.message));
     } else {
-      return Result.ok<Price>(
+      return right(
         new Price(
           {
-            ...props
+            ...props,
           },
           id
         )

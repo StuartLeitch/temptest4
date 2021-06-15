@@ -1,47 +1,37 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
-import { left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-
-import { Invoice } from './../../../invoices/domain/Invoice';
-import { InvoiceItem } from './../../../invoices/domain/InvoiceItem';
-import { ManuscriptId } from './../../../invoices/domain/ManuscriptId';
-import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
-import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
-import { Transaction, TransactionStatus } from '../../domain/Transaction';
-import { TransactionRepoContract } from '../../repos/transactionRepo';
-import { Manuscript } from './../../../manuscripts/domain/Manuscript';
-import { ArticleRepoContract as ManuscriptRepoContract } from './../../../manuscripts/repos/articleRepo';
-
-import type { SoftDeleteDraftTransactionRequestDTO } from './softDeleteDraftTransactionDTOs';
+import { right, left } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  Authorize,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
+import { TransactionStatus, Transaction } from '../../domain/Transaction';
+import { ManuscriptId } from './../../../manuscripts/domain/ManuscriptId';
+import { Manuscript } from './../../../manuscripts/domain/Manuscript';
+import { InvoiceItem } from './../../../invoices/domain/InvoiceItem';
+import { Invoice } from './../../../invoices/domain/Invoice';
+
+import { ArticleRepoContract as ManuscriptRepoContract } from './../../../manuscripts/repos/articleRepo';
+import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
+import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
+import { TransactionRepoContract } from '../../repos/transactionRepo';
+
+import type { SoftDeleteDraftTransactionRequestDTO as DTO } from './softDeleteDraftTransactionDTO';
+import { SoftDeleteDraftTransactionResponse as Response } from './softDeleteDraftTransactionResponse';
 import * as Errors from './softDeleteDraftTransactionErrors';
-import { SoftDeleteDraftTransactionResponse } from './softDeleteDraftTransactionResponse';
 
 export class SoftDeleteDraftTransactionUsecase
   implements
-    UseCase<
-      SoftDeleteDraftTransactionRequestDTO,
-      Promise<SoftDeleteDraftTransactionResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      SoftDeleteDraftTransactionRequestDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     private transactionRepo: TransactionRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -54,10 +44,7 @@ export class SoftDeleteDraftTransactionUsecase
   }
 
   @Authorize('transaction:delete')
-  public async execute(
-    request: SoftDeleteDraftTransactionRequestDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<SoftDeleteDraftTransactionResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     let invoiceItem: InvoiceItem;
     let invoice: Invoice;
     let transaction: Transaction;
@@ -66,28 +53,56 @@ export class SoftDeleteDraftTransactionUsecase
     // * build the ManuscriptId
     const manuscriptId = ManuscriptId.create(
       new UniqueEntityID(request.manuscriptId)
-    ).getValue();
+    );
 
     try {
       try {
         // * System identifies article by manuscript Id
-        manuscript = await this.manuscriptRepo.findById(manuscriptId);
+        const maybeManuscript = await this.manuscriptRepo.findById(
+          manuscriptId
+        );
+
+        if (maybeManuscript.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeManuscript.value.message))
+          );
+        }
+
+        manuscript = maybeManuscript.value;
       } catch (err) {
         return left(new Errors.InvoiceItemNotFoundError(request.manuscriptId));
       }
 
       try {
         // * System identifies invoice item by manuscript Id
-        [invoiceItem] = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
+        const maybeInvoiceItems = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
           manuscriptId
         );
+
+        if (maybeInvoiceItems.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeInvoiceItems.value.message))
+          );
+        }
+
+        invoiceItem = maybeInvoiceItems.value[0];
       } catch (err) {
         return left(new Errors.InvoiceItemNotFoundError(request.manuscriptId));
       }
 
       try {
         // * System identifies invoice by invoice item Id
-        invoice = await this.invoiceRepo.getInvoiceById(invoiceItem.invoiceId);
+        const maybeInvoice = await this.invoiceRepo.getInvoiceById(
+          invoiceItem.invoiceId
+        );
+
+        if (maybeInvoice.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeInvoice.value.message))
+          );
+        }
+
+        invoice = maybeInvoice.value;
       } catch (err) {
         return left(
           new Errors.InvoiceNotFoundError(
@@ -98,9 +113,17 @@ export class SoftDeleteDraftTransactionUsecase
 
       try {
         // * System identifies transaction by invoice Id
-        transaction = await this.transactionRepo.getTransactionById(
+        const maybeTransaction = await this.transactionRepo.getTransactionById(
           invoice.transactionId
         );
+
+        if (maybeTransaction.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeTransaction.value.message))
+          );
+        }
+
+        transaction = maybeTransaction.value;
       } catch (err) {
         return left(
           new Errors.TransactionNotFoundError(invoice.invoiceId.id.toString())

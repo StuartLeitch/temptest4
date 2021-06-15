@@ -1,12 +1,15 @@
-import { Invoice } from '../../domain/Invoice';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { Either, Result } from '../../../../core/logic/Result';
+import { Either } from '../../../../core/logic/Either';
 
-import { ChangeInvoiceStatusErrors } from './changeInvoiceStatusErrors';
+import { Invoice } from '../../domain/Invoice';
+
+import * as Errors from './changeInvoiceStatusErrors';
 
 export type ChangeInvoiceStatusResponse = Either<
-  | ChangeInvoiceStatusErrors.ChangeStatusError
-  | ChangeInvoiceStatusErrors.InvoiceNotFoundError
-  | UnexpectedError,
-  Result<Invoice>
+  | Errors.InvoiceNotFoundError
+  | Errors.ChangeStatusError
+  | UnexpectedError
+  | GuardFailure,
+  Invoice
 >;

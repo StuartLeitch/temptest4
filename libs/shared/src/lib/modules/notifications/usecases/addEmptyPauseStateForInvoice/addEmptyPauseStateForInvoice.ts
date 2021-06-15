@@ -1,17 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 // * Core Domain
-import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { AsyncEither } from '../../../../core/logic/AsyncEither';
+import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
@@ -27,13 +22,7 @@ import { AddEmptyPauseStateForInvoiceDTO as DTO } from './addEmptyPauseStateForI
 import * as Errors from './addEmptyPauseStateForInvoiceErrors';
 
 export class AddEmptyPauseStateForInvoiceUsecase
-  implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
     private invoiceRepo: InvoiceRepoContract,
@@ -44,22 +33,14 @@ export class AddEmptyPauseStateForInvoiceUsecase
     this.validateRequest = this.validateRequest.bind(this);
   }
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  // @Authorize('invoice:read')
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const execution = new AsyncEither(request)
         .then(this.validateRequest)
         .then(this.addNewPauseInstance)
-        .map((val) => Result.ok(val));
+        .execute();
 
-      return execution.execute();
+      return execution;
     } catch (e) {
       return left(new UnexpectedError(e));
     }
@@ -87,9 +68,15 @@ export class AddEmptyPauseStateForInvoiceUsecase
     this.loggerService.info(`Check if invoice with id ${id} exists in the DB`);
 
     const uuid = new UniqueEntityID(id);
-    const invoiceId = InvoiceId.create(uuid).getValue();
+    const invoiceId = InvoiceId.create(uuid);
 
-    return await this.invoiceRepo.existsWithId(invoiceId);
+    const result = await this.invoiceRepo.existsWithId(invoiceId);
+
+    if (result.isRight()) {
+      return result.value;
+    } else {
+      throw new Error(result.value.message);
+    }
   }
 
   private async addNewPauseInstance(
@@ -100,11 +87,21 @@ export class AddEmptyPauseStateForInvoiceUsecase
     );
 
     const uuid = new UniqueEntityID(request.invoiceId);
-    const invoiceId = InvoiceId.create(uuid).getValue();
+    const invoiceId = InvoiceId.create(uuid);
 
     try {
       const result = await this.pausedReminderRepo.insertBasePause(invoiceId);
-      return right(result);
+
+      if (result.isLeft()) {
+        return left(
+          new Errors.AddPauseDbError(
+            request.invoiceId,
+            new Error(result.value.message)
+          )
+        );
+      }
+
+      return right(result.value);
     } catch (e) {
       return left(new Errors.AddPauseDbError(request.invoiceId, e));
     }

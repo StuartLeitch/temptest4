@@ -1,12 +1,14 @@
+import { SQS, S3 } from 'aws-sdk';
+
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
 import { RawEvent as EveEvent } from '../../../infrastructure/RawEvent';
 
 import { EventDTO } from '../domain/EventDTO';
 
 export class FilterEventsService {
-  constructor(private s3Service: AWS.S3, private logger: LoggerContract) {}
+  constructor(private s3Service: S3, private logger: LoggerContract) {}
   public async filterEvents(
-    events: AWS.SQS.Message[] /* | EveEvent[] */
+    events: SQS.Message[] /* | EveEvent[] */
   ): Promise<EventDTO[]> {
     const { s3Service, logger } = this;
     const processedEvents: EventDTO[] = [];

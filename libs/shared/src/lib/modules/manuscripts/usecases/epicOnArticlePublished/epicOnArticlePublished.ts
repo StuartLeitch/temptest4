@@ -1,57 +1,52 @@
 // * Core Domain
-import { Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  AccessControlContext,
-  AuthorizationContext,
-  Roles,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 
-import { TransactionRepoContract } from '../../../transactions/repos/transactionRepo';
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
-import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
-import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
-import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
-import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
-import { PayerRepoContract } from '../../../payers/repos/payerRepo';
-import { CouponRepoContract } from '../../../coupons/repos/couponRepo';
-import { WaiverRepoContract } from '../../../waivers/repos/waiverRepo';
+import { Manuscript } from '../../../manuscripts/domain/Manuscript';
+import { InvoiceStatus } from '../../../invoices/domain/Invoice';
+import { ManuscriptId } from '../../domain/ManuscriptId';
+import { PayerType } from '../../../payers/domain/Payer';
 
 import { AddressMap } from '../../../addresses/mappers/AddressMap';
 import { PayerMap } from '../../../payers/mapper/Payer';
 
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-// TODO: Move ManuscriptId to manuscripts domain
-import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
-import { InvoiceStatus } from '../../../invoices/domain/Invoice';
-import { PayerType } from '../../../payers/domain/Payer';
+import { TransactionRepoContract } from '../../../transactions/repos/transactionRepo';
+import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
+import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
+import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
+import { CouponRepoContract } from '../../../coupons/repos/couponRepo';
+import { WaiverRepoContract } from '../../../waivers/repos/waiverRepo';
+import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 
 // * Usecase specific
-import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId';
-import { ConfirmInvoiceUsecase } from '../../../invoices/usecases/confirmInvoice/confirmInvoice';
-import { ConfirmInvoiceDTO } from '../../../invoices/usecases/confirmInvoice/confirmInvoiceDTO';
 
 import { EmailService } from '../../../../infrastructure/communication-channels';
 import { VATService } from '../../../../domain/services/VATService';
 
+import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId';
+import {
+  ConfirmInvoiceUsecase,
+  ConfirmInvoiceDTO,
+} from '../../../invoices/usecases/confirmInvoice';
+
 import { EpicOnArticlePublishedResponse as Response } from './epicOnArticlePublishedResponse';
-import { EpicOnArticlePublishedErrors as Errors } from './epicOnArticlePublishedErrors';
 import { EpicOnArticlePublishedDTO as DTO } from './epicOnArticlePublishedDTO';
+import * as Errors from './epicOnArticlePublishedErrors';
 
 interface CorrelationContext {
   correlationId: string;
 }
-type Context = AuthorizationContext<Roles> & CorrelationContext;
 
+type Context = UsecaseAuthorizationContext & CorrelationContext;
 export class EpicOnArticlePublishedUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
     private transactionRepo: TransactionRepoContract,
@@ -66,11 +61,6 @@ export class EpicOnArticlePublishedUsecase
     private loggerService: LoggerContract
   ) {}
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  // @Authorize('invoice:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     let manuscript: Manuscript;
 
@@ -92,9 +82,7 @@ export class EpicOnArticlePublishedUsecase
 
     // * It should describe the business rules with minimal amount of implementation details.
 
-    const manuscriptId = ManuscriptId.create(
-      new UniqueEntityID(customId)
-    ).getValue();
+    const manuscriptId = ManuscriptId.create(new UniqueEntityID(customId));
 
     try {
       loggerService.info('Find Manuscript by Custom Id', {
@@ -102,7 +90,17 @@ export class EpicOnArticlePublishedUsecase
         manuscriptId: manuscriptId.id.toString(),
       });
       try {
-        manuscript = await manuscriptRepo.findByCustomId(manuscriptId);
+        const maybeManuscript = await manuscriptRepo.findByCustomId(
+          manuscriptId
+        );
+
+        if (maybeManuscript.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeManuscript.value.message))
+          );
+        }
+
+        manuscript = maybeManuscript.value;
       } catch (e) {
         return left(new Errors.ManuscriptNotFound(manuscriptId.id.toString()));
       }
@@ -130,13 +128,11 @@ export class EpicOnArticlePublishedUsecase
 
       if (maybeAutoConfirmed.isLeft()) {
         this.loggerService.error(
-          `While auto-confirming on article published an error ocurred: ${
-            maybeAutoConfirmed.value.errorValue().message
-          }`
+          `While auto-confirming on article published an error ocurred: ${maybeAutoConfirmed.value.message}`
         );
       }
 
-      return right(Result.ok<void>());
+      return right(null);
     } catch (err) {
       return left(new UnexpectedError(err));
     }
@@ -147,7 +143,7 @@ export class EpicOnArticlePublishedUsecase
     emailReceiver: string,
     emailSender: string,
     context: Context
-  ) {
+  ): Promise<Either<UnexpectedError, void>> {
     const getInvoiceIds = new GetInvoiceIdByManuscriptCustomIdUsecase(
       this.manuscriptRepo,
       this.invoiceItemRepo
@@ -163,10 +159,12 @@ export class EpicOnArticlePublishedUsecase
     });
 
     if (maybeInvoiceIds.isLeft()) {
-      return maybeInvoiceIds;
+      return left(
+        new UnexpectedError(new Error(maybeInvoiceIds.value.message))
+      );
     }
 
-    const invoiceIds = maybeInvoiceIds.value.getValue();
+    const invoiceIds = maybeInvoiceIds.value;
 
     for (const invoiceId of invoiceIds) {
       this.loggerService.info('Get invoice details', {
@@ -174,7 +172,13 @@ export class EpicOnArticlePublishedUsecase
         invoiceId: invoiceId.toString(),
       });
 
-      const invoice = await this.invoiceRepo.getInvoiceById(invoiceId);
+      const maybeInvoice = await this.invoiceRepo.getInvoiceById(invoiceId);
+
+      if (maybeInvoice.isLeft()) {
+        return left(new UnexpectedError(new Error(maybeInvoice.value.message)));
+      }
+
+      const invoice = maybeInvoice.value;
 
       if (
         !invoice.cancelledInvoiceReference &&
@@ -198,12 +202,20 @@ export class EpicOnArticlePublishedUsecase
             .sendEmail();
         }
 
-        const newAddress = AddressMap.toDomain({
+        const maybeNewAddress = AddressMap.toDomain({
           country: manuscript.authorCountry,
         });
 
+        if (maybeNewAddress.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeNewAddress.value.message))
+          );
+        }
+
+        const newAddress = maybeNewAddress.value;
+
         // * create new payer
-        const newPayer = PayerMap.toDomain({
+        const maybeNewPayer = PayerMap.toDomain({
           invoiceId: invoiceId.id.toString(),
           name: `${manuscript.authorFirstName} ${manuscript.authorSurname}`,
           email: manuscript.authorEmail,
@@ -211,6 +223,14 @@ export class EpicOnArticlePublishedUsecase
           organization: ' ',
           type: PayerType.INDIVIDUAL,
         });
+
+        if (maybeNewPayer.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeNewPayer.value.message))
+          );
+        }
+
+        const newPayer = maybeNewPayer.value;
 
         const confirmInvoiceUsecase = new ConfirmInvoiceUsecase(
           this.invoiceItemRepo,
@@ -260,7 +280,7 @@ export class EpicOnArticlePublishedUsecase
           return left(new UnexpectedError(err));
         }
       } else {
-        return right<Result<UnexpectedError>, void>(null);
+        return right(null);
       }
     }
   }

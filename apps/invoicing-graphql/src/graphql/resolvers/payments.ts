@@ -10,6 +10,10 @@ import {
   CorrelationID,
   Roles,
 } from '@hindawi/shared';
+import {
+  RepoErrorCode,
+  RepoError,
+} from 'libs/shared/src/lib/infrastructure/RepoError';
 
 import { ExternalOrderId } from '../../../../../libs/shared/src/lib/modules/payments/domain/external-order-id';
 import { Context } from '../../builders';
@@ -30,10 +34,11 @@ export const payments: Resolvers<Context> = {
 
       const result = await usecase.execute(null, {
         correlationId,
+        roles: null,
       });
 
       if (result.isRight()) {
-        return result.value.getValue().map(PaymentMethodMap.toPersistence);
+        return result.value.map(PaymentMethodMap.toPersistence);
       } else {
         throw new Error(`Can't get payments methods.`);
       }
@@ -216,16 +221,25 @@ export const payments: Resolvers<Context> = {
       } = args;
 
       // check if the payment reference is already used
-      let alreadyUsedPaymentReference;
-      try {
-        alreadyUsedPaymentReference = await paymentRepo.getPaymentByForeignId(
-          ExternalOrderId.create(paymentReference)
-        );
-      } catch (err) {
-        // do nothing, just let it go
+
+      const alreadyUsedPaymentReference = await paymentRepo.getPaymentByForeignId(
+        ExternalOrderId.create(paymentReference)
+      );
+
+      if (alreadyUsedPaymentReference.isLeft()) {
+        if (
+          !(alreadyUsedPaymentReference.value instanceof RepoError) ||
+          alreadyUsedPaymentReference.value.code !==
+            RepoErrorCode.ENTITY_NOT_FOUND
+        ) {
+          throw new Error(alreadyUsedPaymentReference.value.message);
+        }
       }
 
-      if (alreadyUsedPaymentReference) {
+      if (
+        alreadyUsedPaymentReference.isRight() &&
+        alreadyUsedPaymentReference.value
+      ) {
         throw new Error('Payment reference already used!');
       }
 

@@ -50,36 +50,61 @@ let invoice: Invoice;
 let invoiceItem: InvoiceItem;
 let manuscript: Manuscript;
 
-Given(/^A journal "([\w-]+)" with a manuscript "([\w-]+)"$/, async function (
-  journalTestId: string,
-  manuscriptTestId: string
-) {
-  journalId = journalTestId;
-  manuscriptId = manuscriptTestId;
+Given(
+  /^A journal "([\w-]+)" with a manuscript "([\w-]+)"$/,
+  async function (journalTestId: string, manuscriptTestId: string) {
+    journalId = journalTestId;
+    manuscriptId = manuscriptTestId;
 
-  manuscript = ArticleMap.toDomain({
-    id: manuscriptId,
-    journalId: journalId,
-  });
+    const maybeManuscript = ArticleMap.toDomain({
+      id: manuscriptId,
+      journalId: journalId,
+    });
 
-  mockArticleRepo.save(manuscript);
-});
+    if (maybeManuscript.isLeft()) {
+      throw maybeManuscript.value;
+    }
+
+    manuscript = maybeManuscript.value;
+
+    mockArticleRepo.save(manuscript);
+  }
+);
 
 Given(
   /^A Invoice with a DRAFT Transaction and a Invoice Item tied to the manuscript "([\w-]+)"$/,
   async function (manuscriptTestId: string) {
-    transaction = TransactionMap.toDomain({
+    const maybeTransaction = TransactionMap.toDomain({
       status: TransactionStatus.DRAFT,
     });
 
-    invoice = InvoiceMap.toDomain({
+    if (maybeTransaction.isLeft()) {
+      throw maybeTransaction.value;
+    }
+
+    transaction = maybeTransaction.value;
+
+    const maybeInvoice = InvoiceMap.toDomain({
       status: InvoiceStatus.DRAFT,
       transactionId: transaction.transactionId.id.toString(),
     });
-    invoiceItem = InvoiceItemMap.toDomain({
+
+    if (maybeInvoice.isLeft()) {
+      throw maybeInvoice.value;
+    }
+
+    invoice = maybeInvoice.value;
+
+    const maybeInvoiceItem = InvoiceItemMap.toDomain({
       manuscriptId: manuscriptTestId,
       invoiceId: invoice.invoiceId.id.toString(),
     });
+
+    if (maybeInvoiceItem.isLeft()) {
+      throw maybeInvoiceItem.value;
+    }
+
+    invoiceItem = maybeInvoiceItem.value;
 
     invoice.addInvoiceItem(invoiceItem);
     transaction.addInvoice(invoice);

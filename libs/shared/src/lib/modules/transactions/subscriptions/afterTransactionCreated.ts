@@ -1,15 +1,9 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
-import { Roles } from './../../../modules/users/domain/enums/Roles';
 
 import { CreateManuscriptUsecase } from './../../manuscripts/usecases/createManuscript/createManuscript';
-import { CreateManuscriptAuthorizationContext } from './../../manuscripts/usecases/createManuscript/createManuscriptAuthorizationContext';
 
 import { TransactionCreatedEvent } from '../domain/events/transactionCreatedEvent';
-
-const defaultContext: CreateManuscriptAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN]
-};
 
 export class AfterTransactionCreated
   implements HandleContract<TransactionCreatedEvent> {
@@ -29,7 +23,6 @@ export class AfterTransactionCreated
   ): Promise<void> {
     const { transactionId } = event;
     try {
-      // await this.createManuscript.execute({}, defaultContext);
       console.log(
         `[AfterTransactionCreated]: Successfully executed CreateManuscript use case AfterTransactionCreated.`
       );

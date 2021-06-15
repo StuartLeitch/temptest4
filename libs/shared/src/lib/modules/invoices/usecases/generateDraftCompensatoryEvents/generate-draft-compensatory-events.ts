@@ -2,12 +2,11 @@ import { cloneDeep } from 'lodash';
 
 // * Core Domain
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
-import { Either, right, left } from '../../../../core/logic/Result';
+import { Either, right, left } from '../../../../core/logic/Either';
 import { UseCaseError } from '../../../../core/logic/UseCaseError';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
-import { Result } from '../../../../core/logic/Result';
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 
@@ -116,7 +115,7 @@ export class GenerateDraftCompensatoryEventsUsecase
         .then(this.sendDeleted(context))
         .execute();
 
-      return execution.map(() => null) as any;
+      return execution.map(() => null);
     } catch (e) {
       return left(
         new UnexpectedError(
@@ -143,9 +142,7 @@ export class GenerateDraftCompensatoryEventsUsecase
       const { invoiceId } = request;
 
       const maybeInvoice = await usecase.execute({ invoiceId }, context);
-      return maybeInvoice
-        .map((result) => result.getValue())
-        .map((invoice) => ({ ...request, invoice }));
+      return maybeInvoice.map((invoice) => ({ ...request, invoice }));
     };
   }
 
@@ -159,12 +156,10 @@ export class GenerateDraftCompensatoryEventsUsecase
       const { invoiceId } = request;
 
       const maybeItems = await usecase.execute({ invoiceId }, context);
-      return maybeItems
-        .map((result) => result.getValue())
-        .map((items) => ({
-          ...request,
-          invoiceItems: items,
-        }));
+      return maybeItems.map((items) => ({
+        ...request,
+        invoiceItems: items,
+      }));
     };
   }
 
@@ -178,7 +173,6 @@ export class GenerateDraftCompensatoryEventsUsecase
 
       const maybeManuscript = await usecase.execute({ invoiceId }, context);
       return maybeManuscript
-        .map((result) => result.getValue())
         .chain(
           (
             manuscripts
@@ -277,7 +271,7 @@ export class GenerateDraftCompensatoryEventsUsecase
 
       const originalItems = cloneDeep(invoiceItems);
 
-      let finalResp = right<Result<UseCaseError>, void>(null);
+      let finalResp = right<UseCaseError, void>(null);
 
       allReductionDates.forEach(async (date) => {
         const it = cloneDeep(originalItems);

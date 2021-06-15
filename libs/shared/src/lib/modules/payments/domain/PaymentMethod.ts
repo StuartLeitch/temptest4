@@ -1,15 +1,15 @@
 // * Core Domain
-import { AggregateRoot } from '../../../core/domain/AggregateRoot';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
-import { Result } from '../../../core/logic/Result';
-// import {Guard} from '../../core/Guard';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either, right } from '../../../core/logic/Either';
 
 // * Subdomain
 import { PaymentMethodId } from './PaymentMethodId';
 
 interface PaymentMethodProps {
-  name: string;
   isActive: boolean;
+  name: string;
 }
 
 export enum PaymentMethodNames {
@@ -47,24 +47,13 @@ export class PaymentMethod extends AggregateRoot<PaymentMethodProps> {
   public static create(
     props: PaymentMethodProps,
     id?: UniqueEntityID
-  ): Result<PaymentMethod> {
-    // const guardResult = Guard.againstNullOrUndefinedBulk([
-    //   {argument: props.email, argumentName: 'email'},
-    //   {argument: props.password, argumentName: 'password'}
-    // ]);
-    // if (!guardResult.succeeded) {
-    //   return Result.fail<User>(guardResult.message);
-    // } else {
+  ): Either<GuardFailure, PaymentMethod> {
     const paymentMethod = new PaymentMethod(
       {
         ...props,
       },
       id
     );
-    // const idWasProvided = !!id;
-    // if (!idWasProvided) {
-    //   user.addDomainEvent(new UserCreatedEvent(user));
-    // }
-    return Result.ok<PaymentMethod>(paymentMethod);
+    return right(paymentMethod);
   }
 }

@@ -1,6 +1,3 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-
 import { JobData } from '@hindawi/sisif';
 import {
   SendInvoiceConfirmationReminderUsecase,
@@ -62,10 +59,7 @@ export const invoiceConfirmHandler = (
     .execute(request, usecaseContext)
     .then((maybeResult) => {
       if (maybeResult.isLeft()) {
-        loggerService.error(
-          maybeResult.value.errorValue().message,
-          maybeResult.value.errorValue()
-        );
+        loggerService.error(maybeResult.value.message, maybeResult.value);
       }
     })
     .catch((err) => {

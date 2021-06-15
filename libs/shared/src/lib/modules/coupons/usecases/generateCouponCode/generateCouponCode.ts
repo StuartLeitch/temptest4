@@ -1,17 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { UseCase } from '../../../../core/domain/UseCase';
-import { Result, left, right } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { right, left } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+
+import { CouponCode } from '../../domain/CouponCode';
 
 import { CouponRepoContract } from '../../repos/couponRepo';
-import { CouponCode } from '../../domain/CouponCode';
+
 import { GenerateCouponCodeResponse } from './generateCouponCodeResponse';
 
 export class GenerateCouponCodeUsecase
@@ -19,30 +16,33 @@ export class GenerateCouponCodeUsecase
     UseCase<
       Record<string, unknown>,
       Promise<GenerateCouponCodeResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      Record<string, unknown>,
-      UsecaseAuthorizationContext,
-      AccessControlContext
+      Context
     > {
   constructor(private couponRepo: CouponRepoContract) {}
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
   public async execute(
-    request?,
-    context?: UsecaseAuthorizationContext
+    request?: unknown,
+    context?: Context
   ): Promise<GenerateCouponCodeResponse> {
     try {
       const found = false;
       while (!found) {
-        const code = CouponCode.generateCouponCode();
-        const isCodeDuplicate = await this.couponRepo.isCodeUsed(code);
-        if (!isCodeDuplicate) {
-          return right(Result.ok(code));
+        const maybeCode = CouponCode.generateCouponCode();
+        if (maybeCode.isRight()) {
+          const code = maybeCode.value;
+          const maybeIsCodeDuplicate = await this.couponRepo.isCodeUsed(code);
+
+          if (maybeIsCodeDuplicate.isLeft()) {
+            return left(
+              new UnexpectedError(new Error(maybeIsCodeDuplicate.value.message))
+            );
+          }
+
+          const isCodeDuplicate = maybeIsCodeDuplicate.value;
+
+          if (!isCodeDuplicate) {
+            return right(code);
+          }
         }
       }
     } catch (err) {

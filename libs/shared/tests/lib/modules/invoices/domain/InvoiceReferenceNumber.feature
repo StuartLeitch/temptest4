@@ -1,5 +1,6 @@
 Feature: Invoice Reference Number
-    @referenceNumber
+
+    @ValidateInvoiceReferenceNumber
     Scenario Outline: Reference Number persistence matrix with new rules
         Given Invoice number is <invoiceNumber>
         Given The date of manuscript acceptance is <dateAccepted>
@@ -11,7 +12,7 @@ Feature: Invoice Reference Number
             | status | invoiceNumber | dateAccepted | dateIssued | persistentReferenceNumber |
             | DRAFT  |               |              |            |                           |
             | DRAFT  | 6666          | 2020-12-07   |            |                           |
-            | DRAFT  | 542           | 2008-03-13   | 2020-09-16 | 00542/2008                |                          
+            | DRAFT  | 542           | 2008-03-13   | 2020-09-16 | 00542/2008                |
             | ACTIVE | 6666          | 2020-12-06   | 2020-12-06 | 06666/2020                |
             | ACTIVE | 6666          | 2020-12-15   | 2020-12-15 | 006666/2020               |
             | ACTIVE | 6666          | 2021-04-14   | 2021-04-16 | 006666/2021               |

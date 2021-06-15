@@ -1,18 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
-import { Either, right, left } from '../../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
+import { right, left } from '../../../../../core/logic/Either';
 import { UseCase } from '../../../../../core/domain/UseCase';
+
+import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
+
 import { ErrorUtils } from './../../../../../utils/ErrorUtils';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
 
+import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
 import { ArticleRepoContract } from '../../../../manuscripts/repos/articleRepo';
 import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
 import { InvoiceItemRepoContract } from '../../../repos/invoiceItemRepo';
@@ -22,33 +19,19 @@ import { CatalogRepoContract } from '../../../../journals/repos';
 import { InvoiceRepoContract } from '../../../repos/invoiceRepo';
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
-import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
 
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
-import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
-import { VATService } from '@hindawi/shared';
+import { VATService } from '../../../../../domain/services/VATService';
 
 import { PublishInvoiceToErpUsecase } from '../publishInvoiceToErp/publishInvoiceToErp';
 
 import { ErpInvoiceResponse } from '../../../../../domain/services/ErpService';
 
-export type RetryFailedNetsuiteErpInvoicesResponse = Either<
-  UnexpectedError,
-  ErpInvoiceResponse[]
->;
+import { RetryFailedNetsuiteErpInvoicesResponse as Response } from './retryFailedNetsuiteErpInvoicesResponse';
+import { RetryFailedNetsuiteErpInvoicesDTO as DTO } from './retryFailedNetsuiteErpInvoicesDTO';
 
 export class RetryFailedNetsuiteErpInvoicesUsecase
-  implements
-    UseCase<
-      Record<string, unknown>,
-      Promise<RetryFailedNetsuiteErpInvoicesResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      Record<string, unknown>,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   private publishToErpUsecase: PublishInvoiceToErpUsecase;
   constructor(
     private invoiceRepo: InvoiceRepoContract,
@@ -82,17 +65,19 @@ export class RetryFailedNetsuiteErpInvoicesUsecase
     );
   }
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  // @Authorize('zzz:zzz')
-  public async execute(
-    request?: Record<string, unknown>,
-    context?: UsecaseAuthorizationContext
-  ): Promise<RetryFailedNetsuiteErpInvoicesResponse> {
+  public async execute(request?: DTO, context?: Context): Promise<Response> {
     try {
-      const failedErpInvoicesIds = await this.invoiceRepo.getFailedNetsuiteErpInvoices();
+      const maybeFailedErpInvoicesIds = await this.invoiceRepo.getFailedNetsuiteErpInvoices();
+
+      if (maybeFailedErpInvoicesIds.isLeft()) {
+        return left(
+          new UnexpectedError(
+            new Error(maybeFailedErpInvoicesIds.value.message)
+          )
+        );
+      }
+
+      const failedErpInvoicesIds = maybeFailedErpInvoicesIds.value;
 
       const updatedInvoices: ErpInvoiceResponse[] = [];
 

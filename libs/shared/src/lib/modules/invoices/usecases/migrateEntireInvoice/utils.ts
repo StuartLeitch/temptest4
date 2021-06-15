@@ -1,4 +1,4 @@
-import { left, right, Either } from '../../../../core/logic/Result';
+import { Either, right, left } from '../../../../core/logic/Either';
 
 import { PayerType } from '../../../payers/domain/Payer';
 

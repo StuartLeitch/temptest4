@@ -1,22 +1,33 @@
-import {Address} from '../../domain/Address';
-import {AddressId} from '../../domain/AddressId';
-import {AddressRepoContract} from '../addressRepo';
-import {AddressMap} from '../../mappers/AddressMap';
-import {Knex, TABLES} from '../../../../infrastructure/database/knex';
-import {RepoErrorCode, RepoError} from '../../../../infrastructure/RepoError';
-import {AbstractBaseDBRepo} from '../../../../infrastructure/AbstractBaseDBRepo';
+import { Either, right, left } from '../../../../core/logic/Either';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
-export class KnexAddressRepo extends AbstractBaseDBRepo<Knex, Address>
+import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
+import { RepoErrorCode, RepoError } from '../../../../infrastructure/RepoError';
+import { Knex, TABLES } from '../../../../infrastructure/database/knex';
+
+import { AddressId } from '../../domain/AddressId';
+import { Address } from '../../domain/Address';
+
+import { AddressMap } from '../../mappers/AddressMap';
+
+import { AddressRepoContract } from '../addressRepo';
+
+export class KnexAddressRepo
+  extends AbstractBaseDBRepo<Knex, Address>
   implements AddressRepoContract {
-  async save(address: Address): Promise<Address> {
-    const {db} = this;
+  async save(
+    address: Address
+  ): Promise<Either<GuardFailure | RepoError, Address>> {
+    const { db } = this;
     await db(TABLES.ADDRESSES).insert(AddressMap.toPersistence(address));
 
-    return await this.findById(address.addressId);
+    return this.findById(address.addressId);
   }
 
-  async findById(addressId: AddressId): Promise<Address> {
-    const {db} = this;
+  async findById(
+    addressId: AddressId
+  ): Promise<Either<GuardFailure | RepoError, Address>> {
+    const { db } = this;
 
     const addressRow = await db(TABLES.ADDRESSES)
       .select()
@@ -24,26 +35,27 @@ export class KnexAddressRepo extends AbstractBaseDBRepo<Knex, Address>
       .first();
 
     if (!addressRow) {
-      throw RepoError.createEntityNotFoundError(
-        'address',
-        addressId.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError('address', addressId.id.toString())
       );
     }
 
     return AddressMap.toDomain(addressRow);
   }
 
-  async exists(address: Address): Promise<boolean> {
+  async exists(
+    address: Address
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     try {
       await this.findById(address.addressId);
     } catch (err) {
       if (err.code === RepoErrorCode.ENTITY_NOT_FOUND) {
-        return false;
+        return right(false);
       }
 
-      throw err;
+      return left(RepoError.fromDBError(err));
     }
 
-    return true;
+    return right(true);
   }
 }

@@ -1,5 +1,5 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
 import { Transaction } from '../../domain/Transaction';
 
@@ -9,5 +9,5 @@ export type GetTransactionDetailsByManuscriptCustomIdResponse = Either<
   | Errors.TransactionNotFoundError
   | Errors.CustomIdRequiredError
   | UnexpectedError,
-  Result<Transaction>
+  Transaction
 >;

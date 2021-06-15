@@ -1,12 +1,13 @@
-import { Result, Either } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
-import { GetPaymentMethodByNameErrors } from './getPaymentMethodByNameErrors';
 import { PaymentMethod } from '../../domain/PaymentMethod';
 
+import * as Errors from './getPaymentMethodByNameErrors';
+
 export type GetPaymentMethodByNameResponse = Either<
-  | GetPaymentMethodByNameErrors.NoPaymentMethodFound
-  | GetPaymentMethodByNameErrors.SearchNameMustNotBeEmpty
+  | Errors.NoPaymentMethodFound
+  | Errors.SearchNameMustNotBeEmpty
   | UnexpectedError,
-  Result<PaymentMethod>
+  PaymentMethod
 >;

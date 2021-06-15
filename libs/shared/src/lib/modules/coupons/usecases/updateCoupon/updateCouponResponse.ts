@@ -1,17 +1,20 @@
-import { Result, Either } from '../../../../core/logic/Result';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
 import { Coupon } from '../../domain/Coupon';
 
-import { UpdateCouponErrors } from './updateCouponErrors';
+import * as Errors from './updateCouponErrors';
 
 export type UpdateCouponResponse = Either<
-  | UpdateCouponErrors.ExpirationDateRequired
-  | UpdateCouponErrors.InvalidExpirationDate
-  | UpdateCouponErrors.InvalidCouponStatus
-  | UpdateCouponErrors.InvalidCouponType
-  | UpdateCouponErrors.IdRequired
-  | UpdateCouponErrors.InvalidId
-  | UnexpectedError,
-  Result<Coupon>
+  | Errors.CouldNotSaveCouponError
+  | Errors.ExpirationDateRequired
+  | Errors.InvalidExpirationDate
+  | Errors.CouponNotFoundError
+  | Errors.InvalidCouponStatus
+  | Errors.InvalidCouponType
+  | Errors.IdRequired
+  | UnexpectedError
+  | GuardFailure,
+  Coupon
 >;

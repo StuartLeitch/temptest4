@@ -13,7 +13,7 @@ import {
 } from '../../../../../../src/lib/shared';
 
 function makeCouponData(id: string, code: string, overwrites?: any): Coupon {
-  return CouponMap.toDomain({
+  const coupon = CouponMap.toDomain({
     id,
     code,
     status: 'ACTIVE',
@@ -23,6 +23,12 @@ function makeCouponData(id: string, code: string, overwrites?: any): Coupon {
     name: 'test-coupon',
     ...overwrites,
   });
+
+  if (coupon.isLeft()) {
+    throw coupon.value;
+  }
+
+  return coupon.value;
 }
 
 const context: UsecaseAuthorizationContext = {
@@ -47,7 +53,13 @@ Given(
   /^I have the coupon "([\w-]+)" with "([\w-]+)"/,
   async (testId: string, testCode: string) => {
     coupon = makeCouponData(testId, testCode);
-    coupon = await mockCouponRepo.save(coupon);
+    const maybeCoupon = await mockCouponRepo.save(coupon);
+
+    if (maybeCoupon.isLeft()) {
+      throw maybeCoupon.value;
+    }
+
+    coupon = maybeCoupon.value;
   }
 );
 
@@ -58,10 +70,10 @@ When(/^I execute getRecentCouponsUsecase/, async () => {
 
 Then(/^I should receive the recently added coupon/, () => {
   expect(response.isRight()).to.be.true;
-  expect(response.value.getValue()).to.have.property('totalCount').to.equal(1);
+  expect(response.value).to.have.property('totalCount').to.equal(1);
 });
 
 Then(/^I should not receive any coupon/, () => {
   expect(response.isRight()).to.be.true;
-  expect(response.value.getValue()).to.have.property('totalCount').to.equal(0);
+  expect(response.value).to.have.property('totalCount').to.equal(0);
 });

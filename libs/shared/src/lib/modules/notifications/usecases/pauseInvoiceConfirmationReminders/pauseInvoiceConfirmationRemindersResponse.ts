@@ -1,11 +1,9 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
-import * as PauseInvoiceConfirmationRemindersErrors from './pauseInvoiceConfirmationRemindersErrors';
+import * as Errors from './pauseInvoiceConfirmationRemindersErrors';
 
 export type PauseInvoiceConfirmationRemindersResponse = Either<
-  | PauseInvoiceConfirmationRemindersErrors.InvoiceIdRequiredError
-  | PauseInvoiceConfirmationRemindersErrors.InvoiceNotFoundError
-  | UnexpectedError,
-  Result<void>
+  Errors.InvoiceIdRequiredError | Errors.InvoiceNotFoundError | UnexpectedError,
+  void
 >;

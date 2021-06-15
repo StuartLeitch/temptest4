@@ -1,22 +1,24 @@
 // * Core Domain
-import { AggregateRoot } from '../../../core/domain/AggregateRoot';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
-import { Result } from '../../../core/logic/Result';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { Either, right, left } from '../../../core/logic/Either';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
 import { Guard } from '../../../core/logic/Guard';
 
 // * Subdomain imports
-import { InvoiceId } from '../../invoices/domain/InvoiceId';
-import { Name } from '../../../domain/Name';
-import { Email } from '../../../domain/Email';
 import { PhoneNumber } from '../../../domain/PhoneNumber';
+import { Email } from '../../../domain/Email';
+import { Name } from '../../../domain/Name';
+
 import { AddressId } from '../../addresses/domain/AddressId';
-import { PayerId } from './PayerId';
-import { PayerName } from './PayerName';
+import { InvoiceId } from '../../invoices/domain/InvoiceId';
 import { PayerTitle } from './PayerTitle';
+import { PayerName } from './PayerName';
+import { PayerId } from './PayerId';
 
 export enum PayerType {
+  INSTITUTION = 'INSTITUTION',
   INDIVIDUAL = 'INDIVIDUAL',
-  INSTITUTION = 'INSTITUTION'
 }
 
 export interface PayerProps {
@@ -97,26 +99,29 @@ export class Payer extends AggregateRoot<PayerProps> {
     super(props, id);
   }
 
-  public static create(props: PayerProps, id?: UniqueEntityID): Result<Payer> {
+  public static create(
+    props: PayerProps,
+    id?: UniqueEntityID
+  ): Either<GuardFailure, Payer> {
     const propsResult = Guard.againstNullOrUndefinedBulk([
       { argument: props.name, argumentName: 'Payer Name' },
       { argument: props.type, argumentName: 'Payer Type' },
-      { argument: props.billingAddressId, argumentName: 'Address Id' }
+      { argument: props.billingAddressId, argumentName: 'Address Id' },
     ]);
 
     if (!propsResult.succeeded) {
-      return Result.fail<Payer>(propsResult.message);
+      return left(new GuardFailure(propsResult.message));
     }
 
     const payer = new Payer(
       {
         ...props,
-        dateAdded: props.dateAdded ? props.dateAdded : new Date()
+        dateAdded: props.dateAdded ? props.dateAdded : new Date(),
       },
       id
     );
 
-    return Result.ok<Payer>(payer);
+    return right(payer);
   }
 
   public set(key: string, value: any) {

@@ -3,7 +3,6 @@ import { Given, When, Then, Before } from '@cucumber/cucumber';
 import { spy } from 'sinon';
 
 import { ConfirmInvoiceUsecase } from '../../../../../../src/lib/modules/invoices/usecases/confirmInvoice/confirmInvoice';
-// import { ConfirmInvoiceResponse } from '../../../../../../src/lib/modules/invoices/usecases/confirmInvoice/confirmInvoiceResponse'
 import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import { MockAddressRepo } from '../../../../../../src/lib/modules/addresses/repos/mocks/mockAddressRepo';
@@ -53,7 +52,7 @@ const context: UsecaseAuthorizationContext = {
   roles: [Roles.PAYER],
 };
 
-Before(function () {
+Before({ tags: '@ValidateConfirmInvoice' }, function () {
   const _emailService = {
     createInvoicePendingNotification: () => ({
       sendEmail: () => void 0,
@@ -99,69 +98,118 @@ Given(
       dateCreated: new Date(),
       id: testInvoiceId,
     });
+
+    if (invoice.isLeft()) {
+      throw invoice.value;
+    }
+
     const invoiceItem = InvoiceItemMap.toDomain({
       invoiceId: testInvoiceId,
       manuscriptId: '8888',
       price: 100,
     });
+
+    if (invoiceItem.isLeft()) {
+      throw invoiceItem.value;
+    }
+
     const transaction = TransactionMap.toDomain({
       id: 'transaction-id',
       status: 'ACTIVE',
     });
 
-    await mockInvoiceRepo.save(invoice);
-    await mockInvoiceItemRepo.save(invoiceItem);
-    await mockTransactionRepo.save(transaction);
+    if (transaction.isLeft()) {
+      throw transaction.value;
+    }
+
+    await mockInvoiceRepo.save(invoice.value);
+    await mockInvoiceItemRepo.save(invoiceItem.value);
+    await mockTransactionRepo.save(transaction.value);
   }
 );
 
 Given(
   /^There is a fully discounted Invoice with the ID "([\w-]+)"$/,
   async function (testInvoiceId: string) {
-    const invoice = InvoiceMap.toDomain({
+    const maybeInvoice = InvoiceMap.toDomain({
       transactionId: 'transaction-id',
       status: 'DRAFT',
       dateCreated: new Date(),
       id: testInvoiceId,
     });
 
-    const invoiceItem = InvoiceItemMap.toDomain({
+    if (maybeInvoice.isLeft()) {
+      throw maybeInvoice.value;
+    }
+
+    const invoice = maybeInvoice.value;
+
+    const maybeInvoiceItem = InvoiceItemMap.toDomain({
       invoiceId: testInvoiceId,
       manuscriptId: '8888',
       price: 100,
       vat: 0,
     });
-    const transaction = TransactionMap.toDomain({
+
+    if (maybeInvoiceItem.isLeft()) {
+      throw maybeInvoiceItem.value;
+    }
+
+    const invoiceItem = maybeInvoiceItem.value;
+
+    const maybeTransaction = TransactionMap.toDomain({
       id: 'transaction-id',
       status: 'ACTIVE',
     });
+
+    if (maybeTransaction.isLeft()) {
+      throw maybeTransaction.value;
+    }
+
+    const transaction = maybeTransaction.value;
 
     await mockInvoiceRepo.save(invoice);
     await mockInvoiceItemRepo.save(invoiceItem);
     await mockTransactionRepo.save(transaction);
 
+    const maybeCoupon = CouponMap.toDomain({
+      code: 'ASD1123',
+      dateCreated: new Date(),
+      dateUpdated: new Date(),
+      id: 'coup1',
+      invoiceItemType: 'APC',
+      name: 'coup',
+      redeemCount: 1,
+      reduction: 50,
+      status: 'active',
+      type: 'SINGLE_USE',
+    });
+
+    if (maybeCoupon.isLeft()) {
+      throw maybeCoupon.value;
+    }
+
+    const coupon = maybeCoupon.value;
+
     mockCouponRepo.addMockCouponToInvoiceItem(
-      CouponMap.toDomain({
-        code: 'ASD1123',
-        dateCreated: new Date(),
-        dateUpdated: new Date(),
-        id: 'coup1',
-        invoiceItemType: 'APC',
-        name: 'coup',
-        redeemCount: 1,
-        reduction: 50,
-        status: 'active',
-        type: 'SINGLE_USE',
-      }),
+      coupon,
       invoiceItem.invoiceItemId
     );
 
+    const maybeWaiver = WaiverMap.toDomain({
+      waiverType: 'EDITOR_DISCOUNT',
+      reduction: 50,
+      isActive: true,
+    });
+
+    if (maybeWaiver.isLeft()) {
+      throw maybeWaiver.value;
+    }
+
+    const waiver = maybeWaiver.value;
+
     mockWaiverRepo.addMockWaiverForInvoiceItem(
-      WaiverMap.toDomain({
-        waiverType: 'EDITOR_DISCOUNT',
-        reduction: 50,
-        isActive: true,
-      }),
+      waiver,
       invoiceItem.invoiceItemId
     );
   }
@@ -171,9 +219,15 @@ Given(/^The transaction has status "([\w]+)"$/, async (status) => {
   const transactionId = TransactionId.create(
     new UniqueEntityID('transaction-id')
   );
-  const transaction = await mockTransactionRepo.getTransactionById(
+  const maybeTransaction = await mockTransactionRepo.getTransactionById(
     transactionId
   );
+
+  if (maybeTransaction.isLeft()) {
+    throw maybeTransaction.value;
+  }
+
+  const transaction = maybeTransaction.value;
 
   transaction.props.status = TransactionStatus[status];
 
@@ -205,9 +259,16 @@ Then('The result is successful', function () {
 Then(
   /^The invoice "([\w-]+)" is successfully updated to status "([\w-]+)"$/,
   async function (invoiceId: string, status: string) {
-    const invoice = await mockInvoiceRepo.getInvoiceById(
-      InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
+    const maybeInvoice = await mockInvoiceRepo.getInvoiceById(
+      InvoiceId.create(new UniqueEntityID(invoiceId))
     );
+
+    if (maybeInvoice.isLeft()) {
+      throw maybeInvoice.value;
+    }
+
+    const invoice = maybeInvoice.value;
+
     expect(invoice.status).to.equal(status);
   }
 );
@@ -215,9 +276,16 @@ Then(
 Then(
   /^The Payer "([\w-]+)" is saved successfully for the invoice with the ID "([\w-]+)"$/,
   async function (payerName: string, invoiceId: string) {
-    const payer = await mockPayerRepo.getPayerByInvoiceId(
-      InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
+    const maybePayer = await mockPayerRepo.getPayerByInvoiceId(
+      InvoiceId.create(new UniqueEntityID(invoiceId))
     );
+
+    if (maybePayer.isLeft()) {
+      throw maybePayer.value;
+    }
+
+    const payer = maybePayer.value;
+
     expect(payer.name.value).to.equal(payerName);
   }
 );
@@ -225,10 +293,25 @@ Then(
 Then(
   /^The Invoice "([\w-]+)" has vat amount greater than (\d+)$/,
   async function (invoiceId: string, vatAmount: number) {
-    const id = InvoiceId.create(new UniqueEntityID(invoiceId)).getValue();
-    const invoice = await mockInvoiceRepo.getInvoiceById(id);
+    const id = InvoiceId.create(new UniqueEntityID(invoiceId));
 
-    invoice.addItems(await mockInvoiceItemRepo.getItemsByInvoiceId(id));
+    const maybeInvoice = await mockInvoiceRepo.getInvoiceById(id);
+
+    if (maybeInvoice.isLeft()) {
+      throw maybeInvoice.value;
+    }
+
+    const invoice = maybeInvoice.value;
+
+    const maybeInvoiceItems = await mockInvoiceItemRepo.getItemsByInvoiceId(id);
+
+    if (maybeInvoiceItems.isLeft()) {
+      throw maybeInvoiceItems.value;
+    }
+
+    const invoiceItems = maybeInvoiceItems.value;
+
+    invoice.addItems(invoiceItems);
     expect(invoice.invoiceVatTotal).to.be.greaterThan(vatAmount);
   }
 );

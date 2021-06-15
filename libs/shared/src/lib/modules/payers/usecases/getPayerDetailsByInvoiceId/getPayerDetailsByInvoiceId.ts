@@ -1,18 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { AsyncEither } from '../../../../core/logic/AsyncEither';
+import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
@@ -23,17 +17,11 @@ import { Payer } from '../../domain/Payer';
 
 // * Usecase specific
 import { GetPayerDetailsByInvoiceIdResponse as Response } from './getPayerDetailsByInvoiceIdResponse';
-import { GetPayerDetailsByInvoiceIdErrors as Errors } from './getPayerDetailsByInvoiceIdErrors';
 import { GetPayerDetailsByInvoiceIdDTO as DTO } from './getPayerDetailsByInvoiceIdDTO';
+import * as Errors from './getPayerDetailsByInvoiceIdErrors';
 
 export class GetPayerDetailsByInvoiceIdUsecase
-  implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private payerRepo: PayerRepoContract,
     private loggerService: LoggerContract
@@ -42,22 +30,14 @@ export class GetPayerDetailsByInvoiceIdUsecase
     this.fetchPayer = this.fetchPayer.bind(this);
   }
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  // @Authorize('invoice:read')
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      const execution = new AsyncEither(request)
+      const execution = await new AsyncEither(request)
         .then(this.validateRequest)
         .then(this.fetchPayer)
-        .map((payer) => Result.ok<Payer>(payer));
+        .execute();
 
-      return execution.execute();
+      return execution;
     } catch (e) {
       return left(new UnexpectedError(e));
     }
@@ -88,16 +68,16 @@ export class GetPayerDetailsByInvoiceIdUsecase
     );
 
     const uuid = new UniqueEntityID(request.invoiceId);
-    const invoiceId = InvoiceId.create(uuid).getValue();
+    const invoiceId = InvoiceId.create(uuid);
 
     try {
       const payer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
 
-      if (!payer) {
+      if (payer.isLeft()) {
         return left(new Errors.NoPayerFoundForInvoiceError(request.invoiceId));
       }
 
-      return right(payer);
+      return right(payer.value);
     } catch (e) {
       return left(new Errors.FetchPayerFromDbError(e));
     }

@@ -1,6 +1,10 @@
 import { expect } from 'chai';
 import { Given, When, Then, Before } from '@cucumber/cucumber';
 
+import { GuardFailure } from '../../../../../../src/lib/core/logic/GuardFailure';
+import { RepoError } from '../../../../../../src/lib/infrastructure/RepoError';
+import { Either } from '../../../../../../src/lib/core/logic/Either';
+
 import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceId';
 import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 import { Invoice } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
@@ -14,12 +18,18 @@ import { MockInvoiceRepo } from './../../../../../../src/lib/modules/invoices/re
 import { MockErpReferenceRepo } from './../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
 
 function makeInvoiceData(overwrites?: any): Invoice {
-  return InvoiceMap.toDomain({
+  const invoice = InvoiceMap.toDomain({
     status: InvoiceStatus.DRAFT,
     dateCreated: new Date(),
     deleted: 0,
     ...overwrites,
   });
+
+  if (invoice.isLeft()) {
+    throw invoice.value;
+  }
+
+  return invoice.value;
 }
 
 let mockInvoiceRepo: MockInvoiceRepo;
@@ -31,10 +41,11 @@ let invoiceExists: boolean;
 let saveInvoice: Invoice;
 let invoiceList: Invoice[];
 let foundInvoice: Invoice;
+let maybeInvoiceList: Either<GuardFailure | RepoError, Invoice[]>;
 
 let lastInvoiceNumber: number = 1;
 
-Before(async () => {
+Before({ tags: '@ValidateKnexInvoiceRepo' }, async () => {
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
   mockArticleRepo = new MockArticleRepo();
   mockErpReferenceRepo = new MockErpReferenceRepo();
@@ -49,15 +60,25 @@ Given(
   /^a invoice with the id "([\w-]+)" and transaction id "([\w-]+)"$/,
   async (invoiceId: string, transactionId: string) => {
     invoice = makeInvoiceData({ id: invoiceId, transactionId: transactionId });
-    invoice = await mockInvoiceRepo.save(invoice);
+    const maybeInvoice = await mockInvoiceRepo.save(invoice);
+
+    if (maybeInvoice.isLeft()) {
+      throw maybeInvoice.value;
+    }
+
+    invoice = maybeInvoice.value;
   }
 );
 
 When(/^we call getInvoiceById for "([\w-]+)"$/, async (invoiceId: string) => {
-  const invoiceIdObj = InvoiceId.create(
-    new UniqueEntityID(invoiceId)
-  ).getValue();
-  foundInvoice = await mockInvoiceRepo.getInvoiceById(invoiceIdObj);
+  const invoiceIdObj = InvoiceId.create(new UniqueEntityID(invoiceId));
+  const maybeFoundInvoice = await mockInvoiceRepo.getInvoiceById(invoiceIdObj);
+
+  if (maybeFoundInvoice.isLeft()) {
+    throw maybeFoundInvoice.value;
+  }
+
+  foundInvoice = maybeFoundInvoice.value;
 });
 
 Then('getInvoiceById returns the invoice', async () => {
@@ -67,12 +88,15 @@ Then('getInvoiceById returns the invoice', async () => {
 When(
   /^we call getInvoiceById for an un-existent invoice "([\w-]+)"$/,
   async (wrongInvoiceId: string) => {
-    const id = InvoiceId.create(new UniqueEntityID(wrongInvoiceId)).getValue();
-    try {
-      foundInvoice = await mockInvoiceRepo.getInvoiceById(id);
-    } catch (err) {
-      // do nothing yet
+    const id = InvoiceId.create(new UniqueEntityID(wrongInvoiceId));
+
+    const maybeFoundInvoice = await mockInvoiceRepo.getInvoiceById(id);
+
+    if (maybeFoundInvoice.isLeft()) {
+      throw maybeFoundInvoice.value;
     }
+
+    foundInvoice = maybeFoundInvoice.value;
   }
 );
 
@@ -86,38 +110,57 @@ When(
     const transactionIdObj = TransactionId.create(
       new UniqueEntityID(transactionId)
     );
-    invoiceList = await mockInvoiceRepo.getInvoicesByTransactionId(
+
+    maybeInvoiceList = await mockInvoiceRepo.getInvoicesByTransactionId(
       transactionIdObj
     );
+
+    if (maybeInvoiceList.isRight()) {
+      invoiceList = maybeInvoiceList.value;
+    } else {
+      invoiceList = null;
+    }
   }
 );
 Then(
   /^getInvoiceByTransactionId returns the (\d+) invoices$/,
   async (count: number) => {
+    expect(maybeInvoiceList.isRight()).to.be.true;
     expect(invoiceList.length).to.equal(count);
   }
 );
 Then('getInvoiceByTransactionId returns null', async () => {
+  expect(maybeInvoiceList.isLeft()).to.be.true;
   expect(invoiceList).to.equal(null);
 });
 
 When(
   /^we call delete for the invoice "([\w-]+)"$/,
   async (invoiceId: string) => {
-    const invoiceIdObj = InvoiceId.create(
-      new UniqueEntityID(invoiceId)
-    ).getValue();
-    foundInvoice = await mockInvoiceRepo.getInvoiceById(invoiceIdObj);
-    await mockInvoiceRepo.delete(foundInvoice);
+    const invoiceIdObj = InvoiceId.create(new UniqueEntityID(invoiceId));
+
+    const maybeFoundInvoice = await mockInvoiceRepo.getInvoiceById(
+      invoiceIdObj
+    );
+
+    if (maybeFoundInvoice.isLeft()) {
+      throw maybeFoundInvoice.value;
+    }
+
+    foundInvoice = maybeFoundInvoice.value;
+
+    const maybeResult = await mockInvoiceRepo.delete(foundInvoice);
+
+    if (maybeResult.isLeft()) {
+      throw maybeResult.value;
+    }
   }
 );
 
 Then(
   /^delete soft deletes the invoice "([\w-]+)"$/,
   async (invoiceId: string) => {
-    const invoiceIdObj = InvoiceId.create(
-      new UniqueEntityID(invoiceId)
-    ).getValue();
+    const invoiceIdObj = InvoiceId.create(new UniqueEntityID(invoiceId));
     const index = mockInvoiceRepo.deletedItems.findIndex((item) =>
       item.id.equals(invoiceIdObj.id)
     );
@@ -126,32 +169,62 @@ Then(
 );
 
 When(/^we call update for invoice "([\w-]+)"$/, async (invoiceId: string) => {
-  const invoiceIdObj = InvoiceId.create(
-    new UniqueEntityID(invoiceId)
-  ).getValue();
-  foundInvoice = await mockInvoiceRepo.getInvoiceById(invoiceIdObj);
+  const invoiceIdObj = InvoiceId.create(new UniqueEntityID(invoiceId));
+
+  const maybeFoundInvoice = await mockInvoiceRepo.getInvoiceById(invoiceIdObj);
+
+  if (maybeFoundInvoice.isLeft()) {
+    throw maybeFoundInvoice.value;
+  }
+
+  foundInvoice = maybeFoundInvoice.value;
+
   const invoiceNumber = 1111;
   foundInvoice.invoiceNumber = invoiceNumber;
-  await mockInvoiceRepo.update(foundInvoice);
+
+  const maybeResult = await mockInvoiceRepo.update(foundInvoice);
+
+  if (maybeResult.isLeft()) {
+    throw maybeResult.value;
+  }
 });
 
 Then(/^update modifies the invoice "([\w-]+)"$/, async (invoiceId: string) => {
-  const invoiceIdObj = InvoiceId.create(
-    new UniqueEntityID(invoiceId)
-  ).getValue();
-  foundInvoice = await mockInvoiceRepo.getInvoiceById(invoiceIdObj);
+  const invoiceIdObj = InvoiceId.create(new UniqueEntityID(invoiceId));
+
+  const maybeFoundInvoice = await mockInvoiceRepo.getInvoiceById(invoiceIdObj);
+
+  if (maybeFoundInvoice.isLeft()) {
+    throw maybeFoundInvoice.value;
+  }
+
+  foundInvoice = maybeFoundInvoice.value;
+
   expect(foundInvoice.invoiceNumber).to.equal('1111');
 });
 
 When(/^we call exists for ([\w-]+) invoice id$/, async (invoiceId: string) => {
-  const id = InvoiceId.create(new UniqueEntityID(invoiceId)).getValue();
-  foundInvoice = await mockInvoiceRepo.getInvoiceById(id);
+  const id = InvoiceId.create(new UniqueEntityID(invoiceId));
+
+  const maybeFoundInvoice = await mockInvoiceRepo.getInvoiceById(id);
+
+  if (maybeFoundInvoice.isLeft()) {
+    throw maybeFoundInvoice.value;
+  }
+
+  foundInvoice = maybeFoundInvoice.value;
 
   if (!foundInvoice) {
     foundInvoice = makeInvoiceData({ id: invoiceId });
   }
 
-  invoiceExists = await mockInvoiceRepo.exists(foundInvoice);
+  const maybeInvoiceExists = await mockInvoiceRepo.exists(foundInvoice);
+
+  if (maybeInvoiceExists.isLeft()) {
+    throw maybeInvoiceExists.value;
+  }
+
+  invoiceExists = maybeInvoiceExists.value;
 });
 
 Then(/^Invoice.exists returns (.*)$/, async (exists: string) => {
@@ -166,7 +239,13 @@ Given(
 );
 
 When('we call Invoice.save on the invoice object', async () => {
-  saveInvoice = await mockInvoiceRepo.save(invoice);
+  const maybeSaveInvoice = await mockInvoiceRepo.save(invoice);
+
+  if (maybeSaveInvoice.isLeft()) {
+    throw maybeSaveInvoice.value;
+  }
+
+  saveInvoice = maybeSaveInvoice.value;
 });
 
 Then('the invoice object should be saved', async () => {
@@ -188,8 +267,15 @@ When(
 When(
   /^we call Invoice.assignInvoiceNumber on the invoice "([\w-]+)"$/,
   async (invoiceId: string) => {
-    const id = InvoiceId.create(new UniqueEntityID(invoiceId)).getValue();
-    foundInvoice = await mockInvoiceRepo.getInvoiceById(id);
+    const id = InvoiceId.create(new UniqueEntityID(invoiceId));
+    const maybeFoundInvoice = await mockInvoiceRepo.getInvoiceById(id);
+
+    if (maybeFoundInvoice.isLeft()) {
+      throw maybeFoundInvoice.value;
+    }
+
+    foundInvoice = maybeFoundInvoice.value;
+
     lastInvoiceNumber = await mockInvoiceRepo.getCurrentInvoiceNumber();
     foundInvoice.assignInvoiceNumber(lastInvoiceNumber);
   }
@@ -198,8 +284,13 @@ When(
 Then(
   /^the invoice number of "([\w-]+)" should be ([\w-]+)$/,
   async (invoiceId: string, invoiceNumber: string) => {
-    const id = InvoiceId.create(new UniqueEntityID(invoiceId)).getValue();
-    foundInvoice = await mockInvoiceRepo.getInvoiceById(id);
-    // expect(foundInvoice.invoiceNumber).to.equal(invoiceNumber);
+    const id = InvoiceId.create(new UniqueEntityID(invoiceId));
+    const maybeFoundInvoice = await mockInvoiceRepo.getInvoiceById(id);
+
+    if (maybeFoundInvoice.isLeft()) {
+      throw maybeFoundInvoice.value;
+    }
+
+    foundInvoice = maybeFoundInvoice.value;
   }
 );

@@ -1,20 +1,18 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { Result, right, left } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { right, left } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
   AccessControlledUsecase,
   AccessControlContext,
   Authorize,
 } from '../../../../domain/authorization';
 
-import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
+import { ManuscriptId } from '../../../manuscripts/domain/ManuscriptId';
 import { Manuscript } from '../../domain/Manuscript';
 
 import { ArticleRepoContract } from '../../repos/articleRepo';
@@ -22,8 +20,6 @@ import { ArticleRepoContract } from '../../repos/articleRepo';
 import { EditManuscriptResponse as Response } from './editManuscriptResponse';
 import type { EditManuscriptDTO as DTO } from './editManuscriptDTO';
 import * as Errors from './editManuscriptErrors';
-
-type Context = UsecaseAuthorizationContext;
 
 export class EditManuscriptUsecase
   implements
@@ -44,11 +40,21 @@ export class EditManuscriptUsecase
 
     const manuscriptId = ManuscriptId.create(
       new UniqueEntityID(request.manuscriptId)
-    ).getValue();
+    );
 
     try {
       try {
-        manuscript = await this.manuscriptRepo.findById(manuscriptId);
+        const maybeManuscript = await this.manuscriptRepo.findById(
+          manuscriptId
+        );
+
+        if (maybeManuscript.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeManuscript.value.message))
+          );
+        }
+
+        manuscript = maybeManuscript.value;
       } catch (e) {
         return left(
           new Errors.ManuscriptFoundError(manuscriptId.id.toString())

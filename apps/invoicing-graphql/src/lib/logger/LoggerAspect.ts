@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
 import { beforeMethod, afterMethod, Metadata } from 'aspect.js';
 
 import {
@@ -33,19 +30,14 @@ import {
   EditManuscriptUsecase,
   GetPaymentInfoUsecase,
   RecordPaymentUsecase,
-  GetJournal,
+  GetJournalUsecase,
   Logger,
 } from '@hindawi/shared';
 
-// import { Logger } from '../../../../../libs/shared/src/lib/infrastructure/logging/implementations/Logger';
 const logger = new Logger();
 logger.setScope('Usecase:Aspect');
 
 const watchList = [
-  // GetPaymentMethodsUseCase,
-
-  // Phenom Events handling usecases
-  // EpicOnArticlePublishedUsecase,
   CreateTransactionUsecase,
   CreateManuscriptUsecase,
   GetManuscriptByManuscriptIdUsecase,
@@ -54,7 +46,7 @@ const watchList = [
   UpdateInvoiceItemsUsecase,
   GetInvoiceIdByManuscriptCustomIdUsecase,
   GetItemsForInvoiceUsecase,
-  GetJournal,
+  GetJournalUsecase,
   UpdateTransactionOnAcceptManuscriptUsecase,
   UpdateCatalogItemToCatalogUseCase,
   AssignEditorsToJournalUsecase,
@@ -88,9 +80,6 @@ export class LoggerAspect {
   @beforeMethod({
     classes: aspect.classes,
     methods: [
-      // GetPaymentMethodsUseCase.prototype.execute,
-      // Phenom Events handling usecases
-      // EpicOnArticlePublishedUsecase.prototype.execute,
       CreateTransactionUsecase.prototype.execute,
       CreateManuscriptUsecase.prototype.execute,
       GetManuscriptByManuscriptIdUsecase.prototype.execute,
@@ -99,7 +88,7 @@ export class LoggerAspect {
       UpdateInvoiceItemsUsecase.prototype.execute,
       GetInvoiceIdByManuscriptCustomIdUsecase.prototype.execute,
       GetItemsForInvoiceUsecase.prototype.execute,
-      GetJournal.prototype.execute,
+      GetJournalUsecase.prototype.execute,
       UpdateTransactionOnAcceptManuscriptUsecase.prototype.execute,
       UpdateCatalogItemToCatalogUseCase.prototype.execute,
       AssignEditorsToJournalUsecase.prototype.execute,
@@ -134,8 +123,6 @@ export class LoggerAspect {
   @afterMethod({
     classes: aspect.classes,
     methods: [
-      // GetPaymentMethodsUseCase.prototype.execute,
-      // EpicOnArticlePublishedUsecase.prototype.execute,
       CreateTransactionUsecase.prototype.execute,
       CreateManuscriptUsecase.prototype.execute,
       GetManuscriptByManuscriptIdUsecase.prototype.execute,
@@ -144,7 +131,7 @@ export class LoggerAspect {
       UpdateInvoiceItemsUsecase.prototype.execute,
       GetInvoiceIdByManuscriptCustomIdUsecase.prototype.execute,
       GetItemsForInvoiceUsecase.prototype.execute,
-      GetJournal.prototype.execute,
+      GetJournalUsecase.prototype.execute,
       UpdateTransactionOnAcceptManuscriptUsecase.prototype.execute,
       UpdateCatalogItemToCatalogUseCase.prototype.execute,
       AssignEditorsToJournalUsecase.prototype.execute,

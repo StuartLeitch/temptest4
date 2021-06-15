@@ -34,7 +34,14 @@ export class WaiverService {
 
     const reductionsPoliciesRegister = new ReductionsPoliciesRegister();
 
-    const activeWaivers = await this.waiverRepo.getWaivers();
+    const maybeActiveWaivers = await this.waiverRepo.getWaivers();
+
+    if (maybeActiveWaivers.isLeft()) {
+      return null;
+    }
+
+    const activeWaivers = maybeActiveWaivers.value;
+
     const activeWaiverMap = activeWaivers
       .filter((w) => w.isActive)
       .reduce((acc, curr) => {
@@ -70,9 +77,15 @@ export class WaiverService {
       }
     }
 
-    const editorRoles = await this.editorRepo.getEditorListRolesByEmails(
+    const maybeEditorRoles = await this.editorRepo.getEditorListRolesByEmails(
       allAuthorsEmails
     );
+
+    if (maybeEditorRoles.isLeft()) {
+      return null;
+    }
+
+    const editorRoles = maybeEditorRoles.value;
 
     if (activeWaiverMap[WaiverType.WAIVED_CHIEF_EDITOR]) {
       const isChiefEditor = editorRoles.some((e) => e.isChiefEditor());
@@ -96,13 +109,18 @@ export class WaiverService {
       }
     }
 
-    const invoiceIdObject = InvoiceId.create(
-      new UniqueEntityID(invoiceId)
-    ).getValue();
+    const invoiceIdObject = InvoiceId.create(new UniqueEntityID(invoiceId));
 
-    const applicableWaivers = await this.waiverRepo.getWaiversByTypes(
+    const maybeApplicableWaivers = await this.waiverRepo.getWaiversByTypes(
       waiversToApply
     );
+
+    if (maybeApplicableWaivers.isLeft()) {
+      return null;
+    }
+
+    const applicableWaivers = maybeApplicableWaivers.value;
+
     return this.applyHighestReductionWaiver(invoiceIdObject, applicableWaivers);
   }
 
@@ -114,9 +132,15 @@ export class WaiverService {
       return;
     }
 
-    const invoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
+    const maybeInvoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
       invoiceId
     );
+
+    if (maybeInvoiceItems.isLeft()) {
+      return null;
+    }
+
+    const invoiceItems = maybeInvoiceItems.value;
 
     if (!invoiceItems || invoiceItems.length === 0) {
       return;
@@ -124,9 +148,15 @@ export class WaiverService {
 
     const item = invoiceItems[0];
 
-    const existingWaivers = (
-      await this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId)
-    ).waivers;
+    const maybeExistingWaivers = await this.waiverRepo.getWaiversByInvoiceItemId(
+      item.invoiceItemId
+    );
+
+    if (maybeExistingWaivers.isLeft()) {
+      return null;
+    }
+
+    const existingWaivers = maybeExistingWaivers.value.waivers;
 
     const highestReductionWaiver = applicableWaivers.sort(
       (a, b) => b.reduction - a.reduction
@@ -143,9 +173,15 @@ export class WaiverService {
       }
     }
 
-    return this.waiverRepo.attachWaiverToInvoiceItem(
+    const resp = await this.waiverRepo.attachWaiverToInvoiceItem(
       highestReductionWaiver.waiverType,
       item.invoiceItemId
     );
+
+    if (resp.isLeft()) {
+      return null;
+    }
+
+    return resp.value;
   }
 }

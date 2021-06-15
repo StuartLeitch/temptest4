@@ -1,14 +1,14 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
 import { NotificationPause } from '../../domain/NotificationPause';
 
-import * as AddEmptyPauseStateForInvoiceErrors from './addEmptyPauseStateForInvoiceErrors';
+import * as Errors from './addEmptyPauseStateForInvoiceErrors';
 
 export type AddEmptyPauseStateForInvoiceResponse = Either<
-  | AddEmptyPauseStateForInvoiceErrors.InvoiceIdRequiredError
-  | AddEmptyPauseStateForInvoiceErrors.InvoiceNotFoundError
-  | AddEmptyPauseStateForInvoiceErrors.AddPauseDbError
+  | Errors.InvoiceIdRequiredError
+  | Errors.InvoiceNotFoundError
+  | Errors.AddPauseDbError
   | UnexpectedError,
-  Result<NotificationPause>
+  NotificationPause
 >;

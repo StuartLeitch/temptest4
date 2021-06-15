@@ -42,7 +42,7 @@ export const transactions: Resolvers<Context> = {
         return null;
       }
 
-      const updatedTransaction = result.value.getValue();
+      const updatedTransaction = result.value;
 
       return {
         id: updatedTransaction.transactionId.id.toString(),

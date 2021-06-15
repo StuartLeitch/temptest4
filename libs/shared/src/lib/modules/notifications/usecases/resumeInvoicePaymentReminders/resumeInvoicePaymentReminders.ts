@@ -1,19 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { AsyncEither } from '../../../../core/logic/AsyncEither';
+import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 
+import { PayloadBuilder } from '../../../../infrastructure/message-queues/payloadBuilder';
+import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import {
   SisifJobTypes,
@@ -24,8 +20,14 @@ import {
   TimerBuilder,
 } from '../../../../infrastructure/message-queues/contracts/Time';
 
-import { PayloadBuilder } from '../../../../infrastructure/message-queues/payloadBuilder';
-import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
+import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
+import { NotificationType } from '../../domain/Notification';
+import { Payer } from '../../../payers/domain/Payer';
+import {
+  TransactionStatus,
+  Transaction,
+} from '../../../transactions/domain/Transaction';
 
 import { TransactionRepoContract } from '../../../transactions/repos/transactionRepo';
 import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
@@ -36,15 +38,6 @@ import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceD
 import { GetPayerDetailsByInvoiceIdUsecase } from '../../../payers/usecases/getPayerDetailsByInvoiceId';
 import { GetTransactionUsecase } from '../../../transactions/usecases/getTransaction/getTransaction';
 import { AreNotificationsPausedUsecase } from '../areNotificationsPaused';
-
-import {
-  Transaction,
-  TransactionStatus,
-} from '../../../transactions/domain/Transaction';
-import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-import { NotificationType } from '../../domain/Notification';
-import { Payer } from '../../../payers/domain/Payer';
 
 // * Usecase specific
 import { ResumeInvoicePaymentRemindersResponse as Response } from './resumeInvoicePaymentRemindersResponse';
@@ -58,13 +51,7 @@ interface CompoundDTO extends DTO {
 }
 
 export class ResumeInvoicePaymentReminderUsecase
-  implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
     private transactionRepo: TransactionRepoContract,
@@ -85,15 +72,7 @@ export class ResumeInvoicePaymentReminderUsecase
     this.resume = this.resume.bind(this);
   }
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  // @Authorize('invoice:read')
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const execution = new AsyncEither(request)
         .then(this.validateRequest)
@@ -104,7 +83,7 @@ export class ResumeInvoicePaymentReminderUsecase
         .advanceOrEnd(this.shouldScheduleJob)
         .then(this.getPayer(context))
         .then(this.scheduleJob)
-        .map(() => Result.ok<void>(null));
+        .map(() => null);
 
       return execution.execute();
     } catch (e) {
@@ -149,12 +128,12 @@ export class ResumeInvoicePaymentReminderUsecase
     this.loggerService.info(`Check if invoice with id ${id} exists in the DB`);
 
     const uuid = new UniqueEntityID(id);
-    const invoiceId = InvoiceId.create(uuid).getValue();
+    const invoiceId = InvoiceId.create(uuid);
 
     return await this.invoiceRepo.existsWithId(invoiceId);
   }
 
-  private validatePauseState(context: UsecaseAuthorizationContext) {
+  private validatePauseState(context: Context) {
     return async (request: DTO) => {
       this.loggerService.info(
         `Validate the state of the reminders of type ${NotificationType.REMINDER_PAYMENT} for invoice with id ${request.invoiceId}`
@@ -171,7 +150,7 @@ export class ResumeInvoicePaymentReminderUsecase
       );
 
       return maybeResult
-        .map((result) => result.getValue())
+        .map((result) => result)
         .chain((isPaused) => {
           if (!isPaused) {
             return left<Errors.PaymentRemindersNotPausedError, DTO>(
@@ -184,7 +163,7 @@ export class ResumeInvoicePaymentReminderUsecase
     };
   }
 
-  private getInvoice(context: UsecaseAuthorizationContext) {
+  private getInvoice(context: Context) {
     return async (request: CompoundDTO) => {
       this.loggerService.info(
         `Get details of invoice with id ${request.invoiceId}`
@@ -194,14 +173,14 @@ export class ResumeInvoicePaymentReminderUsecase
       const { invoiceId } = request;
       const maybeResult = await usecase.execute({ invoiceId }, context);
 
-      return maybeResult.map((result) => ({
+      return maybeResult.map((invoice) => ({
         ...request,
-        invoice: result.getValue(),
+        invoice,
       }));
     };
   }
 
-  private getTransaction(context: UsecaseAuthorizationContext) {
+  private getTransaction(context: Context) {
     return async (request: CompoundDTO) => {
       this.loggerService.info(
         `Get transaction details for invoice with id ${request.invoiceId}`
@@ -212,14 +191,14 @@ export class ResumeInvoicePaymentReminderUsecase
       try {
         const result = await usecase.execute({ transactionId }, context);
 
-        if (result.isFailure) {
+        if (result.isLeft()) {
           return left<
             Errors.CouldNotGetTransactionForInvoiceError,
             CompoundDTO
           >(
             new Errors.CouldNotGetTransactionForInvoiceError(
               request.invoiceId,
-              new Error(result.errorValue() as any)
+              new Error(result.value.message)
             )
           );
         }
@@ -227,7 +206,7 @@ export class ResumeInvoicePaymentReminderUsecase
         return right<Errors.CouldNotGetTransactionForInvoiceError, CompoundDTO>(
           {
             ...request,
-            transaction: result.getValue(),
+            transaction: result.value,
           }
         );
       } catch (e) {
@@ -238,7 +217,7 @@ export class ResumeInvoicePaymentReminderUsecase
     };
   }
 
-  private getPayer(context: UsecaseAuthorizationContext) {
+  private getPayer(context: Context) {
     return async (request: CompoundDTO) => {
       const usecase = new GetPayerDetailsByInvoiceIdUsecase(
         this.payerRepo,
@@ -253,9 +232,9 @@ export class ResumeInvoicePaymentReminderUsecase
         context
       );
 
-      return maybeResult.map((result) => ({
+      return maybeResult.map((payer) => ({
         ...request,
-        payer: result.getValue(),
+        payer,
       }));
     };
   }

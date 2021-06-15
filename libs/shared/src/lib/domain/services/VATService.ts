@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { createClient } from 'soap';
 import EuroVat from 'eu-vat';
 
@@ -18,6 +17,15 @@ const vat = new EuroVat();
 const policiesRegister = new PoliciesRegister();
 
 let VATPolicy: USVATPolicy | UKVATTreatmentArticleProcessingChargesPolicy;
+
+export interface CheckVatResponse {
+  countryCode: string;
+  vatNumber: string;
+  requestDate: Date;
+  valid: boolean;
+  name: string;
+  address: string;
+}
 
 // !!! Ugly as fuck!
 // TODO: Please reconsider this solution
@@ -58,7 +66,7 @@ export class VATService {
   }: {
     countryCode: string;
     vatNumber: string;
-  }): Promise<any> {
+  }): Promise<CheckVatResponse | Error> {
     let client: any;
     let result: any;
 

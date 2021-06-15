@@ -1,5 +1,5 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
 import * as Errors from './scheduleRemindersForExistingInvoicesErrors';
 
@@ -15,5 +15,5 @@ export type ScheduleRemindersForExistingInvoicesResponse = Either<
   | Errors.PaymentDelayRequiredError
   | Errors.PauseDbError
   | UnexpectedError,
-  Result<void>
+  void
 >;

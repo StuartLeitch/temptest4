@@ -1,8 +1,11 @@
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
 import { Mapper } from '../../../infrastructure/Mapper';
-import { InvoiceItem, InvoiceItemType } from '../domain/InvoiceItem';
+import { Either } from '../../../core/logic/Either';
+
+import { InvoiceItemType, InvoiceItem } from '../domain/InvoiceItem';
+import { ManuscriptId } from '../../manuscripts/domain/ManuscriptId';
 import { InvoiceId } from '../domain/InvoiceId';
-import { ManuscriptId } from '../domain/ManuscriptId';
 
 export interface InvoiceItemPersistenceDTO {
   id?: string;
@@ -15,15 +18,13 @@ export interface InvoiceItemPersistenceDTO {
 }
 
 export class InvoiceItemMap extends Mapper<InvoiceItem> {
-  public static toDomain(raw: InvoiceItemPersistenceDTO): InvoiceItem {
-    const invoiceItemOrError = InvoiceItem.create(
+  public static toDomain(
+    raw: InvoiceItemPersistenceDTO
+  ): Either<GuardFailure, InvoiceItem> {
+    return InvoiceItem.create(
       {
-        invoiceId: InvoiceId.create(
-          new UniqueEntityID(raw.invoiceId)
-        ).getValue(),
-        manuscriptId: ManuscriptId.create(
-          new UniqueEntityID(raw.manuscriptId)
-        ).getValue(),
+        invoiceId: InvoiceId.create(new UniqueEntityID(raw.invoiceId)),
+        manuscriptId: ManuscriptId.create(new UniqueEntityID(raw.manuscriptId)),
         type: raw.type,
         price: raw.price,
         vat: raw.vat,
@@ -31,12 +32,6 @@ export class InvoiceItemMap extends Mapper<InvoiceItem> {
       },
       new UniqueEntityID(raw.id)
     );
-
-    if (invoiceItemOrError.isFailure) {
-      return null;
-    }
-
-    return invoiceItemOrError.getValue();
   }
 
   public static toPersistence(

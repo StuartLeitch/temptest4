@@ -1,5 +1,4 @@
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
-import { Result } from './../../../core/logic/Result';
 import { Entity } from '../../../core/domain/Entity';
 
 export class PublisherId extends Entity<any> {
@@ -11,7 +10,7 @@ export class PublisherId extends Entity<any> {
     super(null, id);
   }
 
-  public static create(id?: UniqueEntityID): Result<PublisherId> {
-    return Result.ok<PublisherId>(new PublisherId(id));
+  public static create(id?: UniqueEntityID): PublisherId {
+    return new PublisherId(id);
   }
 }

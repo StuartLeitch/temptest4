@@ -36,13 +36,13 @@ export const generateDraftCompensatoryEvents: Resolvers<Context> = {
       });
 
       if (maybeResult.isLeft()) {
-        throw new Error(maybeResult.value.errorValue().message);
+        throw new Error(maybeResult.value.message);
       }
       const usecaseContext = {
         roles: [Roles.ADMIN],
       };
 
-      const ids = maybeResult.value.getValue();
+      const ids = maybeResult.value;
 
       const errors = [];
 

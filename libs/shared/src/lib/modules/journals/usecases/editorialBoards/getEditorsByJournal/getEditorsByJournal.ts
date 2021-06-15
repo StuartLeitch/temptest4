@@ -1,60 +1,30 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
-import { UseCase } from '../../../../../core/domain/UseCase';
-import { UnexpectedError } from '../../../../../core/logic/AppError';
-import { right, Either, left } from '../../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
+import { UnexpectedError } from '../../../../../core/logic/AppError';
+import { right, left } from '../../../../../core/logic/Either';
+import { UseCase } from '../../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+
+import { JournalId } from '../../../domain/JournalId';
 
 import { EditorRepoContract } from '../../../repos/editorRepo';
-import { JournalId } from '../../../domain/JournalId';
-import { Editor } from '../../../domain/Editor';
 import { CatalogRepoContract } from '../../../repos';
 
-interface GetEditorsByJournalDTO {
-  journalId: string;
-}
-
-type GetEditorsByJournalResponse = Either<UnexpectedError, Editor[]>;
+import { GetEditorsByJournalResponse as Response } from './getEditorsByJournalResponse';
+import { GetEditorsByJournalDTO as DTO } from './getEditorsByJournalDTO';
 
 export class GetEditorsByJournalUsecase
-  implements
-    UseCase<
-      GetEditorsByJournalDTO,
-      Promise<GetEditorsByJournalResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      GetEditorsByJournalDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private editorRepo: EditorRepoContract,
     private catalogRepo: CatalogRepoContract
   ) {}
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  public async execute(
-    request: GetEditorsByJournalDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<GetEditorsByJournalResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const { journalId: journalIdString } = request;
 
-    const journalId = JournalId.create(
-      new UniqueEntityID(journalIdString)
-    ).getValue();
+    const journalId = JournalId.create(new UniqueEntityID(journalIdString));
 
     try {
       const journal = await this.catalogRepo.getCatalogItemByJournalId(
@@ -62,18 +32,30 @@ export class GetEditorsByJournalUsecase
       );
       if (!journal) {
         return left(
-          new UnexpectedError(`Journal ${journalId.id.toString()} not found.`)
+          new UnexpectedError(
+            new Error(`Journal ${journalId.id.toString()} not found.`)
+          )
         );
       }
 
-      const currentEditors = await this.editorRepo.getEditorsByJournalId(
+      const maybeCurrentEditors = await this.editorRepo.getEditorsByJournalId(
         journalId
       );
+
+      if (maybeCurrentEditors.isLeft()) {
+        return left(
+          new UnexpectedError(new Error(maybeCurrentEditors.value.message))
+        );
+      }
+
+      const currentEditors = maybeCurrentEditors.value;
 
       if (!currentEditors) {
         return left(
           new UnexpectedError(
-            `Could not get editors for journalId: ${journalId.id.toString()}.`
+            new Error(
+              `Could not get editors for journalId: ${journalId.id.toString()}.`
+            )
           )
         );
       }

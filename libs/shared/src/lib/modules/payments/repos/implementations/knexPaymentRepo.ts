@@ -1,22 +1,26 @@
+import { Either, flatten, right, left } from '../../../../core/logic/Either';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
-
-import { PaymentRepoContract } from './../paymentRepo';
 
 import { ExternalOrderId } from '../../domain/external-order-id';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { PaymentId } from './../../domain/PaymentId';
 import { Payment } from './../../domain/Payment';
 
+import { PaymentRepoContract } from './../paymentRepo';
+
 import { PaymentMap } from './../../mapper/Payment';
 
 export class KnexPaymentRepo
   extends AbstractBaseDBRepo<Knex, Payment>
   implements PaymentRepoContract {
-  async getPaymentById(paymentId: PaymentId): Promise<Payment> {
+  async getPaymentById(
+    paymentId: PaymentId
+  ): Promise<Either<GuardFailure | RepoError, Payment>> {
     const { db } = this;
 
     const paymentRow = await db(TABLES.PAYMENTS)
@@ -25,16 +29,17 @@ export class KnexPaymentRepo
       .first();
 
     if (!paymentRow) {
-      throw RepoError.createEntityNotFoundError(
-        'payment',
-        paymentId.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError('payment', paymentId.id.toString())
       );
     }
 
     return PaymentMap.toDomain(paymentRow);
   }
 
-  async getPaymentByInvoiceId(invoiceId: InvoiceId): Promise<Payment> {
+  async getPaymentByInvoiceId(
+    invoiceId: InvoiceId
+  ): Promise<Either<GuardFailure | RepoError, Payment>> {
     const { db } = this;
 
     const paymentRow = await db(TABLES.PAYMENTS)
@@ -43,41 +48,43 @@ export class KnexPaymentRepo
       .first();
 
     if (!paymentRow) {
-      // throw RepoError.createEntityNotFoundError(
-      //   'payment',
-      //   invoiceId.id.toString()
-      // );
-      return null;
+      return left(
+        RepoError.createEntityNotFoundError(
+          'payment by invoice id',
+          invoiceId.id.toString()
+        )
+      );
     }
 
     return PaymentMap.toDomain(paymentRow);
   }
 
-  async getPaymentsByInvoiceId(invoiceId: InvoiceId): Promise<Payment[]> {
+  async getPaymentsByInvoiceId(
+    invoiceId: InvoiceId
+  ): Promise<Either<GuardFailure | RepoError, Payment[]>> {
     const { db } = this;
 
     const paymentRows = await db(TABLES.PAYMENTS)
       .select()
       .where('invoiceId', invoiceId.id.toString());
 
-    return paymentRows.reduce((aggregator: any[], p) => {
-      aggregator.push(PaymentMap.toDomain(p));
-      return aggregator;
-    }, []);
+    return flatten(paymentRows.map(PaymentMap.toDomain));
   }
 
   async getPaymentByForeignId(
     foreignPaymentId: ExternalOrderId
-  ): Promise<Payment> {
+  ): Promise<Either<GuardFailure | RepoError, Payment>> {
     const result = await this.db(TABLES.PAYMENTS)
       .select()
       .where({ foreignPaymentId: foreignPaymentId.toString() })
       .first();
 
     if (!result) {
-      throw RepoError.createEntityNotFoundError(
-        'payment by foreignPaymentId',
-        foreignPaymentId.toString()
+      return left(
+        RepoError.createEntityNotFoundError(
+          'payment by foreignPaymentId',
+          foreignPaymentId.toString()
+        )
       );
     }
 
@@ -114,7 +121,7 @@ export class KnexPaymentRepo
         .whereIn(
           'invoiceId',
           db.raw(
-           `SELECT entity_id AS "invoiceId" FROM "erp_references" AS "erprefs2"
+            `SELECT entity_id AS "invoiceId" FROM "erp_references" AS "erprefs2"
             WHERE "erprefs2"."vendor" = 'netsuite'
             AND "erprefs2"."type" = 'invoice'
             AND "erprefs2"."attribute" = 'confirmation'
@@ -122,7 +129,8 @@ export class KnexPaymentRepo
             AND "erprefs2"."value" <> 'NON_INVOICEABLE'
             AND "erprefs2"."value" <> 'ERP_NOT_FOUND'
             AND "erprefs2"."value" <> 'migrationRef'
-           `)
+           `
+          )
         );
   }
 
@@ -158,11 +166,13 @@ export class KnexPaymentRepo
     const payments = await prepareIdsSQL;
 
     return payments.map((payment) =>
-      PaymentId.create(new UniqueEntityID(payment.paymentId)).getValue()
+      PaymentId.create(new UniqueEntityID(payment.paymentId))
     );
   }
 
-  async updatePayment(payment: Payment): Promise<Payment> {
+  async updatePayment(
+    payment: Payment
+  ): Promise<Either<GuardFailure | RepoError, Payment>> {
     const { logger } = this;
 
     logger.debug('update', payment);
@@ -187,7 +197,9 @@ export class KnexPaymentRepo
     return this.getPaymentById(payment.paymentId);
   }
 
-  async save(payment: Payment): Promise<Payment> {
+  async save(
+    payment: Payment
+  ): Promise<Either<GuardFailure | RepoError, Payment>> {
     const { db } = this;
 
     try {
@@ -199,17 +211,19 @@ export class KnexPaymentRepo
     return await this.getPaymentById(payment.paymentId);
   }
 
-  async exists(payment: Payment): Promise<boolean> {
+  async exists(
+    payment: Payment
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     try {
       await this.getPaymentById(payment.paymentId);
     } catch (e) {
       if (e.code === RepoErrorCode.ENTITY_NOT_FOUND) {
-        return false;
+        return right(false);
       }
 
-      throw e;
+      return left(RepoError.fromDBError(e));
     }
 
-    return true;
+    return right(true);
   }
 }

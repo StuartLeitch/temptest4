@@ -1,19 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { InvoiceFinalized as InvoiceFinalizedEvent } from '@hindawi/phenom-events';
 
-import { Either, right, left } from '../../../../../core/logic/Result';
+import { Either, right, left } from '../../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { UseCase } from '../../../../../core/domain/UseCase';
 
 import { EventUtils } from '../../../../../utils/EventUtils';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../../domain/authorization';
+import { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
 
 import { SQSPublishServiceContract } from '../../../../../domain/services/SQSPublishService';
 import { Invoice } from '../../../domain/Invoice';
@@ -33,19 +27,10 @@ import * as Errors from './publishInvoiceFinalized.errors';
 const INVOICE_FINALIZED = 'InvoiceFinalized';
 
 export class PublishInvoiceFinalizedUsecase
-  implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private publishService: SQSPublishServiceContract) {}
 
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const validRequest = this.verifyInput(request);
 
     if (validRequest.isLeft()) {
@@ -126,11 +111,6 @@ export class PublishInvoiceFinalizedUsecase
     | Errors.PayerRequiredError,
     void
   > {
-    // Commented the checks so that credit notes could be sent
-    // if (!request.payer) {
-    //   return left(new Errors.PayerRequiredError());
-    // }
-
     if (!request.invoice) {
       return left(new Errors.InvoiceRequiredError());
     }
@@ -150,10 +130,6 @@ export class PublishInvoiceFinalizedUsecase
     if (!request.paymentMethods) {
       return left(new Errors.PaymentMethodsRequiredError());
     }
-
-    // if (!request.payments) {
-    //   return left(new Errors.PaymentsRequiredError());
-    // }
 
     return right(null);
   }

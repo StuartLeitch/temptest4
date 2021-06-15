@@ -49,7 +49,16 @@ export class AfterInvoicePaidEvent
     event: InvoicePaymentAddedEvent
   ): Promise<any> {
     try {
-      const invoice = await this.invoiceRepo.getInvoiceById(event.invoiceId);
+      const maybeInvoice = await this.invoiceRepo.getInvoiceById(
+        event.invoiceId
+      );
+
+      if (maybeInvoice.isLeft()) {
+        throw new Error(`Invoice not found ${event.invoiceId}`);
+      }
+
+      const invoice = maybeInvoice.value;
+
       let invoiceItems = invoice.invoiceItems.currentItems;
 
       if (invoiceItems.length === 0) {
@@ -68,15 +77,17 @@ export class AfterInvoicePaidEvent
           );
         }
 
-        invoiceItems = resp.value.getValue();
+        invoiceItems = resp.value;
       }
 
       const manuscript = await this.manuscriptRepo.findById(
         invoiceItems[0].manuscriptId
       );
 
-      if (!manuscript) {
-        throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
+      if (manuscript.isLeft()) {
+        throw new Error(
+          `Invoice ${invoice.id.toString()} has no manuscripts associated.`
+        );
       }
 
       const payerUsecase = new GetPayerDetailsByInvoiceIdUsecase(
@@ -98,36 +109,46 @@ export class AfterInvoicePaidEvent
 
       if (paymentMethods.isLeft()) {
         throw new Error(
-          `Payment methods could not be accessed: ${
-            paymentMethods.value.errorValue().message
-          }`
+          `Payment methods could not be accessed: ${paymentMethods.value.message}`
         );
       }
 
-      const payer = maybePayerResponse.value.getValue();
+      const payer = maybePayerResponse.value;
 
       const billingAddress = await this.addressRepo.findById(
         payer.billingAddressId
       );
 
+      if (billingAddress.isLeft()) {
+        throw new Error(
+          `Billing address could not be accessed: ${billingAddress.value.message}`
+        );
+      }
+
       const payments = await this.paymentRepo.getPaymentsByInvoiceId(
         invoice.invoiceId
       );
 
+      if (payments.isLeft()) {
+        throw new Error(
+          `Payments could not be accessed: ${payments.value.message}`
+        );
+      }
+
       invoice.addItems(invoiceItems);
 
       const publishResult = await this.publishInvoicePaid.execute({
-        paymentMethods: paymentMethods.value.getValue(),
+        paymentMethods: paymentMethods.value,
+        billingAddress: billingAddress.value,
+        manuscript: manuscript.value,
+        payments: payments.value,
         invoiceItems,
-        billingAddress,
-        manuscript,
-        payments,
         invoice,
         payer,
       });
 
       if (publishResult.isLeft()) {
-        throw publishResult.value.errorValue();
+        throw publishResult.value;
       }
 
       console.log(

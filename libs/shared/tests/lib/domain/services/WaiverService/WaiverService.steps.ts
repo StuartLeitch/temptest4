@@ -38,7 +38,7 @@ const invoiceItemId = Object.freeze(
   InvoiceItemId.create(new UniqueEntityID('testInvoiceItem'))
 );
 const invoiceId = Object.freeze(
-  InvoiceId.create(new UniqueEntityID('testInvoice')).getValue()
+  InvoiceId.create(new UniqueEntityID('testInvoice'))
 );
 const manuscriptId = Object.freeze('testManuscript');
 
@@ -49,7 +49,7 @@ Before({ tags: '@ValidateWaiverService' }, () => {
 
   waiverService = new WaiverService(invoiceItemRepo, editorRepo, waiverRepo);
 
-  const invoiceItem = InvoiceItemMap.toDomain({
+  const maybeInvoiceItem = InvoiceItemMap.toDomain({
     manuscriptId,
     invoiceId: invoiceId.toString(),
     id: invoiceItemId.toString(),
@@ -58,6 +58,12 @@ Before({ tags: '@ValidateWaiverService' }, () => {
     price: 500,
     vat: 20,
   });
+
+  if (maybeInvoiceItem.isLeft()) {
+    throw maybeInvoiceItem.value;
+  }
+
+  const invoiceItem = maybeInvoiceItem.value;
 
   invoiceItemRepo.addMockItem(invoiceItem);
 
@@ -84,11 +90,17 @@ After({ tags: '@ValidateWaiverService' }, () => {
 Given(
   /^There is a waiver for "([\w_]+)" of "(\d+)" percent reduction$/,
   (waiverType: string, reduction: string) => {
-    const waiver = WaiverMap.toDomain({
+    const maybeWaiver = WaiverMap.toDomain({
       reduction: Number.parseFloat(reduction),
       type_id: waiverType,
       isActive: true,
     });
+
+    if (maybeWaiver.isLeft()) {
+      throw maybeWaiver.value;
+    }
+
+    const waiver = maybeWaiver.value;
 
     waiverRepo.addMockItem(waiver);
   }
@@ -117,9 +129,15 @@ Then(
     expect(serviceResponse.waiverType.toString()).to.equal(waiverType);
     expect(serviceResponse.reduction).to.equal(Number.parseFloat(reduction));
 
-    const appliedWaivers = await waiverRepo.getWaiversByInvoiceItemId(
+    const maybeAppliedWaivers = await waiverRepo.getWaiversByInvoiceItemId(
       invoiceItemId as InvoiceItemId
     );
+
+    if (maybeAppliedWaivers.isLeft()) {
+      throw maybeAppliedWaivers.value;
+    }
+
+    const appliedWaivers = maybeAppliedWaivers.value;
 
     expect(appliedWaivers.length).to.equal(1);
     expect(appliedWaivers.getItems()[0].waiver.waiverType).to.equal(waiverType);
@@ -140,7 +158,11 @@ Given(
       name: 'testEditor',
     });
 
-    editorRepo.addMockItem(editor);
+    if (editor.isLeft()) {
+      throw editor.value;
+    }
+
+    editorRepo.addMockItem(editor.value);
   }
 );
 
@@ -154,7 +176,11 @@ Given(
 Given(/^Waiver of type "([\w_]+)" should apply$/, async (type: string) => {
   const waiver = await waiverRepo.getWaiverByType(WaiverType[type]);
 
-  waiversToApply.push(waiver);
+  if (waiver.isLeft()) {
+    throw waiver.value;
+  }
+
+  waiversToApply.push(waiver.value);
 });
 
 When(/^applyHighestReductionWaiver is called$/, async () => {

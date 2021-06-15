@@ -1,7 +1,8 @@
 Feature: Restore Soft Delete Draft Transaction Usecase
-    This usecase is executed when manuscript is resubmitted
+    # This usecase is executed when manuscript is resubmitted
     # Restore means the deleted value of a Transaction, Manuscript, Invoice are changed to 0
 
+    @ValidateRestoreSoftDeleteTransaction
     Scenario: Restore Soft Delete Draft Transaction
         Given A resubmitted manuscript "test-manuscript" on journal "test-journal"
         And An Invoice with a DRAFT Transaction and an Invoice Item linked to the manuscript "test-manuscript"

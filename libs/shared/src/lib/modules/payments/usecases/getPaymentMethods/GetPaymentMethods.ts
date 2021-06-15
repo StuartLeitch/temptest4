@@ -1,18 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { Result, left, right } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { right, left } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 
 import { PaymentMethodRepoContract } from '../../repos/paymentMethodRepo';
 
@@ -20,28 +14,17 @@ import { GetPaymentMethodsResponse as Response } from './GetPaymentMethodsRespon
 import { GetPaymentMethodsDTO as DTO } from './GetPaymentMethodsDTO';
 import * as Errors from './GetPaymentMethodsErrors';
 
+type Context = UsecaseAuthorizationContext & { correlationId?: string };
+
 export class GetPaymentMethodsUseCase
-  implements
-    UseCase<DTO, Promise<Response>>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private paymentMethodRepo: PaymentMethodRepoContract,
     private loggerService: LoggerContract
   ) {}
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  // @Authorize('invoice:read')
-  public async execute(request?: any, context?: any): Promise<Response> {
+  public async execute(request?: DTO, context?: Context): Promise<Response> {
     try {
-      // (this.paymentMethodRepo as any).correlationId = context.correlationId;
-
       this.loggerService.debug('GetPaymentMethodsUseCase', {
         request,
         context,
@@ -55,7 +38,15 @@ export class GetPaymentMethodsUseCase
           data: paymentMethods,
         });
 
-        return right(Result.ok(paymentMethods));
+        if (paymentMethods.isLeft()) {
+          return left(
+            new Errors.GetPaymentMethodsDbRequestError(
+              new Error(paymentMethods.value.message)
+            )
+          );
+        }
+
+        return right(paymentMethods.value);
       } catch (err) {
         return left(new Errors.GetPaymentMethodsDbRequestError(err));
       }

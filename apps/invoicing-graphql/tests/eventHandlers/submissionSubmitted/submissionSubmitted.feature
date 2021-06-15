@@ -7,17 +7,20 @@ Feature: Submission Submitted event handled
   Background:
     Given There is a Journal "foo-journal" with APC "200"
 
+  @ValidateSubmissionSubmitted
   Scenario: Article is submitted for the first time and is invoiceable
     Given A "Research Article" with CustomId "111111" is submitted on journal "foo-journal"
     When The "Submission Submitted" event is triggered
     Then The invoice for CustomId "111111" is created
     And The invoice for CustomId "111111" has price "200"
 
+  @ValidateSubmissionSubmitted
   Scenario: Article is submitted for the first time and is non-invoiceable
     Given A "Corrigendum" with CustomId "111112" is submitted on journal "foo-journal"
     When The "Submission Submitted" event is triggered
     Then The invoice for CustomId "111112" is not created
 
+  @ValidateSubmissionSubmitted
   Scenario: Article is re-submitted to an other journal
     Given There is a Journal "bar-journal" with APC "300"
     And A "Research Article" with CustomId "111113" is on "foo-journal"
@@ -25,12 +28,14 @@ Feature: Submission Submitted event handled
     When The "Submission Submitted" event is triggered
     Then The invoice for CustomId "111113" has price "300"
 
+  @ValidateSubmissionSubmitted
   Scenario: Article is re-submitted with other articleType
     Given A "Research Article" with CustomId "111114" is on "foo-journal"
     And A "Corrigendum" with CustomId "111114" is submitted on journal "foo-journal"
     When The "Submission Submitted" event is triggered
     Then The invoice for CustomId "111114" is deleted
 
+  @ValidateSubmissionSubmitted
   Scenario: Article is re-submitted after it was soft-deleted
     Given A "Research Article" with CustomId "111115" is on "foo-journal"
     And Article with CustomId "111115" is deleted
@@ -38,7 +43,7 @@ Feature: Submission Submitted event handled
     When The "Submission Submitted" event is triggered
     Then The invoice for CustomId "111115" is restored
 
-
+  @ValidateSubmissionSubmitted
   Scenario Outline: Article has waivers applied if it is eligible for them
     Given There is an editor for Journal "foo-journal" with email "<editorEmail>"
     And There is a waiver for editors
@@ -53,6 +58,7 @@ Feature: Submission Submitted event handled
       | 111116   | editor@test.com | editor@test.com     | 1              |
       | 111117   | editor@test.com | not_editor@test.com | 0              |
 
+  @ValidateSubmissionSubmitted
   Scenario: Article has waiver applied even if corresponding author is not eligible
     Given There is an editor for Journal "foo-journal" with email "editor@test.com"
     And There is a waiver for editors

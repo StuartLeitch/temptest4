@@ -1,68 +1,39 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
-import { UseCase } from '../../../../../core/domain/UseCase';
-import { UnexpectedError } from '../../../../../core/logic/AppError';
-import { right, Either, left } from '../../../../../core/logic/Result';
+import { Either, flatten, right, left } from '../../../../../core/logic/Either';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
+import { GuardFailure } from '../../../../../core/logic/GuardFailure';
+import { UnexpectedError } from '../../../../../core/logic/AppError';
+import { UseCase } from '../../../../../core/domain/UseCase';
+
+import { RepoError } from '../../../../../infrastructure/RepoError';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+
+import { JournalId } from '../../../domain/JournalId';
+
+import { EditorMap } from '../../../mappers/EditorMap';
 
 import { EditorRepoContract } from '../../../repos/editorRepo';
-import { JournalId } from '../../../domain/JournalId';
-import { EditorMap } from '../../../mappers/EditorMap';
 import { CatalogRepoContract } from '../../../repos';
-import { DeleteEditorDTO } from '../deleteEditor/deleteEditorDTO';
 
-interface RemoveEditorsFromJournalDTO {
-  journalId: string;
-
-  // when an editor is added the event contains all the editors previous to the change and the new ones
-  // we have to check which editors are not present and remove the entries
-  allEditors: DeleteEditorDTO[];
-}
-
-type RemoveEditorsFromJournalResponse = Either<UnexpectedError, null>;
+import { RemoveEditorsFromJournalResponse as Response } from './removeEditorsFromJournalResponse';
+import { RemoveEditorsFromJournalDTO as DTO } from './removeEditorsFromJournalDTO';
 
 export class RemoveEditorsFromJournalUsecase
-  implements
-    UseCase<
-      RemoveEditorsFromJournalDTO,
-      Promise<RemoveEditorsFromJournalResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      RemoveEditorsFromJournalDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private editorRepo: EditorRepoContract,
     private catalogRepo: CatalogRepoContract
   ) {}
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  public async execute(
-    request: RemoveEditorsFromJournalDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<RemoveEditorsFromJournalResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const { journalId: journalIdString, allEditors: editors } = request;
     const allEditors = editors.map((e) => ({
       ...e,
       journalId: journalIdString,
     }));
 
-    const journalId = JournalId.create(
-      new UniqueEntityID(journalIdString)
-    ).getValue();
+    const journalId = JournalId.create(new UniqueEntityID(journalIdString));
 
     try {
       const journal = await this.catalogRepo.getCatalogItemByJournalId(
@@ -70,14 +41,32 @@ export class RemoveEditorsFromJournalUsecase
       );
       if (!journal) {
         return left(
-          new UnexpectedError(`Journal ${journalId.id.toString()} not found.`)
+          new UnexpectedError(
+            new Error(`Journal ${journalId.id.toString()} not found.`)
+          )
         );
       }
 
       try {
-        await Promise.all(
-          allEditors.map((e) => this.editorRepo.delete(EditorMap.toDomain(e)))
+        const maybeResults = await Promise.all(
+          allEditors.map(
+            (e): Promise<Either<GuardFailure | RepoError, void>> => {
+              const maybeEditor = EditorMap.toDomain(e);
+
+              if (maybeEditor.isLeft()) {
+                return Promise.resolve(left(maybeEditor.value));
+              }
+
+              return this.editorRepo.delete(maybeEditor.value);
+            }
+          )
         );
+
+        const result = flatten(maybeResults);
+
+        if (result.isLeft()) {
+          return left(new UnexpectedError(new Error(result.value.message)));
+        }
       } catch (errors) {
         const errs = [];
         for (const editorResponse of errors) {

@@ -1,60 +1,37 @@
 // * Core Domain
-import { UseCase } from '../../../../../core/domain/UseCase';
-import { left, right } from '../../../../../core/logic/Either';
-import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
+import { UnexpectedError } from '../../../../../core/logic/AppError';
+import { right, left } from '../../../../../core/logic/Either';
+import { UseCase } from '../../../../../core/domain/UseCase';
 
-// import { EditorRole } from '../../../../../domain/EditorRole';
-// import { Email } from '../../../../../domain/Email';
-// import { Name } from '../../../../../domain/Name';
+import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+
+import { EditorId } from '../../../domain/EditorId';
+import { Editor } from '../../../domain/Editor';
 
 import { EditorRepoContract } from '../../../repos/editorRepo';
-import { Editor } from '../../../domain/Editor';
-import { EditorId } from '../../../domain/EditorId';
-import { EditorMap } from '../../../mappers/EditorMap';
 
-import { DeleteEditorDTO } from './deleteEditorDTO';
-import { DeleteEditorResponse } from './deleteEditorResponse';
-import {
-  AccessControlContext,
-  AccessControlledUsecase,
-  DeleteEditorAuthorizationContext,
-} from './deleteEditorAuthorizationContext';
-// import { JournalId } from '../../../domain/JournalId';
-// import { UserId } from '../../../../../modules/users/domain/UserId';
+import { DeleteEditorResponse as Response } from './deleteEditorResponse';
+import { DeleteEditorDTO as DTO } from './deleteEditorDTO';
 
-export class DeleteEditor
-  implements
-    UseCase<
-      DeleteEditorDTO,
-      Promise<DeleteEditorResponse>,
-      DeleteEditorAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      DeleteEditorDTO,
-      DeleteEditorAuthorizationContext,
-      AccessControlContext
-    > {
+export class DeleteEditor implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private editorRepo: EditorRepoContract) {}
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  public async execute(
-    request: DeleteEditorDTO,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    context?: DeleteEditorAuthorizationContext
-  ): Promise<DeleteEditorResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     let editor: Editor;
 
     const { editorId } = request;
 
     try {
-      editor = await this.editorRepo.getEditorById(
-        EditorId.create(new UniqueEntityID(editorId)).getValue()
+      const maybeEditor = await this.editorRepo.getEditorById(
+        EditorId.create(new UniqueEntityID(editorId))
       );
+
+      if (maybeEditor.isLeft()) {
+        return left(new UnexpectedError(new Error(maybeEditor.value.message)));
+      }
+
+      editor = maybeEditor.value;
 
       // * This is where all the magic happens
       await this.editorRepo.delete(editor);

@@ -32,7 +32,7 @@ function makeNotificationData(
   invoiceId: string,
   overwrites?: any
 ): Notification {
-  return NotificationMap.toDomain({
+  const notification = NotificationMap.toDomain({
     recipientEmail: 'test-email',
     dateSent: new Date(),
     type: NotificationType.REMINDER_CONFIRMATION,
@@ -40,6 +40,12 @@ function makeNotificationData(
     invoiceId,
     ...overwrites,
   });
+
+  if (notification.isLeft()) {
+    throw notification.value;
+  }
+
+  return notification.value;
 }
 
 let mockPausedReminderRepo: MockPausedReminderRepo = null;
@@ -94,21 +100,39 @@ Given(/^the invoice "([\w-]+)" id/, async (testInvoiceId: string) => {
     id: testInvoiceId,
   });
 
-  await mockInvoiceRepo.save(invoice);
+  if (invoice.isLeft()) {
+    throw invoice.value;
+  }
+
+  await mockInvoiceRepo.save(invoice.value);
 });
 
 Given(
   /^notification with "([\w-]+)" for invoice "([\w-]+)"/,
   async (testNotificationId: string, testInvoiceId: string) => {
-    const invoiceId = InvoiceId.create(
-      new UniqueEntityID(testInvoiceId)
-    ).getValue();
+    const invoiceId = InvoiceId.create(new UniqueEntityID(testInvoiceId));
 
     notification = makeNotificationData(testNotificationId, testInvoiceId);
-    notification = await mockSentNotificationRepo.save(notification);
+
+    const maybeNotification = await mockSentNotificationRepo.save(notification);
+
+    if (maybeNotification.isLeft()) {
+      throw maybeNotification.value;
+    }
+
+    notification = maybeNotification.value;
 
     pausedReminder = { invoiceId, confirmation: false, payment: false };
-    pausedReminder = await mockPausedReminderRepo.save(pausedReminder);
+
+    const maybePausedReminder = await mockPausedReminderRepo.save(
+      pausedReminder
+    );
+
+    if (maybePausedReminder.isLeft()) {
+      throw maybePausedReminder.value;
+    }
+
+    pausedReminder = maybePausedReminder.value;
   }
 );
 
@@ -125,7 +149,9 @@ Then(/^the confirmation reminder should be paused/, () => {
 
 Then(/^an error should occur saying the pause state does not exist/, () => {
   expect(response.isLeft()).to.be.true;
-  expect(response.value.error)
+  expect(response.value)
     .to.have.property('message')
-    .to.equal('While saving the pause state an error ocurred: does not exist');
+    .to.equal(
+      'While saving the pause state an error ocurred: Entity(pause) with id[testInvoice-2] not found'
+    );
 });

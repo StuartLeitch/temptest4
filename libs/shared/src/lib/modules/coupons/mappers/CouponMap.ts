@@ -1,4 +1,6 @@
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either, flatten } from '../../../core/logic/Either';
 import { Mapper } from '../../../infrastructure/Mapper';
 
 import { CouponAssignedProps, CouponAssigned } from '../domain/CouponAssigned';
@@ -22,12 +24,20 @@ export class CouponPersistenceDTO {
 }
 
 export class CouponMap extends Mapper<Coupon> {
-  public static toDomain(raw: CouponPersistenceDTO): Coupon {
+  public static toDomain(
+    raw: CouponPersistenceDTO
+  ): Either<GuardFailure, Coupon> {
+    const maybeCode = CouponCode.create(raw.code);
+
+    if (maybeCode.isLeft()) {
+      return null;
+    }
+
     const couponOrError = Coupon.create(
       {
         couponType: raw.type as CouponType,
         reduction: raw.reduction,
-        code: CouponCode.create(raw.code).getValue(),
+        code: maybeCode.value,
         dateCreated: raw.dateCreated ? new Date(raw.dateCreated) : null,
         dateUpdated: raw.dateUpdated ? new Date(raw.dateUpdated) : null,
         expirationDate: raw.expirationDate
@@ -41,23 +51,27 @@ export class CouponMap extends Mapper<Coupon> {
       new UniqueEntityID(raw.id)
     );
 
-    return couponOrError.isSuccess ? couponOrError.getValue() : null;
+    return couponOrError;
   }
 
-  public static toDomainCollection(raw: any[]): CouponAssignedCollection {
-    const domainItems = raw
-      .map((item) => {
-        return {
-          invoiceItemId: InvoiceItemId.create(
-            new UniqueEntityID(item.invoiceItemId)
-          ),
-          coupon: CouponMap.toDomain(item),
-          dateAssigned: item.dateAssigned,
-        };
-      })
-      .map((item: CouponAssignedProps) => CouponAssigned.create(item));
+  public static toDomainCollection(
+    raw: any[]
+  ): Either<GuardFailure, CouponAssignedCollection> {
+    const createItemId = (id: string) =>
+      InvoiceItemId.create(new UniqueEntityID(id));
+    const createPayload = (item: any) => (coupon: Coupon) => ({
+      invoiceItemId: createItemId(item.invoiceItemId),
+      dateAssigned: new Date(item.dateAssigned),
+      coupon,
+    });
 
-    return CouponAssignedCollection.create(domainItems);
+    const maybeRawDataList = raw.map((item) =>
+      CouponMap.toDomain(item).map(createPayload(item))
+    );
+
+    return flatten(maybeRawDataList)
+      .map((items) => items.map(CouponAssigned.create))
+      .map(CouponAssignedCollection.create);
   }
 
   public static toPersistence(coupon: Coupon): CouponPersistenceDTO {

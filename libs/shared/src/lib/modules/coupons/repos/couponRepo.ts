@@ -1,11 +1,15 @@
 import { PaginationArguments } from './../../../core/domain/arguments/arguments';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either } from '../../../core/logic/Either';
+
+import { RepoError } from '../../../infrastructure/RepoError';
 import { Repo } from '../../../infrastructure/Repo';
 
+import { CouponAssignedCollection } from '../domain/CouponAssignedCollection';
 import { InvoiceItemId } from '../../invoices/domain/InvoiceItemId';
 import { CouponCode } from '../domain/CouponCode';
 import { CouponId } from '../domain/CouponId';
 import { Coupon } from '../domain/Coupon';
-import { CouponAssignedCollection } from '../domain/CouponAssignedCollection';
 
 export interface GetRecentCouponsArguments {
   pagination?: PaginationArguments;
@@ -20,18 +24,18 @@ export interface PaginatedCouponsResult {
 export interface CouponRepoContract extends Repo<Coupon> {
   getRecentCoupons(
     args?: GetRecentCouponsArguments
-  ): Promise<PaginatedCouponsResult>;
-  getCouponCollection(): Promise<Coupon[]>;
+  ): Promise<Either<GuardFailure | RepoError, PaginatedCouponsResult>>;
+  getCouponCollection(): Promise<Either<GuardFailure | RepoError, Coupon[]>>;
   getCouponsByInvoiceItemId(
     invoiceItemId: InvoiceItemId
-  ): Promise<CouponAssignedCollection>;
-  getCouponById(couponId: CouponId): Promise<Coupon>;
-  getCouponByCode(code: CouponCode): Promise<Coupon>;
-  incrementRedeemedCount(coupon: Coupon): Promise<Coupon>;
+  ): Promise<Either<GuardFailure | RepoError, CouponAssignedCollection>>;
+  getCouponById(couponId: CouponId): Promise<Either<GuardFailure | RepoError, Coupon>>;
+  getCouponByCode(code: CouponCode): Promise<Either<GuardFailure | RepoError, Coupon>>;
+  incrementRedeemedCount(coupon: Coupon): Promise<Either<GuardFailure | RepoError, Coupon>>;
   assignCouponToInvoiceItem(
     coupon: Coupon,
     invoiceItemId: InvoiceItemId
-  ): Promise<Coupon>;
-  update(coupon: Coupon): Promise<Coupon>;
-  isCodeUsed(code: CouponCode | string): Promise<boolean>;
+  ): Promise<Either<GuardFailure | RepoError, Coupon>>;
+  update(coupon: Coupon): Promise<Either<GuardFailure | RepoError, Coupon>>;
+  isCodeUsed(code: CouponCode | string): Promise<Either<GuardFailure | RepoError, boolean>>;
 }

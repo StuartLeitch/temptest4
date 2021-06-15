@@ -1,5 +1,14 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../.././core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
+
 import { Payer } from '../../domain/Payer';
 
-export type CreatePayerResponse = Either<UnexpectedError, Result<Payer>>;
+import * as Errors from './createPayerErrors';
+
+export type CreatePayerResponse = Either<
+  | Errors.NotAbleToCreatePayerError
+  | Errors.InvoiceNotFoundError
+  | Errors.PayerNotFoundError
+  | UnexpectedError,
+  Payer
+>;

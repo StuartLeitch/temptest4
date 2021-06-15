@@ -19,14 +19,9 @@ export const journals: Resolvers<Context> = {
         return undefined;
       }
 
-      const journalsList = result.value.getValue();
-      // console.info('[INFO] Journal list:', journalsList.slice(0,6), '...');
+      const journalsList = result.value;
 
       return journalsList.map(CatalogMap.toPersistence);
-      // return journalsList.map(({ props: { journalId, journalTitle } }) => ({
-      //   journalId: journalId.id.toString(),
-      //   journalTitle,
-      // }));
     },
   },
 };

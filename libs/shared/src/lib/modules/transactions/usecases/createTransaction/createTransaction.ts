@@ -1,14 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { Either, right, left } from '../../../../core/logic/Result';
+import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import { WaiverService } from '../../../../domain/services/WaiverService';
 import {
   AccessControlledUsecase,
@@ -20,7 +18,7 @@ import { NotificationPause } from '../../../notifications/domain/NotificationPau
 import { InvoiceStatus, Invoice } from './../../../invoices/domain/Invoice';
 import { TransactionStatus, Transaction } from '../../domain/Transaction';
 import { InvoiceItem } from './../../../invoices/domain/InvoiceItem';
-import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
+import { ManuscriptId } from '../../../manuscripts/domain/ManuscriptId';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { JournalId } from './../../../journals/domain/JournalId';
 import { Waiver } from '../../../waivers/domain/Waiver';
@@ -33,7 +31,7 @@ import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
 import { TransactionRepoContract } from '../../repos/transactionRepo';
 
 import { CreateTransactionResponse as Response } from './createTransactionResponse';
-import type { CreateTransactionRequestDTO as DTO } from './createTransactionDTO';
+import type { CreateTransactionDTO as DTO } from './createTransactionDTO';
 import * as Errors from './createTransactionErrors';
 
 import {
@@ -46,8 +44,6 @@ import {
   WithInvoice,
   WithJournal,
 } from './helper-types';
-
-type Context = UsecaseAuthorizationContext;
 
 export class CreateTransactionUsecase
   implements
@@ -131,14 +127,14 @@ export class CreateTransactionUsecase
     const transactionOrError = Transaction.create({
       status: TransactionStatus.DRAFT,
     });
-    if (transactionOrError.isFailure) {
-      const err = (transactionOrError.errorValue() as unknown) as Error;
+    if (transactionOrError.isLeft()) {
+      const err = new Error(transactionOrError.value.message);
       return left(new Errors.TransactionCreatedError(err));
     }
 
     return right({
       ...data,
-      transaction: transactionOrError.getValue(),
+      transaction: transactionOrError.value,
     });
   }
 
@@ -151,16 +147,14 @@ export class CreateTransactionUsecase
     };
 
     const invoiceOrError = Invoice.create(invoiceProps);
-    if (invoiceOrError.isFailure) {
+    if (invoiceOrError.isLeft()) {
       return left(
-        new Errors.InvoiceCreatedError(
-          (invoiceOrError.errorValue() as unknown) as Error
-        )
+        new Errors.InvoiceCreatedError(new Error(invoiceOrError.value.message))
       );
     }
     return right({
       ...data,
-      invoice: invoiceOrError.getValue(),
+      invoice: invoiceOrError.value,
     });
   }
 
@@ -169,7 +163,7 @@ export class CreateTransactionUsecase
   ): Promise<Either<Errors.InvoiceItemCreatedError, T & WithInvoiceItem>> {
     const manuscriptId = ManuscriptId.create(
       new UniqueEntityID(data.manuscriptId)
-    ).getValue();
+    );
     const invoiceItemProps = {
       manuscriptId,
       invoiceId: data.invoice.invoiceId,
@@ -177,30 +171,36 @@ export class CreateTransactionUsecase
     };
 
     const invoiceItemOrError = InvoiceItem.create(invoiceItemProps);
-    if (invoiceItemOrError.isFailure) {
+    if (invoiceItemOrError.isLeft()) {
       return left(
         new Errors.InvoiceItemCreatedError(
-          (invoiceItemOrError.errorValue() as unknown) as Error
+          new Error(invoiceItemOrError.value.message)
         )
       );
     }
     return right({
       ...data,
-      invoiceItem: invoiceItemOrError.getValue(),
+      invoiceItem: invoiceItemOrError.value,
     });
   }
 
   private async getCatalog<T extends WithJournalId>(
     data: T
   ): Promise<Either<Errors.CatalogItemNotFoundError, T & WithJournal>> {
-    const journalId = JournalId.create(
-      new UniqueEntityID(data.journalId)
-    ).getValue();
+    const journalId = JournalId.create(new UniqueEntityID(data.journalId));
     try {
       // * System identifies catalog item
-      const catalogItem = await this.catalogRepo.getCatalogItemByJournalId(
+      const maybeCatalogItem = await this.catalogRepo.getCatalogItemByJournalId(
         journalId
       );
+
+      if (maybeCatalogItem.isLeft()) {
+        return left(
+          new Errors.CatalogItemNotFoundError(journalId.id.toString())
+        );
+      }
+
+      const catalogItem = maybeCatalogItem.value;
 
       if (!catalogItem) {
         return left(
@@ -234,9 +234,15 @@ export class CreateTransactionUsecase
     try {
       const invoice = await this.invoiceRepo.save(data.invoice);
 
+      if (invoice.isLeft()) {
+        return left(
+          new Errors.SaveInvoiceError(new Error(invoice.value.message))
+        );
+      }
+
       return right({
         ...data,
-        invoice,
+        invoice: invoice.value,
       });
     } catch (err) {
       return left(new Errors.SaveInvoiceError(err));
@@ -303,12 +309,16 @@ export class CreateTransactionUsecase
   ): Promise<Either<Errors.ManuscriptNotFoundError, T & WithManuscript>> {
     const manuscriptId = ManuscriptId.create(
       new UniqueEntityID(data.manuscriptId)
-    ).getValue();
+    );
 
     try {
-      const manuscript: Manuscript = await this.manuscriptRepo.findById(
-        manuscriptId
-      );
+      const maybeManuscript = await this.manuscriptRepo.findById(manuscriptId);
+
+      if (maybeManuscript.isLeft()) {
+        return left(new Errors.ManuscriptNotFoundError(data.manuscriptId));
+      }
+
+      const manuscript = maybeManuscript.value;
 
       if (!manuscript) {
         return left(new Errors.ManuscriptNotFoundError(data.manuscriptId));
@@ -329,6 +339,7 @@ export class CreateTransactionUsecase
     data: T
   ): Promise<Either<Errors.WaiversCalculationError, T & { waiver: Waiver }>> {
     const { manuscript, invoice, authorsEmails } = data;
+
     try {
       const waiver = await this.waiverService.applyWaiver({
         country: manuscript.authorCountry,

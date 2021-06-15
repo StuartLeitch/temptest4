@@ -1,34 +1,25 @@
 import { UseCaseError } from '../../../../../core/logic/UseCaseError';
-import { Result } from '../../../../../core/logic/Result';
 
-export class ManuscriptRequiredError extends Result<UseCaseError> {
+export class ManuscriptRequiredError extends UseCaseError {
   constructor() {
-    super(false, {
-      message: 'Manuscript is required.',
-    });
+    super('Manuscript is required.');
   }
 }
 
-export class InvoiceItemsRequiredError extends Result<UseCaseError> {
+export class InvoiceItemsRequiredError extends UseCaseError {
   constructor() {
-    super(false, {
-      message: 'Invoice items required.',
-    });
+    super('Invoice items required.');
   }
 }
 
-export class InvoiceRequiredError extends Result<UseCaseError> {
+export class InvoiceRequiredError extends UseCaseError {
   constructor() {
-    super(false, {
-      message: 'Invoice required.',
-    });
+    super('Invoice required.');
   }
 }
 
-export class SQSServiceFailure extends Result<UseCaseError> {
+export class SQSServiceFailure extends UseCaseError {
   constructor(public errorMsg: string) {
-    super(false, {
-      message: `SQS Service failure: ${errorMsg}`,
-    });
+    super(`SQS Service failure: ${errorMsg}`);
   }
 }

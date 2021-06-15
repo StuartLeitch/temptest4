@@ -1,43 +1,24 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { Result, left, right } from '../../../../core/logic/Result';
+import { left, right } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
-import {
-  AccessControlledUsecase,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 
 // * Usecase specific
-import { GetAuthorDetailsResponse } from './getAuthorDetailsResponse';
-import { GetAuthorDetailsErrors } from './getAuthorDetailsErrors';
-import { GetAuthorDetailsDTO } from './getAuthorDetailsDTO';
-
 import { AuthorMap } from '../../mappers/AuthorMap';
 
+import { GetAuthorDetailsResponse as Response } from './getAuthorDetailsResponse';
+import { GetAuthorDetailsDTO as DTO } from './getAuthorDetailsDTO';
+import * as Errors from './getAuthorDetailsErrors';
+
 export class GetAuthorDetailsUsecase
-  implements
-    UseCase<
-      GetAuthorDetailsDTO,
-      Promise<GetAuthorDetailsResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      GetAuthorDetailsDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
-  public async execute(
-    request: GetAuthorDetailsDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<GetAuthorDetailsResponse> {
+  implements UseCase<DTO, Promise<Response>, Context> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const { article } = request;
 
     if (!article) {
-      return left(new GetAuthorDetailsErrors.NoArticleForAuthor());
+      return left(new Errors.NoArticleForAuthor());
     } else {
       try {
         const country = article.authorCountry;
@@ -49,11 +30,13 @@ export class GetAuthorDetailsUsecase
           email,
           name,
         });
-        return right(Result.ok(author));
+        if (author.isLeft()) {
+          return left(author.value);
+        }
+
+        return right(author.value);
       } catch (e) {
-        return left(
-          new GetAuthorDetailsErrors.AuthorNotFoundError(article.id.toString())
-        );
+        return left(new Errors.AuthorNotFoundError(article.id.toString()));
       }
     }
   }

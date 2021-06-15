@@ -1,14 +1,14 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
 import { Payer } from '../../domain/Payer';
 
-import { GetPayerDetailsByInvoiceIdErrors } from './getPayerDetailsByInvoiceIdErrors';
+import * as Errors from './getPayerDetailsByInvoiceIdErrors';
 
 export type GetPayerDetailsByInvoiceIdResponse = Either<
-  | GetPayerDetailsByInvoiceIdErrors.NoPayerFoundForInvoiceError
-  | GetPayerDetailsByInvoiceIdErrors.InvoiceIdRequiredError
-  | GetPayerDetailsByInvoiceIdErrors.FetchPayerFromDbError
+  | Errors.NoPayerFoundForInvoiceError
+  | Errors.InvoiceIdRequiredError
+  | Errors.FetchPayerFromDbError
   | UnexpectedError,
-  Result<Payer>
+  Payer
 >;

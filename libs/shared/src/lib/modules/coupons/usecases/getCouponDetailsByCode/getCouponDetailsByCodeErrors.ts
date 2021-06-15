@@ -1,10 +1,7 @@
 import { UseCaseError } from '../../../../core/logic/UseCaseError';
-import { Result } from '../../../../core/logic/Result';
 
-export class CouponNotFoundError extends Result<UseCaseError> {
+export class CouponNotFoundError extends UseCaseError {
   constructor(couponCode: string) {
-    super(false, {
-      message: `Couldn't find a Coupon with code {${couponCode}}.`,
-    } as UseCaseError);
+    super(`Couldn't find a Coupon with code {${couponCode}}.`);
   }
 }

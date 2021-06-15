@@ -1,14 +1,14 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../.././core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
-import { UpdateTransactionOnAcceptManuscriptErrors } from './updateTransactionOnAcceptManuscriptErrors';
+import * as Errors from './updateTransactionOnAcceptManuscriptErrors';
 
 export type UpdateTransactionOnAcceptManuscriptResponse = Either<
-  | UpdateTransactionOnAcceptManuscriptErrors.CatalogItemNotFoundError
-  | UpdateTransactionOnAcceptManuscriptErrors.InvoiceItemNotFoundError
-  | UpdateTransactionOnAcceptManuscriptErrors.TransactionNotFoundError
-  | UpdateTransactionOnAcceptManuscriptErrors.ManuscriptNotFoundError
-  | UpdateTransactionOnAcceptManuscriptErrors.InvoiceNotFoundError
+  | Errors.CatalogItemNotFoundError
+  | Errors.InvoiceItemNotFoundError
+  | Errors.TransactionNotFoundError
+  | Errors.ManuscriptNotFoundError
+  | Errors.InvoiceNotFoundError
   | UnexpectedError,
-  Result<void>
+  void
 >;

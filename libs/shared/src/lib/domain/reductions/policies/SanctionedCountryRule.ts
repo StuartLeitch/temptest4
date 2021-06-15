@@ -9,7 +9,7 @@ const SANCTIONED_COUNTRIES = {
   SS: { country: 'South Sudan' },
   SD: { country: 'Sudan' },
   SY: { country: 'Syria' },
-  UA: { country: 'Ukraine' }
+  UA: { country: 'Ukraine' },
 };
 
 export class SanctionedCountryRule implements ReductionRuleContract<Waiver> {
@@ -21,10 +21,16 @@ export class SanctionedCountryRule implements ReductionRuleContract<Waiver> {
     if (
       this.correspondingAuthorInstitutionCountryCode in SANCTIONED_COUNTRIES
     ) {
-      return Waiver.create({
+      const waiver = Waiver.create({
         reduction: -1,
-        waiverType: WaiverType.SANCTIONED_COUNTRY
-      }).getValue();
+        waiverType: WaiverType.SANCTIONED_COUNTRY,
+      });
+
+      if (waiver.isLeft()) {
+        throw waiver.value;
+      }
+
+      return waiver.value;
     }
   }
 }

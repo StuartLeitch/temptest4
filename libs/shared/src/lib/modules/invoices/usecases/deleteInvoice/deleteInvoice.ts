@@ -1,38 +1,31 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
-import { Result } from '../../../../core/logic/Result';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
-import { Invoice } from '../../domain/Invoice';
-import { InvoiceId } from '../../domain/InvoiceId';
-import { InvoiceRepoContract } from '../../repos/invoiceRepo';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { Either, right, left } from '../../../../core/logic/Either';
+import { UnexpectedError } from '../../../..//core/logic/AppError';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  Authorize,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
-export interface DeleteInvoiceRequestDTO {
-  invoiceId: string;
-}
+import { InvoiceId } from '../../domain/InvoiceId';
+import { Invoice } from '../../domain/Invoice';
+
+import { InvoiceRepoContract } from '../../repos/invoiceRepo';
+
+import { DeleteInvoiceResponse as Response } from './deleteInvoiceResponse';
+import type { DeleteInvoiceRequestDTO as DTO } from './deleteInvoiceDTO';
+import * as Errors from './deleteInvoiceErrors';
 
 export class DeleteInvoiceUsecase
   implements
-    UseCase<
-      DeleteInvoiceRequestDTO,
-      Result<unknown>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      DeleteInvoiceRequestDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   private invoiceRepo: InvoiceRepoContract;
 
   constructor(invoiceRepo: InvoiceRepoContract) {
@@ -40,23 +33,28 @@ export class DeleteInvoiceUsecase
   }
 
   private async getInvoice(
-    request: DeleteInvoiceRequestDTO
-  ): Promise<Result<Invoice>> {
+    request: DTO
+  ): Promise<
+    Either<
+      Errors.InvoiceIdRequiredError | Errors.InvoiceNotExistsError,
+      Invoice
+    >
+  > {
     const { invoiceId } = request;
 
     if (!invoiceId) {
-      return Result.fail<Invoice>(`Invalid invoice id=${invoiceId}`);
+      return left(new Errors.InvoiceIdRequiredError());
     }
 
-    const invoice = await this.invoiceRepo.getInvoiceById(
-      InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
-    );
-    const found = !!invoice;
+    const invoiceIdEntity = InvoiceId.create(new UniqueEntityID(invoiceId));
 
-    if (found) {
-      return Result.ok<Invoice>(invoice);
-    } else {
-      return Result.fail<Invoice>(`Couldn't find invoice by id=${invoiceId}`);
+    const invoice = await this.invoiceRepo.getInvoiceById(invoiceIdEntity);
+
+    if (invoice.isLeft()) {
+      return left(new Errors.InvoiceNotExistsError(invoiceId));
+    }
+    {
+      return right(invoice.value);
     }
   }
 
@@ -65,28 +63,25 @@ export class DeleteInvoiceUsecase
   }
 
   @Authorize('invoice:delete')
-  public async execute(
-    request: DeleteInvoiceRequestDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Result<unknown>> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       // * System looks-up the invoice
-      const invoiceOrError = await this.getInvoice(request);
+      const maybeInvoice = await this.getInvoice(request);
 
-      if (invoiceOrError.isFailure) {
-        return Result.fail<Invoice>(invoiceOrError.error);
+      if (maybeInvoice.isLeft()) {
+        return maybeInvoice.map(() => null);
       }
 
-      const invoice = invoiceOrError.getValue();
+      const invoice = maybeInvoice.value;
       // * This is where all the magic happens
       await this.invoiceRepo.delete(invoice);
       invoice.generateInvoiceDraftDeletedEvent();
       DomainEvents.dispatchEventsForAggregate(invoice.id);
 
-      return Result.ok<Invoice>(null);
+      return right(null);
     } catch (err) {
       console.log(err);
-      return Result.fail<Invoice>(err);
+      return left(new UnexpectedError(err));
     }
   }
 }

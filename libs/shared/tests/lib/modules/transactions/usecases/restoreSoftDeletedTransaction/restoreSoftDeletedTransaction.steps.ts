@@ -40,7 +40,7 @@ const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.SUPER_ADMIN],
 };
 
-Before(function () {
+Before({ tags: '@ValidateRestoreSoftDeleteTransaction' }, function () {
   mockTransactionRepo = new MockTransactionRepo();
   mockInvoiceRepo = new MockInvoiceRepo();
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
@@ -61,11 +61,17 @@ Before(function () {
 Given(
   /^A resubmitted manuscript "([\w-]+)" on journal "([\w-]+)"$/,
   async function (manuscriptId: string, journalId: string) {
-    manuscript = ArticleMap.toDomain({
+    const maybeManuscript = ArticleMap.toDomain({
       id: manuscriptId,
       journalId: journalId,
       customId: '1111',
     });
+
+    if (maybeManuscript.isLeft()) {
+      throw maybeManuscript.value;
+    }
+
+    manuscript = maybeManuscript.value;
 
     mockArticleRepo.addMockItem(manuscript);
   }
@@ -74,20 +80,38 @@ Given(
 Given(
   /^An Invoice with a DRAFT Transaction and an Invoice Item linked to the manuscript "([\w-]+)"$/,
   async function (manuscriptTestId: string) {
-    const transaction = TransactionMap.toDomain({
+    const maybeTransaction = TransactionMap.toDomain({
       status: TransactionStatus.DRAFT,
       deleted: 1,
     });
 
-    const invoice = InvoiceMap.toDomain({
+    if (maybeTransaction.isLeft()) {
+      throw maybeTransaction.value;
+    }
+
+    const transaction = maybeTransaction.value;
+
+    const maybeInvoice = InvoiceMap.toDomain({
       status: InvoiceStatus.DRAFT,
       transactionId: transaction.transactionId.id.toString(),
     });
 
-    const invoiceItem = InvoiceItemMap.toDomain({
+    if (maybeInvoice.isLeft()) {
+      throw maybeInvoice.value;
+    }
+
+    const invoice = maybeInvoice.value;
+
+    const maybeInvoiceItem = InvoiceItemMap.toDomain({
       manuscriptId: manuscriptTestId,
       invoiceId: invoice.invoiceId.id.toString(),
     });
+
+    if (maybeInvoiceItem.isLeft()) {
+      throw maybeInvoiceItem.value;
+    }
+
+    const invoiceItem = maybeInvoiceItem.value;
 
     invoice.addInvoiceItem(invoiceItem);
     transaction.addInvoice(invoice);

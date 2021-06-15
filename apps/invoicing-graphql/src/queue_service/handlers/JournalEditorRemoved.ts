@@ -56,7 +56,7 @@ function removeEditorEventHandlerFactory(eventName: string) {
         });
 
         if (maybeCurrentEditors.isLeft()) {
-          const err = maybeCurrentEditors.value.errorValue();
+          const err = maybeCurrentEditors.value;
           logger.error(err.message);
           throw err;
         }
@@ -73,7 +73,7 @@ function removeEditorEventHandlerFactory(eventName: string) {
         const editorsRemovedResponse = maybeEditorsRemoved.value;
 
         if (maybeEditorsRemoved.isLeft()) {
-          logger.error(editorsRemovedResponse.errorValue().message);
+          logger.error(editorsRemovedResponse.message);
           throw editorsRemovedResponse;
         }
 
@@ -84,7 +84,7 @@ function removeEditorEventHandlerFactory(eventName: string) {
 
         const addEditorsToJournalResponse = maybeAddEditorsToJournal.value;
         if (maybeAddEditorsToJournal.isLeft()) {
-          logger.error(maybeAddEditorsToJournal.value.errorValue().message);
+          logger.error(maybeAddEditorsToJournal.value.message);
           throw addEditorsToJournalResponse;
         }
 

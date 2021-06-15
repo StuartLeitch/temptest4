@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Either } from '../../core/logic/Result';
-import { right } from '../../core/logic/Result';
+import { Either, right } from '../../core/logic/Either';
 import { UseCase } from './UseCase';
 
 type EitherNull = Either<null, null>;

@@ -1,14 +1,34 @@
+import { Either, flatten, right, left } from '../../../core/logic/Either';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
 import { Mapper } from '../../../infrastructure/Mapper';
 
-import { Invoice } from '../domain/Invoice';
+import { InvoiceErpReferences } from './../domain/InvoiceErpReferences';
 import { TransactionId } from '../../transactions/domain/TransactionId';
 import { ErpReferenceMap } from './../../vendors/mapper/ErpReference';
-import { InvoiceErpReferences } from './../domain/InvoiceErpReferences';
+import { ErpReference } from '../../vendors/domain/ErpReference';
+import { Invoice } from '../domain/Invoice';
 
 export class InvoiceMap extends Mapper<Invoice> {
-  public static toDomain(raw: any): Invoice {
-    const invoiceOrError = Invoice.create(
+  public static toDomain(raw: any): Either<GuardFailure, Invoice> {
+    let maybeErpReference: Either<GuardFailure, ErpReference[]> = right([]);
+
+    if (
+      raw.erpReferences &&
+      raw.erpReferences.every(
+        (ef: { vendor: any; type: any }) => ef.vendor && ef.type
+      )
+    ) {
+      maybeErpReference = flatten(
+        (raw.erpReferences as Array<any>).map(ErpReferenceMap.toDomain)
+      );
+    }
+
+    if (maybeErpReference.isLeft()) {
+      return left(maybeErpReference.value);
+    }
+
+    const maybeInvoice = Invoice.create(
       {
         transactionId: TransactionId.create(
           new UniqueEntityID(raw.transactionId)
@@ -24,20 +44,12 @@ export class InvoiceMap extends Mapper<Invoice> {
         cancelledInvoiceReference: raw.cancelledInvoiceReference ?? null,
         creationReason: raw.creationReason ?? null,
         persistentReferenceNumber: raw.persistentReferenceNumber ?? null,
-        erpReferences:
-          raw.erpReferences &&
-          raw.erpReferences.every((ef: { vendor: any; type: any; }) => ef.vendor && ef.type)
-            ? InvoiceErpReferences.create(
-                raw.erpReferences.map(ErpReferenceMap.toDomain)
-              )
-            : InvoiceErpReferences.create([]),
+        erpReferences: InvoiceErpReferences.create(maybeErpReference.value),
       },
       new UniqueEntityID(raw.id)
     );
 
-    invoiceOrError.isFailure ? console.log(invoiceOrError) : '';
-
-    return invoiceOrError.isSuccess ? invoiceOrError.getValue() : null;
+    return maybeInvoice;
   }
 
   public static toPersistence(invoice: Invoice): any {
@@ -52,7 +64,7 @@ export class InvoiceMap extends Mapper<Invoice> {
       dateMovedToFinal: invoice.dateMovedToFinal,
       cancelledInvoiceReference: invoice.cancelledInvoiceReference ?? null,
       creationReason: invoice.creationReason ?? null,
-      persistentReferenceNumber: invoice.persistentReferenceNumber ?? null
+      persistentReferenceNumber: invoice.persistentReferenceNumber ?? null,
     };
   }
 }

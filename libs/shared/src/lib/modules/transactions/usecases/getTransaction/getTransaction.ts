@@ -1,62 +1,31 @@
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
-import { Result } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { UnexpectedError } from '../../../..//core/logic/AppError';
+import { right, left } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
 
-import { Transaction } from '../../domain/Transaction';
-import { TransactionId } from '../../domain/TransactionId';
-import { TransactionRepoContract } from '../../repos/transactionRepo';
-
-// * Authorization Logic
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  Authorize,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
-export interface GetTransactionRequestDTO {
-  transactionId?: string;
-}
+import { TransactionId } from '../../domain/TransactionId';
+
+import { TransactionRepoContract } from '../../repos/transactionRepo';
+
+import { GetTransactionResponse as Response } from './getTransactionResponse';
+import type { GetTransactionDTO as DTO } from './getTransactionDTO';
+
+// * Authorization Logic
 
 export class GetTransactionUsecase
   implements
-    UseCase<
-      GetTransactionRequestDTO,
-      Result<Transaction>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      GetTransactionRequestDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Response, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(private transactionRepo: TransactionRepoContract) {
     this.transactionRepo = transactionRepo;
-  }
-
-  private async getTransaction(
-    request: GetTransactionRequestDTO
-  ): Promise<Result<Transaction>> {
-    const { transactionId } = request;
-
-    if (!transactionId) {
-      return Result.fail<Transaction>(
-        `Invalid Transaction id=${transactionId}`
-      );
-    }
-    const transaction = await this.transactionRepo.getTransactionById(
-      TransactionId.create(new UniqueEntityID(transactionId))
-    );
-    const found = !!transaction;
-
-    if (found) {
-      return Result.ok<Transaction>(transaction);
-    } else {
-      return Result.fail<Transaction>(
-        `Couldn't find transaction by id=${transactionId}`
-      );
-    }
   }
 
   private async getAccessControlContext(request, context?) {
@@ -64,35 +33,30 @@ export class GetTransactionUsecase
   }
 
   @Authorize('transaction:read')
-  public async execute(
-    request: GetTransactionRequestDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Result<Transaction>> {
-    // if ('transactionId' in request) {
-    //   const transactionOrError = await this.getTransaction(request);
-    //   if (transactionOrError.isFailure) {
-    //     return Result.fail<Invoice>(transactionOrError.error);
-    //   }
-    //   transactionId = TransactionId.create(
-    //     new UniqueEntityID(rawTransactionId)
-    //   );
-    // }
-
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      // * System looks-up the transaction
-      const transactionOrError = await this.getTransaction(request);
+      const { transactionId } = request;
 
-      if (transactionOrError.isFailure) {
-        return Result.fail<Transaction>(transactionOrError.error);
+      if (!transactionId) {
+        return left(
+          new UnexpectedError(
+            new Error(`Invalid Transaction id=${transactionId}`)
+          )
+        );
       }
+      const maybeTransaction = await this.transactionRepo.getTransactionById(
+        TransactionId.create(new UniqueEntityID(transactionId))
+      );
 
-      const transaction = transactionOrError.getValue();
-
-      // * This is where all the magic happens
-      return Result.ok<Transaction>(transaction);
+      if (maybeTransaction.isRight()) {
+        return right(maybeTransaction.value);
+      } else {
+        return left(
+          new UnexpectedError(new Error(maybeTransaction.value.message))
+        );
+      }
     } catch (err) {
-      console.log(err);
-      return Result.fail<Transaction>(err);
+      return left(new UnexpectedError(err));
     }
   }
 }

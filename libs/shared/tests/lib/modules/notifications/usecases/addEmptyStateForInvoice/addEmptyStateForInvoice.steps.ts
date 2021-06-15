@@ -64,11 +64,18 @@ After({ tags: '@ValidateEmptyStateForInvoice' }, () => {
 });
 
 Given(/^an invoice with the id "([\w-]+)"/, async (testInvoiceId: string) => {
-  const invoiceId = InvoiceId.create(
-    new UniqueEntityID(testInvoiceId)
-  ).getValue();
+  const invoiceId = InvoiceId.create(new UniqueEntityID(testInvoiceId));
   pausedReminderState = { invoiceId, confirmation: false, payment: false };
-  pausedReminderState = await mockPausedReminderRepo.save(pausedReminderState);
+
+  const maybePausedReminderState = await mockPausedReminderRepo.save(
+    pausedReminderState
+  );
+
+  if (maybePausedReminderState.isLeft()) {
+    throw maybePausedReminderState.value;
+  }
+
+  pausedReminderState = maybePausedReminderState.value;
 });
 
 When(
@@ -86,18 +93,23 @@ When(
 Then(
   /^the empty pause reminder for invoice "([\w-]+)" should be added/,
   async (testInvoiceId: string) => {
-    const invoiceId = InvoiceId.create(
-      new UniqueEntityID(testInvoiceId)
-    ).getValue();
+    const invoiceId = InvoiceId.create(new UniqueEntityID(testInvoiceId));
 
-    const pausedReminder = await mockPausedReminderRepo.getNotificationPausedStatus(
+    const maybePausedReminder = await mockPausedReminderRepo.getNotificationPausedStatus(
       invoiceId
     );
+
+    if (maybePausedReminder.isLeft()) {
+      throw maybePausedReminder.value;
+    }
+
+    const pausedReminder = maybePausedReminder.value;
+
     expect(pausedReminder.payment).to.equal(false);
     expect(pausedReminder.confirmation).to.equal(false);
   }
 );
 
 Then(/^I should receive an error that the invoice was not found/, () => {
-  expect(response.value.isFailure).to.equal(true);
+  expect(response.isLeft()).to.equal(true);
 });

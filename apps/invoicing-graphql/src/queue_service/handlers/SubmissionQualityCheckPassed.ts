@@ -94,13 +94,11 @@ export const SubmissionQualityCheckPassed: EventHandler<SQCP> = {
       );
 
       if (maybeTransaction.isLeft()) {
-        logger.error(maybeTransaction.value.errorValue().message);
-        throw maybeTransaction.value.error;
+        logger.error(maybeTransaction.value.message);
+        throw maybeTransaction.value;
       }
 
-      if (
-        maybeTransaction.value.getValue().status !== TransactionStatus.DRAFT
-      ) {
+      if (maybeTransaction.value.status !== TransactionStatus.DRAFT) {
         return;
       }
 
@@ -147,8 +145,8 @@ export const SubmissionQualityCheckPassed: EventHandler<SQCP> = {
       );
 
       if (result.isLeft()) {
-        logger.error(result.value.errorValue().message);
-        throw result.value.error;
+        logger.error(result.value.message);
+        throw result.value;
       }
     };
   },

@@ -1,4 +1,5 @@
 import { StrategyFactory } from '../../../../core/logic/strategy/strategy-factory';
+import { UnexpectedStrategyError } from '../../../../core/logic/strategy-error';
 
 import { PaymentMethodNames } from '../PaymentMethod';
 import { PaymentMethodId } from '../PaymentMethodId';
@@ -72,7 +73,15 @@ class PaymentStrategyFactory
 
   private async getPaymentMethodId(name: string): Promise<PaymentMethodId> {
     const pm = await this.paymentMethodRepo.getPaymentMethodByName(name);
-    return pm.paymentMethodId;
+
+    if (pm.isLeft()) {
+      throw new UnexpectedStrategyError(
+        new Error(pm.value.message),
+        'Strategy Factory'
+      );
+    }
+
+    return pm.value.paymentMethodId;
   }
 
   private builders: Builders = {

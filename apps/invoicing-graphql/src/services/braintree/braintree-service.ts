@@ -107,7 +107,15 @@ class Service implements ServiceContract {
       return left(new Errors.UnsuccessfulTokenGeneration(result.message));
     }
 
-    return right(PaymentClientToken.create(result.clientToken).getValue());
+    const maybeToken = PaymentClientToken.create(result.clientToken);
+
+    if (maybeToken.isLeft()) {
+      return left(
+        new Errors.UnsuccessfulTokenGeneration(maybeToken.value.message)
+      );
+    }
+
+    return right(maybeToken.value);
   }
 }
 
