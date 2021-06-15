@@ -41,16 +41,19 @@ const defaultContext: UsecaseAuthorizationContext = {
 
 Given(
   /^the credit note with an invoice id "([\w-]+)"/,
-  async (invoiceId: string) => {
-    creditNote = makeCreditNoteData(invoiceId);
+  async (testInvoiceId: string) => {
+    creditNote = makeCreditNoteData({ invoiceId: testInvoiceId });
     creditNote = await mockCreditNoteRepo.save(creditNote);
   }
 );
 
 When(
   /^we call GetCreditNoteByInvoiceIdUsecase with invoice id "([\w-]+)"/,
-  async (invoiceId: string) => {
-    result = await usecase.execute({ invoiceId });
+  async (testInvoiceId: string) => {
+    result = await usecase.execute(
+      { invoiceId: testInvoiceId },
+      defaultContext
+    );
   }
 );
 

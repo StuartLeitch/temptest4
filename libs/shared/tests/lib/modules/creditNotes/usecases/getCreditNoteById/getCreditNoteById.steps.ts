@@ -39,15 +39,21 @@ const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.SUPER_ADMIN],
 };
 
-Given(/^a credit note with the id "([\w-]+)"/, async (creditNoteId: string) => {
-  creditNote = makeCreditNoteData(creditNoteId);
-  creditNote = await mockCreditNoteRepo.save(creditNote);
-});
+Given(
+  /^a credit note with the id "([\w-]+)"/,
+  async (testCreditNoteId: string) => {
+    creditNote = makeCreditNoteData({ id: testCreditNoteId });
+    creditNote = await mockCreditNoteRepo.save(creditNote);
+  }
+);
 
 When(
   /^GetCreditNoteByIdUsecase is executed for credit note "([\w-]+)"/,
-  async (creditNoteId: string) => {
-    result = await usecase.execute({ creditNoteId }, defaultContext);
+  async (testCreditNoteId: string) => {
+    result = await usecase.execute(
+      { creditNoteId: testCreditNoteId },
+      defaultContext
+    );
   }
 );
 

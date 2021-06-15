@@ -78,7 +78,7 @@ Given(
       customId: testCustomId,
     });
 
-    creditNote = makeCreditNoteData(testInvoiceId);
+    creditNote = makeCreditNoteData({ invoiceId: testInvoiceId });
 
     await mockInvoiceRepo.save(invoice);
     await mockInvoiceItemRepo.save(invoiceItem);

@@ -19,11 +19,9 @@ export class MockCreditNoteRepo
   public async getCreditNoteByInvoiceId(
     invoiceId: InvoiceId
   ): Promise<CreditNote> {
-    const match = this._items.find((i) => i.invoiceId.equals(invoiceId));
-    if (!match) {
-      return null;
-    }
-    return match;
+    const match = this._items.find((i) => i.invoiceId.id.equals(invoiceId.id));
+
+    return match ? match : null;
   }
 
   public async getCreditNoteById(
