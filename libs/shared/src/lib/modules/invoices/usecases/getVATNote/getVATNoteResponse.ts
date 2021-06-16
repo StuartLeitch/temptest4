@@ -1,4 +1,4 @@
-import { Either } from '../../../../core/logic/Result';
+import { Either } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 
 import * as GetVATNoteErrors from './getVATNoteErrors';
