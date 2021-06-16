@@ -38,7 +38,7 @@ const Authorize = <R, C extends AuthorizationContext>(action: string) => (
     );
 
     if (!permission.granted) {
-      return left('UnauthorizedUserException');
+      return left(new Error('UnauthorizedUserException'));
     }
 
     const result = await method.call(this, request, context, permission);
