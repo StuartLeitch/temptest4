@@ -281,5 +281,7 @@ export class EpicOnArticlePublishedUsecase
         }
       }
     }
+
+    return right(null);
   }
 }
