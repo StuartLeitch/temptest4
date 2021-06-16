@@ -1,6 +1,6 @@
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
-import { left, right, Result } from '../../../../core/logic/Result';
+import { left, right } from '../../../../core/logic/Either';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 
@@ -51,20 +51,26 @@ export class GetTransactionByInvoiceIdUsecase
       return left(new Errors.InvoiceIdRequiredError());
     }
 
-    let transaction: Transaction;
+    let transactionOrError;
 
     try {
       try {
         // * System identifies invoice by cancelled Invoice reference
-        transaction = await this.transactionRepo.getTransactionByInvoiceId(
-          InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
+        transactionOrError = await this.transactionRepo.getTransactionByInvoiceId(
+          InvoiceId.create(new UniqueEntityID(invoiceId))
         );
       } catch (e) {
         return left(
           new Errors.TransactionNotFoundError(invoiceId)
         );
       }
-      return right(transaction);
+
+      if (transactionOrError.isLeft()) {
+        const err = new Error(transactionOrError.value.message);
+        return left(err);
+      }
+
+      return right(transactionOrError.value);
     } catch (err) {
       return left(new UnexpectedError(err));
     }

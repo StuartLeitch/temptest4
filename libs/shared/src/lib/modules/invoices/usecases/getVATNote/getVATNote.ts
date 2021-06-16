@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 // * Core Domain
-import { Result, left, right } from '../../../../core/logic/Result';
+import { left, right } from '../../../../core/logic/Either';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
@@ -54,12 +54,12 @@ export class GetVATNoteUsecase
 
     const invoiceId = InvoiceId.create(
       new UniqueEntityID(request.invoiceId)
-    ).getValue();
+    );
 
     try {
-      let payer: Payer;
+      let payerOrError;
       try {
-        payer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
+        payerOrError = await this.payerRepo.getPayerByInvoiceId(invoiceId);
       } catch (err) {
         console.log(err);
         return left(
@@ -69,15 +69,28 @@ export class GetVATNoteUsecase
         );
       }
 
+      if (payerOrError.isLeft()) {
+        const err = new Error(payerOrError.value.message);
+        return left(err);
+      }
+
+      const payer = payerOrError.value;
+
       let vatnote = ' ';
       if (payer && payer.billingAddressId) {
-        const address = await this.addressRepo.findById(payer.billingAddressId);
+        const addressOrError = await this.addressRepo.findById(payer.billingAddressId);
+
+        if (addressOrError.isLeft()) {
+          const err = new Error(addressOrError.value.message);
+          return left(err);
+        }
+
         // * Get the VAT note for the invoice item
         const { template } = this.vatService.getVATNote(
           {
-            postalCode: address.postalCode,
-            countryCode: address.country,
-            stateCode: address.state,
+            postalCode: addressOrError.value.postalCode,
+            countryCode: addressOrError.value.country,
+            stateCode: addressOrError.value.state,
           },
           payer.type !== PayerType.INSTITUTION,
           new Date(request?.dateIssued)

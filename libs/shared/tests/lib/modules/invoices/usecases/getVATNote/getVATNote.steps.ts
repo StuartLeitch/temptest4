@@ -32,9 +32,9 @@ const validateVATUsecase = new ValidateVATUsecase(vatService);
 const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.SUPER_ADMIN],
 };
-let payer: Payer;
-let invoice: Invoice;
-let invoiceItem: InvoiceItem;
+let payer; //: Payer;
+let invoice; //: Invoice;
+let invoiceItem; //: InvoiceItem;
 let APCPolicy: UKVATTreatmentArticleProcessingChargesPolicy;
 let policiesRegister: PoliciesRegister;
 let calculateVAT: any;
@@ -123,16 +123,18 @@ Before(() => {
     invoiceId,
     name: 'foo',
     type: PayerType.INSTITUTION,
-  });
+  }).value;
+
   invoice = InvoiceMap.toDomain({
     id: invoiceId,
     status: InvoiceStatus.DRAFT,
     payerId: payer.payerId.id.toString(),
-  });
+  }).value;
+
   invoiceItem = InvoiceItemMap.toDomain({
     invoiceId,
     manuscriptId: 'test-manuscript',
-  });
+  }).value;
   policiesRegister = new PoliciesRegister();
   setupVatService();
 });
