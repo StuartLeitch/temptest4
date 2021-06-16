@@ -600,7 +600,7 @@ export const invoice: Resolvers<Context> = {
       } = env.app;
 
       const usecaseContext = {
-        roles: [Roles.PAYER],
+        roles: [Roles.SUPER_ADMIN],
       };
 
       const applyCouponUsecase = new ApplyCouponToInvoiceUsecase(
