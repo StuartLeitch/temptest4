@@ -6,8 +6,8 @@ import { Transaction } from './../../domain/Transaction';
 import * as Errors from './getTransactionByInvoiceIdErrors';
 
 export type GetTransactionByInvoiceIdResponse = Either<
-  | Errors.InvoiceIdRequiredError
   | Errors.TransactionNotFoundError
+  | Errors.InvoiceIdRequiredError
   | UnexpectedError,
   Transaction
 >;

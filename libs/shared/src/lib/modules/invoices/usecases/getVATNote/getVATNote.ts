@@ -1,104 +1,79 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { left, right } from '../../../../core/logic/Either';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { right, left } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 
 // * Usecase specific
-// import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
+import { VATService } from '../../../../domain/services/VATService';
 
-import { GetVATNoteResponse as Response } from './getVATNoteResponse';
-import * as Errors from './getVATNoteErrors';
-import { GetVATNoteDTO } from './getVATNoteDTO';
 import { PayerType } from '../../../payers/domain/Payer';
+import { Payer } from '../../../payers/domain/Payer';
 import { InvoiceId } from '../../domain/InvoiceId';
 
-import { VATService } from '../../../../domain/services/VATService';
-import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
-import { Payer } from '../../../payers/domain/Payer';
+import { PayerRepoContract } from '../../../payers/repos/payerRepo';
+
+import { GetVATNoteResponse as Response } from './getVATNoteResponse';
+import type { GetVATNoteDTO as DTO } from './getVATNoteDTO';
+import * as Errors from './getVATNoteErrors';
 
 export class GetVATNoteUsecase
-  implements
-    UseCase<
-      GetVATNoteDTO,
-      Promise<Response>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      GetVATNoteDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private payerRepo: PayerRepoContract,
     private addressRepo: AddressRepoContract,
     private vatService: VATService
   ) {}
 
-  // @Authorize('invoice:read')
-  public async execute(
-    request: GetVATNoteDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
-    let vatNote: string;
-
-    const invoiceId = InvoiceId.create(
-      new UniqueEntityID(request.invoiceId)
-    );
+  public async execute(request: DTO, context?: Context): Promise<Response> {
+    const invoiceId = InvoiceId.create(new UniqueEntityID(request.invoiceId));
 
     try {
-      let payerOrError;
+      let payer: Payer;
       try {
-        payerOrError = await this.payerRepo.getPayerByInvoiceId(invoiceId);
+        const maybePayer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
+
+        if (maybePayer.isLeft()) {
+          return left(new UnexpectedError(new Error(maybePayer.value.message)));
+        }
+        payer = maybePayer.value;
       } catch (err) {
         console.log(err);
-        return left(
-          new Errors.PayerNotFoundError(
-            invoiceId.id.toString()
-          )
-        );
+        return left(new Errors.PayerNotFoundError(invoiceId.id.toString()));
       }
 
-      if (payerOrError.isLeft()) {
-        const err = new Error(payerOrError.value.message);
-        return left(err);
-      }
-
-      const payer = payerOrError.value;
-
-      let vatnote = ' ';
+      let vatNote = ' ';
       if (payer && payer.billingAddressId) {
-        const addressOrError = await this.addressRepo.findById(payer.billingAddressId);
+        const maybeAddress = await this.addressRepo.findById(
+          payer.billingAddressId
+        );
+        // * Get the VAT note for the invoice item
 
-        if (addressOrError.isLeft()) {
-          const err = new Error(addressOrError.value.message);
-          return left(err);
+        if (maybeAddress.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeAddress.value.message))
+          );
         }
 
-        // * Get the VAT note for the invoice item
+        const address = maybeAddress.value;
+
         const { template } = this.vatService.getVATNote(
           {
-            postalCode: addressOrError.value.postalCode,
-            countryCode: addressOrError.value.country,
-            stateCode: addressOrError.value.state,
+            postalCode: address.postalCode,
+            countryCode: address.country,
+            stateCode: address.state,
           },
           payer.type !== PayerType.INSTITUTION,
           new Date(request?.dateIssued)
         );
-        vatnote = template;
+        vatNote = template;
       }
 
-      return right(vatnote);
+      return right(vatNote);
     } catch (err) {
       return left(new UnexpectedError(err));
     }

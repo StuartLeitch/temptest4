@@ -28,7 +28,7 @@ import {
   Roles,
   GetTransactionByInvoiceIdUsecase,
   GetPaymentsByInvoiceIdUsecase,
-  GetVATNoteUsecase
+  GetVATNoteUsecase,
   // Payer
 } from '@hindawi/shared';
 
@@ -350,16 +350,22 @@ export const invoice: Resolvers<Context> = {
       }
 
       let vatnote = ' ';
-      const getVatNoteUsecase = new GetVATNoteUsecase(payerRepo, addressRepo, vatService);
-      const getVatNoteResult = await getVatNoteUsecase.execute({
-        invoiceId: parent.invoiceId,
-        dateIssued: parent.dateIssued
-      }, usecaseContext)
+      const getVatNoteUsecase = new GetVATNoteUsecase(
+        payerRepo,
+        addressRepo,
+        vatService
+      );
+      const getVatNoteResult = await getVatNoteUsecase.execute(
+        {
+          invoiceId: parent.invoiceId,
+          dateIssued: parent.dateIssued,
+        },
+        usecaseContext
+      );
 
       if (getVatNoteResult.isRight()) {
         vatnote = getVatNoteResult.value;
       }
-
 
       return { ...rawItem, rate: Math.round(rate * 10000) / 10000, vatnote };
     },
@@ -372,9 +378,15 @@ export const invoice: Resolvers<Context> = {
         roles: [Roles.ADMIN],
       };
 
-      const usecase = new GetPaymentsByInvoiceIdUsecase(invoiceRepo, paymentRepo);
+      const usecase = new GetPaymentsByInvoiceIdUsecase(
+        invoiceRepo,
+        paymentRepo
+      );
 
-      const result = await usecase.execute({ invoiceId: parent.invoiceId }, usecaseContext);
+      const result = await usecase.execute(
+        { invoiceId: parent.invoiceId },
+        usecaseContext
+      );
 
       if (result.isLeft()) {
         console.error(result.value);
@@ -398,9 +410,15 @@ export const invoice: Resolvers<Context> = {
         roles: [Roles.ADMIN],
       };
 
-      const usecase = new GetPaymentsByInvoiceIdUsecase(invoiceRepo, paymentRepo);
+      const usecase = new GetPaymentsByInvoiceIdUsecase(
+        invoiceRepo,
+        paymentRepo
+      );
 
-      const result = await usecase.execute({ invoiceId: parent.invoiceId }, usecaseContext);
+      const result = await usecase.execute(
+        { invoiceId: parent.invoiceId },
+        usecaseContext
+      );
 
       if (result.isLeft()) {
         console.error(result.value);
@@ -483,11 +501,14 @@ export const invoice: Resolvers<Context> = {
 
       const usecase = new GetTransactionByInvoiceIdUsecase(transactionRepo);
 
-      const result = await usecase.execute({ invoiceId: parent.invoiceId }, usecaseContext);
+      const result = await usecase.execute(
+        { invoiceId: parent.invoiceId },
+        usecaseContext
+      );
 
       if (result.isLeft()) {
         console.error(result.value);
-        throw result.value.errorValue;
+        throw result.value;
       }
 
       const transaction = result.value;
@@ -497,7 +518,6 @@ export const invoice: Resolvers<Context> = {
       }
 
       return TransactionMap.toPersistence(transaction);
-
     },
   },
   InvoiceItem: {
@@ -600,7 +620,7 @@ export const invoice: Resolvers<Context> = {
       } = env.app;
 
       const usecaseContext = {
-        roles: [Roles.PAYER],
+        roles: [Roles.SUPER_ADMIN],
       };
 
       const applyCouponUsecase = new ApplyCouponToInvoiceUsecase(

@@ -4,32 +4,21 @@ import { Either } from '../../../../core/logic/Either';
 
 import { Coupon } from '../../../../modules/coupons/domain/Coupon';
 
-import {
-  CouponAlreadyUsedForInvoiceError,
-  InvoiceConfirmationFailed,
-  InvoiceStatusInvalidError,
-  TransactionNotFoundError,
-  ManuscriptNotFoundError,
-  CouponAlreadyUsedError,
-  InvoiceNotFoundError,
-  CouponInactiveError,
-  CouponNotFoundError,
-  CouponExpiredError,
-  CouponInvalidError,
-} from './applyCouponToInvoiceErrors';
+import * as Errors from './applyCouponToInvoiceErrors';
 
 export type ApplyCouponToInvoiceResponse = Either<
-  | CouponAlreadyUsedForInvoiceError
-  | InvoiceConfirmationFailed
-  | InvoiceStatusInvalidError
-  | TransactionNotFoundError
-  | ManuscriptNotFoundError
-  | CouponAlreadyUsedError
-  | InvoiceNotFoundError
-  | CouponInactiveError
-  | CouponNotFoundError
-  | CouponExpiredError
-  | CouponInvalidError
+  | Errors.CouponAlreadyUsedForInvoiceError
+  | Errors.InvoiceConfirmationFailed
+  | Errors.InvoiceItemsNotFoundError
+  | Errors.InvoiceStatusInvalidError
+  | Errors.TransactionNotFoundError
+  | Errors.ManuscriptNotFoundError
+  | Errors.CouponAlreadyUsedError
+  | Errors.InvoiceNotFoundError
+  | Errors.CouponInactiveError
+  | Errors.CouponNotFoundError
+  | Errors.CouponExpiredError
+  | Errors.CouponInvalidError
   | UnexpectedError
   | GuardFailure,
   Coupon

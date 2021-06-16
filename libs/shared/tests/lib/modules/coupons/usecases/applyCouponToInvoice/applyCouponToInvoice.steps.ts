@@ -1,5 +1,5 @@
+import { Before, After, Given, When, Then } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
 import { MockLogger } from '../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
 import { EmailService } from '../../../../../../src/lib/infrastructure/communication-channels/EmailService';
@@ -9,6 +9,9 @@ import { ApplyCouponToInvoiceUsecase } from '../../../../../../src/lib/modules/c
 import { ApplyCouponToInvoiceResponse } from '../../../../../../src/lib/modules/coupons/usecases/applyCouponToInvoice/applyCouponToInvoiceResponse';
 
 import { Coupon } from '../../../../../../src/lib/modules/coupons/domain/Coupon';
+
+import { PublisherMap } from '../../../../../../src/lib/modules/publishers/mappers/PublisherMap';
+
 import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import { MockCouponRepo } from '../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
@@ -19,23 +22,24 @@ import { MockCatalogRepo } from '../../../../../../src/lib/modules/journals/repo
 import { MockPayerRepo } from '../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
 import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
 import { MockPublisherRepo } from '../../../../../../src/lib/modules/publishers/repos/mocks/mockPublisherRepo';
-import { PublisherMap } from '../../../../../../src/lib/modules/publishers/mappers/PublisherMap';
 
 import {
-  AddressMap,
   ArticleMap,
   CatalogMap,
   CouponMap,
   Invoice,
   InvoiceMap,
   InvoiceItemMap,
-  PayerMap,
-  PayerType,
   Roles,
   TransactionMap,
   TransactionStatus,
   UsecaseAuthorizationContext,
+  InvoiceId,
+  UniqueEntityID,
+  VATService,
+  WaiverMap,
 } from '../../../../../../src/lib/shared';
+import { WaiverType } from '../../../../../../src/lib/modules/waivers/domain/Waiver';
 
 function makeCouponData(id: string, code: string, overwrites?: any): Coupon {
   const maybeCoupon = CouponMap.toDomain({
@@ -118,7 +122,9 @@ Before({ tags: '@ValidateApplyCoupon' }, () => {
     mockInvoiceItemRepo
   );
 
-  mockVatService = setupVatService();
+  setupVatService();
+
+  mockVatService = new VATService();
 
   usecase = new ApplyCouponToInvoiceUsecase(
     mockInvoiceRepo,
@@ -151,6 +157,7 @@ After({ tags: '@ValidateApplyCoupon' }, () => {
   mockVatService = null;
   usecase = null;
 });
+
 Given(
   /^we have an Invoice with id "([\w-]+)"/,
   async (testInvoiceId: string) => {
@@ -230,32 +237,6 @@ Given(
 
     const invoiceItem = maybeInvoiceItem.value;
 
-    const maybeAddress = AddressMap.toDomain({
-      country: 'RO',
-    });
-
-    if (maybeAddress.isLeft()) {
-      throw maybeAddress.value;
-    }
-
-    const address = maybeAddress.value;
-
-    const maybePayer = PayerMap.toDomain({
-      name: 'Silvestru',
-      addressId: address.id.toValue(),
-      invoiceId: invoice.invoiceId.id.toValue(),
-      type: PayerType.INDIVIDUAL,
-    });
-
-    if (maybePayer.isLeft()) {
-      throw maybePayer.value;
-    }
-
-    const payer = maybePayer.value;
-
-    mockPayerRepo.addMockItem(payer);
-    mockAddressRepo.addMockItem(address);
-
     mockPublisherRepo.addMockItem(publisher);
     mockCatalogRepo.addMockItem(catalog);
     mockManuscriptRepo.addMockItem(manuscript);
@@ -267,9 +248,11 @@ Given(
 );
 
 Given(
-  /^a coupon with id "([\w-]+)" with code "([\w-]+)"/,
-  async (testCouponId: string, testCode: string) => {
-    coupon = makeCouponData(testCouponId, testCode);
+  /^a coupon with id "([\w-]+)" with code "([\w-]+)" and reduction "([\d]+)"/,
+  async (testCouponId: string, testCode: string, reduction: string) => {
+    coupon = makeCouponData(testCouponId, testCode, {
+      reduction: Number.parseInt(reduction),
+    });
     const maybeCoupon = await mockCouponRepo.save(coupon);
 
     if (maybeCoupon.isLeft()) {
@@ -283,10 +266,13 @@ Given(
 When(
   /^I apply coupon for invoice "([\w-]+)" with code "([\w-]+)"/,
   async (testInvoiceId: string, testCode: string) => {
-    response = await usecase.execute({
-      invoiceId: testInvoiceId,
-      couponCode: testCode,
-    });
+    response = await usecase.execute(
+      {
+        invoiceId: testInvoiceId,
+        couponCode: testCode,
+      },
+      context
+    );
   }
 );
 
@@ -309,13 +295,61 @@ When(
 
     inactiveCoupon = maybeInactiveCoupon.value;
 
-    response = await usecase.execute({
-      invoiceId: testInvoiceId,
-      couponCode: testCode,
-    });
+    response = await usecase.execute(
+      {
+        invoiceId: testInvoiceId,
+        couponCode: testCode,
+      },
+      context
+    );
   }
 );
 
 Then(/^I receive an error that coupon is inactive/, () => {
   expect(response.isLeft()).to.be.true;
 });
+
+Then(
+  /^The invoice with id "([\w-]+)" is auto-confirmed$/,
+  async (invoiceId: string) => {
+    const maybePayer = await mockPayerRepo.getPayerByInvoiceId(
+      InvoiceId.create(new UniqueEntityID(invoiceId))
+    );
+
+    expect(response.isRight()).to.be.true;
+
+    expect(maybePayer.isRight()).to.be.true;
+    if (maybePayer.isRight()) {
+      expect(maybePayer.value).to.exist;
+    }
+  }
+);
+
+Given(
+  /^A waiver of "([\d]+)" is applied to invoice "([\w-]+)"$/,
+  async (reduction: string, invoiceId: string) => {
+    const maybeWaiver = WaiverMap.toDomain({
+      waiverType: WaiverType.EDITOR_DISCOUNT,
+      reduction: Number.parseInt(reduction),
+      isActive: true,
+    });
+
+    if (maybeWaiver.isLeft()) {
+      throw maybeWaiver.value;
+    }
+
+    const waiver = maybeWaiver.value;
+
+    const maybeInvoiceItems = await mockInvoiceItemRepo.getItemsByInvoiceId(
+      InvoiceId.create(new UniqueEntityID(invoiceId))
+    );
+
+    if (maybeInvoiceItems.isLeft()) {
+      throw maybeInvoiceItems.value;
+    }
+
+    const invoiceItems = maybeInvoiceItems.value;
+
+    mockWaiverRepo.addMockWaiverForInvoiceItem(waiver, invoiceItems[0]);
+  }
+);

@@ -279,9 +279,9 @@ export class EpicOnArticlePublishedUsecase
         } catch (err) {
           return left(new UnexpectedError(err));
         }
-      } else {
-        return right(null);
       }
     }
+
+    return right(null);
   }
 }
