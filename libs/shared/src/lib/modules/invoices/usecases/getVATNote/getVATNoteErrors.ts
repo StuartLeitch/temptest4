@@ -5,9 +5,3 @@ export class PayerNotFoundError extends UseCaseError {
     super(`Could not find a Payer associated with Invoice id {${invoiceId}}.`);
   }
 }
-
-// export class InvoiceHasNoItems extends UseCaseError {
-//   constructor(invoiceItemId: string) {
-//     super(`The Invoice with Invoice id {${invoiceItemId}} has no Invoice Items.`);
-//   }
-// }
