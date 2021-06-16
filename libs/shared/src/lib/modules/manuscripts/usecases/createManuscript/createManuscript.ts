@@ -38,7 +38,6 @@ export class CreateManuscriptUsecase
 
     try {
       const manuscriptProps = request;
-      console.log(request);
 
       // * System creates manuscript
       const maybeManuscript = Manuscript.create(
