@@ -20,7 +20,15 @@ export class CouponExpiredError extends UseCaseError {
 
 export class InvoiceNotFoundError extends UseCaseError {
   constructor(invoiceId: string) {
-    super(`Couldn't find an invoice with code ${invoiceId}.`);
+    super(`Couldn't find an invoice with id ${invoiceId}.`);
+  }
+}
+
+export class InvoiceItemsNotFoundError extends UseCaseError {
+  constructor(invoiceId: string, err: Error) {
+    super(
+      `Couldn't find the invoice items for invoice with id ${invoiceId}, got error: ${err.message}, with stack ${err.stack}.`
+    );
   }
 }
 
