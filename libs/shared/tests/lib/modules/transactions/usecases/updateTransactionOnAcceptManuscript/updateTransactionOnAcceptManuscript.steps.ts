@@ -238,7 +238,6 @@ When(
 Then(
   'The Transaction associated with the manuscript should be ACTIVE',
   async () => {
-    console.log(result);
     expect(result.isRight()).to.equal(true);
 
     const transactions = await mockTransactionRepo.getTransactionCollection();

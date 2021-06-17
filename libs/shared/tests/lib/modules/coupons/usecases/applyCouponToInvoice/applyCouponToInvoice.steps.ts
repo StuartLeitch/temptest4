@@ -353,3 +353,15 @@ Given(
     mockWaiverRepo.addMockWaiverForInvoiceItem(waiver, invoiceItems[0]);
   }
 );
+
+Then(
+  /^I receive an error that coupon with code "([\w-]+)" is already applied$/,
+  (couponCode: string) => {
+    expect(response.isLeft()).to.be.true;
+    if (response.isLeft()) {
+      expect(response.value.message).to.equal(
+        `Coupon ${couponCode} has already been used for this invoice.`
+      );
+    }
+  }
+);

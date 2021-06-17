@@ -127,6 +127,14 @@ export class MockCouponRepo
     coupon: Coupon,
     invoiceItemId: InvoiceItemId
   ): Promise<Either<GuardFailure | RepoError, Coupon>> {
+    const invoiceIdValue = invoiceItemId.id.toString();
+    if (!this.invoiceItemToCouponMapper[invoiceIdValue]) {
+      this.invoiceItemToCouponMapper[invoiceIdValue] = [];
+    }
+
+    this.invoiceItemToCouponMapper[invoiceIdValue].push(coupon.id.toString());
+    this._items.push(coupon);
+
     return right(coupon);
   }
 

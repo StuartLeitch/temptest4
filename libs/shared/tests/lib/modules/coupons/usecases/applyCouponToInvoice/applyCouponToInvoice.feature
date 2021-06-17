@@ -17,7 +17,7 @@ Feature: Apply Coupon to Invoice Usecase test
     @ValidateApplyCoupon
     Scenario: When an invoice has an 100% reduction applied it is auto-confirmed
         Given a coupon with id "coupon2" with code "TEST100" and reduction "100"
-        When I apply inactive coupon for invoice "test-invoice" with code "TEST100"
+        When I apply coupon for invoice "test-invoice" with code "TEST100"
         Then The invoice with id "test-invoice" is auto-confirmed
 
     @ValidateApplyCoupon
@@ -25,3 +25,10 @@ Feature: Apply Coupon to Invoice Usecase test
         Given A waiver of "50" is applied to invoice "test-invoice"
         When I apply coupon for invoice "test-invoice" with code "TESTINGBS"
         Then The invoice with id "test-invoice" is auto-confirmed
+
+    @ValidateApplyCoupon
+    Scenario: When appling a second time the same coupon an error occures
+        Given a coupon with id "coupon3" with code "TEST10" and reduction "10"
+        When I apply coupon for invoice "test-invoice" with code "TEST10"
+        And I apply coupon for invoice "test-invoice" with code "TEST10"
+        Then I receive an error that coupon with code "TEST10" is already applied
