@@ -30,6 +30,7 @@ export class KnexCouponRepo
     const coupons = await db
       .select(
         `${TABLES.INVOICE_ITEMS_TO_COUPONS}.dateCreated as dateAssigned`,
+        `${TABLES.INVOICE_ITEMS_TO_COUPONS}.invoiceItemId`,
         `${TABLES.COUPONS}.invoiceItemType`,
         `${TABLES.COUPONS}.expirationDate`,
         `${TABLES.COUPONS}.dateCreated`,
