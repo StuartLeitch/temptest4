@@ -126,12 +126,26 @@ export class ApplyCouponToInvoiceUsecase
           dateAssigned: null,
           coupon,
         });
+
+        if (invoiceItem.assignedCoupons.exists(newCouponAssignment)) {
+          return left(
+            new Errors.CouponAlreadyUsedForInvoiceError(request.couponCode)
+          );
+        }
+
         invoiceItem.addAssignedCoupon(newCouponAssignment);
 
-        await this.couponRepo.assignCouponToInvoiceItem(
+        const maybeAssigned = await this.couponRepo.assignCouponToInvoiceItem(
           coupon,
           invoiceItem.invoiceItemId
         );
+
+        if (maybeAssigned.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeAssigned.value.message))
+          );
+        }
+
         assignedCoupons++;
       }
 
