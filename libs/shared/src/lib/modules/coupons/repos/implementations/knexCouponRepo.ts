@@ -64,6 +64,13 @@ export class KnexCouponRepo
       .from(TABLES.COUPONS)
       .where('code', code.value)
       .first();
+
+    if (!coupon) {
+      return left(
+        RepoError.createEntityNotFoundError('coupon by code', code.toString())
+      );
+    }
+
     return CouponMap.toDomain(coupon);
   }
 

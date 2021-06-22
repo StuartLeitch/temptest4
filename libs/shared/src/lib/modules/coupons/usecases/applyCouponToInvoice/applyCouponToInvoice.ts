@@ -4,6 +4,8 @@ import { UnexpectedError } from '../../../../core/logic/AppError';
 import { right, left } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
 
+import { RepoErrorCode, RepoError } from '../../../../infrastructure/RepoError';
+
 // * Authorization Logic
 
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
@@ -328,6 +330,13 @@ export class ApplyCouponToInvoiceUsecase
     const maybeCoupon = await couponRepo.getCouponByCode(couponCode);
 
     if (maybeCoupon.isLeft()) {
+      if (
+        maybeCoupon.value instanceof RepoError &&
+        maybeCoupon.value.code === RepoErrorCode.ENTITY_NOT_FOUND
+      ) {
+        return new Errors.CouponNotFoundError(request.couponCode);
+      }
+
       return maybeCoupon.value;
     }
 
