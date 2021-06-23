@@ -1,6 +1,7 @@
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
-import { Result, left, right } from '../../../../core/logic/Result';
+import { left, right } from '../../../../core/logic/Either';
+import { UnexpectedError } from 'libs/shared/src/lib/core/logic/AppError';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
@@ -41,8 +42,17 @@ export class GetCreditNoteByCustomIdUsecase
     let creditNote: CreditNote;
 
     try {
-      creditNote = await this.creditNoteRepo.getCreditNoteByCustomId(customId);
-      return right(Result.ok<CreditNote>(creditNote));
+      const maybeCreditNote = await this.creditNoteRepo.getCreditNoteByCustomId(
+        customId
+      );
+      if (maybeCreditNote.isLeft()) {
+        return left(
+          new UnexpectedError(new Error(maybeCreditNote.value.message))
+        );
+      }
+
+      creditNote = maybeCreditNote.value;
+      return right(creditNote);
     } catch (e) {
       return left(new Errors.CreditNoteNotFoundError(customId));
     }
