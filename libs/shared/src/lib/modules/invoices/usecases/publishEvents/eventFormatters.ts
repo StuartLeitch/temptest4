@@ -91,7 +91,7 @@ export function formatCosts(
   const dueAmount = totalPrice - totalDiscount + vatAmount - paid;
 
   const creditNoteExists =
-    creditNote.invoiceId.id.toString() === invoice.invoiceId.id.toString();
+    invoice.invoiceId.id.toString() === creditNote?.invoiceId.id.toString();
 
   return {
     dueAmount: creditNoteExists ? 0 : dueAmount,
