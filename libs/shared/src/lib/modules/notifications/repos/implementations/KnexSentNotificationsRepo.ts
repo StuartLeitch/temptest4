@@ -1,3 +1,6 @@
+import { Either, flatten, right, left } from '../../../../core/logic/Either';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
+
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { RepoErrorCode, RepoError } from '../../../../infrastructure/RepoError';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
@@ -12,66 +15,89 @@ import { SentNotificationRepoContract } from '../SentNotificationRepo';
 export class KnexSentNotificationsRepo
   extends AbstractBaseDBRepo<Knex, Notification>
   implements SentNotificationRepoContract {
-  async getNotificationById(id: NotificationId): Promise<Notification> {
+  async getNotificationById(
+    id: NotificationId
+  ): Promise<Either<GuardFailure | RepoError, Notification>> {
     const notification = this.db(TABLES.NOTIFICATIONS_SENT)
       .select()
       .where('id', id.id.toString())
       .first();
 
     if (!notification) {
-      throw RepoError.createEntityNotFoundError(
-        'notification',
-        id.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError('notification', id.id.toString())
       );
     }
 
     return NotificationMap.toDomain(notification as any);
   }
 
-  async getNotificationsByInvoiceId(id: InvoiceId): Promise<Notification[]> {
-    const notifications = await this.db(TABLES.NOTIFICATIONS_SENT)
-      .select()
-      .where('invoiceId', id.id.toString())
-      .orderBy('dateSent', 'desc');
+  async getNotificationsByInvoiceId(
+    id: InvoiceId
+  ): Promise<Either<GuardFailure | RepoError, Notification[]>> {
+    try {
+      const notifications = await this.db(TABLES.NOTIFICATIONS_SENT)
+        .select()
+        .where('invoiceId', id.id.toString())
+        .orderBy('dateSent', 'desc');
 
-    return notifications.map(NotificationMap.toDomain);
+      return flatten(notifications.map(NotificationMap.toDomain));
+    } catch (err) {
+      return left(RepoError.fromDBError(err));
+    }
   }
 
-  async getNotificationsByRecipient(email: string): Promise<Notification[]> {
-    const notifications = await this.db(TABLES.NOTIFICATIONS_SENT)
-      .select()
-      .where('recipientEmail', email);
+  async getNotificationsByRecipient(
+    email: string
+  ): Promise<Either<GuardFailure | RepoError, Notification[]>> {
+    try {
+      const notifications = await this.db(TABLES.NOTIFICATIONS_SENT)
+        .select()
+        .where('recipientEmail', email);
 
-    return notifications.map(NotificationMap.toDomain);
+      return flatten(notifications.map(NotificationMap.toDomain));
+    } catch (err) {
+      return left(RepoError.fromDBError(err));
+    }
   }
 
   async getNotificationsByType(
     type: NotificationType
-  ): Promise<Notification[]> {
-    const notifications = await this.db(TABLES.NOTIFICATIONS_SENT)
-      .select()
-      .where('type', type);
+  ): Promise<Either<GuardFailure | RepoError, Notification[]>> {
+    try {
+      const notifications = await this.db(TABLES.NOTIFICATIONS_SENT)
+        .select()
+        .where('type', type);
 
-    return notifications.map(NotificationMap.toDomain);
+      return flatten(notifications.map(NotificationMap.toDomain));
+    } catch (err) {
+      return left(RepoError.fromDBError(err));
+    }
   }
 
-  async addNotification(notification: Notification): Promise<Notification> {
+  async addNotification(
+    notification: Notification
+  ): Promise<Either<GuardFailure | RepoError, Notification>> {
     const rawNotification = NotificationMap.toPersistence(notification);
 
     try {
       await this.db(TABLES.NOTIFICATIONS_SENT).insert(rawNotification);
     } catch (e) {
-      throw RepoError.fromDBError(e);
+      return left(RepoError.fromDBError(e));
     }
 
     return this.getNotificationById(notification.notificationId);
   }
 
-  async save(notification: Notification): Promise<Notification> {
+  async save(
+    notification: Notification
+  ): Promise<Either<GuardFailure | RepoError, Notification>> {
     return this.addNotification(notification);
   }
 
-  async updateNotification(notification: Notification): Promise<Notification> {
+  async updateNotification(
+    notification: Notification
+  ): Promise<Either<GuardFailure | RepoError, Notification>> {
     const rawNotification = NotificationMap.toPersistence(notification);
 
     const updated = await this.db(TABLES.NOTIFICATIONS_SENT)
@@ -79,26 +105,30 @@ export class KnexSentNotificationsRepo
       .update(rawNotification);
 
     if (!updated) {
-      throw RepoError.createEntityNotFoundError(
-        'notification',
-        notification.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError(
+          'notification',
+          notification.id.toString()
+        )
       );
     }
 
-    return notification;
+    return this.getNotificationById(notification.notificationId);
   }
 
-  async exists(notification: Notification): Promise<boolean> {
+  async exists(
+    notification: Notification
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     try {
       await this.getNotificationById(notification.notificationId);
     } catch (e) {
       if (e.code === RepoErrorCode.ENTITY_NOT_FOUND) {
-        return false;
+        return right(false);
       }
 
-      throw e;
+      return left(RepoError.fromDBError(e));
     }
 
-    return true;
+    return right(true);
   }
 }

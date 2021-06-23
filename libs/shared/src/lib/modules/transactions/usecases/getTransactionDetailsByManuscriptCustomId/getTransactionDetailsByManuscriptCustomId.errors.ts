@@ -1,18 +1,13 @@
 import { UseCaseError } from '../../../../core/logic/UseCaseError';
-import { Result } from '../../../../core/logic/Result';
 
-export class CustomIdRequiredError extends Result<UseCaseError> {
+export class CustomIdRequiredError extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Manuscript custom id is required`,
-    });
+    super(`Manuscript custom id is required`);
   }
 }
 
-export class TransactionNotFoundError extends Result<UseCaseError> {
+export class TransactionNotFoundError extends UseCaseError {
   constructor(id: string) {
-    super(false, {
-      message: `No transaction found with id {${id}}`,
-    });
+    super(`No transaction found with id {${id}}`);
   }
 }

@@ -1,26 +1,21 @@
 import { UseCaseError } from '../../../../core/logic/UseCaseError';
-import { Result } from '../../../../core/logic/Result';
 
-export class InvoiceIdRequiredError extends Result<UseCaseError> {
+export class InvoiceIdRequiredError extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `The invoice id is required.`,
-    });
+    super(`The invoice id is required.`);
   }
 }
 
-export class InvoiceNotFoundError extends Result<UseCaseError> {
+export class InvoiceNotFoundError extends UseCaseError {
   constructor(id: string) {
-    super(false, {
-      message: `The invoice with id {${id}} was not found.`,
-    });
+    super(`The invoice with id {${id}} was not found.`);
   }
 }
 
-export class AddPauseDbError extends Result<UseCaseError> {
+export class AddPauseDbError extends UseCaseError {
   constructor(id: string, err: Error) {
-    super(false, {
-      message: `While adding a pause state for invoice with id {${id}} an error ocurred: ${err.message}`,
-    });
+    super(
+      `While adding a pause state for invoice with id {${id}} an error ocurred: ${err.message}`
+    );
   }
 }

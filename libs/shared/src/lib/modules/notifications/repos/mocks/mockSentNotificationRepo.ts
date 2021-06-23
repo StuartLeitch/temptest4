@@ -1,14 +1,20 @@
 import { cloneDeep } from 'lodash';
 
 import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
+import { Either, right, left } from '../../../../core/logic/Either';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
+
+import { RepoError } from '../../../../infrastructure/RepoError';
 
 import { NotificationType, Notification } from '../../domain/Notification';
-import { SentNotificationRepoContract } from '../SentNotificationRepo';
+import { NotificationPause } from '../../domain/NotificationPause';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { NotificationId } from '../../domain/NotificationId';
-import { NotificationPause } from '../../domain/NotificationPause';
 
-export class MockSentNotificationRepo extends BaseMockRepo<Notification>
+import { SentNotificationRepoContract } from '../SentNotificationRepo';
+
+export class MockSentNotificationRepo
+  extends BaseMockRepo<Notification>
   implements SentNotificationRepoContract {
   private pauses: NotificationPause[];
 
@@ -16,50 +22,50 @@ export class MockSentNotificationRepo extends BaseMockRepo<Notification>
     super();
   }
 
-  async getNotificationById(id: NotificationId): Promise<Notification> {
-    const match = this._items.find(item => item.notificationId.equals(id));
+  async getNotificationById(
+    id: NotificationId
+  ): Promise<Either<GuardFailure | RepoError, Notification>> {
+    const match = this._items.find((item) => item.notificationId.equals(id));
 
-    if (match) {
-      return cloneDeep(match);
-    } else {
-      return null;
-    }
+    return right(cloneDeep(match));
   }
 
-  async getNotificationsByInvoiceId(id: InvoiceId): Promise<Notification[]> {
-    const matches = this._items.filter(item => item.invoiceId.equals(id));
+  async getNotificationsByInvoiceId(
+    id: InvoiceId
+  ): Promise<Either<GuardFailure | RepoError, Notification[]>> {
+    const matches = this._items.filter((item) => item.invoiceId.equals(id));
 
-    if (matches.length > 0) {
-      return cloneDeep(matches);
-    } else {
-      return null;
-    }
+    return right(cloneDeep(matches));
   }
 
-  async getNotificationsByRecipient(email: string): Promise<Notification[]> {
-    const matches = this._items.filter(item => item.recipientEmail === email);
+  async getNotificationsByRecipient(
+    email: string
+  ): Promise<Either<GuardFailure | RepoError, Notification[]>> {
+    const matches = this._items.filter((item) => item.recipientEmail === email);
 
-    if (matches.length > 0) {
-      return cloneDeep(matches);
-    } else {
-      return null;
-    }
+    return right(cloneDeep(matches));
   }
 
   async getNotificationsByType(
     type: NotificationType
-  ): Promise<Notification[]> {
-    const matches = this._items.filter(item => item.type === type);
+  ): Promise<Either<GuardFailure | RepoError, Notification[]>> {
+    const matches = this._items.filter((item) => item.type === type);
 
-    if (matches.length > 0) {
-      return cloneDeep(matches);
-    } else {
-      return null;
-    }
+    return right(cloneDeep(matches));
   }
 
-  async addNotification(notification: Notification): Promise<Notification> {
-    const alreadyExists = await this.exists(notification);
+  async addNotification(
+    notification: Notification
+  ): Promise<Either<GuardFailure | RepoError, Notification>> {
+    const maybeAlreadyExists = await this.exists(notification);
+
+    if (maybeAlreadyExists.isLeft()) {
+      return left(
+        RepoError.fromDBError(new Error(maybeAlreadyExists.value.message))
+      );
+    }
+
+    const alreadyExists = maybeAlreadyExists.value;
 
     if (alreadyExists) {
       throw new Error('duplicate');
@@ -67,17 +73,27 @@ export class MockSentNotificationRepo extends BaseMockRepo<Notification>
 
     this._items.push(cloneDeep(notification));
 
-    return notification;
+    return right(notification);
   }
 
-  async updateNotification(notification: Notification): Promise<Notification> {
-    const alreadyExists = await this.exists(notification);
+  async updateNotification(
+    notification: Notification
+  ): Promise<Either<GuardFailure | RepoError, Notification>> {
+    const maybeAlreadyExists = await this.exists(notification);
+
+    if (maybeAlreadyExists.isLeft()) {
+      return left(
+        RepoError.fromDBError(new Error(maybeAlreadyExists.value.message))
+      );
+    }
+
+    const alreadyExists = maybeAlreadyExists.value;
 
     if (!alreadyExists) {
       throw Error('Notification does not exist');
     }
 
-    this._items = this._items.map(i => {
+    this._items = this._items.map((i) => {
       if (this.compareMockItems(i, notification)) {
         return cloneDeep(notification);
       } else {
@@ -85,18 +101,22 @@ export class MockSentNotificationRepo extends BaseMockRepo<Notification>
       }
     });
 
-    return notification;
+    return right(notification);
   }
 
-  async save(notification: Notification): Promise<Notification> {
+  async save(
+    notification: Notification
+  ): Promise<Either<GuardFailure | RepoError, Notification>> {
     return this.addNotification(notification);
   }
 
-  async exists(notification: Notification): Promise<boolean> {
-    const match = this._items.find(item =>
+  async exists(
+    notification: Notification
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
+    const match = this._items.find((item) =>
       this.compareMockItems(item, notification)
     );
-    return !!match;
+    return right(!!match);
   }
 
   compareMockItems(a: Notification, b: Notification): boolean {

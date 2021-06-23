@@ -1,56 +1,41 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { Result, left, right } from '../../../../core/logic/Result';
+import { left, right } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 
 import { PaymentMethodRepoContract } from '../../repos/paymentMethodRepo';
 
 // * Usecase specific
-import { GetPaymentMethodByNameResponse } from './getPaymentMethodByNameResponse';
-import { GetPaymentMethodByNameErrors } from './getPaymentMethodByNameErrors';
-import { GetPaymentMethodByNameDTO } from './getPaymentMethodByNameDTO';
+import { GetPaymentMethodByNameResponse as Response } from './getPaymentMethodByNameResponse';
+import { GetPaymentMethodByNameDTO as DTO } from './getPaymentMethodByNameDTO';
+import * as Errors from './getPaymentMethodByNameErrors';
 
 export class GetPaymentMethodByNameUsecase
-  implements
-    UseCase<
-      GetPaymentMethodByNameDTO,
-      Promise<GetPaymentMethodByNameResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      GetPaymentMethodByNameDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private paymentMethodRepo: PaymentMethodRepoContract) {}
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  // @Authorize('payment-method:read')
-  public async execute(
-    request: GetPaymentMethodByNameDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<GetPaymentMethodByNameResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const searchedName = request.name;
 
     if (!searchedName) {
-      return left(new GetPaymentMethodByNameErrors.SearchNameMustNotBeEmpty());
+      return left(new Errors.SearchNameMustNotBeEmpty());
     }
 
     try {
       try {
-        const paymentMethods = await this.paymentMethodRepo.getPaymentMethodCollection();
+        const maybePaymentMethods = await this.paymentMethodRepo.getPaymentMethodCollection();
+
+        if (maybePaymentMethods.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybePaymentMethods.value.message))
+          );
+        }
+
+        const paymentMethods = maybePaymentMethods.value;
+
         const methodsWithName = paymentMethods.filter(
           (method) => method.name.indexOf(searchedName) > -1
         );
@@ -59,11 +44,9 @@ export class GetPaymentMethodByNameUsecase
           throw new Error('no payment method with name');
         }
 
-        return right(Result.ok(methodsWithName[0]));
+        return right(methodsWithName[0]);
       } catch (e) {
-        return left(
-          new GetPaymentMethodByNameErrors.NoPaymentMethodFound(searchedName)
-        );
+        return left(new Errors.NoPaymentMethodFound(searchedName));
       }
     } catch (e) {
       return left(new UnexpectedError(e));

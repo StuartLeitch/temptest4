@@ -1,9 +1,8 @@
 // * Core Domain
+import { Either, right, left } from '../../../core/logic/Either';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
 import { ValueObject } from '../../../core/domain/ValueObject';
-import { Either, right, left } from '../../../core/logic/Result';
-
 import { Guard } from '../../../core/logic/Guard';
-import { InvalidErpReference } from './InvalidErpReference';
 
 export interface ErpReferenceProps {
   readonly entity_id: string;
@@ -42,7 +41,7 @@ export class ErpReference extends ValueObject<ErpReferenceProps> {
 
   public static create(
     props: ErpReferenceProps
-  ): Either<InvalidErpReference, ErpReference> {
+  ): Either<GuardFailure, ErpReference> {
     const guardResult = Guard.againstNullOrUndefinedBulk([
       { argument: props.entity_id, argumentName: 'entity_id' },
       { argument: props.vendor, argumentName: 'vendor' },
@@ -50,7 +49,7 @@ export class ErpReference extends ValueObject<ErpReferenceProps> {
     ]);
 
     if (!guardResult.succeeded) {
-      return left(guardResult.message);
+      return left(new GuardFailure(guardResult.message));
     }
 
     const newErpReference = new ErpReference({

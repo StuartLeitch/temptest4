@@ -1,43 +1,41 @@
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
-import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { Result, left, right } from '../../../../core/logic/Result';
+import { UnexpectedError } from '../../../../core/logic/AppError';
+import { right, left } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
 
-import { Invoice } from '../../domain/Invoice';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+
+import { InvoiceStatus, Invoice } from '../../domain/Invoice';
 import { InvoiceId } from '../../domain/InvoiceId';
-import { InvoiceStatus } from '../../domain/Invoice';
+
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
-import { ChangeInvoiceStatusErrors } from './changeInvoiceStatusErrors';
 
-import { ChangeInvoiceStatusResponse } from './changeInvoiceStatusResponse';
-
-export interface ChangeInvoiceStatusRequestDTO {
-  invoiceId: string;
-  status: string;
-}
+import { ChangeInvoiceStatusResponse as Response } from './changeInvoiceStatusResponse';
+import { ChangeInvoiceStatusRequestDTO as DTO } from './changeInvoiceStatusDTO';
+import * as Errors from './changeInvoiceStatusErrors';
 
 export class ChangeInvoiceStatus
-  implements
-    UseCase<
-      ChangeInvoiceStatusRequestDTO,
-      Promise<ChangeInvoiceStatusResponse>
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private invoiceRepo: InvoiceRepoContract) {}
 
-  public async execute(
-    request: ChangeInvoiceStatusRequestDTO
-  ): Promise<ChangeInvoiceStatusResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     let invoice: Invoice;
     try {
       try {
-        invoice = await this.invoiceRepo.getInvoiceById(
-          InvoiceId.create(new UniqueEntityID(request.invoiceId)).getValue()
+        const invoiceId = InvoiceId.create(
+          new UniqueEntityID(request.invoiceId)
         );
+
+        const maybeInvoice = await this.invoiceRepo.getInvoiceById(invoiceId);
+
+        if (maybeInvoice.isLeft()) {
+          return left(new Errors.InvoiceNotFoundError(request.invoiceId));
+        }
+
+        invoice = maybeInvoice.value;
       } catch (err) {
-        return left(
-          new ChangeInvoiceStatusErrors.InvoiceNotFoundError(request.invoiceId)
-        );
+        return left(new Errors.InvoiceNotFoundError(request.invoiceId));
       }
 
       try {
@@ -47,12 +45,10 @@ export class ChangeInvoiceStatus
         }
         await this.invoiceRepo.update(invoice);
       } catch (err) {
-        return left(
-          new ChangeInvoiceStatusErrors.ChangeStatusError(request.invoiceId)
-        );
+        return left(new Errors.ChangeStatusError(request.invoiceId));
       }
 
-      return right(Result.ok<Invoice>(invoice));
+      return right(invoice);
     } catch (err) {
       return left(new UnexpectedError(err));
     }

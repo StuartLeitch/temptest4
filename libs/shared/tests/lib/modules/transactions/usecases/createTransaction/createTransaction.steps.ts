@@ -73,7 +73,7 @@ let invoiceId: InvoiceId;
 
 let usecase: CreateTransactionUsecase = null;
 
-Before(() => {
+Before({ tags: '@ValidateCreateTransaction' }, () => {
   context.repos.pausedReminder = new MockPausedReminderRepo();
   context.repos.invoiceItem = new MockInvoiceItemRepo();
   context.repos.transaction = new MockTransactionRepo();
@@ -109,7 +109,11 @@ Given(
       type: 'APC',
     });
 
-    context.repos.catalog.addMockItem(catalogItem);
+    if (catalogItem.isLeft()) {
+      throw catalogItem.value;
+    }
+
+    context.repos.catalog.addMockItem(catalogItem.value);
   }
 );
 
@@ -122,7 +126,11 @@ Given(
       id: manuscriptId,
     });
 
-    context.repos.manuscript.addMockItem(manuscript);
+    if (manuscript.isLeft()) {
+      throw manuscript.value;
+    }
+
+    context.repos.manuscript.addMockItem(manuscript.value);
   }
 );
 
@@ -143,7 +151,13 @@ When(
 Then('A DRAFT Transaction should be created', async () => {
   expect(result.isRight()).to.equal(true);
 
-  const lastSavedTransactions = await context.repos.transaction.getTransactionCollection();
+  const maybeLastSavedTransactions = await context.repos.transaction.getTransactionCollection();
+
+  if (maybeLastSavedTransactions.isLeft()) {
+    throw maybeLastSavedTransactions.value;
+  }
+
+  const lastSavedTransactions = maybeLastSavedTransactions.value;
 
   expect(lastSavedTransactions.length).to.equal(1);
   expect(lastSavedTransactions[0].status).to.equal(TransactionStatus.DRAFT);
@@ -162,7 +176,13 @@ Then('A DRAFT Invoice should be created', async () => {
 });
 
 Then('An Invoice Item should be created', async () => {
-  const lastSavedInvoiceItems = await context.repos.invoiceItem.getInvoiceItemCollection();
+  const maybeLastSavedInvoiceItems = await context.repos.invoiceItem.getInvoiceItemCollection();
+
+  if (maybeLastSavedInvoiceItems.isLeft()) {
+    throw maybeLastSavedInvoiceItems.value;
+  }
+
+  const lastSavedInvoiceItems = maybeLastSavedInvoiceItems.value;
 
   expect(lastSavedInvoiceItems.length).to.equal(1);
   expect(lastSavedInvoiceItems[0].invoiceId.id.toString()).to.equal(
@@ -173,7 +193,14 @@ Then('An Invoice Item should be created', async () => {
 Then(
   /^The Invoice Item should have a price attached equal to (\d+)$/,
   async (invoiceItemTestPrice: number) => {
-    const lastSavedInvoiceItems = await context.repos.invoiceItem.getInvoiceItemCollection();
+    const maybeLastSavedInvoiceItems = await context.repos.invoiceItem.getInvoiceItemCollection();
+
+    if (maybeLastSavedInvoiceItems.isLeft()) {
+      throw maybeLastSavedInvoiceItems.value;
+    }
+
+    const lastSavedInvoiceItems = maybeLastSavedInvoiceItems.value;
+
     expect(lastSavedInvoiceItems.length).to.equal(1);
     expect(lastSavedInvoiceItems[0].invoiceId.id.toString()).to.equal(
       invoiceId.id.toString()

@@ -1,29 +1,37 @@
-import { Result } from '../../../core/logic/Result';
+import { Either, right, left } from '../../../core/logic/Either';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
 import { ValueObject } from '../../../core/domain/ValueObject';
-import { Guard } from './../../../core/logic/Guard';
+import { Guard } from '../../../core/logic/Guard';
 
 export interface InvoiceNumberProps {
   value: number;
 }
 
 export class InvoiceNumber extends ValueObject<InvoiceNumberProps> {
-  get value () : number {
+  get value(): number {
     return this.props.value;
   }
 
-  private constructor (props: InvoiceNumberProps) {
+  private constructor(props: InvoiceNumberProps) {
     super(props);
   }
 
-  public static create (props: InvoiceNumberProps): Result<InvoiceNumber> {
-    const propsResult = Guard.againstNullOrUndefined(props.value, 'invoiceNumber');
+  public static create(
+    props: InvoiceNumberProps
+  ): Either<GuardFailure, InvoiceNumber> {
+    const propsResult = Guard.againstNullOrUndefined(
+      props.value,
+      'invoiceNumber'
+    );
 
     if (!propsResult.succeeded) {
-      return Result.fail<InvoiceNumber>(propsResult.message);
+      return left(new GuardFailure(propsResult.message));
     } else {
-      return Result.ok<InvoiceNumber>(new InvoiceNumber({
-        value: props.value
-      }));
+      return right(
+        new InvoiceNumber({
+          value: props.value,
+        })
+      );
     }
   }
 

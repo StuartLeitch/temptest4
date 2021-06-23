@@ -3,8 +3,10 @@
 
 import { JournalAdded } from '@hindawi/phenom-events';
 
-import { AddCatalogItemToCatalogUseCaseRequestDTO } from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalogDTOs';
-import { AddCatalogItemToCatalogUseCase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/catalogItems/addCatalogItemToCatalog/addCatalogItemToCatalog';
+import {
+  AddCatalogItemToCatalogUseCaseDTO,
+  AddCatalogItemToCatalogUseCase,
+} from '../../../../../libs/shared/src/lib/modules/journals/usecases/addCatalogItemToCatalog';
 
 import { Context } from '../../builders';
 
@@ -29,7 +31,7 @@ export const JournalAddedHandler: EventHandler<JournalAdded> = {
         publisherRepo
       );
 
-      const request: AddCatalogItemToCatalogUseCaseRequestDTO = {
+      const request: AddCatalogItemToCatalogUseCaseDTO = {
         isActive: data.isActive,
         journalTitle: data.name,
         created: data.created,
@@ -45,8 +47,8 @@ export const JournalAddedHandler: EventHandler<JournalAdded> = {
         const result = await addJournalUsecase.execute(request);
 
         if (result.isLeft()) {
-          logger.error(result.value.errorValue().message);
-          throw result.value.error;
+          logger.error(result.value.message);
+          throw result.value;
         }
       } catch (error) {
         logger.error(error.message);

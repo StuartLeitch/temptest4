@@ -1,21 +1,15 @@
 // * Core Domain
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { Result, right, left } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { right, left } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
-import {
-  AccessControlledUsecase,
-  AccessControlContext,
-  Authorize,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 
 import { NotificationPause } from '../../../notifications/domain/NotificationPause';
 import { Transaction } from '../../../transactions/domain/Transaction';
-import { Waiver } from '../../../../modules/waivers/domain/Waiver';
 import { InvoiceStatus, Invoice } from '../../domain/Invoice';
 import { InvoiceItem } from '../../domain/InvoiceItem';
 import { InvoiceId } from '../../domain/InvoiceId';
@@ -30,83 +24,61 @@ import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 
-import { WaiverService } from '../../../../domain/services/WaiverService';
-
-import type { CreateCreditNoteRequestDTO } from './createCreditNoteDTO';
-import { CreateCreditNoteResponse } from './createCreditNoteResponse';
-import { CreateCreditNoteErrors } from './createCreditNoteErrors';
+import { CreateCreditNoteResponse as Response } from './createCreditNoteResponse';
+import type { CreateCreditNoteRequestDTO as DTO } from './createCreditNoteDTO';
+import * as Errors from './createCreditNoteErrors';
 
 export class CreateCreditNoteUsecase
-  implements
-    UseCase<
-      CreateCreditNoteRequestDTO,
-      Promise<CreateCreditNoteResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      CreateCreditNoteRequestDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
     private transactionRepo: TransactionRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
-    private pausedReminderRepo: PausedReminderRepoContract,
-    private waiverService: WaiverService
+    private pausedReminderRepo: PausedReminderRepoContract
   ) {}
 
-  private async getAccessControlContext(
-    request: CreateCreditNoteRequestDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<AccessControlContext> {
-    return {};
-  }
-
-  @Authorize('create:invoice')
-  public async execute(
-    request: CreateCreditNoteRequestDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<CreateCreditNoteResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     let transaction: Transaction;
     let invoice: Invoice;
     let items: InvoiceItem[];
 
-    // console.info(request);
-
     // * build the InvoiceId
-    const invoiceId = InvoiceId.create(
-      new UniqueEntityID(request.invoiceId)
-    ).getValue();
+    const invoiceId = InvoiceId.create(new UniqueEntityID(request.invoiceId));
 
     try {
       try {
         // * System identifies transaction by invoice Id
-        transaction = await this.transactionRepo.getTransactionByInvoiceId(
+        const maybeTransaction = await this.transactionRepo.getTransactionByInvoiceId(
           invoiceId
         );
+
+        if (maybeTransaction.isLeft()) {
+          return left(new Errors.TransactionNotFoundError(request.invoiceId));
+        }
+
+        transaction = maybeTransaction.value;
       } catch (err) {
-        return left(
-          new CreateCreditNoteErrors.TransactionNotFoundError(request.invoiceId)
-        );
+        return left(new Errors.TransactionNotFoundError(request.invoiceId));
       }
 
       try {
         // * System identifies invoice by Id
-        invoice = await this.invoiceRepo.getInvoiceById(invoiceId);
+        const maybeInvoice = await this.invoiceRepo.getInvoiceById(invoiceId);
+
+        if (maybeInvoice.isLeft()) {
+          return left(new Errors.InvoiceNotFoundError(request.invoiceId));
+        }
+
+        invoice = maybeInvoice.value;
       } catch (err) {
-        return left(
-          new CreateCreditNoteErrors.InvoiceNotFoundError(request.invoiceId)
-        );
+        return left(new Errors.InvoiceNotFoundError(request.invoiceId));
       }
 
       // * check invoice status
       if (invoice.status === InvoiceStatus.DRAFT) {
-        return left(
-          new CreateCreditNoteErrors.InvoiceIsDraftError(request.invoiceId)
-        );
+        return left(new Errors.InvoiceIsDraftError(request.invoiceId));
       }
 
       // * set the invoice status to FINAL
@@ -115,17 +87,39 @@ export class CreateCreditNoteUsecase
       await this.invoiceRepo.update(invoice);
 
       try {
-        items = await this.invoiceItemRepo.getItemsByInvoiceId(invoiceId);
+        const maybeItems = await this.invoiceItemRepo.getItemsByInvoiceId(
+          invoiceId
+        );
+
+        if (maybeItems.isLeft()) {
+          return left(new UnexpectedError(new Error(maybeItems.value.message)));
+        }
+
+        items = maybeItems.value;
+
         for (const item of items) {
-          const [coupons, waivers] = await Promise.all([
+          const [maybeCoupons, maybeWaivers] = await Promise.all([
             this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
             this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId),
           ]);
-          item.addAssignedCoupons(coupons);
-          item.addAssignedWaivers(waivers);
+
+          if (maybeCoupons.isLeft()) {
+            return left(
+              new UnexpectedError(new Error(maybeCoupons.value.message))
+            );
+          }
+
+          if (maybeWaivers.isLeft()) {
+            return left(
+              new UnexpectedError(new Error(maybeWaivers.value.message))
+            );
+          }
+
+          item.addAssignedCoupons(maybeCoupons.value);
+          item.addAssignedWaivers(maybeWaivers.value);
         }
       } catch (err) {
-        return left(new UnexpectedError('Bad Invoice Items!'));
+        return left(new UnexpectedError(err));
       }
 
       // * actually create the Credit Note
@@ -139,7 +133,11 @@ export class CreateCreditNoteUsecase
       clonedRawInvoice.invoiceNumber = null;
       clonedRawInvoice.creationReason = request.reason;
 
-      const creditNote = InvoiceMap.toDomain(clonedRawInvoice);
+      const maybeCreditNote = InvoiceMap.toDomain(clonedRawInvoice);
+      if (maybeCreditNote.isLeft()) {
+        return left(maybeCreditNote.value);
+      }
+      const creditNote = maybeCreditNote.value;
 
       if (items.length) {
         items.forEach(async (invoiceItem) => {
@@ -159,9 +157,14 @@ export class CreateCreditNoteUsecase
               ((invoiceItem.price * -1) / 100) * w.reduction;
           });
 
-          const creditNoteInvoiceItem = InvoiceItemMap.toDomain(rawInvoiceItem);
+          const maybeCreditNoteInvoiceItem = InvoiceItemMap.toDomain(
+            rawInvoiceItem
+          );
+          if (maybeCreditNoteInvoiceItem.isLeft()) {
+            return left(maybeCreditNoteInvoiceItem.value);
+          }
 
-          await this.invoiceItemRepo.save(creditNoteInvoiceItem);
+          await this.invoiceItemRepo.save(maybeCreditNoteInvoiceItem.value);
         });
       }
 
@@ -190,7 +193,11 @@ export class CreateCreditNoteUsecase
         // * System creates DRAFT invoice
 
         // This is where all the magic happens
-        let draftInvoice = InvoiceMap.toDomain(invoiceProps);
+        const maybeDraftInvoice = InvoiceMap.toDomain(invoiceProps);
+        if (maybeDraftInvoice.isLeft()) {
+          return left(maybeDraftInvoice.value);
+        }
+        let draftInvoice = maybeDraftInvoice.value;
         if (items.length) {
           items.forEach(async (invoiceItem) => {
             const rawInvoiceItem = InvoiceItemMap.toPersistence(invoiceItem);
@@ -200,9 +207,12 @@ export class CreateCreditNoteUsecase
             delete rawInvoiceItem.id;
 
             const draftInvoiceItem = InvoiceItemMap.toDomain(rawInvoiceItem);
-            draftInvoice.addInvoiceItem(draftInvoiceItem);
+            if (draftInvoiceItem.isLeft()) {
+              return left(draftInvoiceItem.value);
+            }
+            draftInvoice.addInvoiceItem(draftInvoiceItem.value);
 
-            await this.invoiceItemRepo.save(draftInvoiceItem);
+            await this.invoiceItemRepo.save(draftInvoiceItem.value);
           });
         }
 
@@ -227,7 +237,7 @@ export class CreateCreditNoteUsecase
       DomainEvents.dispatchEventsForAggregate(invoice.id);
       DomainEvents.dispatchEventsForAggregate(creditNote.id);
 
-      return right(Result.ok<Invoice>(creditNote));
+      return right(creditNote);
     } catch (err) {
       return left(new UnexpectedError(err));
     }

@@ -15,6 +15,7 @@ const common = [
   // '--format node_modules/cucumber-pretty', // Load custom formatter
   // '--format json', // Load custom formatter
   `--format-options '{"snippetInterface": "synchronous"}'`, // Custom formatting
+  '--publish-quiet'
 ].join(' ');
 
 module.exports = {

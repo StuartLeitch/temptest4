@@ -1,16 +1,24 @@
+import { Either, right, left } from '../../../../core/logic/Either';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
+
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
-import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
+import { RepoErrorCode, RepoError } from '../../../../infrastructure/RepoError';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-import { Payer } from '../../domain/Payer';
 import { PayerId } from '../../domain/PayerId';
+import { Payer } from '../../domain/Payer';
+
 import { PayerMap } from '../../mapper/Payer';
+
 import { PayerRepoContract } from '../payerRepo';
 
-export class KnexPayerRepo extends AbstractBaseDBRepo<Knex, Payer>
+export class KnexPayerRepo
+  extends AbstractBaseDBRepo<Knex, Payer>
   implements PayerRepoContract {
-  async getPayerById(payerId: PayerId): Promise<Payer> {
+  async getPayerById(
+    payerId: PayerId
+  ): Promise<Either<GuardFailure | RepoError, Payer>> {
     const { db } = this;
 
     const payerRow = await db(TABLES.PAYERS)
@@ -19,13 +27,17 @@ export class KnexPayerRepo extends AbstractBaseDBRepo<Knex, Payer>
       .first();
 
     if (!payerRow) {
-      throw RepoError.createEntityNotFoundError('payer', payerId.id.toString());
+      return left(
+        RepoError.createEntityNotFoundError('payer', payerId.id.toString())
+      );
     }
 
     return PayerMap.toDomain(payerRow);
   }
 
-  async getPayerByInvoiceId(invoiceId: InvoiceId): Promise<Payer> {
+  async getPayerByInvoiceId(
+    invoiceId: InvoiceId
+  ): Promise<Either<GuardFailure | RepoError, Payer>> {
     const { db } = this;
     const payerRow = await db(TABLES.PAYERS)
       .select()
@@ -33,17 +45,15 @@ export class KnexPayerRepo extends AbstractBaseDBRepo<Knex, Payer>
       .first();
 
     if (!payerRow) {
-      // throw RepoError.createEntityNotFoundError(
-      //   'payer',
-      //   invoiceId.id.toString()
-      // );
-      return null;
+      return left(
+        RepoError.createEntityNotFoundError('payer', invoiceId.id.toString())
+      );
     }
 
     return PayerMap.toDomain(payerRow);
   }
 
-  async update(payer: Payer): Promise<Payer> {
+  async update(payer: Payer): Promise<Either<GuardFailure | RepoError, Payer>> {
     const { db } = this;
 
     const updated = await db(TABLES.PAYERS)
@@ -51,35 +61,39 @@ export class KnexPayerRepo extends AbstractBaseDBRepo<Knex, Payer>
       .update(PayerMap.toPersistence(payer));
 
     if (!updated) {
-      throw RepoError.createEntityNotFoundError('payer', payer.id.toString());
+      return left(
+        RepoError.createEntityNotFoundError('payer', payer.id.toString())
+      );
     }
 
-    return payer;
+    return this.getPayerById(payer.payerId);
   }
 
-  async save(payer: Payer): Promise<Payer> {
+  async save(payer: Payer): Promise<Either<GuardFailure | RepoError, Payer>> {
     const { db } = this;
 
-    await db(TABLES.PAYERS).insert(PayerMap.toPersistence(payer));
+    try {
+      await db(TABLES.PAYERS).insert(PayerMap.toPersistence(payer));
 
-    return await this.getPayerById(payer.payerId);
+      return this.getPayerById(payer.payerId);
+    } catch (err) {
+      return left(RepoError.fromDBError(err));
+    }
   }
 
-  async exists(payer: Payer): Promise<boolean> {
+  async exists(
+    payer: Payer
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     try {
       await this.getPayerById(payer.payerId);
     } catch (e) {
       if (e.code === RepoErrorCode.ENTITY_NOT_FOUND) {
-        return false;
+        return right(false);
       }
 
-      throw e;
+      return left(RepoError.fromDBError(e));
     }
 
-    return true;
-  }
-
-  getCollection(params?: string[]): Promise<Payer[]> {
-    return Promise.resolve([]);
+    return right(true);
   }
 }

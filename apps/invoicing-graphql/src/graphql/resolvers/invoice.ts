@@ -26,10 +26,13 @@ import {
   WaiverMap,
   PayerMap,
   Roles,
-  GetInvoicesIdsErrors,
+  GetTransactionByInvoiceIdUsecase,
+  GetPaymentsByInvoiceIdUsecase,
+  GetVATNoteUsecase,
+  // Payer
 } from '@hindawi/shared';
 
-import { Resolvers, Invoice, PayerType } from '../schema';
+import { Resolvers, Invoice, PayerType, InvoiceStatus } from '../schema';
 
 import { Context } from '../../builders';
 
@@ -56,13 +59,13 @@ export const invoice: Resolvers<Context> = {
       const result = await usecase.execute(request, usecaseContext);
 
       if (result.isLeft()) {
-        const err = result.value.errorValue();
+        const err = result.value;
         context.services.logger.error(err.message, err);
         return undefined;
       }
 
       // There is a TSLint error for when try to use a shadowed variable!
-      const invoiceDetails = result.value.getValue();
+      const invoiceDetails = result.value;
 
       let assocInvoice = null;
       // * this is a credit note, let's ask for the reference number of the associated invoice
@@ -75,17 +78,31 @@ export const invoice: Resolvers<Context> = {
         if (result.isLeft()) {
           return undefined;
         }
-        const invoice = result.value.getValue();
+        const invoice = result.value;
         assocInvoice = InvoiceMap.toPersistence(invoice);
       }
-      const payments = await repos.payment.getPaymentsByInvoiceId(
+      const maybePayments = await repos.payment.getPaymentsByInvoiceId(
         invoiceDetails.invoiceId
       );
+
+      if (maybePayments.isLeft()) {
+        throw maybePayments.value;
+      }
+
+      const payments = maybePayments.value;
+
       const paymentsIds = payments.map((p) => p.id);
 
-      const erpPaymentReferences = await repos.erpReference.getErpReferenceById(
+      const maybeErpPaymentReferences = await repos.erpReference.getErpReferencesById(
         paymentsIds
       );
+
+      if (maybeErpPaymentReferences.isLeft()) {
+        throw maybeErpPaymentReferences.value;
+      }
+
+      const erpPaymentReferences = maybeErpPaymentReferences.value;
+
       return {
         invoiceId: invoiceDetails.id.toString(),
         status: invoiceDetails.status,
@@ -118,7 +135,7 @@ export const invoice: Resolvers<Context> = {
         return undefined;
       }
 
-      const invoicesList = result.value.getValue();
+      const invoicesList = result.value;
 
       const retrieveAssociatedInvoice = async (item: any) => {
         const result = await getCreditNoteByInvoiceIdUsecase.execute(
@@ -128,7 +145,7 @@ export const invoice: Resolvers<Context> = {
         if (result.isLeft()) {
           return undefined;
         }
-        const invoice = result.value.getValue();
+        const invoice = result.value;
         return InvoiceMap.toPersistence(invoice);
       };
 
@@ -184,7 +201,7 @@ export const invoice: Resolvers<Context> = {
       }
 
       // There is a TSLint error for when try to use a shadowed variable!
-      const invoiceIds = result.value.getValue();
+      const invoiceIds = result.value;
 
       return { invoiceId: invoiceIds.map((ii) => ii.id.toString()) };
     },
@@ -214,7 +231,7 @@ export const invoice: Resolvers<Context> = {
       }
 
       // There is a TSLint error for when try to use a shadowed variable!
-      const invoiceDetails = result.value.getValue();
+      const invoiceDetails = result.value;
 
       let rate = 1.42; // ! Average value for the last seven years
 
@@ -257,29 +274,31 @@ export const invoice: Resolvers<Context> = {
   },
   Invoice: {
     async payer(parent: Invoice, args, context) {
+      if (parent.status === InvoiceStatus.DRAFT) {
+        return null;
+      }
       const {
         repos: { payer: payerRepo },
       } = context;
-      let invoiceId = InvoiceId.create(
-        new UniqueEntityID(parent.invoiceId)
-      ).getValue();
+      let invoiceId = InvoiceId.create(new UniqueEntityID(parent.invoiceId));
 
-      let payer = await payerRepo.getPayerByInvoiceId(invoiceId);
+      let maybePayer = await payerRepo.getPayerByInvoiceId(invoiceId);
 
-      if (!payer) {
+      if (maybePayer.isLeft()) {
         if (parent.cancelledInvoiceReference) {
           invoiceId = InvoiceId.create(
             new UniqueEntityID(parent.cancelledInvoiceReference)
-          ).getValue();
-          payer = await payerRepo.getPayerByInvoiceId(invoiceId);
-          if (!payer) {
+          );
+          maybePayer = await payerRepo.getPayerByInvoiceId(invoiceId);
+          if (maybePayer.isLeft()) {
+            // throw new Error(maybePayer.value.message);
             return null;
           }
         } else {
           return null;
         }
       }
-      return PayerMap.toPersistence(payer);
+      return PayerMap.toPersistence(maybePayer.value);
     },
     async invoiceItem(parent: Invoice, args, context) {
       const {
@@ -293,6 +312,10 @@ export const invoice: Resolvers<Context> = {
         services: { exchangeRateService, vatService },
       } = context;
 
+      const usecaseContext = {
+        roles: [Roles.ADMIN],
+      };
+
       const getItemsUseCase = new GetItemsForInvoiceUsecase(
         invoiceItemRepo,
         couponRepo,
@@ -305,10 +328,9 @@ export const invoice: Resolvers<Context> = {
 
       let rawItem;
       if (result.isLeft()) {
-        // throw result.value.errorValue();
         rawItem = null;
       } else {
-        const [item] = result.value.getValue();
+        const [item] = result.value;
         rawItem = InvoiceItemMap.toPersistence(item);
       }
 
@@ -327,62 +349,88 @@ export const invoice: Resolvers<Context> = {
         }
       }
 
-      const invoiceId = InvoiceId.create(
-        new UniqueEntityID(parent.invoiceId)
-      ).getValue();
-
-      const payer = await payerRepo.getPayerByInvoiceId(invoiceId);
-
       let vatnote = ' ';
-      if (payer && payer.billingAddressId) {
-        const address = await addressRepo.findById(payer.billingAddressId);
-        // * Get the VAT note for the invoice item
-        const { template } = vatService.getVATNote(
-          {
-            postalCode: address.postalCode,
-            countryCode: address.country,
-            stateCode: address.state,
-          },
-          payer.type !== PayerType.INSTITUTION,
-          new Date(parent.dateIssued)
-        );
-        vatnote = template;
-      }
+      const getVatNoteUsecase = new GetVATNoteUsecase(
+        payerRepo,
+        addressRepo,
+        vatService
+      );
+      const getVatNoteResult = await getVatNoteUsecase.execute(
+        {
+          invoiceId: parent.invoiceId,
+          dateIssued: parent.dateIssued,
+        },
+        usecaseContext
+      );
 
-      // if (!rawItem) {
-      //   return null;
-      // }
+      if (getVatNoteResult.isRight()) {
+        vatnote = getVatNoteResult.value;
+      }
 
       return { ...rawItem, rate: Math.round(rate * 10000) / 10000, vatnote };
     },
     async payment(parent: Invoice, args, context) {
       const {
-        repos: { payment: paymentRepo, erpReference: erpReferenceRepo },
+        repos: { payment: paymentRepo, invoice: invoiceRepo },
       } = context;
-      const invoiceId = InvoiceId.create(
-        new UniqueEntityID(parent.invoiceId)
-      ).getValue();
 
-      const payment = await paymentRepo.getPaymentByInvoiceId(invoiceId);
+      const usecaseContext = {
+        roles: [Roles.ADMIN],
+      };
+
+      const usecase = new GetPaymentsByInvoiceIdUsecase(
+        invoiceRepo,
+        paymentRepo
+      );
+
+      const result = await usecase.execute(
+        { invoiceId: parent.invoiceId },
+        usecaseContext
+      );
+
+      if (result.isLeft()) {
+        console.error(result.value);
+        throw result.value.message;
+      }
+
+      const payment = result.value[0];
 
       if (!payment) {
         return null;
       }
+
       return PaymentMap.toPersistence(payment);
     },
     async payments(parent: Invoice, args, context) {
       const {
-        repos: { payment: paymentRepo },
+        repos: { invoice: invoiceRepo, payment: paymentRepo },
       } = context;
-      const invoiceId = InvoiceId.create(
-        new UniqueEntityID(parent.invoiceId)
-      ).getValue();
 
-      const payments = await paymentRepo.getPaymentsByInvoiceId(invoiceId);
+      const usecaseContext = {
+        roles: [Roles.ADMIN],
+      };
+
+      const usecase = new GetPaymentsByInvoiceIdUsecase(
+        invoiceRepo,
+        paymentRepo
+      );
+
+      const result = await usecase.execute(
+        { invoiceId: parent.invoiceId },
+        usecaseContext
+      );
+
+      if (result.isLeft()) {
+        console.error(result.value);
+        throw result.value.message;
+      }
+
+      const payments = result.value;
 
       if (!payments) {
         return null;
       }
+
       return payments.map((p) => PaymentMap.toPersistence(p));
     },
     async creditNote(parent: Invoice, args, context) {
@@ -407,11 +455,17 @@ export const invoice: Resolvers<Context> = {
       }
 
       // There is a TSLint error for when try to use a shadowed variable!
-      const creditNoteDetails = result.value.getValue();
+      const creditNoteDetails = result.value;
 
-      let erpRef = await erpReferenceRepo.getErpReferencesByInvoiceId(
+      let maybeErpRef = await erpReferenceRepo.getErpReferencesByInvoiceId(
         creditNoteDetails.invoiceId
       );
+
+      if (maybeErpRef.isLeft()) {
+        throw new Error(maybeErpRef.value.message);
+      }
+
+      const erpRef = maybeErpRef.value;
 
       const assocInvoiceResponse = await getAssocInvoice.execute(
         { invoiceId: creditNoteDetails.cancelledInvoiceReference },
@@ -421,7 +475,7 @@ export const invoice: Resolvers<Context> = {
         return undefined;
       }
 
-      const assocInvoice = assocInvoiceResponse.value.getValue();
+      const assocInvoice = assocInvoiceResponse.value;
 
       return {
         invoiceId: creditNoteDetails.id.toString(),
@@ -440,17 +494,29 @@ export const invoice: Resolvers<Context> = {
       const {
         repos: { transaction: transactionRepo },
       } = context;
-      const invoiceId = InvoiceId.create(
-        new UniqueEntityID(parent.invoiceId)
-      ).getValue();
 
-      const transaction = await transactionRepo.getTransactionByInvoiceId(
-        invoiceId
+      const usecaseContext = {
+        roles: [Roles.ADMIN],
+      };
+
+      const usecase = new GetTransactionByInvoiceIdUsecase(transactionRepo);
+
+      const result = await usecase.execute(
+        { invoiceId: parent.invoiceId },
+        usecaseContext
       );
+
+      if (result.isLeft()) {
+        console.error(result.value);
+        throw result.value;
+      }
+
+      const transaction = result.value;
 
       if (!transaction) {
         return null;
       }
+
       return TransactionMap.toPersistence(transaction);
     },
   },
@@ -467,43 +533,53 @@ export const invoice: Resolvers<Context> = {
       });
 
       if (article.isLeft()) {
-        throw article.value.errorValue();
+        throw article.value;
       }
 
-      return ArticleMap.toPersistence(article.value.getValue());
+      return ArticleMap.toPersistence(article.value);
     },
 
     async coupons(parent, args, context) {
-      const coupons = await context.repos.coupon
-        .getCouponsByInvoiceItemId(
-          InvoiceItemId.create(new UniqueEntityID(parent.id))
-        )
-        .then((coupons) => coupons.map((c) => c.coupon));
-      return coupons.map(CouponMap.toPersistence);
+      const maybeCouponsAssociation = await context.repos.coupon.getCouponsByInvoiceItemId(
+        InvoiceItemId.create(new UniqueEntityID(parent.id))
+      );
+
+      if (maybeCouponsAssociation.isLeft()) {
+        throw new Error(maybeCouponsAssociation.value.message);
+      }
+
+      const couponsAssociation = maybeCouponsAssociation.value;
+
+      return couponsAssociation
+        .map((c) => c.coupon)
+        .map(CouponMap.toPersistence);
     },
 
     async waivers(parent, args, context) {
-      const waivers = (
+      const maybeWaivers = (
         await context.repos.waiver.getWaiversByInvoiceItemId(
           InvoiceItemId.create(new UniqueEntityID(parent.id))
         )
-      ).waivers;
-      return waivers.map(WaiverMap.toPersistence);
+      ).map((w) => w.waivers);
+
+      if (maybeWaivers.isLeft()) {
+        throw new Error(maybeWaivers.value.message);
+      }
+
+      return maybeWaivers.value.map(WaiverMap.toPersistence);
     },
   },
   Article: {
     async journalTitle(parent, args, context) {
-      let catalogItem;
+      const catalogItem = await context.repos.catalog.getCatalogItemByJournalId(
+        JournalId.create(new UniqueEntityID(parent.journalId))
+      );
 
-      try {
-        catalogItem = await context.repos.catalog.getCatalogItemByJournalId(
-          JournalId.create(new UniqueEntityID(parent.journalId)).getValue()
-        );
-      } catch (e) {
-        return null;
+      if (catalogItem.isLeft()) {
+        throw new Error(catalogItem.value.message);
       }
 
-      return catalogItem?.journalTitle;
+      return catalogItem.value?.journalTitle;
     },
   },
   Payment: {
@@ -517,10 +593,10 @@ export const invoice: Resolvers<Context> = {
       });
 
       if (paymentMethod.isLeft()) {
-        throw paymentMethod.value.errorValue();
+        throw paymentMethod.value;
       }
 
-      return PaymentMethodMap.toPersistence(paymentMethod.value.getValue());
+      return PaymentMethodMap.toPersistence(paymentMethod.value);
     },
   },
   Mutation: {
@@ -544,7 +620,7 @@ export const invoice: Resolvers<Context> = {
       } = env.app;
 
       const usecaseContext = {
-        roles: [Roles.PAYER],
+        roles: [Roles.SUPER_ADMIN],
       };
 
       const applyCouponUsecase = new ApplyCouponToInvoiceUsecase(
@@ -572,22 +648,20 @@ export const invoice: Resolvers<Context> = {
       );
 
       if (result.isLeft()) {
-        throw new Error(result.value.errorValue().message);
+        throw new Error(result.value.message);
       }
 
-      return CouponMap.toPersistence(result.value.getValue());
+      return CouponMap.toPersistence(result.value);
     },
     async createCreditNote(parent, args, context): Promise<any> {
       const {
         repos: {
-          // payment: paymentRepo,
           invoice: invoiceRepo,
           invoiceItem: invoiceItemRepo,
           transaction: transactionRepo,
           coupon: couponRepo,
           waiver: waiverRepo,
           pausedReminder: pausedReminderRepo,
-          // manuscript: manuscriptRepo,
         },
         services: { waiverService },
       } = context;
@@ -595,15 +669,12 @@ export const invoice: Resolvers<Context> = {
       const { invoiceId, createDraft, reason } = args;
 
       const createCreditNoteUsecase = new CreateCreditNoteUsecase(
-        // paymentRepo,
         invoiceRepo,
-        // manuscriptRepo,
         invoiceItemRepo,
         transactionRepo,
         couponRepo,
         waiverRepo,
-        pausedReminderRepo,
-        waiverService
+        pausedReminderRepo
       );
       const usecaseContext = { roles: [Roles.ADMIN] };
 
@@ -617,11 +688,10 @@ export const invoice: Resolvers<Context> = {
       );
 
       if (result.isLeft()) {
-        // console.log(result.value.errorValue());
-        return null;
+        throw new Error(result.value.message);
       }
 
-      const creditNote = result.value.getValue();
+      const creditNote = result.value;
 
       const getInvoiceUsecase = new GetInvoiceDetailsUsecase(invoiceRepo);
       const retrieveInvoice = await getInvoiceUsecase.execute(
@@ -633,15 +703,13 @@ export const invoice: Resolvers<Context> = {
         console.log('Error getting associate invoice', invoiceId);
       }
 
-      const invoice = result.value.getValue();
+      const invoice = result.value;
 
       return {
         id: creditNote.invoiceId.id.toString(),
         cancelledInvoiceReference: creditNote.cancelledInvoiceReference,
         status: creditNote.status,
         dateCreated: creditNote?.dateCreated?.toISOString(),
-        // erpReference: creditNote.erpReference,
-        // revenueRecognitionReference: creditNote.revenueRecognitionReference,
         creationReason: creditNote.creationReason,
         dateIssued: creditNote?.dateIssued?.toISOString(),
         referenceNumber: invoice

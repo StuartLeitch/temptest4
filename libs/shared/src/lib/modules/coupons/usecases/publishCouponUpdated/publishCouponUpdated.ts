@@ -1,12 +1,10 @@
-import { CouponMap } from './../../mappers/CouponMap';
-import { UnexpectedError } from '../../../../../lib/core/logic/AppError';
 import { SQSPublishServiceContract } from './../../../../domain/services/SQSPublishService';
+import { UnexpectedError } from '../../../../../lib/core/logic/AppError';
+import { Either, right, left } from '../../../../core/logic/Either';
 
 export class PublishCouponUpdated {
   constructor(private publishService: SQSPublishServiceContract) {}
-  public async execute(coupon: any): Promise<any> {
-    const rawCoupon = CouponMap.toPersistence(coupon);
-
+  public async execute(coupon: any): Promise<Either<UnexpectedError, void>> {
     const message = {
       event: 'CouponUpdated',
       data: {
@@ -19,8 +17,9 @@ export class PublishCouponUpdated {
 
     try {
       await this.publishService.publishMessage(message);
+      return right(null);
     } catch (err) {
-      throw new UnexpectedError(err.toString());
+      return left(new UnexpectedError(err.toString()));
     }
   }
 }

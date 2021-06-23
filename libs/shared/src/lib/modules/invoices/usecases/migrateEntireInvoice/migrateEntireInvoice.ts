@@ -1,7 +1,7 @@
 // * Core Domain
 import { flattenEither, AsyncEither } from '../../../../core/logic/AsyncEither';
-import { Either, Result, right, left } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
@@ -9,10 +9,10 @@ import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
 // * Authorization Logic
 import {
+  UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  Roles,
   AccessControlContext,
+  Roles,
 } from '../../../../domain/authorization';
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
@@ -61,16 +61,17 @@ import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/g
 import { GetTransactionUsecase } from '../../../transactions/usecases/getTransaction/getTransaction';
 import { GetPaymentsByInvoiceIdUsecase } from '../../../payments/usecases/getPaymentsByInvoiceId';
 import { GetPaymentMethodsUseCase } from '../../../payments/usecases/getPaymentMethods';
-import { GetAddressUseCase } from '../../../addresses/usecases/getAddress/getAddress';
+import { GetAddressUsecase } from '../../../addresses/usecases/getAddress/getAddress';
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
-
-import { CreateAddressRequestDTO } from '../../../addresses/usecases/createAddress/createAddressDTO';
-import { CreateAddress } from '../../../addresses/usecases/createAddress/createAddress';
+import {
+  CreateAddressRequestDTO,
+  CreateAddressUsecase,
+} from '../../../addresses/usecases/createAddress';
 import {
   CreatePayerRequestDTO,
   CreatePayerUsecase,
-} from '../../../payers/usecases/createPayer/createPayer';
+} from '../../../payers/usecases/createPayer';
 
 // * Usecase specific
 import { MigrateEntireInvoiceResponse as Response } from './migrateEntireInvoiceResponse';
@@ -81,12 +82,8 @@ import { validateRequest } from './utils';
 
 export class MigrateEntireInvoiceUsecase
   implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     private paymentMethodRepo: PaymentMethodRepoContract,
     private sqsPublishService: SQSPublishServiceContract,
@@ -166,10 +163,7 @@ export class MigrateEntireInvoiceUsecase
   }
 
   // @Authorize('invoice:read')
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const requestExecution = new AsyncEither<null, DTO>(request).then(
       validateRequest
     );
@@ -239,7 +233,7 @@ export class MigrateEntireInvoiceUsecase
       maybeInvoiceCreated,
       maybeInitialInvoice,
       maybeInvoicePayed,
-    ]).map(() => Result.ok<void>());
+    ]).map(() => null);
   }
 
   private async getTransactionWithAcceptanceDate(request: DTO) {
@@ -272,11 +266,11 @@ export class MigrateEntireInvoiceUsecase
       },
       context
     );
-    if (response.isFailure) {
-      const errorMessage = (response.errorValue() as any) as string;
+    if (response.isLeft()) {
+      const errorMessage = response.value.message;
       return left(new Errors.TransactionError(errorMessage));
     }
-    return right(response.getValue());
+    return right(response.value);
   }
 
   private async updateTransactionStatus(data: {
@@ -304,7 +298,14 @@ export class MigrateEntireInvoiceUsecase
   private async updateTransactionDetails(transaction: Transaction) {
     try {
       const result = await this.transactionRepo.update(transaction);
-      return right<UnexpectedError, Transaction>(result);
+
+      if (result.isLeft()) {
+        return left<UnexpectedError, Transaction>(
+          new UnexpectedError(new Error(result.value.message))
+        );
+      }
+
+      return right<UnexpectedError, Transaction>(result.value);
     } catch (err) {
       return left<UnexpectedError, Transaction>(new UnexpectedError(err));
     }
@@ -371,13 +372,12 @@ export class MigrateEntireInvoiceUsecase
         };
         return usecase.execute(payerRequest);
       })
-      .map((result) => result.getValue())
       .map((payer) => ({ payer, request }));
     return payerExecution.execute();
   }
 
   private async createAddress({ payer: { address } }: DTO) {
-    const usecase = new CreateAddress(this.addressRepo);
+    const usecase = new CreateAddressUsecase(this.addressRepo);
     const addressRequest: CreateAddressRequestDTO = {
       addressLine1: address.addressLine1,
       country: address.countryCode,
@@ -386,7 +386,7 @@ export class MigrateEntireInvoiceUsecase
       postalCode: '',
     };
     const maybeAddress = await usecase.execute(addressRequest);
-    return maybeAddress.map((result) => result.getValue());
+    return maybeAddress.map((result) => result);
   }
 
   private async sendInvoiceCreatedEvent(
@@ -432,7 +432,7 @@ export class MigrateEntireInvoiceUsecase
 
     const maybeInvoice = await invoiceUsecase.execute({ invoiceId }, context);
 
-    return maybeInvoice.map((result) => result.getValue());
+    return maybeInvoice;
   }
 
   private async addItemsToInvoice(invoice: Invoice) {
@@ -445,7 +445,7 @@ export class MigrateEntireInvoiceUsecase
       invoiceId: invoice.id.toString(),
     });
     const maybeInvoiceWithItems = maybeItems.map((result) => {
-      for (const item of result.getValue()) {
+      for (const item of result) {
         invoice.addInvoiceItem(item);
       }
       return invoice;
@@ -465,7 +465,7 @@ export class MigrateEntireInvoiceUsecase
     });
 
     return maybeManuscript.map((result) => ({
-      manuscript: result.getValue()[0],
+      manuscript: result[0],
       invoice,
     }));
   }
@@ -473,7 +473,12 @@ export class MigrateEntireInvoiceUsecase
   private async saveInvoice(invoice: Invoice) {
     try {
       const result = await this.invoiceRepo.update(invoice);
-      return right<Errors.InvoiceSaveFailed, Invoice>(result);
+
+      if (result.isLeft()) {
+        return left<UnexpectedError, Invoice>(new Error(result.value.message));
+      }
+
+      return right<Errors.InvoiceSaveFailed, Invoice>(result.value);
     } catch (err) {
       return left<Errors.InvoiceSaveFailed, Invoice>(
         new Errors.InvoiceSaveFailed(invoice.id.toString(), err)
@@ -544,7 +549,14 @@ export class MigrateEntireInvoiceUsecase
   private async updateInvoiceItem(item: InvoiceItem) {
     try {
       const result = await this.invoiceItemRepo.update(item);
-      return right<UnexpectedError, InvoiceItem>(result);
+
+      if (result.isLeft()) {
+        return left<UnexpectedError, InvoiceItem>(
+          new Error(result.value.message)
+        );
+      }
+
+      return right<UnexpectedError, InvoiceItem>(result.value);
     } catch (err) {
       return left<UnexpectedError, InvoiceItem>(new UnexpectedError(err));
     }
@@ -562,7 +574,6 @@ export class MigrateEntireInvoiceUsecase
 
     return new AsyncEither(invoiceId.id.toString())
       .then((invoiceId) => usecase.execute({ invoiceId }, context))
-      .map((result) => result.getValue())
       .execute();
   }
 
@@ -586,10 +597,7 @@ export class MigrateEntireInvoiceUsecase
       this.paymentMethodRepo,
       this.loggerService
     );
-    return new AsyncEither(null)
-      .then(() => usecase.execute())
-      .map((result) => result.getValue())
-      .execute();
+    return new AsyncEither(null).then(() => usecase.execute()).execute();
   }
 
   private async confirmInvoice({
@@ -650,6 +658,7 @@ export class MigrateEntireInvoiceUsecase
       })
       .then(async ({ invoice, manuscript }) => {
         const maybeSavedManuscript = await this.updateManuscript(manuscript);
+
         return maybeSavedManuscript.map(() => invoice);
       })
       .map((invoice) => ({ invoice, payer, request }))
@@ -659,7 +668,14 @@ export class MigrateEntireInvoiceUsecase
   private async getManuscript(customId: string) {
     try {
       const manuscript = await this.manuscriptRepo.findByCustomId(customId);
-      return right<UnexpectedError, Manuscript>(manuscript);
+
+      if (manuscript.isLeft()) {
+        return left<UnexpectedError, Manuscript>(
+          new Error(manuscript.value.message)
+        );
+      }
+
+      return right<UnexpectedError, Manuscript>(manuscript.value);
     } catch (err) {
       return left<UnexpectedError, Manuscript>(new UnexpectedError(err));
     }
@@ -668,7 +684,14 @@ export class MigrateEntireInvoiceUsecase
   private async updateManuscript(manuscript: Manuscript) {
     try {
       const newManuscript = await this.manuscriptRepo.update(manuscript);
-      return right<UnexpectedError, Manuscript>(newManuscript);
+
+      if (newManuscript.isLeft()) {
+        return left<UnexpectedError, Manuscript>(
+          new Error(newManuscript.value.message)
+        );
+      }
+
+      return right<UnexpectedError, Manuscript>(newManuscript.value);
     } catch (err) {
       return left<UnexpectedError, Manuscript>(new UnexpectedError(err));
     }
@@ -733,8 +756,18 @@ export class MigrateEntireInvoiceUsecase
 
   private async getMigrationPaymentMethod() {
     try {
+      const result = await this.paymentMethodRepo.getPaymentMethodByName(
+        'Migration'
+      );
+
+      if (result.isLeft()) {
+        return left<UnexpectedError, PaymentMethod>(
+          new UnexpectedError(new Error(result.value.message))
+        );
+      }
+
       return right<Errors.MigrationPaymentMethodNotFound, PaymentMethod>(
-        await this.paymentMethodRepo.getPaymentMethodByName('Migration')
+        result.value
       );
     } catch (err) {
       return left<Errors.MigrationPaymentMethodNotFound, PaymentMethod>(
@@ -784,9 +817,9 @@ export class MigrateEntireInvoiceUsecase
           payerId,
         });
       })
-      .map((rawPayment) => {
+      .then(async (rawPayment) => {
         if (!rawPayment) {
-          return null;
+          return left<null, Payment>(null);
         }
         return PaymentMap.toDomain(rawPayment);
       })
@@ -803,17 +836,31 @@ export class MigrateEntireInvoiceUsecase
   private async savePayment(payment: Payment) {
     try {
       const result = await this.paymentRepo.save(payment);
-      return right<UnexpectedError, Payment>(result);
+
+      if (result.isLeft()) {
+        return left<UnexpectedError, Payment>(
+          new UnexpectedError(new Error(result.value.message))
+        );
+      }
+
+      return right<UnexpectedError, Payment>(result.value);
     } catch (err) {
       return left<UnexpectedError, Payment>(new UnexpectedError(err));
     }
   }
 
   private async getPayerByInvoiceId(id: string) {
-    const invoiceId = InvoiceId.create(new UniqueEntityID(id)).getValue();
+    const invoiceId = InvoiceId.create(new UniqueEntityID(id));
     try {
       const payer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
-      return right<UnexpectedError, Payer>(payer);
+
+      if (payer.isLeft()) {
+        return left<UnexpectedError, Payer>(
+          new UnexpectedError(new Error(payer.value.message))
+        );
+      }
+
+      return right<UnexpectedError, Payer>(payer.value);
     } catch (err) {
       return left<UnexpectedError, Payer>(new UnexpectedError(err));
     }
@@ -868,7 +915,14 @@ export class MigrateEntireInvoiceUsecase
       const paymentDetails = await this.invoiceRepo.getInvoicePaymentInfo(
         invoiceId
       );
-      return right<UnexpectedError, InvoicePaymentInfo>(paymentDetails);
+
+      if (paymentDetails.isLeft()) {
+        return left<UnexpectedError, InvoicePaymentInfo>(
+          new UnexpectedError(new Error(paymentDetails.value.message))
+        );
+      }
+
+      return right<UnexpectedError, InvoicePaymentInfo>(paymentDetails.value);
     } catch (err) {
       return left<UnexpectedError, InvoicePaymentInfo>(
         new UnexpectedError(err)
@@ -999,14 +1053,14 @@ export class MigrateEntireInvoiceUsecase
       return right<null, null>(null);
     }
 
-    const usecase = new GetAddressUseCase(this.addressRepo);
+    const usecase = new GetAddressUsecase(this.addressRepo);
     const maybeAddress = await usecase.execute({
       billingAddressId: id.id.toString(),
     });
-    return maybeAddress.map((result) => result.getValue());
+    return maybeAddress;
   }
 
-  private sendInvoiceFinalizedEvent(context: UsecaseAuthorizationContext) {
+  private sendInvoiceFinalizedEvent(context: Context) {
     const usecase = new PublishInvoiceFinalizedUsecase(this.sqsPublishService);
 
     return async ({ invoice, request }: { invoice: Invoice; request: DTO }) => {
@@ -1122,7 +1176,7 @@ export class MigrateEntireInvoiceUsecase
     return right(true);
   }
 
-  private markInvoiceAsFinalAfterWaiver(context: UsecaseAuthorizationContext) {
+  private markInvoiceAsFinalAfterWaiver(context: Context) {
     return async (request: DTO & { invoice: Invoice }) => {
       const { invoice } = request;
 
@@ -1136,7 +1190,7 @@ export class MigrateEntireInvoiceUsecase
     };
   }
 
-  private addMigrationWaiver(context: UsecaseAuthorizationContext) {
+  private addMigrationWaiver(context: Context) {
     return async (
       request: DTO & { invoiceItems: InvoiceItem[]; invoice: Invoice }
     ) => {
@@ -1168,7 +1222,7 @@ export class MigrateEntireInvoiceUsecase
     return right(true);
   }
 
-  private attachInvoice(context: UsecaseAuthorizationContext) {
+  private attachInvoice(context: Context) {
     return async (request: DTO) => {
       return new AsyncEither(request.invoiceId)
         .then(this.getInvoice)

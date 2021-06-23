@@ -1,33 +1,25 @@
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { Either, Result } from '../../../../core/logic/Result';
+import { Either } from '../../../../core/logic/Either';
+
 import { Coupon } from '../../../../modules/coupons/domain/Coupon';
 
-import {
-  CouponAlreadyUsedForInvoiceError,
-  InvoiceConfirmationFailed,
-  InvoiceStatusInvalidError,
-  TransactionNotFoundError,
-  ManuscriptNotFoundError,
-  CouponAlreadyUsedError,
-  InvoiceNotFoundError,
-  CouponInactiveError,
-  CouponNotFoundError,
-  CouponExpiredError,
-  CouponInvalidError,
-} from './applyCouponToInvoiceErrors';
+import * as Errors from './applyCouponToInvoiceErrors';
 
 export type ApplyCouponToInvoiceResponse = Either<
-  | CouponAlreadyUsedForInvoiceError
-  | InvoiceConfirmationFailed
-  | InvoiceStatusInvalidError
-  | TransactionNotFoundError
-  | ManuscriptNotFoundError
-  | CouponAlreadyUsedError
-  | InvoiceNotFoundError
-  | CouponInactiveError
-  | CouponNotFoundError
-  | CouponExpiredError
-  | CouponInvalidError
-  | UnexpectedError,
-  Result<Coupon>
+  | Errors.CouponAlreadyUsedForInvoiceError
+  | Errors.InvoiceConfirmationFailed
+  | Errors.InvoiceItemsNotFoundError
+  | Errors.InvoiceStatusInvalidError
+  | Errors.TransactionNotFoundError
+  | Errors.ManuscriptNotFoundError
+  | Errors.CouponAlreadyUsedError
+  | Errors.InvoiceNotFoundError
+  | Errors.CouponInactiveError
+  | Errors.CouponNotFoundError
+  | Errors.CouponExpiredError
+  | Errors.CouponInvalidError
+  | UnexpectedError
+  | GuardFailure,
+  Coupon
 >;

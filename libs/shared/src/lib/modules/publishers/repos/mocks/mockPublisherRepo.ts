@@ -1,54 +1,71 @@
 import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
+import { Either, right, left } from '../../../../core/logic/Either';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
+
 import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
 
 import { PublisherCustomValues } from '../../domain/PublisherCustomValues';
-import { PublisherRepoContract } from '../publisherRepo';
 import { PublisherId } from '../../domain/PublisherId';
 import { Publisher } from '../../domain/Publisher';
 
-export class MockPublisherRepo extends BaseMockRepo<Publisher>
+import { PublisherRepoContract } from '../publisherRepo';
+
+export class MockPublisherRepo
+  extends BaseMockRepo<Publisher>
   implements PublisherRepoContract {
   constructor() {
     super();
   }
 
-  async getPublisherById(id: PublisherId): Promise<Publisher> {
-    const match = this._items.find(item => item.id.equals(id.id));
+  async getPublisherById(
+    id: PublisherId
+  ): Promise<Either<GuardFailure | RepoError, Publisher>> {
+    const match = this._items.find((item) => item.id.equals(id.id));
     if (!match) {
-      throw RepoError.createEntityNotFoundError('publisher', id.id.toString());
+      return left(
+        RepoError.createEntityNotFoundError('publisher', id.id.toString())
+      );
     }
-    return match;
+    return right(match);
   }
 
   async getCustomValuesByPublisherId(
     id: PublisherId
-  ): Promise<PublisherCustomValues> {
+  ): Promise<Either<GuardFailure | RepoError, PublisherCustomValues>> {
     const publisher = await this.getPublisherById(id);
-    return publisher?.customValue || null;
+
+    return publisher.map((p) => p.customValue);
   }
 
-  async getPublisherByName(name: string): Promise<Publisher> {
-    const match = this._items.find(item => item.name === name);
+  async getPublisherByName(
+    name: string
+  ): Promise<Either<GuardFailure | RepoError, Publisher>> {
+    const match = this._items.find((item) => item.name === name);
     if (!match) {
-      throw RepoError.createEntityNotFoundError('publisher', name);
+      return left(RepoError.createEntityNotFoundError('publisher', name));
     }
-    return match;
+    return right(match);
   }
 
-  async publisherWithIdExists(id: PublisherId): Promise<boolean> {
-    const found = this._items.find(item => item.id.equals(id.id));
-    return !!found;
+  async publisherWithIdExists(
+    id: PublisherId
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
+    const found = this._items.find((item) => item.id.equals(id.id));
+    return right(!!found);
   }
 
-  async exists(publisher: Publisher): Promise<boolean> {
-    const found = this._items.find(item => item.id.equals(publisher.id));
-    return !!found;
+  async exists(
+    publisher: Publisher
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
+    const found = this._items.find((item) => item.id.equals(publisher.id));
+    return right(!!found);
   }
 
-  async save(publisher: Publisher): Promise<Publisher> {
-    throw new RepoError(
-      RepoErrorCode.DB_ERROR,
-      'Save not supported for publishers'
+  async save(
+    publisher: Publisher
+  ): Promise<Either<GuardFailure | RepoError, Publisher>> {
+    return left(
+      new RepoError(RepoErrorCode.DB_ERROR, 'Save not supported for publishers')
     );
   }
 

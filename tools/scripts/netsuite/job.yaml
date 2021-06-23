@@ -26,11 +26,11 @@ spec:
         - name: NETSUITE_REST_ENDPOINT
           value: "https://6416429-sb1.suitetalk.api.netsuite.com/services/rest"
         - name: NETSUITE_CONSUMER_KEY
-          value: "fac6452381dc3265072a171cd166344b351ee68207ff136b62186310be3ff5b5"
+          value: "<placeholder>"
         - name: NETSUITE_CONSUMER_SECRET
-          value: "3e025fd25e68ff24e281654ca0cbf1be898ed6ee4d84181bcd896491206101d1"
+          value: "<placeholder>"
         - name: NETSUITE_TOKEN_ID
-          value: "9d83f6146d803d251b9b64d1df8f878161a2e2b2b82de0439aae6d06bc409abf"
+          value: "<placeholder>"
         - name: NETSUITE_TOKEN_SECRET
-          value: "d74447a1b4276d7f17837c40fc516af612dd11f7b7d0f33afb9f49713ba68d6a"
+          value: "<placeholder>"
       restartPolicy: OnFailure

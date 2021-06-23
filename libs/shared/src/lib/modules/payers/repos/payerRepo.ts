@@ -1,13 +1,15 @@
-import {Repo} from '../../../infrastructure/Repo';
+import { GuardFailure } from '../../../core/logic/GuardFailure'
+import { Either } from '../../../core/logic/Either'
 
-import {Payer} from '../domain/Payer';
-import {PayerId} from '../domain/PayerId';
+import { RepoError } from '../../../infrastructure/RepoError'
+import { Repo } from '../../../infrastructure/Repo';
+
 import { InvoiceId } from '../../invoices/domain/InvoiceId';
-// import {TransactionId} from '../../../transactions/domain/TransactionId';
+import { PayerId } from '../domain/PayerId';
+import { Payer } from '../domain/Payer';
 
 export interface PayerRepoContract extends Repo<Payer> {
-  getPayerByInvoiceId(invoiceId: InvoiceId): Promise<Payer>
-  getPayerById(payerId: PayerId): Promise<Payer>;
-  update(payer: Payer): Promise<Payer>;
-  getCollection(params?: string[]): Promise<Payer[]>;
+  getPayerByInvoiceId(invoiceId: InvoiceId): Promise<Either<GuardFailure | RepoError, Payer>>
+  getPayerById(payerId: PayerId): Promise<Either<GuardFailure | RepoError,Payer>>;
+  update(payer: Payer): Promise<Either<GuardFailure | RepoError,Payer>>;
 }

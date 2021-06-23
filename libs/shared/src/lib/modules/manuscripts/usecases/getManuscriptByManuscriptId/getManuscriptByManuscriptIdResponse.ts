@@ -1,10 +1,11 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
 import { Manuscript } from './../../domain/Manuscript';
-import { GetManuscriptByManuscriptIdErrors } from './getManuscriptByManuscriptIdErrors';
+
+import * as Errors from './getManuscriptByManuscriptIdErrors';
 
 export type GetManuscriptByManuscriptIdResponse = Either<
-  GetManuscriptByManuscriptIdErrors.ManuscriptFoundError | UnexpectedError,
-  Result<Manuscript>
+  Errors.ManuscriptFoundError | UnexpectedError,
+  Manuscript
 >;

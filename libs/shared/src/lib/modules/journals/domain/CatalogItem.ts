@@ -1,9 +1,11 @@
 // * Core Domain
-import { AggregateRoot } from '../../../core/domain/AggregateRoot';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
-import { Result } from '../../../core/logic/Result';
-import { JournalId } from '../domain/JournalId';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either, right } from '../../../core/logic/Either';
+
 import { PublisherId } from '../../publishers/domain/PublisherId';
+import { JournalId } from '../domain/JournalId';
 
 export interface CatalogItemProps {
   type: string;
@@ -26,14 +28,14 @@ export class CatalogItem extends AggregateRoot<CatalogItemProps> {
   public static create(
     props: CatalogItemProps,
     id?: UniqueEntityID
-  ): Result<CatalogItem> {
+  ): Either<GuardFailure, CatalogItem> {
     const catalogItem = new CatalogItem(
       {
-        ...props
+        ...props,
       },
       id
     );
-    return Result.ok<CatalogItem>(catalogItem);
+    return right(catalogItem);
   }
 
   public get id(): UniqueEntityID {

@@ -1,9 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
-import { right, left } from '../../../../../core/logic/Result';
+import { right, left } from '../../../../../core/logic/Either';
 import { UseCase } from '../../../../../core/domain/UseCase';
 
 // * Authorization Logic
@@ -13,7 +10,9 @@ import {
   AccessControlContext,
 } from '../../../../../domain/authorization';
 
+import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
 import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
+import { ErpReferenceMap } from './../../../../vendors/mapper/ErpReference';
 import { InvoiceItemRepoContract } from './../../../repos/invoiceItemRepo';
 import { PayerRepoContract } from './../../../../payers/repos/payerRepo';
 import { PublisherRepoContract } from '../../../../publishers/repos';
@@ -22,28 +21,24 @@ import { InvoiceRepoContract } from './../../../repos/invoiceRepo';
 import { CatalogRepoContract } from '../../../../journals/repos';
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
-import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
-import { ErpReferenceMap } from './../../../../vendors/mapper/ErpReference';
 
 import { ExchangeRateService } from '../../../../../domain/services/ExchangeRateService';
-import {
-  ErpInvoiceRequest,
-  ErpServiceContract,
-} from '../../../../../domain/services/ErpService';
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 import { VATService } from '../../../../../domain/services/VATService';
+import {
+  ErpServiceContract,
+  ErpInvoiceRequest,
+} from '../../../../../domain/services/ErpService';
 
-import { InvoiceId } from '../../../domain/InvoiceId';
+import { CatalogItem } from '../../../../journals/domain/CatalogItem';
 import { JournalId } from '../../../../journals/domain/JournalId';
-import { Invoice } from '../../../domain/Invoice';
 import { PayerType } from './../../../../payers/domain/Payer';
+import { InvoiceId } from '../../../domain/InvoiceId';
+import { Invoice } from '../../../domain/Invoice';
 
 import { GetItemsForInvoiceUsecase } from '../../getItemsForInvoice/getItemsForInvoice';
 import { PublishInvoiceToErpResponse } from './publishInvoiceToErpResponse';
-
-export interface PublishInvoiceToErpRequestDTO {
-  invoiceId?: string;
-}
+import { PublishInvoiceToErpRequestDTO } from './publishInvoiceToErpDTO';
 
 export class PublishInvoiceToErpUsecase
   implements
@@ -88,9 +83,15 @@ export class PublishInvoiceToErpUsecase
     let invoice: Invoice;
 
     try {
-      invoice = await this.invoiceRepo.getInvoiceById(
-        InvoiceId.create(new UniqueEntityID(request.invoiceId)).getValue()
+      const maybeInvoice = await this.invoiceRepo.getInvoiceById(
+        InvoiceId.create(new UniqueEntityID(request.invoiceId))
       );
+
+      if (maybeInvoice.isLeft()) {
+        return left(new UnexpectedError(new Error(maybeInvoice.value.message)));
+      }
+      invoice = maybeInvoice.value;
+
       this.loggerService.info('PublishInvoiceToERP invoice', invoice);
 
       const getItemsUsecase = new GetItemsForInvoiceUsecase(
@@ -112,7 +113,7 @@ export class PublishInvoiceToErpUsecase
         );
       }
 
-      const invoiceItems = resp.value.getValue();
+      const invoiceItems = resp.value;
 
       this.loggerService.info('PublishInvoiceToERP invoiceItems', invoiceItems);
 
@@ -138,7 +139,15 @@ export class PublishInvoiceToErpUsecase
           value: 'NON_INVOICEABLE',
         });
 
-        await this.erpReferenceRepo.save(nonInvoiceableErpReference);
+        if (nonInvoiceableErpReference.isLeft()) {
+          return left(
+            new UnexpectedError(
+              new Error(nonInvoiceableErpReference.value.message)
+            )
+          );
+        }
+
+        await this.erpReferenceRepo.save(nonInvoiceableErpReference.value);
 
         this.loggerService.info(
           `PublishInvoiceToERP Flag invoice ${invoice.invoiceId.id.toString()} as NON_INVOICEABLE`,
@@ -148,31 +157,45 @@ export class PublishInvoiceToErpUsecase
         return right(null);
       }
 
-      const payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
-      if (!payer) {
+      const maybePayer = await this.payerRepo.getPayerByInvoiceId(
+        invoice.invoiceId
+      );
+      if (maybePayer.isLeft()) {
         throw new Error(`Invoice ${invoice.id} has no payers.`);
       }
+      const payer = maybePayer.value;
       this.loggerService.info('PublishInvoiceToERP payer', payer);
 
-      const address = await this.addressRepo.findById(payer.billingAddressId);
-      if (!address) {
+      const maybeAddress = await this.addressRepo.findById(
+        payer.billingAddressId
+      );
+      if (maybeAddress.isLeft()) {
         throw new Error(`Invoice ${invoice.id} has no address associated.`);
       }
+      const address = maybeAddress.value;
       this.loggerService.info('PublishInvoiceToERP address', address);
 
-      const manuscript = await this.manuscriptRepo.findById(
+      const maybeManuscript = await this.manuscriptRepo.findById(
         invoiceItems[0].manuscriptId
       );
-      if (!manuscript) {
+      if (maybeManuscript.isLeft()) {
         throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
       }
+      const manuscript = maybeManuscript.value;
       this.loggerService.info('PublishInvoiceToERP manuscript', manuscript);
 
-      let catalog;
+      let catalog: CatalogItem;
       try {
-        catalog = await this.catalogRepo.getCatalogItemByJournalId(
-          JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
+        const maybeCatalog = await this.catalogRepo.getCatalogItemByJournalId(
+          JournalId.create(new UniqueEntityID(manuscript.journalId))
         );
+
+        if (maybeCatalog.isLeft()) {
+          throw new Error(maybeCatalog.value.message);
+        }
+
+        catalog = maybeCatalog.value;
+
         if (!catalog) {
           throw new Error(`Invoice ${invoice.id} has no catalog associated.`);
         }
@@ -181,12 +204,13 @@ export class PublishInvoiceToErpUsecase
         return err;
       }
 
-      const publisherCustomValues = await this.publisherRepo.getCustomValuesByPublisherId(
+      const maybePublisherCustomValues = await this.publisherRepo.getCustomValuesByPublisherId(
         catalog?.publisherId
       );
-      if (!publisherCustomValues) {
+      if (maybePublisherCustomValues.isLeft()) {
         throw new Error(`Invoice ${invoice.id} has no publisher associated.`);
       }
+      const publisherCustomValues = maybePublisherCustomValues.value;
       this.loggerService.info(
         'PublishInvoiceToERP publisher data',
         publisherCustomValues
@@ -272,7 +296,14 @@ export class PublishInvoiceToErpUsecase
               'invoice',
             value: String(erpResponse.tradeDocumentId),
           });
-          await this.erpReferenceRepo.save(erpPaymentReference);
+
+          if (erpPaymentReference.isLeft()) {
+            return left(
+              new UnexpectedError(new Error(erpPaymentReference.value.message))
+            );
+          }
+
+          await this.erpReferenceRepo.save(erpPaymentReference.value);
           this.loggerService.info(`Added ErpReference`, erpPaymentReference);
         }
 

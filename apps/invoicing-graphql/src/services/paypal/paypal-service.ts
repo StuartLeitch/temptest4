@@ -1,5 +1,3 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
 import * as checkoutNodeJsSDK from '@paypal/checkout-server-sdk';
 
 import {

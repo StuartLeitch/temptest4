@@ -1,48 +1,44 @@
+import streamToPromise from 'stream-to-promise';
 import { Readable } from 'stream';
 
 // * Core Domain
 import { UniqueEntityID } from './../../../../core/domain/UniqueEntityID';
-import { Result, Either, left, right } from '../../../../core/logic/Result';
+import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
-import { chain } from '../../../../core/logic/EitherChain';
-import { map } from '../../../../core/logic/EitherMap';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 
 // * Usecase specific
-import streamToPromise from 'stream-to-promise';
-
-import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
-import { PayerRepoContract } from '../../../payers/repos/payerRepo';
-import { InvoiceRepoContract } from '../../repos/invoiceRepo';
-
 import { Invoice } from '../../domain/Invoice';
 import { JournalId } from './../../../journals/domain/JournalId';
 
-import { GetInvoicePdfResponse, PdfResponse } from './getInvoicePdfResponse';
-import { GetInvoicePdfErrors } from './getInvoicePdfErrors';
-import { GetInvoicePdfDTO } from './getInvoicePdfDTO';
+import { CatalogRepoContract } from './../../../journals/repos/catalogRepo';
+import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
+import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
+import { PayerRepoContract } from '../../../payers/repos/payerRepo';
+import { ArticleRepoContract } from '../../../manuscripts/repos';
+import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
 import { GetArticleDetailsUsecase } from '../../../manuscripts/usecases/getArticleDetails/getArticleDetails';
 import { GetAuthorDetailsUsecase } from '../../../authors/usecases/getAuthorDetails/getAuthorDetails';
 import { GetPayerDetailsUsecase } from '../../../payers/usecases/getPayerDetails/getPayerDetails';
-import { GetAddressUseCase } from '../../../addresses/usecases/getAddress/getAddress';
+import { GetAddressUsecase } from '../../../addresses/usecases/getAddress/getAddress';
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
 
-import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
-import { ArticleRepoContract } from '../../../manuscripts/repos';
-import { CatalogRepoContract } from './../../../journals/repos/catalogRepo';
+import {
+  GetInvoicePdfResponse as Response,
+  PdfResponse,
+} from './getInvoicePdfResponse';
+import { GetInvoicePdfErrors as Errors } from './getInvoicePdfErrors';
+import { GetInvoicePdfDTO as DTO } from './getInvoicePdfDTO';
 
 import {
-  InvoicePayload,
   PdfGeneratorService,
+  InvoicePayload,
 } from '../../../../domain/services/PdfGenerator';
 
 import { VATService } from '../../../../domain/services/VATService';
@@ -55,18 +51,8 @@ import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 
 export class GetInvoicePdfUsecase
-  implements
-    UseCase<
-      GetInvoicePdfDTO,
-      Promise<GetInvoicePdfResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      GetInvoicePdfDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
-  authorizationContext: UsecaseAuthorizationContext;
+  implements UseCase<DTO, Promise<Response>, Context> {
+  authorizationContext: Context;
 
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -79,13 +65,21 @@ export class GetInvoicePdfUsecase
     private waiverRepo: WaiverRepoContract,
     private pdfGenerator: PdfGeneratorService,
     private logger: LoggerContract
-  ) {}
+  ) {
+    this.getPayloadWithAddress = this.getPayloadWithAddress.bind(this);
+    this.getPayloadWithInvoice = this.getPayloadWithInvoice.bind(this);
+    this.getPayloadWithArticle = this.getPayloadWithArticle.bind(this);
+    this.getPayloadWithAuthor = this.getPayloadWithAuthor.bind(this);
+    this.getPayloadWithPayer = this.getPayloadWithPayer.bind(this);
+    this.addExchangeRate = this.addExchangeRate.bind(this);
+    this.addJournalTitle = this.addJournalTitle.bind(this);
+    this.generateThePdf = this.generateThePdf.bind(this);
+  }
 
-  // @Authorize('payer:read')
-  public async execute(
-    request: GetInvoicePdfDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<GetInvoicePdfResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
+    const exchangeRateService = new ExchangeRateService();
+    const vatService = new VATService();
+
     this.authorizationContext = context;
     const { payerId } = request;
 
@@ -98,122 +92,123 @@ export class GetInvoicePdfUsecase
       payer: null,
     };
 
-    const payloadEither = await chain(
-      [
-        this.getPayloadWithPayer(payerId).bind(this),
-        this.getPayloadWithAddress.bind(this),
-        this.getPayloadWithInvoice.bind(this),
-        this.getPayloadWithArticle.bind(this),
-        this.getPayloadWithAuthor.bind(this),
-      ],
-      emptyPayload
-    );
+    const payloadExecution = await new AsyncEither(emptyPayload)
+      .then(this.getPayloadWithPayer(payerId))
+      .then(this.getPayloadWithAddress)
+      .then(this.getPayloadWithInvoice)
+      .then(this.getPayloadWithArticle)
+      .then(this.getPayloadWithAuthor)
+      .then(this.addJournalTitle)
+      .then(this.addExchangeRate(exchangeRateService, vatService))
+      .execute();
 
-    const payloadWithJournal = await map(
-      [
-        async (payload) => {
-          const catalogItem = await this.catalogRepo.getCatalogItemByJournalId(
-            JournalId.create(
-              new UniqueEntityID(payload.article.props.journalId)
-            ).getValue()
-          );
-
-          if (payload.article) {
-            // eslint-disable-next-line require-atomic-updates
-            payload.article.props.journalTitle = catalogItem.journalTitle;
+    const pdfExecution = await new AsyncEither(null)
+      .then(async () => payloadExecution)
+      .then(this.generateThePdf)
+      .then(
+        async (stream): Promise<Either<UnexpectedError, Buffer>> => {
+          try {
+            const result = await streamToPromise(stream);
+            return right(result);
+          } catch (err) {
+            return left(new UnexpectedError(err));
           }
+        }
+      )
+      .execute();
 
-          return payload;
-        },
-      ],
-      payloadEither
-    );
-
-    const vatService = new VATService();
-    const exchangeRateService = new ExchangeRateService();
-
-    let rate = 1.42; // ! Average value for the last seven years
-
-    const payloadWithVatNote = await map(
-      [
-        async (payload) => {
-          const { template } = vatService.getVATNote(
-            {
-              postalCode: payload.address.postalCode,
-              countryCode: payload.address.country,
-              stateCode: payload.address.state,
-            },
-            payload.payer.type !== PayerType.INSTITUTION,
-            new Date(payload.invoice.dateIssued)
-          );
-
-          if (payload && payload.invoice && payload.invoice.dateIssued) {
-            let exchangeRate = null;
-            try {
-              exchangeRate = await exchangeRateService.getExchangeRate(
-                new Date(payload.invoice.dateIssued),
-                'USD'
-              );
-              this.logger.info(
-                'PublishInvoiceToERP exchangeRate',
-                exchangeRate
-              );
-            } catch (error) {
-              this.logger.error('PublishInvoiceToERP exchangeRate', error);
-            }
-            if (exchangeRate?.exchangeRate) {
-              rate = exchangeRate.exchangeRate;
-            }
-          }
-
-          payload.invoice.props.rate = Math.round(rate * 10000) / 10000;
-          payload.invoice.props.vatnote = template;
-
-          return payload;
-        },
-      ],
-      payloadWithJournal
-    );
-
-    const pdfStreamEither = payloadWithVatNote.chain(
-      this.generateThePdf.bind(this)
-    );
-
-    const pdfEither: any = await map([streamToPromise], pdfStreamEither);
-
-    return this.addFileNameToResponse(payloadEither, pdfEither).map((pdf) =>
-      Result.ok(pdf)
-    ) as GetInvoicePdfResponse;
+    return this.addFileNameToResponse(payloadExecution, pdfExecution);
   }
 
-  private generateThePdf(
+  private async generateThePdf(
     payload: InvoicePayload
-  ): Either<unknown, Promise<Readable>> {
+  ): Promise<Either<Errors.PdfInvoiceError, Readable>> {
     try {
       const invoiceId = payload.invoice.id.toString();
       const paymentPath = 'payment-details/';
       const link = payload.invoiceLink.concat(paymentPath, invoiceId);
       payload.invoiceLink = link;
 
-      const pdf = this.pdfGenerator.getInvoice(payload);
+      const pdf = await this.pdfGenerator.getInvoice(payload);
       return right(pdf);
     } catch (error) {
       this.logger.error(error.message, error);
       return left(
-        new GetInvoicePdfErrors.PdfInvoiceError(
-          'empty pdf',
-          payload.invoice.id.toString()
-        )
+        new Errors.PdfInvoiceError('empty pdf', payload.invoice.id.toString())
       );
     }
   }
 
-  private addFileNameToResponse(
-    payloadEither: Either<any, InvoicePayload>,
-    pdfEither: Either<any, Buffer>
+  private async addJournalTitle<T extends InvoicePayload>(
+    payload: T
+  ): Promise<Either<UnexpectedError, T>> {
+    const maybeCatalogItem = await this.catalogRepo.getCatalogItemByJournalId(
+      JournalId.create(new UniqueEntityID(payload.article.props.journalId))
+    );
+
+    if (maybeCatalogItem.isLeft()) {
+      return left(
+        new UnexpectedError(new Error(maybeCatalogItem.value.message))
+      );
+    }
+
+    const catalogItem = maybeCatalogItem.value;
+
+    if (payload.article) {
+      payload.article.props.journalTitle = catalogItem.journalTitle;
+    }
+
+    return right(payload);
+  }
+
+  private addExchangeRate(
+    exchangeRateService: ExchangeRateService,
+    vatService: VATService
   ) {
-    return payloadEither.chain<any, Buffer | PdfResponse>((payload) => {
-      return pdfEither.map<PdfResponse>((pdf) => {
+    return async (
+      payload: InvoicePayload
+    ): Promise<Either<UnexpectedError, InvoicePayload>> => {
+      let rate = 1.42; // ! Average value for the last seven years
+      const { template } = vatService.getVATNote(
+        {
+          postalCode: payload.address.postalCode,
+          countryCode: payload.address.country,
+          stateCode: payload.address.state,
+        },
+        payload.payer.type !== PayerType.INSTITUTION,
+        new Date(payload.invoice.dateIssued)
+      );
+
+      if (payload && payload.invoice && payload.invoice.dateIssued) {
+        let exchangeRate = null;
+        try {
+          exchangeRate = await exchangeRateService.getExchangeRate(
+            new Date(payload.invoice.dateIssued),
+            'USD'
+          );
+          this.logger.info('PublishInvoiceToERP exchangeRate', exchangeRate);
+        } catch (error) {
+          this.logger.error('PublishInvoiceToERP exchangeRate', error);
+          return left(new UnexpectedError(error));
+        }
+        if (exchangeRate?.exchangeRate) {
+          rate = exchangeRate.exchangeRate;
+        }
+      }
+
+      payload.invoice.props.rate = Math.round(rate * 10000) / 10000;
+      payload.invoice.props.vatnote = template;
+
+      return right(payload);
+    };
+  }
+
+  private addFileNameToResponse<A, B>(
+    payloadEither: Either<A, InvoicePayload>,
+    pdfEither: Either<B, Buffer>
+  ) {
+    return payloadEither.chain((payload) => {
+      return pdfEither.map((pdf) => {
         const date = payload.invoice.dateCreated;
         const parsedDate = `${date.getUTCFullYear()}-${
           date.getUTCMonth() + 1
@@ -234,23 +229,23 @@ export class GetInvoicePdfUsecase
         { payerId },
         this.authorizationContext
       );
-      return payerEither.map((payerResult) => ({
+      return payerEither.map((payer) => ({
         ...payload,
-        payer: payerResult.getValue(),
+        payer,
       }));
     };
   }
 
   private async getPayloadWithAddress(payload: InvoicePayload) {
     const { billingAddressId } = payload.payer;
-    const usecase = new GetAddressUseCase(this.addressRepo);
+    const usecase = new GetAddressUsecase(this.addressRepo);
     const addressEither = await usecase.execute({
       billingAddressId: billingAddressId.id.toString(),
     });
 
-    return addressEither.map((addressResult) => ({
+    return addressEither.map((address) => ({
       ...payload,
-      address: addressResult.getValue(),
+      address,
     }));
   }
 
@@ -264,35 +259,39 @@ export class GetInvoicePdfUsecase
     return itemsEither;
   }
 
-  private async addItemsForInvoice(
-    invoiceId: string,
-    invoiceResult: Result<Invoice>
-  ) {
-    const invoice = invoiceResult.getValue();
+  private async addItemsForInvoice(invoiceId: string, invoiceResult: Invoice) {
+    const invoice = invoiceResult;
     const itemsEither = await this.getInvoiceItems(invoiceId);
     const invoiceEither = itemsEither
       .map((itemsResult) =>
-        itemsResult.getValue().map((item) => invoice.addInvoiceItem(item))
+        itemsResult.map((item) => invoice.addInvoiceItem(item))
       )
-      .map(() => Result.ok(invoice));
+      .map(() => invoice);
     return invoiceEither;
   }
 
-  private async getPayloadWithInvoice(payload: InvoicePayload) {
+  private async getPayloadWithInvoice(
+    payload: InvoicePayload
+  ): Promise<Either<UnexpectedError, InvoicePayload>> {
     const invoiceId = payload.payer.invoiceId.id.toString();
     const usecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
     const invoiceEither = await usecase.execute(
       { invoiceId },
       this.authorizationContext
     );
-    const invoiceWithItems = await chain(
-      [this.addItemsForInvoice.bind(this, invoiceId)],
-      invoiceEither
+
+    if (invoiceEither.isLeft()) {
+      return left(new UnexpectedError(new Error(invoiceEither.value.message)));
+    }
+
+    const invoiceWithItems = await this.addItemsForInvoice(
+      invoiceId,
+      invoiceEither.value
     );
 
-    return invoiceWithItems.map((invoiceResult) => ({
+    return invoiceWithItems.map((invoice) => ({
       ...payload,
-      invoice: invoiceResult.getValue(),
+      invoice,
     }));
   }
 
@@ -316,14 +315,16 @@ export class GetInvoicePdfUsecase
         { articleId: articleIdEither.value },
         this.authorizationContext
       );
-      return articleEither.map((articleResult) => ({
+      return articleEither.map((article) => ({
         ...payload,
-        article: articleResult.getValue(),
+        article,
       }));
     } else {
       return left<UnexpectedError, InvoicePayload>(
         new UnexpectedError(
-          `no APC found for the invoice with id ${payload.invoice.id.toString()}`
+          new Error(
+            `no APC found for the invoice with id ${payload.invoice.id.toString()}`
+          )
         )
       );
     }
@@ -336,9 +337,9 @@ export class GetInvoicePdfUsecase
       { article },
       this.authorizationContext
     );
-    return authorEither.map((authorResult) => ({
+    return authorEither.map((author) => ({
       ...payload,
-      author: authorResult.getValue(),
+      author,
     }));
   }
 }

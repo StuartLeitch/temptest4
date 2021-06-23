@@ -2,16 +2,17 @@
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 import { AggregateRoot } from '../../../core/domain/AggregateRoot';
 import { GuardArgument, Guard } from './../../../core/logic/Guard';
-import { Result } from '../../../core/logic/Result';
+import { Either, right, left } from '../../../core/logic/Either';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
 
 import { Reduction } from '../../../domain/reductions/Reduction';
 
 import { CouponAssignedCollection } from '../../coupons/domain/CouponAssignedCollection';
 import { WaiverAssignedCollection } from '../../waivers/domain/WaiverAssignedCollection';
-import { WaiverAssigned } from '../../waivers/domain/WaiverAssigned';
 import { CouponAssigned } from '../../coupons/domain/CouponAssigned';
+import { ManuscriptId } from '../../manuscripts/domain/ManuscriptId';
+import { WaiverAssigned } from '../../waivers/domain/WaiverAssigned';
 import { InvoiceItemId } from './InvoiceItemId';
-import { ManuscriptId } from './ManuscriptId';
 import { InvoiceId } from './InvoiceId';
 
 export type InvoiceItemType = 'APC' | 'PRINT ORDER';
@@ -84,7 +85,7 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
   public static create(
     props: InvoiceItemProps,
     id?: UniqueEntityID
-  ): Result<InvoiceItem> {
+  ): Either<GuardFailure, InvoiceItem> {
     const guardArgs: GuardArgument[] = [
       { argument: props.invoiceId, argumentName: 'invoiceId' },
       { argument: props.manuscriptId, argumentName: 'manuscriptId' },
@@ -93,7 +94,7 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     const guardResult = Guard.againstNullOrUndefinedBulk(guardArgs);
 
     if (!guardResult.succeeded) {
-      return Result.fail<InvoiceItem>(guardResult.message);
+      return left(new GuardFailure(guardResult.message));
     }
 
     const defaultValues: InvoiceItemProps = {
@@ -107,7 +108,7 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     };
 
     const invoiceItem = new InvoiceItem(defaultValues, id);
-    return Result.ok<InvoiceItem>(invoiceItem);
+    return right(invoiceItem);
   }
 
   private removeCouponIfExists(coupon: CouponAssigned): void {

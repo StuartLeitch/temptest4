@@ -1,85 +1,55 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
-import { UnexpectedError } from '../../../../core/logic/AppError';
-import { chain } from '../../../../core/logic/EitherChain';
-import { Result, left, right, Either } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { Either, right, left } from '../../../../core/logic/Either';
+import { UnexpectedError } from '../../../../core/logic/AppError';
+import { AsyncEither } from '../../../../core/logic/AsyncEither';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 
-import { ArticleRepoContract } from '../../repos/articleRepo';
-
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
-import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
-
-// * Usecase specific
-import { GetManuscriptByInvoiceIdResponse } from './getManuscriptByInvoiceIdResponse';
-import { GetManuscriptByInvoiceIdErrors } from './getManuscriptByInvoiceIdErrors';
-import { GetManuscriptByInvoiceIdDTO } from './getManuscriptByInvoiceIdDTO';
-
-// import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { Manuscript } from '../../domain/Manuscript';
 
+import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
+import { ArticleRepoContract } from '../../repos/articleRepo';
+
+// * Usecase specific
+import { GetManuscriptByInvoiceIdResponse as Response } from './getManuscriptByInvoiceIdResponse';
+import { GetManuscriptByInvoiceIdDTO as DTO } from './getManuscriptByInvoiceIdDTO';
+import * as Errors from './getManuscriptByInvoiceIdErrors';
+
 export class GetManuscriptByInvoiceIdUsecase
-  implements
-    UseCase<
-      GetManuscriptByInvoiceIdDTO,
-      Promise<GetManuscriptByInvoiceIdResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      GetManuscriptByInvoiceIdDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private manuscriptRepo: ArticleRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract
-  ) {}
-
-  private async getAccessControlContext(request, context?) {
-    return {};
+  ) {
+    this.getManuscriptsForInvoiceItems = this.getManuscriptsForInvoiceItems.bind(
+      this
+    );
+    this.getInvoiceItems = this.getInvoiceItems.bind(this);
+    this.sanitizeInput = this.sanitizeInput.bind(this);
   }
 
-  public async execute(
-    request: GetManuscriptByInvoiceIdDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<GetManuscriptByInvoiceIdResponse> {
-    const maybeInvoiceId = this.sanitizeInput(request).map(
-      ({ invoiceId }) => invoiceId
-    );
-    const maybeManuscripts = await chain(
-      [
-        this.getInvoiceItems.bind(this),
-        this.getManuscriptsForInvoiceItems.bind(this),
-      ],
-      maybeInvoiceId
-    );
+  public async execute(request: DTO, context?: Context): Promise<Response> {
+    const execution = await new AsyncEither(request)
+      .then(this.sanitizeInput)
+      .map(({ invoiceId }) => invoiceId)
+      .then(this.getInvoiceItems)
+      .then(this.getManuscriptsForInvoiceItems)
+      .execute();
 
-    return (maybeManuscripts.map((manuscripts) =>
-      Result.ok(manuscripts)
-    ) as unknown) as GetManuscriptByInvoiceIdResponse;
+    return execution;
   }
 
-  private sanitizeInput(
-    request: GetManuscriptByInvoiceIdDTO
-  ): Either<
-    GetManuscriptByInvoiceIdErrors.InvalidInvoiceId,
-    { invoiceId: InvoiceId }
-  > {
+  private async sanitizeInput(
+    request: DTO
+  ): Promise<Either<Errors.InvalidInvoiceId, { invoiceId: InvoiceId }>> {
     const { invoiceId } = request;
     if (!invoiceId) {
-      return left(
-        new GetManuscriptByInvoiceIdErrors.InvalidInvoiceId(invoiceId)
-      );
+      return left(new Errors.InvalidInvoiceId(invoiceId));
     }
     const maybeInvoiceId = this.convertUuid(invoiceId).chain(
       this.convertInvoiceId
@@ -90,45 +60,61 @@ export class GetManuscriptByInvoiceIdUsecase
 
   private convertUuid(
     id: string
-  ): Either<GetManuscriptByInvoiceIdErrors.InvalidInvoiceId, UniqueEntityID> {
+  ): Either<Errors.InvalidInvoiceId, UniqueEntityID> {
     try {
       return right(new UniqueEntityID(id));
     } catch {
-      return left(new GetManuscriptByInvoiceIdErrors.InvalidInvoiceId(id));
+      return left(new Errors.InvalidInvoiceId(id));
     }
   }
 
   private convertInvoiceId(
     uuid: UniqueEntityID
-  ): Either<GetManuscriptByInvoiceIdErrors.InvalidInvoiceId, InvoiceId> {
+  ): Either<Errors.InvalidInvoiceId, InvoiceId> {
     try {
-      return right(InvoiceId.create(uuid).getValue());
+      return right(InvoiceId.create(uuid));
     } catch {
-      return left(
-        new GetManuscriptByInvoiceIdErrors.InvalidInvoiceId(uuid.toString())
-      );
+      return left(new Errors.InvalidInvoiceId(uuid.toString()));
     }
   }
 
-  private async getInvoiceItems(invoiceId: InvoiceId) {
+  private async getInvoiceItems(
+    invoiceId: InvoiceId
+  ): Promise<Either<UnexpectedError | Errors.NoApcForInvoice, InvoiceItem[]>> {
     try {
-      const invoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
+      const maybeInvoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
         invoiceId
       );
-      if (invoiceItems.length === 0) {
+
+      if (maybeInvoiceItems.isLeft()) {
         return left(
-          new GetManuscriptByInvoiceIdErrors.NoApcForInvoice(
-            invoiceId.id.toString()
-          )
+          new UnexpectedError(new Error(maybeInvoiceItems.value.message))
         );
       }
-      return right(await this.invoiceItemRepo.getItemsByInvoiceId(invoiceId));
+
+      const invoiceItems = maybeInvoiceItems.value;
+
+      if (invoiceItems.length === 0) {
+        return left(new Errors.NoApcForInvoice(invoiceId.id.toString()));
+      }
+
+      const maybeUpdated = await this.invoiceItemRepo.getItemsByInvoiceId(
+        invoiceId
+      );
+
+      if (maybeUpdated.isLeft()) {
+        return left(new UnexpectedError(new Error(maybeUpdated.value.message)));
+      }
+
+      return right(maybeUpdated.value);
     } catch (e) {
       return left(new UnexpectedError(e));
     }
   }
 
-  private async getManuscriptsForInvoiceItems(invoiceItems: InvoiceItem[]) {
+  private async getManuscriptsForInvoiceItems(
+    invoiceItems: InvoiceItem[]
+  ): Promise<Either<UnexpectedError, Manuscript[]>> {
     const APCs = invoiceItems.filter(
       (invoiceItem) => invoiceItem.type === 'APC'
     );
@@ -136,10 +122,17 @@ export class GetManuscriptByInvoiceIdUsecase
 
     try {
       for (const invoiceItem of APCs) {
-        const manuscript = await this.manuscriptRepo.findById(
+        const maybeManuscript = await this.manuscriptRepo.findById(
           invoiceItem.manuscriptId
         );
-        manuscripts.push(manuscript);
+
+        if (maybeManuscript.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeManuscript.value.message))
+          );
+        }
+
+        manuscripts.push(maybeManuscript.value);
       }
     } catch (e) {
       return left(new UnexpectedError(e));

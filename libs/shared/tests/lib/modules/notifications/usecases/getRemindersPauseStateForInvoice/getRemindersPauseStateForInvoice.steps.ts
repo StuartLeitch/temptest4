@@ -71,18 +71,29 @@ Given(/^invoice with "([\w-]+)" id/, async (testId: string) => {
     id: testId,
   });
 
-  await mockInvoiceRepo.save(invoice);
+  if (invoice.isLeft()) {
+    throw invoice.value;
+  }
+
+  await mockInvoiceRepo.save(invoice.value);
 });
 
 Given(
   /^the paused state reminders for invoice "([\w-]+)"/,
   async (testId: string) => {
-    const invoiceId = InvoiceId.create(new UniqueEntityID(testId)).getValue();
+    const invoiceId = InvoiceId.create(new UniqueEntityID(testId));
 
     pausedReminderState = { invoiceId, confirmation: false, payment: false };
-    pausedReminderState = await mockPausedReminderRepo.save(
+
+    const maybePausedReminderState = await mockPausedReminderRepo.save(
       pausedReminderState
     );
+
+    if (maybePausedReminderState.isLeft()) {
+      throw maybePausedReminderState.value;
+    }
+
+    pausedReminderState = maybePausedReminderState.value;
   }
 );
 When(
@@ -94,15 +105,15 @@ When(
 
 Then(/^I should receive reminders/, () => {
   expect(response.isRight()).to.be.true;
-  expect(response.value.getValue())
-    .to.have.property('confirmation')
-    .to.equal(false);
-  expect(response.value.getValue()).to.have.property('payment').to.equal(false);
+  expect(response.value).to.have.property('confirmation').to.equal(false);
+  expect(response.value).to.have.property('payment').to.equal(false);
 });
 
 Then(/^I should obtain an error that the pause state does not exist/, () => {
-  expect(response.value.isFailure).to.equal(true);
-  expect(response.value.error)
+  expect(response.isLeft()).to.equal(true);
+  expect(response.value)
     .to.have.property('message')
-    .to.equal('While getting the pause state an error ocurred: does not exist');
+    .to.equal(
+      'While getting the pause state an error ocurred: Entity(pause) with id[nostate-invoice] not found'
+    );
 });

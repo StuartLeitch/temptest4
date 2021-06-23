@@ -1,30 +1,32 @@
+import { Before, After, Given, When, Then } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
-// import { ValidateVATErrors } from './../../../../../../src/lib/modules/invoices/usecases/validateVAT/validateVATErrors';
-import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
-import { InvoiceItem } from '../../../../../../src/lib/modules/invoices/domain/InvoiceItem';
 import { UsecaseAuthorizationContext } from '../../../../../../src/lib/domain/authorization';
 
-import { ValidateVATUsecase } from '../../../../../../src/lib/modules/invoices/usecases/validateVAT/validateVAT';
-import { VATService } from '../../../../../../src/lib/domain/services/VATService';
-import { setupVatService } from '../../../../../../src/lib/domain/services/mocks/VatSoapClient';
-
+import { InvoiceItem } from '../../../../../../src/lib/modules/invoices/domain/InvoiceItem';
 import { Roles } from '../../../../../../src/lib/modules/users/domain/enums/Roles';
 import {
-  Invoice,
   InvoiceStatus,
+  Invoice,
 } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
+import {
+  PayerType,
+  Payer,
+} from '../../../../../../src/lib/modules/payers/domain/Payer';
+
+import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
+import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
+import { PayerMap } from '../../../../../../src/lib/modules/payers/mapper/Payer';
 
 import {
-  Payer,
-  PayerType,
-} from '../../../../../../src/lib/modules/payers/domain/Payer';
-import { PayerMap } from '../../../../../../src/lib/modules/payers/mapper/Payer';
-import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
+  ValidateVATResponse,
+  ValidateVATUsecase,
+} from '../../../../../../src/lib/modules/invoices/usecases/validateVAT';
+import { VATService } from '../../../../../../src/lib/domain/services/VATService';
 
-import { PoliciesRegister } from '../../../../../../src/lib/modules/invoices/domain/policies/PoliciesRegister';
 import { UKVATTreatmentArticleProcessingChargesPolicy } from '../../../../../../src/lib/modules/invoices/domain/policies/UKVATTreatmentArticleProcessingChargesPolicy';
+import { PoliciesRegister } from '../../../../../../src/lib/modules/invoices/domain/policies/PoliciesRegister';
+import { setupVatService } from '../../../../../../src/lib/domain/services/mocks/VatSoapClient';
 
 const vatService: VATService = new VATService();
 
@@ -41,7 +43,7 @@ let calculateVAT: any;
 let invoiceId: string;
 let payerId: string;
 let countryCode: string;
-let vatResponse: any;
+let vatResponse: ValidateVATResponse;
 let receivedTotalAmount: number;
 let VATNote: any;
 
@@ -111,28 +113,49 @@ Before({ tags: '@ValidateVAT' }, () => {
   Date = NewDate;
 });
 
-After({ tags: '@LegacyValidateVAT and @ValidateVAT' }, () => {
+After({ tags: '@LegacyValidateVAT or @ValidateVAT' }, () => {
   Date = oldDate;
 });
 
-Before(() => {
+Before({ tags: '@LegacyValidateVAT or @ValidateVAT' }, () => {
   payerId = 'test-payer';
   invoiceId = 'test-invoice';
-  payer = PayerMap.toDomain({
+  const maybePayer = PayerMap.toDomain({
     id: payerId,
     invoiceId,
     name: 'foo',
     type: PayerType.INSTITUTION,
   });
-  invoice = InvoiceMap.toDomain({
+
+  if (maybePayer.isLeft()) {
+    throw maybePayer.value;
+  }
+
+  payer = maybePayer.value;
+
+  const maybeInvoice = InvoiceMap.toDomain({
     id: invoiceId,
     status: InvoiceStatus.DRAFT,
     payerId: payer.payerId.id.toString(),
   });
-  invoiceItem = InvoiceItemMap.toDomain({
+
+  if (maybeInvoice.isLeft()) {
+    throw maybeInvoice.value;
+  }
+
+  invoice = maybeInvoice.value;
+
+  const maybeInvoiceItem = InvoiceItemMap.toDomain({
     invoiceId,
     manuscriptId: 'test-manuscript',
   });
+
+  if (maybeInvoiceItem.isLeft()) {
+    throw maybeInvoiceItem.value;
+  }
+
+  invoiceItem = maybeInvoiceItem.value;
+
   policiesRegister = new PoliciesRegister();
   setupVatService();
 });
@@ -216,28 +239,38 @@ When(/^The Payer VAT code (\d+) is checked$/, async (vatNumber: string) => {
     },
     defaultContext
   );
-  vatResponse = result.value;
+  vatResponse = result;
 });
 
 Then('The VAT code should be valid', async () => {
   if (
-    vatResponse.error &&
-    vatResponse.error.message === 'Service is currently unavailable'
+    vatResponse.isLeft() &&
+    vatResponse.value.message === 'Service is currently unavailable'
   ) {
-    expect(vatResponse.isSuccess).to.equal(false);
+    expect(vatResponse.isRight()).to.equal(false);
   } else {
-    expect(vatResponse.getValue().valid).to.equal(true);
+    if (vatResponse.isLeft()) {
+      throw vatResponse.value;
+    }
+    expect(vatResponse.isRight()).to.equal(true);
+    expect(vatResponse.value.valid).to.equal(true);
   }
 });
 
 Then('The VAT code should be invalid', async () => {
-  expect(vatResponse.getValue().valid).to.equal(false);
+  if (vatResponse.isLeft()) {
+    throw vatResponse.value;
+  }
+  expect(vatResponse.value.valid).to.equal(false);
 });
 
 Then('The VAT code-country should be invalid', async () => {
-  expect(vatResponse.isSuccess).to.equal(false);
+  expect(vatResponse.isRight()).to.equal(false);
 });
 
 Then(/^The VAT invalid message should be "(.*)"$/, (codeInvalid: string) => {
-  expect(vatResponse.error.message).to.equal(codeInvalid);
+  expect(vatResponse.isRight()).to.equal(false);
+  if (vatResponse.isLeft()) {
+    expect(vatResponse.value.message).to.equal(codeInvalid);
+  }
 });

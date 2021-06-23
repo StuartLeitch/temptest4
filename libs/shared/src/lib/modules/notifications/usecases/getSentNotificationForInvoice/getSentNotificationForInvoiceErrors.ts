@@ -1,26 +1,21 @@
 import { UseCaseError } from '../../../../core/logic/UseCaseError';
-import { Result } from '../../../../core/logic/Result';
 
-export class InvoiceIdRequired extends Result<UseCaseError> {
+export class InvoiceIdRequired extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Invoice id is required.`,
-    });
+    super(`Invoice id is required.`);
   }
 }
 
-export class EncounteredDbError extends Result<UseCaseError> {
+export class EncounteredDbError extends UseCaseError {
   constructor(id: string, e: Error) {
-    super(false, {
-      message: ` When accessing notifications by invoice id {${id}} an error was encountered: ${e.message}`,
-    });
+    super(
+      ` When accessing notifications by invoice id {${id}} an error was encountered: ${e.message}`
+    );
   }
 }
 
-export class InvoiceNotFoundError extends Result<UseCaseError> {
+export class InvoiceNotFoundError extends UseCaseError {
   constructor(id: string) {
-    super(false, {
-      message: `The invoice with id {${id}} was not found.`,
-    });
+    super(`The invoice with id {${id}} was not found.`);
   }
 }

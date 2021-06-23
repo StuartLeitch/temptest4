@@ -1,9 +1,9 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
 import { AllEpicOnArticlePublishedErrors } from './epicOnArticlePublishedErrors';
 
 export type EpicOnArticlePublishedResponse = Either<
   AllEpicOnArticlePublishedErrors | UnexpectedError,
-  Result<void>
+  void
 >;

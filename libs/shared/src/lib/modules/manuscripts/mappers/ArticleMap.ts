@@ -1,9 +1,13 @@
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either } from '../../../core/logic/Either';
+
 import { Mapper } from '../../../infrastructure/Mapper';
+
 import { Article } from '../domain/Article';
 
 export class ArticleMap extends Mapper<Article> {
-  public static toDomain(raw: any): Article {
+  public static toDomain(raw: any): Either<GuardFailure, Article> {
     const articleOrError = Article.create(
       {
         journalId: raw.journalId,
@@ -21,9 +25,7 @@ export class ArticleMap extends Mapper<Article> {
       new UniqueEntityID(raw.id)
     );
 
-    articleOrError.isFailure ? console.log(articleOrError) : '';
-
-    return articleOrError.isSuccess ? articleOrError.getValue() : null;
+    return articleOrError;
   }
 
   public static toPersistence(article: Article): any {

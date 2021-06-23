@@ -1,6 +1,7 @@
-import {ValueObject} from '../core/domain/ValueObject';
-import {Result} from '../core/logic/Result';
-import {Guard} from '../core/logic/Guard';
+import { Either, right, left } from '../core/logic/Either';
+import { GuardFailure } from '../core/logic/GuardFailure';
+import { ValueObject } from '../core/domain/ValueObject';
+import { Guard } from '../core/logic/Guard';
 
 interface FileProps {
   src: string;
@@ -23,12 +24,12 @@ export class File extends ValueObject<FileProps> {
     super(props);
   }
 
-  public static create(src: string, name: string): Result<File> {
+  public static create(src: string, name: string): Either<GuardFailure, File> {
     const guardResult = Guard.againstNullOrUndefined(src, 'source');
     if (!guardResult.succeeded) {
-      return Result.fail<File>(guardResult.message);
+      return left(new GuardFailure(guardResult.message));
     } else {
-      return Result.ok<File>(new File({src, name}));
+      return right(new File({ src, name }));
     }
   }
 }

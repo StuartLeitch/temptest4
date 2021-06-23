@@ -1,28 +1,22 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { Result, left, right, Either } from '../../../../core/logic/Result';
+import { Either, right, left } from '../../../../core/logic/Either';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
+import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
-import { map } from '../../../../core/logic/EitherMap';
-import { chain } from '../../../../core/logic/EitherChain';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+
+// * Usecase specific
+import { CouponId } from '../../domain/CouponId';
+import { Coupon } from '../../domain/Coupon';
 
 import { CouponRepoContract } from '../../repos/couponRepo';
 
-// * Usecase specific
 import { UpdateCouponResponse } from './updateCouponResponse';
-import { UpdateCouponErrors } from './updateCouponErrors';
 import { UpdateCouponDTO } from './updateCouponDTO';
-
-import { CouponId } from '../../domain/CouponId';
-import { Coupon } from '../../domain/Coupon';
+import * as Errors from './updateCouponErrors';
 
 import {
   sanityChecksRequestParameters,
@@ -36,56 +30,59 @@ export class UpdateCouponUsecase
       UpdateCouponDTO,
       Promise<UpdateCouponResponse>,
       UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      UpdateCouponDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
     > {
-  constructor(private couponRepo: CouponRepoContract) {}
+  constructor(private couponRepo: CouponRepoContract) {
+    this.getCouponWithInput = this.getCouponWithInput.bind(this);
+    this.saveCoupon = this.saveCoupon.bind(this);
+  }
 
-  // @Authorize('coupon:update')
   public async execute(
     request: UpdateCouponDTO,
     context?: UsecaseAuthorizationContext
   ): Promise<UpdateCouponResponse> {
-    const maybeValidInput = sanityChecksRequestParameters(request);
+    const maybeCoupon = await new AsyncEither(request)
+      .then(sanityChecksRequestParameters)
+      .then(this.getCouponWithInput)
+      .map(updateCoupon)
+      .then(this.saveCoupon)
+      .execute();
 
-    const maybeCouponWithInput = ((await chain(
-      [this.getCouponWithInput.bind(this)],
-      maybeValidInput
-    )) as unknown) as Either<UpdateCouponErrors.InvalidId, UpdateCouponData>;
-
-    const maybeUpdatedCoupon = maybeCouponWithInput.map(updateCoupon);
-
-    const response = await map(
-      [this.saveCoupon.bind(this)],
-      maybeUpdatedCoupon
-    );
-
-    return (response as unknown) as UpdateCouponResponse;
-  }
-
-  private async getAccessControlContext(request, context?) {
-    return {};
+    return maybeCoupon;
   }
 
   private async getCouponWithInput(
     request: UpdateCouponDTO
-  ): Promise<Either<UpdateCouponErrors.InvalidId, UpdateCouponData>> {
+  ): Promise<
+    Either<Errors.CouponNotFoundError | GuardFailure, UpdateCouponData>
+  > {
     const couponId = CouponId.create(new UniqueEntityID(request.id));
-    const coupon = await this.couponRepo.getCouponById(couponId.getValue());
 
-    if (!coupon) {
-      return left(new UpdateCouponErrors.InvalidId(request.id));
+    const maybeCoupon = await this.couponRepo.getCouponById(couponId);
+
+    if (maybeCoupon.isLeft()) {
+      return left(new Errors.CouponNotFoundError(request.id));
     }
 
-    return right({ coupon, request });
+    return right({ coupon: maybeCoupon.value, request });
   }
 
-  private async saveCoupon(coupon: Coupon): Promise<Result<Coupon>> {
-    const savedCoupon = await this.couponRepo.update(coupon);
+  private async saveCoupon(
+    coupon: Coupon
+  ): Promise<Either<Errors.CouldNotSaveCouponError, Coupon>> {
+    try {
+      const savedCoupon = await this.couponRepo.update(coupon);
 
-    return Result.ok(savedCoupon);
+      if (savedCoupon.isLeft()) {
+        return left(
+          new Errors.CouldNotSaveCouponError(
+            new Error(savedCoupon.value.message)
+          )
+        );
+      }
+
+      return right(savedCoupon.value);
+    } catch (e) {
+      return left(new Errors.CouldNotSaveCouponError(e));
+    }
   }
 }

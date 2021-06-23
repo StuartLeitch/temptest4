@@ -1,6 +1,7 @@
-import {AggregateRoot} from '../../../core/domain/AggregateRoot';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
-import {Result} from '../../../core/logic/Result';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either, right } from '../../../core/logic/Either';
 
 type REDUCTION_REASONS = 'Editor' | 'System';
 
@@ -26,7 +27,7 @@ export class Reduction extends AggregateRoot<ReductionProps> {
   public static create(
     props: ReductionProps,
     id?: UniqueEntityID
-  ): Result<Reduction> {
+  ): Either<GuardFailure, Reduction> {
     // const propsResult = Guard.againstNullOrUndefinedBulk([
     //   {argument: props.album, argumentName: 'album'},
     //   {argument: props.artist, argumentName: 'artist'},
@@ -37,7 +38,7 @@ export class Reduction extends AggregateRoot<ReductionProps> {
     // }
     const reduction = new Reduction(
       {
-        ...props
+        ...props,
       },
       id
     );
@@ -45,6 +46,6 @@ export class Reduction extends AggregateRoot<ReductionProps> {
     // if (isNewlyCreated) {
     //   vinyl.addDomainEvent(new VinylCreatedEvent(vinyl.vinylId));
     // }
-    return Result.ok<Reduction>(reduction);
+    return right(reduction);
   }
 }

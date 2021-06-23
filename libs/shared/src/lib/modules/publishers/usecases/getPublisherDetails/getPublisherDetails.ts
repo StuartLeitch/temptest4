@@ -1,65 +1,43 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
-import { UnexpectedError } from '../../../../core/logic/AppError';
-import { Result, left, right } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { UnexpectedError } from '../../../../core/logic/AppError';
+import { right, left } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+
+import { PublisherId } from '../../domain/PublisherId';
 
 import { PublisherRepoContract } from '../../repos';
 
 // * Usecase specific
-import { GetPublisherDetailsResponse } from './getPublisherDetailsResponse';
-import { GetPublisherDetailsErrors } from './getPublisherDetailsErrors';
-import { GetPublisherDetailsDTO } from './getPublisherDetailsDTO';
-import { PublisherId } from '../../domain/PublisherId';
+import { GetPublisherDetailsResponse as Response } from './getPublisherDetailsResponse';
+import { GetPublisherDetailsDTO as DTO } from './getPublisherDetailsDTO';
+import * as Errors from './getPublisherDetailsErrors';
 
 export class GetPublisherDetailsUsecase
-  implements
-    UseCase<
-      GetPublisherDetailsDTO,
-      Promise<GetPublisherDetailsResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      GetPublisherDetailsDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private publisherRepo: PublisherRepoContract) {}
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  // @Authorize('invoice:read')
-  public async execute(
-    request: GetPublisherDetailsDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<GetPublisherDetailsResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      const id = PublisherId.create(
-        new UniqueEntityID(request.publisherId)
-      ).getValue();
+      const id = PublisherId.create(new UniqueEntityID(request.publisherId));
 
       const exists = await this.publisherRepo.publisherWithIdExists(id);
       if (!exists) {
+        return left(new Errors.PublisherNotFoundError(request.publisherId));
+      }
+
+      const maybePublisher = await this.publisherRepo.getPublisherById(id);
+
+      if (maybePublisher.isLeft()) {
         return left(
-          new GetPublisherDetailsErrors.PublisherNotFoundError(
-            request.publisherId
-          )
+          new UnexpectedError(new Error(maybePublisher.value.message))
         );
       }
 
-      const publisher = await this.publisherRepo.getPublisherById(id);
-      return right(Result.ok(publisher));
+      return right(maybePublisher.value);
     } catch (e) {
       return left(new UnexpectedError(e));
     }

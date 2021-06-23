@@ -1,58 +1,24 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
-import { Result, left, right } from '../../../../core/logic/Result';
-
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { CreatePayerResponse } from './createPayerResponse';
-
-import { PayerRepoContract } from '../../repos/payerRepo';
-import { PayerMap } from '../../mapper/Payer';
+import { left, right } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 
-import { Payer } from '../../domain/Payer';
+import { PayerMap } from '../../mapper/Payer';
 
-export interface CreatePayerRequestDTO {
-  invoiceId: string;
-  type: string;
-  name: string;
-  email?: string;
-  vatId?: string;
-  organization?: string;
-  addressId?: string;
-}
+import { PayerRepoContract } from '../../repos/payerRepo';
+
+import { CreatePayerResponse as Response } from './createPayerResponse';
+import { CreatePayerRequestDTO as DTO } from './createPayerDTO';
+import * as Errors from './createPayerErrors';
 
 export class CreatePayerUsecase
-  implements
-    UseCase<
-      CreatePayerRequestDTO,
-      Promise<CreatePayerResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      CreatePayerRequestDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private payerRepo: PayerRepoContract) {}
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  // ! Disable authorization for now!
-  // @Authorize('payer:create')
-  public async execute(
-    request: CreatePayerRequestDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<CreatePayerResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const {
       name,
       type,
@@ -63,10 +29,8 @@ export class CreatePayerUsecase
       organization,
     } = request;
 
-    let payer: Payer;
-
     try {
-      payer = PayerMap.toDomain({
+      const maybePayer = PayerMap.toDomain({
         invoiceId,
         name,
         email,
@@ -76,9 +40,13 @@ export class CreatePayerUsecase
         organization,
       });
 
-      await this.payerRepo.save(payer);
+      if (maybePayer.isLeft()) {
+        return left(new Errors.NotAbleToCreatePayerError(invoiceId));
+      }
 
-      return right(Result.ok<Payer>(payer));
+      await this.payerRepo.save(maybePayer.value);
+
+      return right(maybePayer.value);
     } catch (err) {
       return left(new UnexpectedError(err));
     }

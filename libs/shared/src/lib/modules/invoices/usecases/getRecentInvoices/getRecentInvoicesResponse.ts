@@ -1,6 +1,4 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../.././core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
-// import { InvoiceCollection } from '../../domain/Invoice';
-
-export type GetRecentInvoicesResponse = Either<UnexpectedError, Result<any>>;
+export type GetRecentInvoicesResponse = Either<UnexpectedError, any>;

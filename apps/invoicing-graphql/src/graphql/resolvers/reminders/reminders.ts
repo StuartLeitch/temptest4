@@ -31,10 +31,10 @@ export const reminders: Resolvers<any> = {
       );
 
       if (maybePauseState.isLeft()) {
-        throw new Error(maybePauseState.value.errorValue().message);
+        throw new Error(maybePauseState.value.message);
       }
 
-      return maybePauseState.value.getValue();
+      return maybePauseState.value;
     },
 
     async remindersSent(parent, args, context) {
@@ -60,10 +60,10 @@ export const reminders: Resolvers<any> = {
       );
 
       if (maybeSentNotifications.isLeft()) {
-        throw new Error(maybeSentNotifications.value.errorValue().message);
+        throw new Error(maybeSentNotifications.value.message);
       }
 
-      return maybeSentNotifications.value.getValue().map((reminder) => ({
+      return maybeSentNotifications.value.map((reminder) => ({
         type: (reminder.type as unknown) as ReminderType,
         forInvoice: reminder.invoiceId.id.toString(),
         toEmail: reminder.recipientEmail,
@@ -101,10 +101,10 @@ export const reminders: Resolvers<any> = {
       const result = maybeUpdate.chain(() => maybeNewPauseState);
 
       if (result.isLeft()) {
-        throw new Error(result.value.errorValue().message);
+        throw new Error(result.value.message);
       }
 
-      return result.value.getValue();
+      return result.value;
     },
 
     async togglePausePaymentReminders(parent, args, context) {
@@ -132,10 +132,10 @@ export const reminders: Resolvers<any> = {
       const result = maybeUpdate.chain(() => maybeNewPauseState);
 
       if (result.isLeft()) {
-        throw new Error(result.value.errorValue().message);
+        throw new Error(result.value.message);
       }
 
-      return result.value.getValue();
+      return result.value;
     },
   },
 };

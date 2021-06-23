@@ -1,16 +1,23 @@
+import { Either, flatten, right, left } from '../../../../core/logic/Either';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { Knex, TABLES } from '../../../../infrastructure/database/knex';
-import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
-import { JournalId } from './../../domain/JournalId';
-import { CatalogRepoContract } from './../catalogRepo';
-import { CatalogMap } from './../../mappers/CatalogMap';
-import { CatalogItem } from './../../domain/CatalogItem';
+import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
+import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 import { RepoError } from '../../../../infrastructure/RepoError';
 
-export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
+import { CatalogItem } from './../../domain/CatalogItem';
+import { CatalogMap } from './../../mappers/CatalogMap';
+import { JournalId } from './../../domain/JournalId';
+
+import { CatalogRepoContract } from './../catalogRepo';
+
+export class KnexCatalogRepo
+  extends AbstractBaseDBRepo<Knex, CatalogItem>
   implements CatalogRepoContract {
-  async getCatalogItemById(catalogId: UniqueEntityID): Promise<CatalogItem> {
+  async getCatalogItemById(
+    catalogId: UniqueEntityID
+  ): Promise<Either<GuardFailure | RepoError, CatalogItem>> {
     const { db } = this;
 
     const catalogItem = await db(TABLES.CATALOG)
@@ -18,52 +25,55 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
       .first();
 
     if (!catalogItem) {
-      throw RepoError.createEntityNotFoundError(
-        'catalogItem',
-        catalogItem.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError(
+          'catalogItem',
+          catalogItem.id.toString()
+        )
       );
     }
 
     return CatalogMap.toDomain(catalogItem);
   }
 
-  async exists(catalogItem: CatalogItem): Promise<boolean> {
+  async exists(
+    catalogItem: CatalogItem
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     try {
       const c = await this.getCatalogItemById(catalogItem.id);
-      return !!c;
+      return right(!!c);
     } catch (error) {
       // ! do nothing yet
+      return left(RepoError.fromDBError(error));
     }
-
-    return false;
   }
 
-  async save(catalogItem: CatalogItem): Promise<CatalogItem> {
+  async save(
+    catalogItem: CatalogItem
+  ): Promise<Either<GuardFailure | RepoError, CatalogItem>> {
     const { db } = this;
 
-    await db(TABLES.CATALOG).insert(CatalogMap.toPersistence(catalogItem));
-
-    return catalogItem;
+    try {
+      await db(TABLES.CATALOG).insert(CatalogMap.toPersistence(catalogItem));
+      return right(catalogItem);
+    } catch (err) {
+      return left(RepoError.fromDBError(err));
+    }
   }
 
-  async getCatalogCollection(): Promise<CatalogItem[]> {
+  async getCatalogCollection(): Promise<
+    Either<GuardFailure | RepoError, CatalogItem[]>
+  > {
     const { db } = this;
 
-    const catalogsRows = await db(TABLES.CATALOG);
+    const catalogsRows: Array<any> = await db(TABLES.CATALOG);
 
-    return catalogsRows.reduce((aggregator: any[], t) => {
-      aggregator.push(CatalogMap.toDomain(t));
-      return aggregator;
-    }, []);
+    return flatten(catalogsRows.map(CatalogMap.toDomain));
   }
 
-  async getCatalogItemByType(type = 'APC'): Promise<CatalogItem> {
-    const { db } = this;
-
-    return await db(TABLES.CATALOG).where({ type }).first();
-  }
-
-  async getCatalogItemByJournalId(journalId: JournalId): Promise<CatalogItem> {
+  async getCatalogItemByJournalId(
+    journalId: JournalId
+  ): Promise<Either<GuardFailure | RepoError, CatalogItem>> {
     const { db } = this;
 
     const journal = await db(TABLES.CATALOG)
@@ -71,16 +81,20 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
       .first();
 
     if (!journal) {
-      throw RepoError.createEntityNotFoundError(
-        'catalogItem',
-        journalId.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError(
+          'catalogItem',
+          journalId.id.toString()
+        )
       );
     }
 
     return CatalogMap.toDomain(journal);
   }
 
-  async updateCatalogItem(catalogItem: CatalogItem): Promise<CatalogItem> {
+  async updateCatalogItem(
+    catalogItem: CatalogItem
+  ): Promise<Either<GuardFailure | RepoError, CatalogItem>> {
     const { db, logger } = this;
 
     const updatedSQL = db(TABLES.CATALOG)
@@ -93,12 +107,14 @@ export class KnexCatalogRepo extends AbstractBaseDBRepo<Knex, CatalogItem>
 
     const updated = await updatedSQL;
     if (!updated) {
-      throw RepoError.createEntityNotFoundError(
-        'invoice',
-        catalogItem.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError(
+          'invoice',
+          catalogItem.id.toString()
+        )
       );
     }
 
-    return catalogItem;
+    return this.getCatalogItemById(catalogItem.id);
   }
 }

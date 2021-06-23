@@ -1,18 +1,23 @@
-import { Knex, TABLES } from '../../../../infrastructure/database/knex';
+import { Either, flatten, right, left } from '../../../../core/logic/Either';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
+
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { RepoErrorCode, RepoError } from '../../../../infrastructure/RepoError';
+import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 
-import { PaymentMethodMap } from './../../mapper/PaymentMethod';
-import { PaymentMethodRepoContract } from './../paymentMethodRepo';
 import { PaymentMethodId } from './../../domain/PaymentMethodId';
 import { PaymentMethod } from './../../domain/PaymentMethod';
+
+import { PaymentMethodMap } from './../../mapper/PaymentMethod';
+
+import { PaymentMethodRepoContract } from './../paymentMethodRepo';
 
 export class KnexPaymentMethodRepo
   extends AbstractBaseDBRepo<Knex, PaymentMethod>
   implements PaymentMethodRepoContract {
   async getPaymentMethodById(
     paymentMethodId: PaymentMethodId
-  ): Promise<PaymentMethod> {
+  ): Promise<Either<GuardFailure | RepoError, PaymentMethod>> {
     const { db } = this;
 
     const paymentMethodRow = await db(TABLES.PAYMENT_METHODS)
@@ -21,9 +26,11 @@ export class KnexPaymentMethodRepo
       .first();
 
     if (!paymentMethodRow) {
-      throw RepoError.createEntityNotFoundError(
-        'payment-method',
-        paymentMethodId.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError(
+          'payment-method',
+          paymentMethodId.id.toString()
+        )
       );
     }
 
@@ -32,7 +39,7 @@ export class KnexPaymentMethodRepo
 
   async getPaymentMethodByName(
     paymentMethodName: string
-  ): Promise<PaymentMethod> {
+  ): Promise<Either<GuardFailure | RepoError, PaymentMethod>> {
     const { db } = this;
 
     const paymentMethodRow = await db(TABLES.PAYMENT_METHODS)
@@ -41,16 +48,17 @@ export class KnexPaymentMethodRepo
       .first();
 
     if (!paymentMethodRow) {
-      throw RepoError.createEntityNotFoundError(
-        'payment-method',
-        paymentMethodName
+      return left(
+        RepoError.createEntityNotFoundError('payment-method', paymentMethodName)
       );
     }
 
     return PaymentMethodMap.toDomain(paymentMethodRow);
   }
 
-  async save(paymentMethod: PaymentMethod): Promise<PaymentMethod> {
+  async save(
+    paymentMethod: PaymentMethod
+  ): Promise<Either<GuardFailure | RepoError, PaymentMethod>> {
     const { db } = this;
 
     try {
@@ -58,13 +66,15 @@ export class KnexPaymentMethodRepo
         PaymentMethodMap.toPersistence(paymentMethod)
       );
     } catch (e) {
-      throw RepoError.fromDBError(e);
+      return left(RepoError.fromDBError(e));
     }
 
     return this.getPaymentMethodById(paymentMethod.paymentMethodId);
   }
 
-  async getPaymentMethods(): Promise<PaymentMethod[]> {
+  async getPaymentMethods(): Promise<
+    Either<GuardFailure | RepoError, PaymentMethod[]>
+  > {
     const { db, logger } = this;
 
     const paymentMethodsSelect = db(TABLES.PAYMENT_METHODS).select();
@@ -78,45 +88,46 @@ export class KnexPaymentMethodRepo
     });
 
     try {
-      return (await paymentMethodsSelect).map(PaymentMethodMap.toDomain);
+      const selection = await paymentMethodsSelect;
+      return flatten(selection.map(PaymentMethodMap.toDomain));
     } catch (e) {
-      throw RepoError.fromDBError(e);
+      return left(RepoError.fromDBError(e));
     }
   }
 
-  async getPaymentMethodCollection(): Promise<PaymentMethod[]> {
+  async getPaymentMethodCollection(): Promise<
+    Either<GuardFailure | RepoError, PaymentMethod[]>
+  > {
     const { db } = this;
     let paymentMethods: any[];
 
     try {
       paymentMethods = await db(TABLES.PAYMENT_METHODS).select();
       if (!paymentMethods) {
-        throw new Error('No payment methods available!');
+        return left(
+          RepoError.createEntityNotFoundError('payment methods', null)
+        );
       }
     } catch (e) {
-      throw RepoError.fromDBError(e);
+      return left(RepoError.fromDBError(e));
     }
 
-    return paymentMethods.map((paymentMethod) =>
-      PaymentMethodMap.toDomain(paymentMethod)
-    );
+    return flatten(paymentMethods.map(PaymentMethodMap.toDomain));
   }
 
-  async exists(paymentMethod: PaymentMethod): Promise<boolean> {
+  async exists(
+    paymentMethod: PaymentMethod
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     try {
       await this.getPaymentMethodById(paymentMethod.paymentMethodId);
     } catch (e) {
       if (e.code === RepoErrorCode.ENTITY_NOT_FOUND) {
-        return false;
+        return right(false);
       }
 
-      throw e;
+      return left(RepoError.fromDBError(e));
     }
 
-    return true;
-  }
-
-  public setCorrelation(correlation: string) {
-    // do nothing yet
+    return right(true);
   }
 }

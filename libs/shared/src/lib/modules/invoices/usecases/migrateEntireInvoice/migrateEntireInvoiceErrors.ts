@@ -1,5 +1,4 @@
 import { UseCaseError } from '../../../../core/logic/UseCaseError';
-import { Result } from '../../../../core/logic/Result';
 
 export type AllMigrateEntireInvoiceErrors =
   | MigrationPaymentMethodNotFound
@@ -57,138 +56,112 @@ enum MtsInvoiceStatus {
   Paid = 'Paid',
 }
 
-export class ManuscriptIdRequired extends Result<UseCaseError> {
+export class ManuscriptIdRequired extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Manuscript id is required.`,
-    });
+    super(`Manuscript id is required.`);
   }
 }
 
-export class InvoiceSaveFailed extends Result<UseCaseError> {
+export class InvoiceSaveFailed extends UseCaseError {
   constructor(invoiceId: string, err: Error) {
-    super(false, {
-      message: `Saving invoice with id {${invoiceId}} encountered error: ${err}.`,
-    });
+    super(`Saving invoice with id {${invoiceId}} encountered error: ${err}.`);
   }
 }
 
-export class InvoiceIdRequired extends Result<UseCaseError> {
+export class InvoiceIdRequired extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Invoice id is required.`,
-    });
+    super(`Invoice id is required.`);
   }
 }
 
-export class ManuscriptNotFound extends Result<UseCaseError> {
+export class ManuscriptNotFound extends UseCaseError {
   constructor(id: string) {
-    super(false, {
-      message: `The Manuscript with id {${id}} does not exists.`,
-    });
+    super(`The Manuscript with id {${id}} does not exists.`);
   }
 }
 
-export class PayerAddressRequired extends Result<UseCaseError> {
+export class PayerAddressRequired extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Address of payer is required, with the following fields: addressLine1, countryCode, city, postalCode, state (if country is US) and optionally addressLine2 `,
-    });
+    super(
+      `Address of payer is required, with the following fields: addressLine1, countryCode, city, postalCode, state (if country is US) and optionally addressLine2 `
+    );
   }
 }
 
-export class MigrationPaymentMethodNotFound extends Result<UseCaseError> {
+export class MigrationPaymentMethodNotFound extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Migration payment method not found.`,
-    });
+    super(`Migration payment method not found.`);
   }
 }
 
-export class StateIsRequiredForUnitedStates extends Result<UseCaseError> {
+export class StateIsRequiredForUnitedStates extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `State is required in address for when the country code is {US}.`,
-    });
+    super(`State is required in address for when the country code is {US}.`);
   }
 }
 
-export class CountryCodeRequired extends Result<UseCaseError> {
+export class CountryCodeRequired extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Country Code is required for payer address.`,
-    });
+    super(`Country Code is required for payer address.`);
   }
 }
 
-export class PostalCodeRequired extends Result<UseCaseError> {
+export class PostalCodeRequired extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Postal code is required for payer address.`,
-    });
+    super(`Postal code is required for payer address.`);
   }
 }
 
-export class AddressLine1Required extends Result<UseCaseError> {
+export class AddressLine1Required extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Address line 1 is required for payer address.`,
-    });
+    super(`Address line 1 is required for payer address.`);
   }
 }
 
-export class CityRequired extends Result<UseCaseError> {
+export class CityRequired extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `City is required for payer address.`,
-    });
+    super(`City is required for payer address.`);
   }
 }
 
-export class PayerTypeRequired extends Result<UseCaseError> {
+export class PayerTypeRequired extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Payer type is required.`,
-    });
+    super(`Payer type is required.`);
   }
 }
 
-export class IncorrectPayerType extends Result<UseCaseError> {
+export class IncorrectPayerType extends UseCaseError {
   constructor(type: string) {
-    super(false, {
-      message: `The provided payer type {${type}} is incorrect, it must be "INDIVIDUAL" or "INSTITUTION".`,
-    });
+    super(
+      `The provided payer type {${type}} is incorrect, it must be "INDIVIDUAL" or "INSTITUTION".`
+    );
   }
 }
 
-export class ApcRequired extends Result<UseCaseError> {
+export class ApcRequired extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `APC is required, with the following fields: manuscriptId, price, vat and discount.`,
-    });
+    super(
+      `APC is required, with the following fields: manuscriptId, price, vat and discount.`
+    );
   }
 }
 
-export class PayerNameRequired extends Result<UseCaseError> {
+export class PayerNameRequired extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Payer name is required, it must contain First Name and Last Name.`,
-    });
+    super(`Payer name is required, it must contain First Name and Last Name.`);
   }
 }
 
-export class TransactionError extends Result<UseCaseError> {
+export class TransactionError extends UseCaseError {
   constructor(message: string) {
-    super(false, {
-      message,
-    });
+    super(message);
   }
 }
 
-export class AddingMigrationWaiverError extends Result<UseCaseError> {
+export class AddingMigrationWaiverError extends UseCaseError {
   constructor(id: string, err: Error) {
-    super(false, {
-      message: `While adding the migration waiver for invoice with id {${id}} an error was encountered: ${err.message}. Stack: ${err.stack}`,
-    });
+    super(
+      `While adding the migration waiver for invoice with id {${id}} an error was encountered: ${err.message}. Stack: ${err.stack}`
+    );
   }
 }

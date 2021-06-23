@@ -1,15 +1,15 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
 import { InvoicePaymentInfo } from '../../../invoices/domain/InvoicePaymentInfo';
 
-import * as GetPaymentInfoErrors from './getPaymentInfoErrors';
+import * as Errors from './getPaymentInfoErrors';
 
 export type GetPaymentInfoResponse = Either<
-  | GetPaymentInfoErrors.InvoiceIdRequiredError
-  | GetPaymentInfoErrors.InvoiceNotFoundError
-  | GetPaymentInfoErrors.NoPaymentFoundError
-  | GetPaymentInfoErrors.PaymentInfoDbError
+  | Errors.InvoiceIdRequiredError
+  | Errors.InvoiceNotFoundError
+  | Errors.NoPaymentFoundError
+  | Errors.PaymentInfoDbError
   | UnexpectedError,
-  Result<InvoicePaymentInfo>
+  InvoicePaymentInfo
 >;

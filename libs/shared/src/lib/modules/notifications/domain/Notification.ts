@@ -1,15 +1,16 @@
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either, right } from '../../../core/logic/Either';
 
 import { InvoiceId } from '../../invoices/domain/InvoiceId';
 import { NotificationId } from './NotificationId';
-import { Result } from '../../../core/logic/Result';
 
 export enum NotificationType {
   REMINDER_CONFIRMATION = 'REMINDER_CONFIRMATION',
   SANCTIONED_COUNTRY = 'SANCTIONED_COUNTRY',
   REMINDER_PAYMENT = 'REMINDER_PAYMENT',
-  INVOICE_CREATED = 'INVOICE_CREATED'
+  INVOICE_CREATED = 'INVOICE_CREATED',
 }
 
 export interface NotificationProps {
@@ -21,7 +22,7 @@ export interface NotificationProps {
 
 export class Notification extends AggregateRoot<NotificationProps> {
   get notificationId(): NotificationId {
-    return NotificationId.create(this._id).getValue();
+    return NotificationId.create(this._id);
   }
 
   get type(): NotificationType {
@@ -47,14 +48,14 @@ export class Notification extends AggregateRoot<NotificationProps> {
   public static create(
     props: NotificationProps,
     id?: UniqueEntityID
-  ): Result<Notification> {
+  ): Either<GuardFailure, Notification> {
     const defaultValues: NotificationProps = {
       dateSent: new Date(),
-      ...props
+      ...props,
     };
 
     const notification = new Notification(defaultValues, id);
 
-    return Result.ok(notification);
+    return right(notification);
   }
 }

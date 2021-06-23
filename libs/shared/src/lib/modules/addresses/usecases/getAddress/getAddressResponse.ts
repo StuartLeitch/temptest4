@@ -1,5 +1,11 @@
-import { Address } from '../../domain/Address';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { Either, Result } from '../../../../core/logic/Result';
+import { Either } from '../../../../core/logic/Either';
 
-export type GetAddressResponse = Either<UnexpectedError, Result<Address>>;
+import { Address } from '../../domain/Address';
+
+import * as Errors from './getAddressErrors';
+
+export type GetAddressResponse = Either<
+  Errors.AddressNotFoundError | UnexpectedError,
+  Address
+>;

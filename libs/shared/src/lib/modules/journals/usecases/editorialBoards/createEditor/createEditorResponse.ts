@@ -1,9 +1,10 @@
+import { GuardFailure } from '../../../../../core/logic/GuardFailure';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
-import { Either, Result } from '../../../../../core/logic/Result';
+import { Either } from '../../../../../core/logic/Either';
 
-import { CreateEditorErrors } from './createEditorErrors';
+import * as Errors from './createEditorErrors';
 
 export type CreateEditorResponse = Either<
-  CreateEditorErrors.JournalDoesntExistError | UnexpectedError | Result<any>,
-  Result<void>
+  Errors.JournalDoesntExistError | UnexpectedError,
+  void
 >;

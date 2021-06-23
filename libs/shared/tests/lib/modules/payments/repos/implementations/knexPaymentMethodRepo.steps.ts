@@ -1,6 +1,10 @@
 import { expect } from 'chai';
 import { Given, When, Then, Before } from '@cucumber/cucumber';
 
+import { GuardFailure } from '../../../../../../src/lib/core/logic/GuardFailure';
+import { RepoError } from '../../../../../../src/lib/infrastructure/RepoError';
+import { Either } from '../../../../../../src/lib/core/logic/Either';
+
 import { PaymentMethodId } from '../../../../../../src/lib/modules/payments/domain/PaymentMethodId';
 import { PaymentMethodMap } from '../../../../../../src/lib/modules/payments/mapper/PaymentMethod';
 import { PaymentMethod } from '../../../../../../src/lib/modules/payments/domain/PaymentMethod';
@@ -8,23 +12,35 @@ import { UniqueEntityID } from './../../../../../../src/lib/core/domain/UniqueEn
 
 import { MockPaymentMethodRepo } from './../../../../../../src/lib/modules/payments/repos/mocks/mockPaymentMethodRepo';
 
+let maybeFoundPaymentMethod: Either<GuardFailure | RepoError, PaymentMethod>;
 let mockPaymentMethodRepo: MockPaymentMethodRepo;
+let savePaymentMethod: PaymentMethod;
 let paymentMethod: PaymentMethod;
-let foundPayment: PaymentMethod;
 let paymentMethodExists: boolean;
-let savePaymentMethod;
+let foundPayment: PaymentMethod;
 
 function makePaymentMethodData(overwrites?: any): PaymentMethod {
-  return PaymentMethodMap.toDomain({
+  const paymentMethod = PaymentMethodMap.toDomain({
     name: 'Credit Card',
     isActive: true,
     paymentProof: {},
     ...overwrites,
   });
+
+  if (paymentMethod.isLeft()) {
+    throw paymentMethod.value;
+  }
+
+  return paymentMethod.value;
 }
 
-Before(async () => {
+Before({ tags: '@ValidateKnexPaymentMethodRepo' }, async () => {
   mockPaymentMethodRepo = new MockPaymentMethodRepo();
+  maybeFoundPaymentMethod = null;
+  paymentMethodExists = null;
+  savePaymentMethod = null;
+  paymentMethod = null;
+  foundPayment = null;
 });
 
 Given(
@@ -41,9 +57,16 @@ When(
     const paymentMethodIdObj = PaymentMethodId.create(
       new UniqueEntityID(paymentMethodId)
     );
-    foundPayment = await mockPaymentMethodRepo.getPaymentMethodById(
+
+    const maybeFoundPayment = await mockPaymentMethodRepo.getPaymentMethodById(
       paymentMethodIdObj
     );
+
+    if (maybeFoundPayment.isLeft()) {
+      throw maybeFoundPayment.value;
+    }
+
+    foundPayment = maybeFoundPayment.value;
   }
 );
 
@@ -55,7 +78,14 @@ When(
   /^we call getPaymentMethodById for an un-existent payment method "([\w-]+)"$/,
   async (wrongPaymentMethodId: string) => {
     const id = PaymentMethodId.create(new UniqueEntityID(wrongPaymentMethodId));
-    foundPayment = await mockPaymentMethodRepo.getPaymentMethodById(id);
+
+    maybeFoundPaymentMethod = await mockPaymentMethodRepo.getPaymentMethodById(
+      id
+    );
+
+    if (maybeFoundPaymentMethod.isRight()) {
+      foundPayment = maybeFoundPaymentMethod.value;
+    }
   }
 );
 
@@ -67,15 +97,35 @@ When(
   /^we call exists for ([\w-]+) payment method id$/,
   async (paymentMethodId: string) => {
     const id = PaymentMethodId.create(new UniqueEntityID(paymentMethodId));
-    foundPayment = await mockPaymentMethodRepo.getPaymentMethodById(id);
-    if (!foundPayment) {
-      foundPayment = await makePaymentMethodData({ id: paymentMethodId });
+
+    maybeFoundPaymentMethod = await mockPaymentMethodRepo.getPaymentMethodById(
+      id
+    );
+
+    if (maybeFoundPaymentMethod.isRight()) {
+      foundPayment = maybeFoundPaymentMethod.value;
+
+      if (!foundPayment) {
+        foundPayment = makePaymentMethodData({ id: paymentMethodId });
+      }
+
+      const maybePaymentMethodExists = await mockPaymentMethodRepo.exists(
+        foundPayment
+      );
+
+      if (maybePaymentMethodExists.isLeft()) {
+        throw maybePaymentMethodExists.value;
+      }
+
+      paymentMethodExists = maybePaymentMethodExists.value;
+    } else {
+      paymentMethodExists = false;
     }
-    paymentMethodExists = await mockPaymentMethodRepo.exists(foundPayment);
   }
 );
 
 Then(/^PaymentMethod.exists returns (.*)$/, async (exists: string) => {
+  expect(maybeFoundPaymentMethod.isRight()).to.equal(exists === 'true');
   expect(paymentMethodExists).to.equal(exists === 'true');
 });
 
@@ -87,7 +137,15 @@ Given(
 );
 
 When('we call PaymentMethod.save on the payment method object', async () => {
-  savePaymentMethod = await mockPaymentMethodRepo.save(paymentMethod);
+  const maybeSavePaymentMethod = await mockPaymentMethodRepo.save(
+    paymentMethod
+  );
+
+  if (maybeSavePaymentMethod.isLeft()) {
+    throw maybeSavePaymentMethod.value;
+  }
+
+  savePaymentMethod = maybeSavePaymentMethod.value;
 });
 
 Then('the PaymentMethod object should be saved', async () => {

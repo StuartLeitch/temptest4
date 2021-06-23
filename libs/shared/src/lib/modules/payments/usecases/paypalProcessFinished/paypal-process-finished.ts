@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 // * Core Domain
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { Either, left, right } from '../../../../core/logic/Either';
@@ -6,8 +5,8 @@ import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  UsecaseAuthorizationContext,
   AccessControlledUsecase,
   AccessControlContext,
   Authorize,
@@ -34,8 +33,6 @@ interface WithPayPalEvent {
 interface WithPayment {
   payment: Payment;
 }
-
-type Context = UsecaseAuthorizationContext;
 
 export class PayPalProcessFinishedUsecase
   implements
@@ -146,9 +143,15 @@ export class PayPalProcessFinishedUsecase
     request: T
   ): Promise<Either<Errors.UpdatePaymentStatusDbError, T>> {
     try {
-      const payment = await this.paymentRepo.updatePayment(request.payment);
+      const maybePayment = await this.paymentRepo.updatePayment(
+        request.payment
+      );
 
-      return right({ ...request, payment });
+      if (maybePayment.isLeft()) {
+        return left(new UnexpectedError(new Error(maybePayment.value.message)));
+      }
+
+      return right({ ...request, payment: maybePayment.value });
     } catch (e) {
       return left(new Errors.UpdatePaymentStatusDbError(e));
     }

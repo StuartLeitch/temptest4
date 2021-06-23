@@ -1,11 +1,12 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../.././core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
-import { GetInvoiceIdByManuscriptCustomIdErrors } from './getInvoiceIdByManuscriptCustomIdErrors';
+import * as Errors from './getInvoiceIdByManuscriptCustomIdErrors';
 import { InvoiceId } from './../../domain/InvoiceId';
 
 export type GetInvoiceIdByManuscriptCustomIdResponse = Either<
-  | GetInvoiceIdByManuscriptCustomIdErrors.ManuscriptNotFoundError
+  | Errors.InvoiceItemNotFoundError
+  | Errors.ManuscriptNotFoundError
   | UnexpectedError,
-  Result<InvoiceId[]>
+  InvoiceId[]
 >;

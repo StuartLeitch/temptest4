@@ -1,35 +1,28 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
-import { Result, right } from '../../../../core/logic/Result';
+import { right } from '../../../../core/logic/Either';
 
 // * Authorization Logic
 import {
+  UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
-  UsecaseAuthorizationContext,
   AccessControlContext,
 } from '../../../../domain/authorization';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+
 import { FilterEventsService } from '../../services/FilterEventsService';
+
 import { SaveEventsUsecase } from '../saveEvents/saveEvents';
-import { SaveSqsEventsDTO } from './saveSqsEventsDTO';
-import { SaveSqsEventsResponse } from './saveSqsEventsResponse';
+
+import { SaveSqsEventsResponse as Response } from './saveSqsEventsResponse';
+import { SaveSqsEventsDTO as DTO } from './saveSqsEventsDTO';
 
 export class SaveSqsEventsUsecase
   implements
-    UseCase<
-      SaveSqsEventsDTO,
-      SaveSqsEventsResponse,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      SaveSqsEventsDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
-  authorizationContext: UsecaseAuthorizationContext;
+    UseCase<DTO, Response, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  authorizationContext: Context;
 
   constructor(
     private filterEventsService: FilterEventsService,
@@ -39,10 +32,7 @@ export class SaveSqsEventsUsecase
     this.authorizationContext = { roles: [] };
   }
 
-  public async execute(
-    request: SaveSqsEventsDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<SaveSqsEventsResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const start = new Date();
     try {
       const filteredEvents = await this.filterEventsService.filterEvents(
@@ -61,6 +51,6 @@ export class SaveSqsEventsUsecase
       this.logger.error(error);
     }
 
-    return right(Result.ok());
+    return right(null);
   }
 }

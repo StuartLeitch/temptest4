@@ -1,5 +1,6 @@
-import {ValueObject} from '../../../core/domain/ValueObject';
-import {Result} from '../../../core/logic/Result';
+import { Either, right, left } from '../../../core/logic/Either';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { ValueObject } from '../../../core/domain/ValueObject';
 
 interface PriceValueProps {
   value: number;
@@ -14,11 +15,11 @@ export class PriceValue extends ValueObject<PriceValueProps> {
     super(props);
   }
 
-  public static create(value: number): Result<PriceValue> {
+  public static create(value: number): Either<GuardFailure, PriceValue> {
     if (!!value === false || isNaN(value)) {
-      return Result.fail<PriceValue>('Must provide a valid price value.');
+      return left(new GuardFailure('Must provide a valid price value.'));
     } else {
-      return Result.ok<PriceValue>(new PriceValue({value}));
+      return right(new PriceValue({ value }));
     }
   }
 }

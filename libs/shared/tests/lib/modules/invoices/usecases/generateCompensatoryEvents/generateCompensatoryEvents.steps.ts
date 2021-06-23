@@ -55,7 +55,7 @@ let context: UsecaseAuthorizationContext;
 let payload;
 let event;
 
-Before(function () {
+Before({ tags: '@ValidateGenerateCompensatoryEvents' }, function () {
   mockSqsPublishService = new MockSqsPublishService();
   mockPaymentMethodRepo = new MockPaymentMethodRepo();
   mockInvoiceItemRepo = new MockInvoiceItemRepo();

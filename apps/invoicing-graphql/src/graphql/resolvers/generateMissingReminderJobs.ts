@@ -6,9 +6,7 @@ import {
 } from '@hindawi/shared';
 
 import { Resolvers } from '../schema';
-
 import { Context } from '../../builders';
-
 import { env } from '../../env';
 
 export const generateMissingReminderJobs: Resolvers<Context> = {
@@ -52,7 +50,7 @@ export const generateMissingReminderJobs: Resolvers<Context> = {
       );
 
       if (maybeResult.isLeft()) {
-        throw maybeResult.value.errorValue();
+        throw maybeResult.value;
       }
 
       return 'ok';

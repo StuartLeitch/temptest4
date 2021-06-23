@@ -1,11 +1,12 @@
 // * Core Domain
-import {AggregateRoot} from '../../../core/domain/AggregateRoot';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
-import {Result} from '../../../core/logic/Result';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either, right } from '../../../core/logic/Either';
 
 // * Subdomain
-import {RoleId} from './RoleId';
-import {Roles} from './enums/Roles';
+import { RoleId } from './RoleId';
+import { Roles } from './enums/Roles';
 
 interface RoleProps {
   name: Roles;
@@ -28,13 +29,16 @@ export class Role extends AggregateRoot<RoleProps> {
     super(props, id);
   }
 
-  public static create(props: RoleProps, id?: UniqueEntityID): Result<Role> {
+  public static create(
+    props: RoleProps,
+    id?: UniqueEntityID
+  ): Either<GuardFailure, Role> {
     const role = new Role(
       {
-        ...props
+        ...props,
       },
       id
     );
-    return Result.ok<Role>(role);
+    return right(role);
   }
 }

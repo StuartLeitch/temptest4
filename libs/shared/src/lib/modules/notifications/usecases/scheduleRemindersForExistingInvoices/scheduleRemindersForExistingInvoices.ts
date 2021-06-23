@@ -1,17 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { Either, Result, right, left } from '../../../../core/logic/Result';
-import { AsyncEither } from '../../../../core/logic/AsyncEither';
+import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
@@ -26,12 +20,12 @@ import {
   TimerBuilder,
 } from '../../../../infrastructure/message-queues/contracts/Time';
 
-import {
-  Transaction,
-  TransactionStatus,
-} from '../../../transactions/domain/Transaction';
 import { Invoice, InvoiceStatus } from '../../../invoices/domain/Invoice';
 import { Payer } from '../../../payers/domain/Payer';
+import {
+  TransactionStatus,
+  Transaction,
+} from '../../../transactions/domain/Transaction';
 
 import { TransactionRepoContract } from '../../../transactions/repos/transactionRepo';
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
@@ -59,13 +53,7 @@ interface InvoiceIdDTO extends DTO {
 }
 
 export class ScheduleRemindersForExistingInvoicesUsecase
-  implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -93,19 +81,11 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     this.logError = this.logError.bind(this);
   }
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  // @Authorize('invoice:read')
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const validation = await new AsyncEither(request)
         .then(this.validateRequest)
-        .map(() => Result.ok<void>())
+        .map(() => null)
         .execute();
 
       if (validation.isLeft()) {
@@ -124,16 +104,16 @@ export class ScheduleRemindersForExistingInvoicesUsecase
           .then(this.pausePayment(context))
           .then(this.resumePayment(context))
           .then(this.scheduleCreditControl(context))
-          .map(() => Result.ok<void>(null));
+          .map(() => null);
         const maybeResult = await execution.execute();
 
         if (maybeResult.isLeft()) {
-          const e = maybeResult.value.errorValue();
+          const e = new Error(maybeResult.value.message);
           this.logError('adding job', id.id.toString(), e);
         }
       }
 
-      return right(Result.ok<void>());
+      return right(null);
     } catch (e) {
       return left(new UnexpectedError(e));
     }
@@ -176,7 +156,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     return right(request);
   }
 
-  private addPauseSettings(context: UsecaseAuthorizationContext) {
+  private addPauseSettings(context: Context) {
     return async (request: InvoiceIdDTO) => {
       this.loggerService.info(
         `Adding the default pause settings for selected invoices`
@@ -194,7 +174,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     };
   }
 
-  private pauseConfirmation(context: UsecaseAuthorizationContext) {
+  private pauseConfirmation(context: Context) {
     return async (request: InvoiceIdDTO) => {
       this.loggerService.info(
         `Pausing the confirmation reminders for the selected invoice ids`
@@ -209,7 +189,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
       try {
         const result = await usecase.execute({ invoiceId }, context);
         if (result.isLeft()) {
-          const e = result.value.errorValue();
+          const e = new Error(result.value.message);
           this.logError('pausing confirmation', invoiceId, e);
         }
         return result.map(() => request);
@@ -220,7 +200,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     };
   }
 
-  private resumeConfirmation(context: UsecaseAuthorizationContext) {
+  private resumeConfirmation(context: Context) {
     return async (request: InvoiceIdDTO) => {
       this.loggerService.info(
         `Resume the confirmation reminders for the selected invoice ids`
@@ -247,7 +227,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
           context
         );
         if (result.isLeft()) {
-          const e = result.value.errorValue();
+          const e = new Error(result.value.message);
           this.logError('resuming confirmation', invoiceId, e);
         }
         return result.map(() => request);
@@ -258,7 +238,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     };
   }
 
-  private pausePayment(context: UsecaseAuthorizationContext) {
+  private pausePayment(context: Context) {
     return async (request: InvoiceIdDTO) => {
       this.loggerService.info(
         `Pausing the payment reminders for the selected invoice ids`
@@ -274,7 +254,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
       try {
         const result = await usecase.execute({ invoiceId }, context);
         if (result.isLeft()) {
-          const e = result.value.getValue();
+          const e = result.value;
           this.logError('pausing payment', invoiceId, e);
         }
         return result.map(() => request);
@@ -285,7 +265,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     };
   }
 
-  private resumePayment(context: UsecaseAuthorizationContext) {
+  private resumePayment(context: Context) {
     return async (request: InvoiceIdDTO) => {
       this.loggerService.info(
         `Resuming the payment reminders for the selected invoice ids`
@@ -311,7 +291,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
           context
         );
         if (result.isLeft()) {
-          const e = result.value.errorValue();
+          const e = new Error(result.value.message);
           this.logError('resuming payment', invoiceId, e);
         }
         return result.map(() => request);
@@ -322,7 +302,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     };
   }
 
-  private scheduleCreditControl(context: UsecaseAuthorizationContext) {
+  private scheduleCreditControl(context: Context) {
     return async (request: InvoiceIdDTO) => {
       this.loggerService.info(`Scheduling the credit control reminder`);
 
@@ -339,7 +319,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
         const result = await execution.execute();
 
         if (result.isLeft()) {
-          const e = result.value.errorValue();
+          const e = new Error(result.value.message);
           this.logError('scheduling the credit control', invoiceId, e);
         }
         return result.map(() => request);
@@ -384,7 +364,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     return right(true);
   }
 
-  private attachPayer(context: UsecaseAuthorizationContext) {
+  private attachPayer(context: Context) {
     const usecase = new GetPayerDetailsByInvoiceIdUsecase(
       this.payerRepo,
       this.loggerService
@@ -393,28 +373,35 @@ export class ScheduleRemindersForExistingInvoicesUsecase
       const { invoiceId } = request;
       const maybePayer = await usecase.execute({ invoiceId }, context);
 
-      return maybePayer.map((result) => ({
+      return maybePayer.map((payer) => ({
         ...request,
-        payer: result.getValue(),
+        payer,
       }));
     };
   }
 
-  private attachInvoice(context: UsecaseAuthorizationContext) {
+  private attachInvoice(context: Context) {
     const usecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
     return async (request: InvoiceIdDTO) => {
       const { invoiceId } = request;
       const maybeInvoice = await usecase.execute({ invoiceId }, context);
 
-      return maybeInvoice.map((result) => ({
+      return maybeInvoice.map((invoice) => ({
         ...request,
-        invoice: result.getValue(),
+        invoice,
       }));
     };
   }
 
-  private attachTransaction(context: UsecaseAuthorizationContext) {
-    return async (request: InvoiceIdDTO & { invoice: Invoice }) => {
+  private attachTransaction(context: Context) {
+    return async (
+      request: InvoiceIdDTO & { invoice: Invoice }
+    ): Promise<
+      Either<
+        Errors.CouldNotGetTransactionForInvoiceError,
+        InvoiceIdDTO & { invoice: Invoice; transaction: Transaction }
+      >
+    > => {
       this.loggerService.info(
         `Get transaction details for invoice with id ${request.invoiceId}`
       );
@@ -424,24 +411,18 @@ export class ScheduleRemindersForExistingInvoicesUsecase
       try {
         const result = await usecase.execute({ transactionId }, context);
 
-        if (result.isFailure) {
-          return left<
-            Errors.CouldNotGetTransactionForInvoiceError,
-            InvoiceIdDTO & { invoice: Invoice; transaction: Transaction }
-          >(
+        if (result.isLeft()) {
+          return left(
             new Errors.CouldNotGetTransactionForInvoiceError(
               request.invoiceId,
-              new Error(result.errorValue() as any)
+              new Error(result.value.message)
             )
           );
         }
 
-        return right<
-          Errors.CouldNotGetTransactionForInvoiceError,
-          InvoiceIdDTO & { invoice: Invoice; transaction: Transaction }
-        >({
+        return right({
           ...request,
-          transaction: result.getValue(),
+          transaction: result.value,
         });
       } catch (e) {
         return left<

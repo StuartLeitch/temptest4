@@ -36,10 +36,10 @@ export class AfterPaymentCompleted implements HandleContract<PaymentCompleted> {
     if (maybeInvoice.isLeft()) {
       this.logger.error(
         `While handling "PaymentCompleted" domain event an error ocurred`,
-        maybeInvoice.value.errorValue
+        maybeInvoice.value
       );
     } else {
-      const invoice = maybeInvoice.value.getValue();
+      const invoice = maybeInvoice.value;
 
       invoice.paymentAdded(paymentId);
 

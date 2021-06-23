@@ -1,5 +1,6 @@
+import { Either, right, left } from '../core/logic/Either';
+import { GuardFailure } from '../core/logic/GuardFailure';
 import { ValueObject } from '../core/domain/ValueObject';
-import { Result } from '../core/logic/Result';
 
 interface AmountProps {
   value: number;
@@ -14,11 +15,11 @@ export class Amount extends ValueObject<AmountProps> {
     super(props);
   }
 
-  public static create(value: number): Result<Amount> {
+  public static create(value: number): Either<GuardFailure, Amount> {
     if (isNaN(value) || value === 0 || value < 0) {
-      return Result.fail<Amount>('Must provide a valid amount');
+      return left(new GuardFailure('Must provide a valid amount'));
     } else {
-      return Result.ok<Amount>(new Amount({ value }));
+      return right(new Amount({ value }));
     }
   }
 }

@@ -1,29 +1,33 @@
-import { getYear } from 'date-fns';
-import isAfter from 'date-fns/isAfter';
+import getMonth from 'date-fns/getMonth';
 import isBefore from 'date-fns/isBefore';
+import isAfter from 'date-fns/isAfter';
+import { getYear } from 'date-fns';
 
 // * Core Domain
-import { AggregateRoot } from '../../../core/domain/AggregateRoot';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
-import { Result } from '../../../core/logic/Result';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { Either, right, left } from '../../../core/logic/Either';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
 
 // * Subdomains
-import { InvoiceId } from './InvoiceId';
-import { InvoiceItem } from './InvoiceItem';
+import { InvoiceErpReferences } from './InvoiceErpReferences';
 import { InvoiceNumber } from './InvoiceNumber';
 import { InvoiceItems } from './InvoiceItems';
-import { InvoiceErpReferences } from './InvoiceErpReferences';
-import { InvoicePaymentAddedEvent } from './events/invoicePaymentAdded';
+import { InvoiceItem } from './InvoiceItem';
+import { InvoiceId } from './InvoiceId';
+
 import { InvoiceDraftDueAmountUpdated } from './events/invoiceDraftDueAmountUpdated';
+import { InvoiceCreditNoteCreated } from './events/invoiceCreditNoteCreated';
+import { InvoicePaymentAddedEvent } from './events/invoicePaymentAdded';
 import { InvoiceDraftCreated } from './events/invoiceDraftCreated';
 import { InvoiceDraftDeleted } from './events/invoiceDraftDeleted';
 import { InvoiceFinalizedEvent } from './events/invoiceFinalized';
-import { InvoiceCreated } from './events/invoiceCreated';
 import { InvoiceConfirmed } from './events/invoiceConfirmed';
-import { InvoiceCreditNoteCreated } from './events/invoiceCreditNoteCreated';
+import { InvoiceCreated } from './events/invoiceCreated';
+
 import { TransactionId } from '../../transactions/domain/TransactionId';
-import { PayerId } from '../../payers/domain/PayerId';
 import { PaymentId } from '../../payments/domain/PaymentId';
+import { PayerId } from '../../payers/domain/PayerId';
 
 export enum InvoiceStatus {
   DRAFT = 'DRAFT', // after the internal object has been created
@@ -52,13 +56,14 @@ interface InvoiceProps {
   cancelledInvoiceReference?: string;
   erpReferences?: InvoiceErpReferences;
   persistentReferenceNumber?: string;
+  rate?: number;
 }
 
 export type InvoiceCollection = Invoice[];
 
 export class Invoice extends AggregateRoot<InvoiceProps> {
   get invoiceId(): InvoiceId {
-    return InvoiceId.create(this._id).getValue();
+    return InvoiceId.create(this._id);
   }
 
   get payerId(): PayerId {
@@ -195,11 +200,10 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     }
   }
 
-  public addInvoiceItem(invoiceItem: InvoiceItem): Result<void> {
+  public addInvoiceItem(invoiceItem: InvoiceItem): void {
     this.removeInvoiceItemIfExists(invoiceItem);
     this.props.invoiceItems.add(invoiceItem);
     this.props.totalNumInvoiceItems++;
-    return Result.ok<void>();
   }
 
   public addItems(invoiceItems: InvoiceItem[] | InvoiceItems): void {
@@ -214,7 +218,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   public static create(
     props: InvoiceProps,
     id?: UniqueEntityID
-  ): Result<Invoice> {
+  ): Either<GuardFailure, Invoice> {
     const defaultValues = {
       ...props,
       totalNumInvoiceItems: props.totalNumInvoiceItems ?? 0,
@@ -225,7 +229,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
     const invoice = new Invoice(defaultValues, id);
 
-    return Result.ok<Invoice>(invoice);
+    return right(invoice);
   }
 
   public generateInvoiceDraftCreatedEvent(): void {
@@ -372,14 +376,22 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     return !!this.props.cancelledInvoiceReference;
   }
 
-  public assignInvoiceNumber(lastInvoiceNumber: number) {
+  public assignInvoiceNumber(
+    lastInvoiceNumber: number
+  ): Either<GuardFailure, void> {
     const now = new Date();
-    const nextInvoiceNumber = InvoiceNumber.create({
+    const maybeNextInvoiceNumber = InvoiceNumber.create({
       value: lastInvoiceNumber,
-    }).getValue();
+    });
+
+    if (maybeNextInvoiceNumber.isLeft()) {
+      return left(maybeNextInvoiceNumber.value);
+    }
 
     // * incremental human-readable value
-    this.props.invoiceNumber = Number(nextInvoiceNumber.value + 1);
+    this.props.invoiceNumber = Number(maybeNextInvoiceNumber.value.value + 1);
+
+    return right(null);
   }
 
   computeReferenceNumber() {
@@ -416,6 +428,12 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
         .toString()
         .padStart(6, '0');
       referenceYear = getYear(this.props.dateIssued);
+
+      // * getMonth returns a number corresponding to each month,
+      // * so January is 0, February is 1, May is 5
+      if (getMonth(this.props.dateIssued) >= 5) {
+        referenceYear += 1;
+      }
     }
 
     return `${referenceNumberPadded}/${referenceYear}`;

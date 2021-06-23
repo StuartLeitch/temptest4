@@ -7,9 +7,7 @@ import {
 } from '@hindawi/shared';
 
 import { Resolvers } from '../schema';
-
 import { Context } from '../../builders';
-
 import { env } from '../../env';
 
 export const migrateEntireInvoice: Resolvers<Context> = {
@@ -76,7 +74,7 @@ export const migrateEntireInvoice: Resolvers<Context> = {
 
         if (maybeResult.isLeft()) {
           console.log(maybeResult.value);
-          throw new Error(maybeResult.value.errorValue().message);
+          throw new Error(maybeResult.value.message);
         }
       } catch (err) {
         console.info(err);

@@ -1,73 +1,70 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 // * Core Domain
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { UseCase } from '../../../../core/domain/UseCase';
-import { Result, right, left } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-
-import { Manuscript } from '../../domain/Manuscript';
-import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
-import { ArticleRepoContract as ManuscriptRepoContract } from '../../repos/articleRepo';
+import { right, left } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import {
-  Authorize,
+  UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
-  UsecaseAuthorizationContext,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
-import { MarkManuscriptAsPublishedDTO } from './markManuscriptAsPublishedDTO';
-import { MarkManuscriptAsPublishedResponse } from './markManuscriptAsPublishedResponse';
-import { MarkManuscriptAsPublishedErrors } from './markManuscriptAsPublishedErrors';
+import { ManuscriptId } from '../../../manuscripts/domain/ManuscriptId';
+import { Manuscript } from '../../domain/Manuscript';
+
+import { ArticleRepoContract as ManuscriptRepoContract } from '../../repos/articleRepo';
+
+import { MarkManuscriptAsPublishedResponse as Response } from './markManuscriptAsPublishedResponse';
+import { MarkManuscriptAsPublishedDTO as DTO } from './markManuscriptAsPublishedDTO';
+import * as Errors from './markManuscriptAsPublishedErrors';
 
 export class MarkManuscriptAsPublishedUsecase
   implements
-    UseCase<
-      MarkManuscriptAsPublishedDTO,
-      Promise<MarkManuscriptAsPublishedResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      MarkManuscriptAsPublishedDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(private manuscriptRepo: ManuscriptRepoContract) {}
 
   private async getAccessControlContext(
-    request: MarkManuscriptAsPublishedDTO,
-    context?: UsecaseAuthorizationContext
+    request: DTO,
+    context?: Context
   ): Promise<AccessControlContext> {
     return {};
   }
 
   @Authorize('write:manuscript')
-  public async execute(
-    request: MarkManuscriptAsPublishedDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<MarkManuscriptAsPublishedResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     let manuscript: Manuscript;
 
     const manuscriptId = ManuscriptId.create(
       new UniqueEntityID(request.customId)
-    ).getValue();
+    );
 
     try {
       try {
-        manuscript = await this.manuscriptRepo.findByCustomId(manuscriptId);
+        const maybeManuscript = await this.manuscriptRepo.findByCustomId(
+          manuscriptId
+        );
+
+        if (maybeManuscript.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeManuscript.value.message))
+          );
+        }
+
+        manuscript = maybeManuscript.value;
       } catch (e) {
         return left(
-          new MarkManuscriptAsPublishedErrors.ManuscriptFoundError(
-            manuscriptId.id.toString()
-          )
+          new Errors.ManuscriptFoundError(manuscriptId.id.toString())
         );
       }
 
       manuscript.markAsPublished(request.publicationDate);
       await this.manuscriptRepo.update(manuscript);
 
-      return right(Result.ok<Manuscript>(manuscript));
+      return right(manuscript);
     } catch (err) {
       return left(new UnexpectedError(err));
     }

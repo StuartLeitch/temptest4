@@ -1,20 +1,18 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
-import { UseCase } from '../../../../core/domain/UseCase';
-import { Result, left, right } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { right, left } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
-  Authorize,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
-import { CouponRepoContract } from '../../repos/couponRepo';
 import { GetRecentCouponsResponse } from './getRecentCouponsResponse';
 import type { GetRecentCouponsDTO } from './getRecentCouponsDTO';
+import { CouponRepoContract } from '../../repos/couponRepo';
 
 export class GetRecentCouponsUsecase
   implements
@@ -41,7 +39,14 @@ export class GetRecentCouponsUsecase
   ): Promise<GetRecentCouponsResponse> {
     try {
       const paginatedResult = await this.couponRepo.getRecentCoupons(request);
-      return right(Result.ok(paginatedResult));
+
+      if (paginatedResult.isLeft()) {
+        return left(
+          new UnexpectedError(new Error(paginatedResult.value.message))
+        );
+      }
+
+      return right(paginatedResult.value);
     } catch (err) {
       return left(new UnexpectedError(err, 'Getting recent coupons failed.'));
     }

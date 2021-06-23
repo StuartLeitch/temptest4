@@ -1,11 +1,10 @@
 import {
-  Invoice,
-  Payer,
-  InvoiceItem,
-  Address,
-  Article,
-  Payment,
   PaymentMethod,
+  InvoiceItem,
+  Invoice,
+  Address,
+  Payment,
+  Payer,
 } from '@hindawi/shared';
 import { Manuscript } from '../../modules/manuscripts/domain/Manuscript';
 import { PublisherCustomValues } from '../../modules/publishers/domain/PublisherCustomValues';

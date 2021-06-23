@@ -1,55 +1,30 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
-import { Result } from '../../../../core/logic/Result';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-
-import { Payer } from '../../domain/Payer';
-import { PayerId } from '../../domain/PayerId';
-import { PayerRepoContract } from '../../repos/payerRepo';
+import { UnexpectedError } from '../../../../core/logic/AppError';
+import { right, left } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  Authorize,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
-export interface GetPayerRequestDTO {
-  payerId?: string;
-}
+import { PayerId } from '../../domain/PayerId';
+
+import { PayerRepoContract } from '../../repos/payerRepo';
+
+import { GetPayerResponse as Response } from './getPayerResponse';
+import type { GetPayerDTO as DTO } from './getPayerDTO';
 
 export class GetPayerUsecase
   implements
-    UseCase<GetPayerRequestDTO, Result<Payer>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      GetPayerRequestDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Response, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(private payerRepo: PayerRepoContract) {
     this.payerRepo = payerRepo;
-  }
-
-  private async getPayer(request: GetPayerRequestDTO): Promise<Result<Payer>> {
-    const { payerId } = request;
-
-    if (!payerId) {
-      return Result.fail<Payer>(`Invalid payer id=${payerId}`);
-    }
-
-    const payer = await this.payerRepo.getPayerById(
-      PayerId.create(new UniqueEntityID(payerId))
-    );
-    const found = !!payer;
-
-    if (found) {
-      return Result.ok<Payer>(payer);
-    } else {
-      return Result.fail<Payer>(`Couldn't find payer by id=${payerId}`);
-    }
   }
 
   private async getAccessControlContext(request, context?) {
@@ -57,25 +32,27 @@ export class GetPayerUsecase
   }
 
   @Authorize('payer:read')
-  public async execute(
-    request: GetPayerRequestDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Result<Payer>> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      // * System looks-up the payer
-      const payerOrError = await this.getPayer(request);
+      const { payerId } = request;
 
-      if (payerOrError.isFailure) {
-        return Result.fail<Payer>(payerOrError.error);
+      if (!payerId) {
+        return left(
+          new UnexpectedError(new Error(`Invalid payer id=${payerId}`))
+        );
       }
 
-      const payer = payerOrError.getValue();
+      const maybePayer = await this.payerRepo.getPayerById(
+        PayerId.create(new UniqueEntityID(payerId))
+      );
 
-      // * This is where all the magic happens
-      return Result.ok<Payer>(payer);
+      if (maybePayer.isRight()) {
+        return right(maybePayer.value);
+      } else {
+        return left(new UnexpectedError(new Error(maybePayer.value.message)));
+      }
     } catch (err) {
-      console.log(err);
-      return Result.fail<Payer>(err);
+      return left(new UnexpectedError(err));
     }
   }
 }

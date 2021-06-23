@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -8,14 +6,12 @@ import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  UsecaseAuthorizationContext,
   AccessControlledUsecase,
   AccessControlContext,
   Authorize,
 } from '../../../../domain/authorization';
-
-import { PaymentRepoContract } from '../../repos/paymentRepo';
 
 import { PaymentStatus, PaymentProps, Payment } from '../../domain/Payment';
 import { ExternalOrderId } from '../../domain/external-order-id';
@@ -23,6 +19,8 @@ import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { PaymentMethodId } from '../../domain/PaymentMethodId';
 import { PayerId } from '../../../payers/domain/PayerId';
 import { Amount } from '../../../../domain/Amount';
+
+import { PaymentRepoContract } from '../../repos/paymentRepo';
 
 import { CreatePaymentResponse as Response } from './CreatePaymentResponse';
 import type { CreatePaymentDTO as DTO } from './CreatePaymentDTO';
@@ -46,8 +44,6 @@ interface DomainEventsDispatchData extends WithPayment {
   isFinalPayment: boolean;
   status: string;
 }
-
-type Context = UsecaseAuthorizationContext;
 
 export class CreatePaymentUsecase
   implements
@@ -114,22 +110,32 @@ export class CreatePaymentUsecase
   private async createPayment<T extends DTO>(
     request: T
   ): Promise<Either<Errors.PaymentCreationError, T & { payment: Payment }>> {
+    const maybeAmount = Amount.create(request.amount);
+
+    if (maybeAmount.isLeft()) {
+      return left(new UnexpectedError(new Error(maybeAmount.value.message)));
+    }
+
     const data: PaymentProps = {
       paymentMethodId: PaymentMethodId.create(
         new UniqueEntityID(request.paymentMethodId)
       ),
-      invoiceId: InvoiceId.create(
-        new UniqueEntityID(request.invoiceId)
-      ).getValue(),
+      invoiceId: InvoiceId.create(new UniqueEntityID(request.invoiceId)),
       datePaid: request.datePaid ? new Date(request.datePaid) : null,
       payerId: PayerId.create(new UniqueEntityID(request.payerId)),
-      amount: Amount.create(request.amount).getValue(),
+      amount: maybeAmount.value,
       foreignPaymentId: ExternalOrderId.create(request.foreignPaymentId),
       status: PaymentStatus[request.status],
     };
 
+    const maybePayment = Payment.create(data);
+
+    if (maybePayment.isLeft()) {
+      return left(new UnexpectedError(new Error(maybePayment.value.message)));
+    }
+
     try {
-      return right({ ...request, payment: Payment.create(data).getValue() });
+      return right({ ...request, payment: maybePayment.value });
     } catch (e) {
       return left(new Errors.PaymentCreationError(e));
     }
@@ -152,7 +158,12 @@ export class CreatePaymentUsecase
   ): Promise<Either<Errors.PaymentSavingDbError, T & { payment: Payment }>> {
     try {
       const payment = await this.paymentRepo.save(request.payment);
-      return right({ ...request, payment });
+
+      if (payment.isLeft()) {
+        return left(new UnexpectedError(new Error(payment.value.message)));
+      }
+
+      return right({ ...request, payment: payment.value });
     } catch (e) {
       return left(new Errors.PaymentSavingDbError(e));
     }

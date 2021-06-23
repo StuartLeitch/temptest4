@@ -1,10 +1,10 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
-import { GetCreditNoteByInvoiceIdErrors } from './getCreditNoteByInvoiceIdErrors';
+import * as Errors from './getCreditNoteByInvoiceIdErrors';
 import { Invoice } from '../../domain/Invoice';
 
 export type GetCreditNoteByInvoiceIdResponse = Either<
-  GetCreditNoteByInvoiceIdErrors.CreditNoteNotFoundError | UnexpectedError,
-  Result<Invoice>
+  Errors.CreditNoteNotFoundError | UnexpectedError,
+  Invoice
 >;

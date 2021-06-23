@@ -1,70 +1,60 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 // * Core Domain
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { UseCase } from '../../../../core/domain/UseCase';
-import { Result, right, left } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-
-import { Manuscript } from '../../domain/Manuscript';
-import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
-import { ArticleRepoContract as ManuscriptRepoContract } from '../../repos/articleRepo';
+import { right, left } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  Authorize,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
-import type { GetManuscriptByManuscriptIdDTO } from './getManuscriptByManuscriptIdDTO';
-import { GetManuscriptByManuscriptIdResponse } from './getManuscriptByManuscriptIdResponse';
-import { GetManuscriptByManuscriptIdErrors } from './getManuscriptByManuscriptIdErrors';
+import { ManuscriptId } from '../../../manuscripts/domain/ManuscriptId';
+
+import { ArticleRepoContract as ManuscriptRepoContract } from '../../repos/articleRepo';
+
+import { GetManuscriptByManuscriptIdResponse as Response } from './getManuscriptByManuscriptIdResponse';
+import type { GetManuscriptByManuscriptIdDTO as DTO } from './getManuscriptByManuscriptIdDTO';
+import * as Errors from './getManuscriptByManuscriptIdErrors';
 
 export class GetManuscriptByManuscriptIdUsecase
   implements
-    UseCase<
-      GetManuscriptByManuscriptIdDTO,
-      Promise<GetManuscriptByManuscriptIdResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      GetManuscriptByManuscriptIdDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(private manuscriptRepo: ManuscriptRepoContract) {}
 
   private async getAccessControlContext(
-    request: GetManuscriptByManuscriptIdDTO,
-    context?: UsecaseAuthorizationContext
+    request: DTO,
+    context?: Context
   ): Promise<AccessControlContext> {
     return {};
   }
 
   @Authorize('read:manuscript')
-  public async execute(
-    request: GetManuscriptByManuscriptIdDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<GetManuscriptByManuscriptIdResponse> {
-    let manuscript: Manuscript;
-
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const manuscriptId = ManuscriptId.create(
       new UniqueEntityID(request.manuscriptId)
-    ).getValue();
+    );
 
     try {
       try {
-        manuscript = await this.manuscriptRepo.findById(manuscriptId);
+        const manuscript = await this.manuscriptRepo.findById(manuscriptId);
+
+        if (manuscript.isLeft()) {
+          return left(
+            new Errors.ManuscriptFoundError(manuscriptId.id.toString())
+          );
+        }
+
+        return right(manuscript.value);
       } catch (e) {
         return left(
-          new GetManuscriptByManuscriptIdErrors.ManuscriptFoundError(
-            manuscriptId.id.toString()
-          )
+          new Errors.ManuscriptFoundError(manuscriptId.id.toString())
         );
       }
-
-      return right(Result.ok<Manuscript>(manuscript));
     } catch (err) {
       return left(new UnexpectedError(err));
     }

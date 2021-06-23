@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { InvoiceConfirmed as InvoiceConfirmedEvent } from '@hindawi/phenom-events';
 
-import { Either, right, left } from '../../../../../core/logic/Result';
+import { Either, right, left } from '../../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { UseCase } from '../../../../../core/domain/UseCase';
 
@@ -10,8 +8,8 @@ import { EventUtils } from '../../../../../utils/EventUtils';
 
 // * Authorization Logic
 import {
-  AccessControlledUsecase,
   UsecaseAuthorizationContext,
+  AccessControlledUsecase,
   AccessControlContext,
 } from '../../../../../domain/authorization';
 
@@ -112,11 +110,6 @@ export class PublishInvoiceConfirmedUsecase
     | Errors.PayerRequiredError,
     void
   > {
-    // Currently there are inconsistent invoices in the db, these should also be sent
-    // if (!request.payer) {
-    //   return left(new Errors.PayerRequiredError());
-    // }
-
     if (request.payer && !request.billingAddress) {
       return left(new Errors.BillingAddressRequiredError());
     }

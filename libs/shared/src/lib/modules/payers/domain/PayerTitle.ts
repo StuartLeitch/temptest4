@@ -1,5 +1,6 @@
-import {ValueObject} from '../../../core/domain/ValueObject';
-import {Result} from '../../../core/logic/Result';
+import { Either, right, left } from '../../../core/logic/Either';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { ValueObject } from '../../../core/domain/ValueObject';
 
 interface PayerTitleProps {
   value: string;
@@ -14,11 +15,11 @@ export class PayerTitle extends ValueObject<PayerTitleProps> {
     super(props);
   }
 
-  public static create(title: string): Result<PayerTitle> {
+  public static create(title: string): Either<GuardFailure, PayerTitle> {
     if (!!title === false || title.length === 0) {
-      return Result.fail<PayerTitle>('Must provide a payer title');
+      return left(new GuardFailure('Must provide a payer title'));
     } else {
-      return Result.ok<PayerTitle>(new PayerTitle({value: title}));
+      return right(new PayerTitle({ value: title }));
     }
   }
 }

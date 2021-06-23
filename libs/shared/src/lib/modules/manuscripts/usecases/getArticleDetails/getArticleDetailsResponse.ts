@@ -1,10 +1,11 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../.././core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
-import { GetArticleDetailsErrors } from './getArticleDetailsErrors';
 import { Article } from './../../domain/Article';
 
+import * as Errors from './getArticleDetailsErrors';
+
 export type GetArticleDetailsResponse = Either<
-  GetArticleDetailsErrors.ArticleNotFoundError | UnexpectedError,
-  Result<Article>
+  Errors.ArticleNotFoundError | UnexpectedError,
+  Article
 >;

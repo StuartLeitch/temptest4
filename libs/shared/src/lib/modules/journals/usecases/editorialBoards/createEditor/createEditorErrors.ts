@@ -1,12 +1,7 @@
-import {UseCaseError} from '../../../../../core/logic/UseCaseError';
-import {Result} from '../../../../../core/logic/Result';
+import { UseCaseError } from '../../../../../core/logic/UseCaseError';
 
-export namespace CreateEditorErrors {
-  export class JournalDoesntExistError extends Result<UseCaseError> {
-    constructor() {
-      super(false, {
-        message: `A Journal doesn't exist for this Editor.`
-      } as UseCaseError);
-    }
+export class JournalDoesntExistError extends UseCaseError {
+  constructor() {
+    super(`A Journal doesn't exist for this Editor.`);
   }
 }

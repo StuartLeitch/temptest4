@@ -1,38 +1,31 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { Result, left, right } from '../../../../core/logic/Result';
+import { left, right } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
+
+import { RepoError } from '../../../../infrastructure/RepoError';
 
 // * Authorization Logic
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  Authorize,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
-import { Coupon } from '../../domain/Coupon';
 import { CouponCode } from '../../domain/CouponCode';
+
 import { CouponRepoContract } from '../../repos/couponRepo';
 
 // * Usecase specific
-import { GetCouponDetailsByCodeResponse } from './getCouponDetailsByCodeResponse';
+import { GetCouponDetailsByCodeResponse as Response } from './getCouponDetailsByCodeResponse';
+import type { GetCouponDetailsByCodeDTO as DTO } from './getCouponDetailsByCodeDTO';
 import { CouponNotFoundError } from './getCouponDetailsByCodeErrors';
-import type { GetCouponDetailsByCodeDTO } from './getCouponDetailsByCodeDTO';
 
 export class GetCouponDetailsByCodeUsecase
   implements
-    UseCase<
-      GetCouponDetailsByCodeDTO,
-      Promise<GetCouponDetailsByCodeResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      GetCouponDetailsByCodeDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(private couponRepo: CouponRepoContract) {}
 
   private async getAccessControlContext(request, context?) {
@@ -40,22 +33,29 @@ export class GetCouponDetailsByCodeUsecase
   }
 
   @Authorize('invoice:read')
-  public async execute(
-    request: GetCouponDetailsByCodeDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<GetCouponDetailsByCodeResponse> {
-    let coupon: Coupon;
+  public async execute(request: DTO, context?: Context): Promise<Response> {
+    const maybeCouponCode = CouponCode.create(request.couponCode);
 
-    const couponCode = CouponCode.create(request.couponCode).getValue();
+    if (maybeCouponCode.isLeft()) {
+      return left(maybeCouponCode.value);
+    }
+
+    const couponCode = maybeCouponCode.value;
 
     try {
       try {
-        coupon = await this.couponRepo.getCouponByCode(couponCode);
+        const coupon = await this.couponRepo.getCouponByCode(couponCode);
+        if (coupon.isLeft()) {
+          if (coupon.value instanceof RepoError) {
+            return left(new CouponNotFoundError(couponCode.toString()));
+          } else {
+            return left(new UnexpectedError(new Error(coupon.value.message)));
+          }
+        }
+        return right(coupon.value);
       } catch (err) {
-        return left(new CouponNotFoundError(coupon.code.toString()));
+        return left(new CouponNotFoundError(couponCode.toString()));
       }
-
-      return right(Result.ok<Coupon>(coupon));
     } catch (err) {
       return left(new UnexpectedError(err));
     }

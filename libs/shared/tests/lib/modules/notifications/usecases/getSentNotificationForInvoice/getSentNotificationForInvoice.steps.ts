@@ -30,7 +30,7 @@ function makeNotificationData(
   invoiceId: string,
   overwrites?: any
 ): Notification {
-  return NotificationMap.toDomain({
+  const notification = NotificationMap.toDomain({
     recipientEmail: 'test-email',
     dateSent: new Date(),
     type: NotificationType.REMINDER_CONFIRMATION,
@@ -38,6 +38,12 @@ function makeNotificationData(
     invoiceId,
     ...overwrites,
   });
+
+  if (notification.isLeft()) {
+    throw notification.value;
+  }
+
+  return notification.value;
 }
 
 let mockSentNotificationRepo: MockSentNotificationRepo = null;
@@ -91,7 +97,11 @@ Given(
       id: testInvoiceId,
     });
 
-    await mockInvoiceRepo.save(invoice);
+    if (invoice.isLeft()) {
+      throw invoice.value;
+    }
+
+    await mockInvoiceRepo.save(invoice.value);
   }
 );
 
@@ -99,7 +109,14 @@ Given(
   /^the notification with "([\w-]+)" id for "([\w-]+)"/,
   async (testNotificationId: string, testInvoiceId: string) => {
     notification = makeNotificationData(testNotificationId, testInvoiceId);
-    notification = await mockSentNotificationRepo.save(notification);
+
+    const maybeNotification = await mockSentNotificationRepo.save(notification);
+
+    if (maybeNotification.isLeft()) {
+      throw maybeNotification.value;
+    }
+
+    notification = maybeNotification.value;
   }
 );
 When(
@@ -112,22 +129,30 @@ When(
 Then(
   /^I should receive notifications for id "([\w-]+)"/,
   async (testInvoiceId: string) => {
-    const invoiceId = InvoiceId.create(
-      new UniqueEntityID(testInvoiceId)
-    ).getValue();
+    const invoiceId = InvoiceId.create(new UniqueEntityID(testInvoiceId));
     expect(response.isRight()).to.be.true;
 
-    notificationList = await mockSentNotificationRepo.getNotificationsByInvoiceId(
+    const maybeNotificationList = await mockSentNotificationRepo.getNotificationsByInvoiceId(
       invoiceId
     );
+
+    if (maybeNotificationList.isLeft()) {
+      throw maybeNotificationList.value;
+    }
+
+    notificationList = maybeNotificationList.value;
+
     expect(!!notificationList).to.be.true;
     expect(notificationList.length).to.equal(2);
 
-    expect(response.value.getValue()).to.not.equal(null);
+    expect(response.value).to.not.equal(null);
   }
 );
 
 Then(/^I should not receive any notifications/, () => {
   expect(response.isRight()).to.be.true;
-  expect(response.value.getValue()).to.equal(null);
+  if (response.isLeft()) {
+    throw response.value;
+  }
+  expect(response.value.length).to.equal(0);
 });

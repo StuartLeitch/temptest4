@@ -1,26 +1,23 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 // * Core Domain
+import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { Result, right, left } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { right, left } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
 
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
   AccessControlledUsecase,
   AccessControlContext,
   Authorize,
 } from '../../../../domain/authorization';
 
-import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
-
-import { LoggerContract } from '../../../../infrastructure/logging';
-
 import { EmailService } from '../../../../infrastructure/communication-channels';
 import { WaiverService } from '../../../../domain/services/WaiverService';
+import { LoggerContract } from '../../../../infrastructure/logging';
 import { VATService } from '../../../../domain/services/VATService';
 
-import { ManuscriptId } from './../../../invoices/domain/ManuscriptId';
+import { ManuscriptId } from './../../../manuscripts/domain/ManuscriptId';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { CatalogItem } from '../../../journals/domain/CatalogItem';
 import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
@@ -28,6 +25,9 @@ import { JournalId } from '../../../journals/domain/JournalId';
 import { Invoice } from '../../../invoices/domain/Invoice';
 import { PayerType } from '../../../payers/domain/Payer';
 import { Transaction } from '../../domain/Transaction';
+
+import { AddressMap } from '../../../addresses/mappers/AddressMap';
+import { PayerMap } from '../../../payers/mapper/Payer';
 
 import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
 import { AddressRepoContract } from './../../../addresses/repos/addressRepo';
@@ -39,9 +39,6 @@ import { CatalogRepoContract } from '../../../journals/repos';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 
-import { AddressMap } from '../../../addresses/mappers/AddressMap';
-import { PayerMap } from '../../../payers/mapper/Payer';
-
 import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 import {
   ConfirmInvoiceUsecase,
@@ -49,22 +46,14 @@ import {
 } from '../../../invoices/usecases/confirmInvoice';
 
 // * Usecase specifics
-import { UpdateTransactionOnAcceptManuscriptResponse } from './updateTransactionOnAcceptManuscriptResponse';
-import { UpdateTransactionOnAcceptManuscriptErrors } from './updateTransactionOnAcceptManuscriptErrors';
-import type { UpdateTransactionOnAcceptManuscriptDTO } from './updateTransactionOnAcceptManuscriptDTOs';
+import { UpdateTransactionOnAcceptManuscriptResponse as Response } from './updateTransactionOnAcceptManuscriptResponse';
+import type { UpdateTransactionOnAcceptManuscriptDTO as DTO } from './updateTransactionOnAcceptManuscriptDTO';
+import * as Errors from './updateTransactionOnAcceptManuscriptErrors';
 
 export class UpdateTransactionOnAcceptManuscriptUsecase
   implements
-    UseCase<
-      UpdateTransactionOnAcceptManuscriptDTO,
-      Promise<UpdateTransactionOnAcceptManuscriptResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      UpdateTransactionOnAcceptManuscriptDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     private addressRepo: AddressRepoContract,
     private catalogRepo: CatalogRepoContract,
@@ -86,10 +75,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
   }
 
   @Authorize('transaction:update')
-  public async execute(
-    request: UpdateTransactionOnAcceptManuscriptDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<UpdateTransactionOnAcceptManuscriptResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     let transaction: Transaction;
     let invoice: Invoice;
     let invoiceItem: InvoiceItem;
@@ -99,7 +85,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
     // * get a proper ManuscriptId
     const manuscriptId = ManuscriptId.create(
       new UniqueEntityID(request.manuscriptId)
-    ).getValue();
+    );
 
     const {
       sanctionedCountryNotificationReceiver,
@@ -109,36 +95,52 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
     try {
       try {
         // * System identifies manuscript by Id
-        manuscript = await this.articleRepo.findById(manuscriptId);
+        const maybeManuscript = await this.articleRepo.findById(manuscriptId);
+
+        if (maybeManuscript.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeManuscript.value.message))
+          );
+        }
+
+        manuscript = maybeManuscript.value;
       } catch (err) {
-        return left(
-          new UpdateTransactionOnAcceptManuscriptErrors.ManuscriptNotFoundError(
-            request.manuscriptId
-          )
-        );
+        return left(new Errors.ManuscriptNotFoundError(request.manuscriptId));
       }
 
       try {
         // * System identifies invoice item by manuscript Id
-        [invoiceItem] = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
+        const maybeInvoiceItem = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
           manuscriptId
         );
+
+        if (maybeInvoiceItem.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeInvoiceItem.value.message))
+          );
+        }
+
+        invoiceItem = maybeInvoiceItem.value[0];
       } catch (err) {
-        return left(
-          new UpdateTransactionOnAcceptManuscriptErrors.InvoiceItemNotFoundError(
-            request.manuscriptId
-          )
-        );
+        return left(new Errors.InvoiceItemNotFoundError(request.manuscriptId));
       }
 
       try {
         // * System identifies invoice by invoice item Id
-        invoice = await this.invoiceRepo.getInvoiceById(invoiceItem.invoiceId);
+        const maybeInvoice = await this.invoiceRepo.getInvoiceById(
+          invoiceItem.invoiceId
+        );
+
+        if (maybeInvoice.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeInvoice.value.message))
+          );
+        }
+
+        invoice = maybeInvoice.value;
       } catch (err) {
         return left(
-          new UpdateTransactionOnAcceptManuscriptErrors.InvoiceNotFoundError(
-            invoiceItem.invoiceId.id.toString()
-          )
+          new Errors.InvoiceNotFoundError(invoiceItem.invoiceId.id.toString())
         );
       }
 
@@ -146,28 +148,38 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
 
       try {
         // * System looks-up the transaction
-        transaction = await this.transactionRepo.getTransactionById(
+        const maybeTransaction = await this.transactionRepo.getTransactionById(
           invoice.transactionId
         );
+
+        if (maybeTransaction.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeTransaction.value.message))
+          );
+        }
+
+        transaction = maybeTransaction.value;
       } catch (err) {
         return left(
-          new UpdateTransactionOnAcceptManuscriptErrors.TransactionNotFoundError(
-            invoice.invoiceId.id.toString()
-          )
+          new Errors.TransactionNotFoundError(invoice.invoiceId.id.toString())
         );
       }
 
       try {
         // * System looks-up the catalog item for the manuscript
-        catalogItem = await this.catalogRepo.getCatalogItemByJournalId(
-          JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
+        const maybeCatalogItem = await this.catalogRepo.getCatalogItemByJournalId(
+          JournalId.create(new UniqueEntityID(manuscript.journalId))
         );
+
+        if (maybeCatalogItem.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeCatalogItem.value.message))
+          );
+        }
+
+        catalogItem = maybeCatalogItem.value;
       } catch (err) {
-        return left(
-          new UpdateTransactionOnAcceptManuscriptErrors.CatalogItemNotFoundError(
-            manuscript.journalId
-          )
-        );
+        return left(new Errors.CatalogItemNotFoundError(manuscript.journalId));
       }
 
       // * Mark transaction as ACTIVE
@@ -197,7 +209,9 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
         console.log('Failed to save waiver', error);
         return left(
           new UnexpectedError(
-            `Failed to save waiver due to error: ${error.message}: ${error.stack}`
+            new Error(
+              `Failed to save waiver due to error: ${error.message}: ${error.stack}`
+            )
           )
         );
       }
@@ -205,8 +219,6 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       await this.transactionRepo.update(transaction);
       await this.articleRepo.update(manuscript);
 
-      // ! DO NOT ASSIGN AN INVOICE NUMBER AT THIS POINT !
-      // invoice = await this.invoiceRepo.assignInvoiceNumber(invoice.invoiceId);
       invoice.dateAccepted = request.acceptanceDate
         ? new Date(request.acceptanceDate)
         : new Date();
@@ -227,10 +239,10 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       );
 
       if (itemsWithReductions.isLeft()) {
-        return itemsWithReductions.map(() => Result.ok<void>());
+        return itemsWithReductions.map(() => null);
       }
 
-      invoice.addItems(itemsWithReductions.value.getValue());
+      invoice.addItems(itemsWithReductions.value);
       const total = invoice.invoiceTotal;
 
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
@@ -250,25 +262,36 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
         );
 
         // * create new address
-        const newAddress = AddressMap.toDomain({
+        const maybeNewAddress = AddressMap.toDomain({
           country: manuscript.authorCountry,
         });
 
+        if (maybeNewAddress.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeNewAddress.value.message))
+          );
+        }
+
         // * create new payer
-        const newPayer = PayerMap.toDomain({
-          // associate payer to the invoice
+        const maybeNewPayer = PayerMap.toDomain({
           invoiceId: invoice.invoiceId.id.toString(),
           name: `${manuscript.authorFirstName} ${manuscript.authorSurname}`,
-          addressId: newAddress.addressId.id.toString(),
+          addressId: maybeNewAddress.value.addressId.id.toString(),
           email: manuscript.authorEmail,
           type: PayerType.INDIVIDUAL,
           organization: ' ',
         });
 
+        if (maybeNewPayer.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeNewPayer.value.message))
+          );
+        }
+
         const confirmInvoiceArgs: ConfirmInvoiceDTO = {
           payer: {
-            ...PayerMap.toPersistence(newPayer),
-            address: AddressMap.toPersistence(newAddress),
+            ...PayerMap.toPersistence(maybeNewPayer.value),
+            address: AddressMap.toPersistence(maybeNewAddress.value),
           },
           sanctionedCountryNotificationReceiver,
           sanctionedCountryNotificationSender,
@@ -281,16 +304,16 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
             context
           );
           if (maybeConfirmed.isLeft()) {
-            return maybeConfirmed.map(() => Result.ok<void>());
+            return maybeConfirmed.map(() => null);
           }
         } catch (err) {
           return left(new UnexpectedError(err));
         }
 
-        return right(Result.ok<void>());
+        return right(null);
       }
 
-      this.emailService
+      await this.emailService
         .createInvoicePaymentTemplate(
           manuscript,
           catalogItem,
@@ -302,7 +325,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
         )
         .sendEmail();
 
-      return right(Result.ok<void>());
+      return right(null);
     } catch (err) {
       console.error(err);
       return left(new UnexpectedError(err));

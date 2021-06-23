@@ -86,7 +86,7 @@ let submittingManuscript: Manuscript = null;
 let event: SubmissionSubmitted = null;
 let additionalAuthors: { email: string; isCorresponding: false }[] = null;
 
-Before(() => {
+Before({ tags: '@ValidateSubmissionSubmitted' }, () => {
   context.repos.pausedReminder = new MockPausedReminderRepo();
   context.repos.invoiceItem = new MockInvoiceItemRepo();
   context.repos.transaction = new MockTransactionRepo();
@@ -112,7 +112,7 @@ Before(() => {
   event = null;
 });
 
-After(() => {
+After({ tags: '@ValidateSubmissionSubmitted' }, () => {
   context = {
     repos: {
       pausedReminder: null,
@@ -143,18 +143,28 @@ Given(
       amount: Number.parseFloat(apc),
     });
 
-    context.repos.catalog.addMockItem(journal);
+    if (journal.isLeft()) {
+      throw journal.value;
+    }
+
+    context.repos.catalog.addMockItem(journal.value);
   }
 );
 
 Given(
   /^A "([\w\s]+)" with CustomId "([\w\d]+)" is submitted on journal "([\w-]+)"$/,
   async (articleType: string, customId: string, journalId: string) => {
-    submittingManuscript = ManuscriptMap.toDomain({
+    const maybeSubmittingManuscript = ManuscriptMap.toDomain({
       articleType,
       journalId,
       customId,
     });
+
+    if (maybeSubmittingManuscript.isLeft()) {
+      throw maybeSubmittingManuscript.value;
+    }
+
+    submittingManuscript = maybeSubmittingManuscript.value;
   }
 );
 
@@ -193,7 +203,7 @@ Then(
     );
 
     expect(maybeInvoiceId.isRight()).to.be.true;
-    expect(maybeInvoiceId.value.getValue()).to.be.ok;
+    expect(maybeInvoiceId.value).to.be.ok;
   }
 );
 
@@ -221,7 +231,7 @@ Then(
     }
     expect(maybeInvoiceId.isRight()).to.be.true;
 
-    const invoiceId = maybeInvoiceId.value.getValue()[0].id.toString();
+    const invoiceId = maybeInvoiceId.value[0].id.toString();
 
     const maybeInvoice = await invoiceUsecase.execute(
       { invoiceId },
@@ -233,7 +243,7 @@ Then(
     }
     expect(maybeInvoice.isRight()).to.be.true;
 
-    const invoice = maybeInvoice.value.getValue();
+    const invoice = maybeInvoice.value;
 
     const maybeInvoiceItems = await invoiceItemsUsecase.execute(
       { invoiceId },
@@ -245,7 +255,7 @@ Then(
     }
     expect(maybeInvoiceItems.isRight()).to.be.true;
 
-    invoice.addItems(maybeInvoiceItems.value.getValue());
+    invoice.addItems(maybeInvoiceItems.value);
 
     expect(invoice.invoiceTotal).to.equal(Number.parseFloat(price));
   }
@@ -255,34 +265,59 @@ Then(
   /^The invoice for CustomId "([\w\d]+)" is not created$/,
   async (customId: string) => {
     const article = await context.repos.manuscript.findByCustomId(customId);
-    expect(article).to.be.null;
+
+    expect(article.isLeft()).to.be.true;
   }
 );
 
 Given(
   /^A "([\w\s]+)" with CustomId "([\w\d]+)" is on "([\w-]+)"$/,
   async (articleType: string, customId: string, journalId: string) => {
-    const article = ArticleMap.toDomain({
+    const maybeArticle = ArticleMap.toDomain({
       articleType,
       journalId,
       customId,
       id: customId,
     });
 
-    const transaction = TransactionMap.toDomain({
+    if (maybeArticle.isLeft()) {
+      throw maybeArticle.value;
+    }
+
+    const article = maybeArticle.value;
+
+    const maybeTransaction = TransactionMap.toDomain({
       status: 'DRAFT',
     });
 
-    const invoice = InvoiceMap.toDomain({
+    if (maybeTransaction.isLeft()) {
+      throw maybeTransaction.value;
+    }
+
+    const transaction = maybeTransaction.value;
+
+    const maybeInvoice = InvoiceMap.toDomain({
       transactionId: transaction.id.toString(),
       status: 'DRAFT',
     });
 
-    const invoiceItem = InvoiceItemMap.toDomain({
+    if (maybeInvoice.isLeft()) {
+      throw maybeInvoice.value;
+    }
+
+    const invoice = maybeInvoice.value;
+
+    const maybeInvoiceItem = InvoiceItemMap.toDomain({
       manuscriptId: article.id.toString(),
       invoiceId: invoice.id.toString(),
       price: 200,
     });
+
+    if (maybeInvoiceItem.isLeft()) {
+      throw maybeInvoiceItem.value;
+    }
+
+    const invoiceItem = maybeInvoiceItem.value;
 
     context.repos.invoiceItem.addMockItem(invoiceItem);
     context.repos.transaction.addMockItem(transaction);
@@ -344,7 +379,11 @@ Given(
       name: 'test',
     });
 
-    context.repos.editor.addMockItem(editor);
+    if (editor.isLeft()) {
+      throw editor.value;
+    }
+
+    context.repos.editor.addMockItem(editor.value);
   }
 );
 
@@ -354,7 +393,12 @@ Given('There is a waiver for editors', async () => {
     reduction: 50,
     isActive: true,
   });
-  context.repos.waiver.addMockItem(waiver);
+
+  if (waiver.isLeft()) {
+    throw waiver.value;
+  }
+
+  context.repos.waiver.addMockItem(waiver.value);
 });
 
 Given(
@@ -389,7 +433,7 @@ Then(
     }
     expect(maybeInvoiceId.isRight()).to.be.true;
 
-    const invoiceId = maybeInvoiceId.value.getValue()[0].id.toString();
+    const invoiceId = maybeInvoiceId.value[0].id.toString();
 
     const maybeInvoiceItems = await invoiceItemsUsecase.execute(
       { invoiceId },
@@ -401,7 +445,7 @@ Then(
     }
     expect(maybeInvoiceItems.isRight()).to.be.true;
 
-    const items = maybeInvoiceItems.value.getValue();
+    const items = maybeInvoiceItems.value;
 
     expect(items[0].assignedWaivers.length).to.equal(waiversCount);
   }
@@ -426,7 +470,7 @@ Then(
     }
     expect(maybeInvoiceId.isRight()).to.be.true;
 
-    const invoiceId = maybeInvoiceId.value.getValue()[0].id.toString();
+    const invoiceId = maybeInvoiceId.value[0].id.toString();
 
     const maybeInvoice = await invoiceUsecase.execute(
       { invoiceId },
@@ -438,7 +482,7 @@ Then(
     }
     expect(maybeInvoice.isRight()).to.be.true;
 
-    const invoice = maybeInvoice.value.getValue();
+    const invoice = maybeInvoice.value;
 
     expect(invoice.status).to.be.equal(InvoiceStatus.DRAFT);
   }
@@ -447,13 +491,36 @@ Then(
 Given(
   /^Invoice for article with CustomId "([\w\d]+)" has waiver applied$/,
   async (customId: string) => {
-    const manuscript = await context.repos.manuscript.findByCustomId(customId);
-    const [item] = await context.repos.invoiceItem.getInvoiceItemByManuscriptId(
+    const maybeManuscript = await context.repos.manuscript.findByCustomId(
+      customId
+    );
+
+    if (maybeManuscript.isLeft()) {
+      throw maybeManuscript.value;
+    }
+
+    const manuscript = maybeManuscript.value;
+
+    const maybeItems = await context.repos.invoiceItem.getInvoiceItemByManuscriptId(
       manuscript.manuscriptId
     );
-    const waiver = await context.repos.waiver.getWaiverByType(
+
+    if (maybeItems.isLeft()) {
+      throw maybeItems.value;
+    }
+
+    const item = maybeItems.value[0];
+
+    const maybeWaiver = await context.repos.waiver.getWaiverByType(
       WaiverType.EDITOR_DISCOUNT
     );
+
+    if (maybeWaiver.isLeft()) {
+      throw maybeWaiver.value;
+    }
+
+    const waiver = maybeWaiver.value;
+
     context.repos.waiver.addMockWaiverForInvoiceItem(
       waiver,
       item.invoiceItemId

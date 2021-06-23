@@ -1,8 +1,10 @@
 // * Core domain
-import { AggregateRoot } from '../../../core/domain/AggregateRoot';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
-import { Result } from '../../../core/logic/Result';
-import { ManuscriptId } from '../../invoices/domain/ManuscriptId';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either, right } from '../../../core/logic/Either';
+
+import { ManuscriptId } from './ManuscriptId';
 
 interface ManuscriptProps {
   journalId?: string;
@@ -24,7 +26,7 @@ export class Manuscript extends AggregateRoot<ManuscriptProps> {
   }
 
   get manuscriptId(): ManuscriptId {
-    return ManuscriptId.create(this._id).getValue();
+    return ManuscriptId.create(this._id);
   }
 
   get authorEmail(): string {
@@ -118,7 +120,7 @@ export class Manuscript extends AggregateRoot<ManuscriptProps> {
   public static create(
     props: ManuscriptProps,
     id?: UniqueEntityID
-  ): Result<Manuscript> {
+  ): Either<GuardFailure, Manuscript> {
     const manuscript = new Manuscript(
       {
         ...props,
@@ -127,7 +129,7 @@ export class Manuscript extends AggregateRoot<ManuscriptProps> {
       id
     );
 
-    return Result.ok<Manuscript>(manuscript);
+    return right(manuscript);
   }
 
   public markAsPublished(published?: string): void {

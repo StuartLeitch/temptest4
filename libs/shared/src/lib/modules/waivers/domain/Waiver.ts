@@ -1,10 +1,12 @@
 // * Core Domain
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
-import { Result } from '../../../core/logic/Result';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either, right } from '../../../core/logic/Either';
+
 import {
-  Reduction,
   ReductionProps,
   ReductionType,
+  Reduction,
 } from '../../../domain/reductions/Reduction';
 
 export type WaiverCollection = Waiver[];
@@ -52,7 +54,7 @@ export class Waiver extends Reduction<WaiverProps> {
   public static create(
     props: WaiverProps,
     id?: UniqueEntityID
-  ): Result<Waiver> {
-    return Result.ok<Waiver>(new Waiver(props, id));
+  ): Either<GuardFailure, Waiver> {
+    return right(new Waiver(props, id));
   }
 }

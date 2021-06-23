@@ -34,10 +34,10 @@ export class CouponAssigned extends ValueObject<CouponAssignedProps> {
     return new CouponAssigned(defaultValues);
   }
 
-  equals(wa: CouponAssigned): boolean {
-    const itemEq = this.invoiceItemId.equals(wa.invoiceItemId);
-    const waiverEq = this.coupon.id.equals(wa.coupon.id);
+  equals(ca: CouponAssigned): boolean {
+    const itemEq = this.invoiceItemId.equals(ca.invoiceItemId);
+    const couponEq = this.coupon.id.equals(ca.coupon.id);
 
-    return itemEq && waiverEq;
+    return itemEq && couponEq;
   }
 }

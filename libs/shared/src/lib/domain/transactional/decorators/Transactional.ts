@@ -1,7 +1,5 @@
 import 'reflect-metadata';
 
-// import { Result } from '../../../core/logic/Result';
-
 import { NAMESPACE_NAME } from './../common';
 import { IsolationLevel } from './../IsolationLevel';
 import { Propagation } from './../Propagation';
@@ -32,7 +30,7 @@ export const Transactional = (options?: {
   ) => {
     const originalMethod = descriptor.value;
 
-    descriptor.value = function(...args: any[]) {
+    descriptor.value = function (...args: any[]) {
       const context = NAMESPACE_NAME;
       const runOriginal = async () => originalMethod.apply(this, [...args]);
       const runWithNewHook = async () =>
@@ -64,7 +62,7 @@ export const Transactional = (options?: {
       return runOriginal();
     };
 
-    Reflect.getMetadataKeys(originalMethod).forEach(previousMetadataKey => {
+    Reflect.getMetadataKeys(originalMethod).forEach((previousMetadataKey) => {
       const previousMetadata = Reflect.getMetadata(
         previousMetadataKey,
         originalMethod
@@ -78,7 +76,7 @@ export const Transactional = (options?: {
 
     Object.defineProperty(descriptor.value, 'name', {
       value: originalMethod.name,
-      writable: false
+      writable: false,
     });
   };
 };

@@ -38,7 +38,7 @@ export class RegisterCreditNotesCron {
 
     const maybeResponse = await retryRevenueRecognizedInvoicesToNetsuiteErpUsecase.execute();
     if (maybeResponse.isLeft()) {
-      loggerService.error(maybeResponse.value.errorValue().message);
+      loggerService.error(maybeResponse.value.message);
       throw maybeResponse.value;
     }
   }

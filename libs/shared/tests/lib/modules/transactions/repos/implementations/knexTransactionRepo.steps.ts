@@ -1,6 +1,10 @@
 import { expect } from 'chai';
 import { Given, When, Then, Before } from '@cucumber/cucumber';
 
+import { GuardFailure } from '../../../../../../src/lib/core/logic/GuardFailure';
+import { RepoError } from '../../../../../../src/lib/infrastructure/RepoError';
+import { Either } from '../../../../../../src/lib/core/logic/Either';
+
 import { TransactionStatus } from '../../../../../../src/lib/modules/transactions/domain/Transaction';
 import { Transaction } from '../../../../../../src/lib/modules/transactions/domain/Transaction';
 import { TransactionMap } from './../../../../../../src/lib/modules/transactions/mappers/TransactionMap';
@@ -10,20 +14,27 @@ import { UniqueEntityID } from './../../../../../../src/lib/core/domain/UniqueEn
 import { MockTransactionRepo } from './../../../../../../src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
 
 function makeTransactionData(overwrites?: Record<string, any>): Transaction {
-  return TransactionMap.toDomain({
+  const transaction = TransactionMap.toDomain({
     id: 'transaction-id-1',
     status: TransactionStatus.DRAFT,
     ...overwrites,
   });
+
+  if (transaction.isLeft()) {
+    throw transaction.value;
+  }
+
+  return transaction.value;
 }
 
+let maybeFoundTransaction: Either<GuardFailure | RepoError, Transaction>;
 let mockTransactionRepo: MockTransactionRepo;
 let transaction: Transaction;
 let saveTransaction: Transaction;
 let foundTransaction: Transaction;
 let transactionExists: boolean;
 
-Before(async () => {
+Before({ tags: '@ValidateKnexTransactionRepo' }, async () => {
   mockTransactionRepo = new MockTransactionRepo();
 });
 
@@ -41,9 +52,16 @@ When(
     const transactionIdObj = TransactionId.create(
       new UniqueEntityID(transactionId)
     );
-    foundTransaction = await mockTransactionRepo.getTransactionById(
+
+    const maybeFoundTransaction = await mockTransactionRepo.getTransactionById(
       transactionIdObj
     );
+
+    if (maybeFoundTransaction.isLeft()) {
+      throw maybeFoundTransaction.value;
+    }
+
+    foundTransaction = maybeFoundTransaction.value;
   }
 );
 
@@ -55,12 +73,17 @@ When(
   /^we call getTransactionById for an un-existent transaction "([\w-]+)"$/,
   async (wrongTransactionId: string) => {
     const id = TransactionId.create(new UniqueEntityID(wrongTransactionId));
-    foundTransaction = await mockTransactionRepo.getTransactionById(id);
+    maybeFoundTransaction = await mockTransactionRepo.getTransactionById(id);
+
+    if (maybeFoundTransaction.isRight()) {
+      foundTransaction = maybeFoundTransaction.value;
+    }
   }
 );
 
 Then('getTransactionById returns null', async () => {
-  expect(foundTransaction).to.equal(null);
+  expect(maybeFoundTransaction.isLeft()).to.equal(true);
+  expect(maybeFoundTransaction.value instanceof RepoError).to.be.true;
 });
 
 When(
@@ -69,9 +92,16 @@ When(
     const transactionIdObj = TransactionId.create(
       new UniqueEntityID(transactionId)
     );
-    foundTransaction = await mockTransactionRepo.getTransactionById(
+    const maybeFoundTransaction = await mockTransactionRepo.getTransactionById(
       transactionIdObj
     );
+
+    if (maybeFoundTransaction.isLeft()) {
+      throw maybeFoundTransaction.value;
+    }
+
+    foundTransaction = maybeFoundTransaction.value;
+
     await mockTransactionRepo.delete(foundTransaction);
   }
 );
@@ -93,11 +123,26 @@ When(
   /^we call exists for ([\w-]+) transaction id$/,
   async (transactionId: string) => {
     const id = TransactionId.create(new UniqueEntityID(transactionId));
-    foundTransaction = await mockTransactionRepo.getTransactionById(id);
-    if (!foundTransaction) {
-      foundTransaction = await makeTransactionData({ id: transactionId });
+    maybeFoundTransaction = await mockTransactionRepo.getTransactionById(id);
+
+    if (maybeFoundTransaction.isRight()) {
+      foundTransaction = maybeFoundTransaction.value;
+      if (!foundTransaction) {
+        foundTransaction = makeTransactionData({ id: transactionId });
+      }
+
+      const maybeTransactionExists = await mockTransactionRepo.exists(
+        foundTransaction
+      );
+
+      if (maybeTransactionExists.isLeft()) {
+        throw maybeTransactionExists.value;
+      }
+
+      transactionExists = maybeTransactionExists.value;
+    } else {
+      transactionExists = false;
     }
-    transactionExists = await mockTransactionRepo.exists(foundTransaction);
   }
 );
 
@@ -113,7 +158,13 @@ Given(
 );
 
 When('we call Transaction.save on the transaction object', async () => {
-  saveTransaction = await mockTransactionRepo.save(transaction);
+  const maybeSaveTransaction = await mockTransactionRepo.save(transaction);
+
+  if (maybeSaveTransaction.isLeft()) {
+    throw maybeSaveTransaction.value;
+  }
+
+  saveTransaction = maybeSaveTransaction.value;
 });
 
 Then('the transaction object should be saved', async () => {

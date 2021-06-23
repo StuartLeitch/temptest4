@@ -1,18 +1,21 @@
+import { GuardFailure } from '../core/logic/GuardFailure';
 import { ValueObject } from '../core/domain/ValueObject';
-import { Result } from '../core/logic/Result';
+import { Either, right } from '../core/logic/Either';
 
 interface ClientTokenProps {
   token: string;
 }
 
 export class PaymentClientToken extends ValueObject<ClientTokenProps> {
-  public static create(rawToken?: string): Result<PaymentClientToken> {
+  public static create(
+    rawToken?: string
+  ): Either<GuardFailure, PaymentClientToken> {
     if (rawToken) {
       const props: ClientTokenProps = { token: rawToken };
 
-      return Result.ok<PaymentClientToken>(
+      return right(
         new PaymentClientToken({
-          ...props
+          ...props,
         })
       );
     }
@@ -28,7 +31,7 @@ export class PaymentClientToken extends ValueObject<ClientTokenProps> {
 
   public toJSON(): string {
     return JSON.stringify({
-      token: this.token
+      token: this.token,
     });
   }
 

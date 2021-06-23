@@ -1,17 +1,17 @@
-import { Either, Result } from '../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { Either } from '../../../../core/logic/Either';
 
-import * as ResumeInvoiceConfirmationRemindersErrors from './resumeInvoiceConfirmationRemindersErrors';
+import * as Errors from './resumeInvoiceConfirmationRemindersErrors';
 
 export type ResumeInvoiceConfirmationRemindersResponse = Either<
-  | ResumeInvoiceConfirmationRemindersErrors.CouldNotGetTransactionForInvoiceError
-  | ResumeInvoiceConfirmationRemindersErrors.ConfirmationRemindersNotPausedError
-  | ResumeInvoiceConfirmationRemindersErrors.ReminderDelayRequiredError
-  | ResumeInvoiceConfirmationRemindersErrors.ReminderResumeSaveDbError
-  | ResumeInvoiceConfirmationRemindersErrors.InvoiceIdRequiredError
-  | ResumeInvoiceConfirmationRemindersErrors.QueueNameRequiredError
-  | ResumeInvoiceConfirmationRemindersErrors.InvoiceNotFoundError
-  | ResumeInvoiceConfirmationRemindersErrors.ScheduleTaskFailed
+  | Errors.CouldNotGetTransactionForInvoiceError
+  | Errors.ConfirmationRemindersNotPausedError
+  | Errors.ReminderDelayRequiredError
+  | Errors.ReminderResumeSaveDbError
+  | Errors.InvoiceIdRequiredError
+  | Errors.QueueNameRequiredError
+  | Errors.InvoiceNotFoundError
+  | Errors.ScheduleTaskFailed
   | UnexpectedError,
-  Result<void>
+  void
 >;

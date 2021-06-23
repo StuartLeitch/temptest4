@@ -1,15 +1,15 @@
 // * Core Domain
-import { Either, Result, right, left } from '../../../../core/logic/Result';
-import { AsyncEither } from '../../../../core/logic/AsyncEither';
+import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
+import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  Authorize,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
@@ -33,12 +33,8 @@ import * as Errors from './getTransactionDetailsByManuscriptCustomId.errors';
 
 export class GetTransactionDetailsByManuscriptCustomIdUsecase
   implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
     private transactionRepo: TransactionRepoContract,
@@ -57,18 +53,17 @@ export class GetTransactionDetailsByManuscriptCustomIdUsecase
   }
 
   @Authorize('transaction:read')
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      return new AsyncEither(request)
+      const execution = await new AsyncEither(request)
         .then(this.verifyInput)
         .then(this.attachInvoiceId(context))
         .then(this.attachInvoice(context))
         .then(this.attachTransaction(context))
-        .map(({ transaction }) => Result.ok(transaction))
+        .map((data) => data.transaction)
         .execute();
+
+      return execution;
     } catch (err) {
       return left(new UnexpectedError(err));
     }
@@ -84,7 +79,7 @@ export class GetTransactionDetailsByManuscriptCustomIdUsecase
     return right(request);
   }
 
-  private attachInvoiceId(context: UsecaseAuthorizationContext) {
+  private attachInvoiceId(context: Context) {
     return async <T extends { customId: string }>(request: T) => {
       const usecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
         this.manuscriptRepo,
@@ -95,27 +90,27 @@ export class GetTransactionDetailsByManuscriptCustomIdUsecase
         .then((customId) => usecase.execute({ customId }, context))
         .map((result) => ({
           ...request,
-          invoiceId: result.getValue()[0],
+          invoiceId: result[0],
         }))
         .execute();
     };
   }
 
-  private attachInvoice(context: UsecaseAuthorizationContext) {
+  private attachInvoice(context: Context) {
     return async <T extends { invoiceId: InvoiceId }>(request: T) => {
       const usecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
 
       return new AsyncEither(request.invoiceId.id.toString())
         .then((invoiceId) => usecase.execute({ invoiceId }, context))
-        .map((result) => ({
+        .map((invoice) => ({
           ...request,
-          invoice: result.getValue(),
+          invoice,
         }))
         .execute();
     };
   }
 
-  private getTransaction(context: UsecaseAuthorizationContext) {
+  private getTransaction(context: Context) {
     return async (id: TransactionId) => {
       const usecase = new GetTransactionUsecase(this.transactionRepo);
 
@@ -124,25 +119,23 @@ export class GetTransactionDetailsByManuscriptCustomIdUsecase
         context
       );
 
-      if (result.isFailure) {
-        return left<Errors.TransactionNotFoundError, Result<Transaction>>(
+      if (result.isLeft()) {
+        return left<Errors.TransactionNotFoundError, Transaction>(
           new Errors.TransactionNotFoundError(id.id.toString())
         );
       }
 
-      return right<Errors.TransactionNotFoundError, Result<Transaction>>(
-        result
-      );
+      return right<Errors.TransactionNotFoundError, Transaction>(result.value);
     };
   }
 
-  private attachTransaction(context: UsecaseAuthorizationContext) {
+  private attachTransaction(context: Context) {
     return async <T extends { invoice: Invoice }>(request: T) => {
       return new AsyncEither(request.invoice.transactionId)
         .then(this.getTransaction(context))
-        .map((result) => ({
+        .map((transaction) => ({
           ...request,
-          transaction: result.getValue(),
+          transaction,
         }))
         .execute();
     };

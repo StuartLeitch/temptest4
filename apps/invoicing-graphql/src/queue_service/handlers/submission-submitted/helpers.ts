@@ -6,6 +6,7 @@ import {
   RestoreSoftDeleteDraftTransactionUsecase,
   GetInvoiceIdByManuscriptCustomIdUsecase,
   GetManuscriptByManuscriptIdUsecase,
+  ExistsManuscriptByIdUsecase,
   SoftDeleteDraftTransactionUsecase,
   UsecaseAuthorizationContext,
   GetItemsForInvoiceUsecase,
@@ -14,9 +15,9 @@ import {
   CreateManuscriptUsecase,
   EditManuscriptUsecase,
   CreateManuscriptDTO,
+  GetJournalUsecase,
   InvoiceItem,
   Transaction,
-  GetJournal,
   Manuscript,
   Roles,
 } from '@hindawi/shared';
@@ -34,23 +35,41 @@ function getExistingManuscript(context: Context) {
       services: { logger },
     } = context;
 
-    const getManuscriptBySubmissionId = new GetManuscriptByManuscriptIdUsecase(
+    const existsManuscriptById = new ExistsManuscriptByIdUsecase(
       manuscriptRepo
     );
 
-    const maybeManuscript = await getManuscriptBySubmissionId.execute(
+    const maybeExists = await existsManuscriptById.execute(
       {
         manuscriptId: submissionId,
       },
       defaultContext
     );
 
-    if (maybeManuscript.isLeft()) {
-      logger.error(maybeManuscript.value.errorValue().message);
-      throw maybeManuscript.value.error;
+    if (maybeExists.isLeft()) {
+      logger.error(maybeExists.value.message);
+      throw maybeExists.value;
     }
 
-    return maybeManuscript.value.getValue();
+    if (maybeExists.value) {
+      const getManuscriptByManuscriptId = new GetManuscriptByManuscriptIdUsecase(
+        manuscriptRepo
+      );
+
+      const maybeManuscript = await getManuscriptByManuscriptId.execute(
+        { manuscriptId: submissionId },
+        defaultContext
+      );
+
+      if (maybeManuscript.isLeft()) {
+        logger.error(maybeManuscript.value.message);
+        throw maybeManuscript.value;
+      }
+
+      return maybeManuscript.value;
+    } else {
+      return null;
+    }
   };
 }
 
@@ -133,10 +152,10 @@ function getInvoiceItems(context: Context) {
       defaultContext
     );
     if (maybeInvoiceId.isLeft()) {
-      logger.error(maybeInvoiceId.value.errorValue().message);
-      throw maybeInvoiceId.value.error;
+      logger.error(maybeInvoiceId.value.message);
+      throw maybeInvoiceId.value;
     }
-    const invoiceId = maybeInvoiceId.value.getValue()[0];
+    const invoiceId = maybeInvoiceId.value[0];
     logger.info(
       'Get invoice ID by manuscript custom ID',
       invoiceId.id.toString()
@@ -149,11 +168,11 @@ function getInvoiceItems(context: Context) {
       defaultContext
     );
     if (maybeItems.isLeft()) {
-      logger.error(maybeItems.value.errorValue().message);
-      throw maybeItems.value.error;
+      logger.error(maybeItems.value.message);
+      throw maybeItems.value;
     }
 
-    return maybeItems.value.getValue();
+    return maybeItems.value;
   };
 }
 
@@ -163,7 +182,7 @@ function updateInvoicePrice(context: Context) {
       repos: { invoiceItem, catalog },
       services: { logger },
     } = context;
-    const getJournalUsecase: GetJournal = new GetJournal(catalog);
+    const getJournalUsecase: GetJournalUsecase = new GetJournalUsecase(catalog);
     const updateInvoiceItemsUsecase: UpdateInvoiceItemsUsecase = new UpdateInvoiceItemsUsecase(
       invoiceItem
     );
@@ -179,11 +198,11 @@ function updateInvoicePrice(context: Context) {
     );
 
     if (journalResult.isLeft()) {
-      logger.error(journalResult.value.errorValue().message);
-      throw journalResult.value.error;
+      logger.error(journalResult.value.message);
+      throw journalResult.value;
     }
 
-    const journal = journalResult.value.getValue();
+    const journal = journalResult.value;
     logger.info('Get Journal details for new journal ID', journal);
 
     items.forEach((i) => {
@@ -198,8 +217,8 @@ function updateInvoicePrice(context: Context) {
     );
 
     if (maybeUpdatedInvoiceItems.isLeft()) {
-      logger.error(maybeUpdatedInvoiceItems.value.errorValue().message);
-      throw maybeUpdatedInvoiceItems.value.error;
+      logger.error(maybeUpdatedInvoiceItems.value.message);
+      throw maybeUpdatedInvoiceItems.value;
     }
 
     logger.info('Update invoice items with new journal ID and price', items);
@@ -331,11 +350,11 @@ function createManuscript(context: Context) {
     );
 
     if (maybeManuscript.isLeft()) {
-      logger.error(maybeManuscript.value.errorValue().message);
-      throw maybeManuscript.value.error;
+      logger.error(maybeManuscript.value.message);
+      throw maybeManuscript.value;
     }
 
-    return maybeManuscript.value.getValue();
+    return maybeManuscript.value;
   };
 }
 

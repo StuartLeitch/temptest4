@@ -1,10 +1,17 @@
 import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
+import { Either, left, right } from '../../../../core/logic/Either';
+
+import { RepoError } from '../../../../infrastructure/RepoError';
+
+import { InvoiceErpReferences } from './../../../invoices/domain/InvoiceErpReferences';
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
+import { ErpReference } from '../../domain/ErpReference';
+
+import { InvoiceMap } from './../../../invoices/mappers/InvoiceMap';
 
 import { ErpReferenceRepoContract } from '../ErpReferenceRepo';
-import { ErpReference } from '../../domain/ErpReference';
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-import { InvoiceErpReferences } from './../../../invoices/domain/InvoiceErpReferences';
-import { InvoiceMap } from './../../../invoices/mappers/InvoiceMap';
 
 export class MockErpReferenceRepo
   extends BaseMockRepo<ErpReference>
@@ -17,8 +24,7 @@ export class MockErpReferenceRepo
 
   public async getErpReferencesByInvoiceId(
     invoiceId: InvoiceId
-  ): Promise<InvoiceErpReferences> {
-    // console.info('\n\n\n :\u{2757} DEBUG \n\n\n');
+  ): Promise<Either<GuardFailure | RepoError, InvoiceErpReferences>> {
     const match = this._items.find(() =>
       this._items.some((ef) => ef.entity_id === invoiceId.id.toString())
     );
@@ -27,22 +33,59 @@ export class MockErpReferenceRepo
       erpReferences: match,
     });
 
-    return invoice.getErpReferences() ?? null;
+    return invoice.map((i) => i.getErpReferences());
   }
 
-  public async exists(erpReference: ErpReference): Promise<boolean> {
+  public async getErpReferenceById(
+    id: UniqueEntityID
+  ): Promise<Either<GuardFailure | RepoError, ErpReference>> {
+    const result = this._items.find((i) => i.entity_id === id.toString());
+
+    if (ErpReference) {
+      return right(result);
+    } else {
+      return left(
+        RepoError.createEntityNotFoundError('erp reference', id.toString())
+      );
+    }
+  }
+
+  public async getErpReferencesById(
+    ids: UniqueEntityID[]
+  ): Promise<Either<GuardFailure | RepoError, ErpReference[]>> {
+    const rawIds = ids.map((i) => i.toString());
+    const result = this._items.filter((i) => rawIds.indexOf(i.entity_id) >= 0);
+
+    if (result.length > 0) {
+      return right(result);
+    } else {
+      return left(
+        RepoError.createEntityNotFoundError('erp references', rawIds.join(' '))
+      );
+    }
+  }
+
+  public async exists(
+    erpReference: ErpReference
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     const found = this._items.filter((i) =>
       this.compareMockItems(i, erpReference)
     );
-    return found.length !== 0;
+    return right(found.length !== 0);
   }
 
-  public async delete(erpReference: ErpReference): Promise<void> {
-    this.deletedItems.push(erpReference);
-  }
+  public async save(
+    erpReference: ErpReference
+  ): Promise<Either<GuardFailure | RepoError, ErpReference>> {
+    const maybeAlreadyExists = await this.exists(erpReference);
 
-  public async save(erpReference: ErpReference): Promise<ErpReference> {
-    const alreadyExists = await this.exists(erpReference);
+    if (maybeAlreadyExists.isLeft()) {
+      return left(
+        RepoError.fromDBError(new Error(maybeAlreadyExists.value.message))
+      );
+    }
+
+    const alreadyExists = maybeAlreadyExists.value;
 
     if (alreadyExists) {
       this._items.map((i) => {
@@ -56,7 +99,7 @@ export class MockErpReferenceRepo
       this._items.push(erpReference);
     }
 
-    return erpReference;
+    return right(erpReference);
   }
 
   public compareMockItems(a: ErpReference, b: ErpReference): boolean {

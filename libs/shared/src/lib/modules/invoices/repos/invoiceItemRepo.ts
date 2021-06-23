@@ -1,18 +1,34 @@
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either } from '../../../core/logic/Either';
+
+import { RepoError } from '../../../infrastructure/RepoError';
 import { Repo } from '../../../infrastructure/Repo';
-import { InvoiceItem } from '../domain/InvoiceItem';
+
+import { ManuscriptId } from '../../manuscripts/domain/ManuscriptId';
 import { InvoiceItemId } from '../domain/InvoiceItemId';
-import { ManuscriptId } from '../domain/ManuscriptId';
-import { InvoiceId } from '../../../shared';
+import { InvoiceItem } from '../domain/InvoiceItem';
+import { InvoiceId } from '../domain/InvoiceId';
 
 export interface InvoiceItemRepoContract extends Repo<InvoiceItem> {
-  getInvoiceItemById(invoiceItemId: InvoiceItemId): Promise<InvoiceItem>;
+  getInvoiceItemById(
+    invoiceItemId: InvoiceItemId
+  ): Promise<Either<GuardFailure | RepoError, InvoiceItem>>;
   getInvoiceItemByManuscriptId(
     manuscriptId: ManuscriptId
-  ): Promise<InvoiceItem[]>;
-  getInvoiceItemCollection(): Promise<InvoiceItem[]>;
-  delete(invoiceItem: InvoiceItem): Promise<void>;
-  restore(invoiceItem: InvoiceItem): Promise<void>;
-
-  getItemsByInvoiceId(invoiceId: InvoiceId): Promise<InvoiceItem[]>;
-  update(invoiceItem: InvoiceItem): Promise<InvoiceItem>;
+  ): Promise<Either<GuardFailure | RepoError, InvoiceItem[]>>;
+  getInvoiceItemCollection(): Promise<
+    Either<GuardFailure | RepoError, InvoiceItem[]>
+  >;
+  delete(
+    invoiceItem: InvoiceItem
+  ): Promise<Either<GuardFailure | RepoError, void>>;
+  restore(
+    invoiceItem: InvoiceItem
+  ): Promise<Either<GuardFailure | RepoError, void>>;
+  getItemsByInvoiceId(
+    invoiceId: InvoiceId
+  ): Promise<Either<GuardFailure | RepoError, InvoiceItem[]>>;
+  update(
+    invoiceItem: InvoiceItem
+  ): Promise<Either<GuardFailure | RepoError, InvoiceItem>>;
 }

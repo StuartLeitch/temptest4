@@ -1,76 +1,55 @@
 import { UniqueEntityID } from '../../../../../lib/core/domain/UniqueEntityID';
-import { UseCase } from '../../../../core/domain/UseCase';
-import { UnexpectedError } from '../../../../core/logic/AppError';
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
-import { left, right, Result } from '../../../../core/logic/Result';
+import { UnexpectedError } from '../../../../core/logic/AppError';
+import { right, left } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
+
+import { RepoErrorCode, RepoError } from '../../../../infrastructure/RepoError';
 
 // * Authorization Logic
 
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
-import {
-  AccessControlledUsecase,
-  AccessControlContext,
-  Roles,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { EmailService } from '../../../../infrastructure/communication-channels';
+import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { VATService } from '../../../../domain/services/VATService';
 
-import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
-import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
-import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
-import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
-import { PayerRepoContract } from '../../../payers/repos/payerRepo';
-import { CouponRepoContract } from '../../../coupons/repos/couponRepo';
-import { WaiverRepoContract } from '../../../waivers/repos/waiverRepo';
-import { TransactionRepoContract } from '../../../transactions/repos';
+import { TransactionStatus } from '../../../transactions/domain/Transaction';
+import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
+import { ManuscriptId } from '../../../manuscripts/domain/ManuscriptId';
+import { Coupon, CouponType, CouponStatus } from '../../domain/Coupon';
+import { Manuscript } from '../../../manuscripts/domain/Manuscript';
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
+import { CouponAssigned } from '../../domain/CouponAssigned';
+import { PayerType } from '../../../payers/domain/Payer';
+import { CouponCode } from '../../domain/CouponCode';
 
 import { AddressMap } from '../../../addresses/mappers/AddressMap';
 import { PayerMap } from '../../../payers/mapper/Payer';
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { ManuscriptId } from '../../../invoices/domain/ManuscriptId';
-import { PayerType } from '../../../payers/domain/Payer';
 
-import { ConfirmInvoiceUsecase } from '../../../invoices/usecases/confirmInvoice/confirmInvoice';
-import { ConfirmInvoiceDTO } from '../../../invoices/usecases/confirmInvoice/confirmInvoiceDTO';
-import { Invoice } from '../../../invoices/domain/Invoice';
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-import { InvoiceStatus } from '../../../invoices/domain/Invoice';
+import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
+import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
+import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
+import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
+import { CouponRepoContract } from '../../../coupons/repos/couponRepo';
+import { WaiverRepoContract } from '../../../waivers/repos/waiverRepo';
+import { TransactionRepoContract } from '../../../transactions/repos';
+import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 
-import { TransactionStatus } from '../../../transactions/domain/Transaction';
-import { GetTransactionUsecase } from '../../../transactions/usecases/getTransaction/getTransaction';
 import { GetManuscriptByManuscriptIdUsecase } from './../../../manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptId';
-import { Coupon, CouponType, CouponStatus } from '../../domain/Coupon';
-import { CouponCode } from '../../domain/CouponCode';
-import { CouponAssigned } from '../../domain/CouponAssigned';
-
-import { ApplyCouponToInvoiceResponse } from './applyCouponToInvoiceResponse';
-import { ApplyCouponToInvoiceDTO } from './applyCouponToInvoiceDTO';
+import { GetTransactionUsecase } from '../../../transactions/usecases/getTransaction/getTransaction';
+import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsForInvoice';
 import {
-  CouponAlreadyUsedForInvoiceError,
-  InvoiceConfirmationFailed,
-  InvoiceStatusInvalidError,
-  CouponAlreadyUsedError,
-  InvoiceNotFoundError,
-  CouponInactiveError,
-  CouponNotFoundError,
-  CouponExpiredError,
-  CouponInvalidError,
-} from './applyCouponToInvoiceErrors';
+  ConfirmInvoiceUsecase,
+  ConfirmInvoiceDTO,
+} from '../../../invoices/usecases/confirmInvoice';
+
+import { ApplyCouponToInvoiceResponse as Response } from './applyCouponToInvoiceResponse';
+import { ApplyCouponToInvoiceDTO as DTO } from './applyCouponToInvoiceDTO';
+import * as Errors from './applyCouponToInvoiceErrors';
 
 export class ApplyCouponToInvoiceUsecase
-  implements
-    UseCase<
-      ApplyCouponToInvoiceDTO,
-      Promise<ApplyCouponToInvoiceResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      ApplyCouponToInvoiceDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -85,27 +64,20 @@ export class ApplyCouponToInvoiceUsecase
     private loggerService: LoggerContract
   ) {}
 
-  public async execute(
-    request: ApplyCouponToInvoiceDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<ApplyCouponToInvoiceResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const {
-      // manuscriptRepo,
       invoiceItemRepo,
       transactionRepo,
       invoiceRepo,
       addressRepo,
       payerRepo,
       couponRepo,
-      // transactionRepo,
       waiverRepo,
       emailService,
       vatService,
       loggerService,
     } = this;
     const {
-      // customId,
-      // published,
       sanctionedCountryNotificationReceiver,
       sanctionedCountryNotificationSender,
     } = request;
@@ -126,15 +98,24 @@ export class ApplyCouponToInvoiceUsecase
 
       const coupon = couponResult as Coupon;
 
-      const invoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
-        invoice.invoiceId
+      const maybeInvoiceItems = await this.getInvoiceItems(
+        invoice.invoiceId,
+        context
       );
-      if (!invoiceItems) {
-        return left(new InvoiceNotFoundError(request.invoiceId));
+
+      if (maybeInvoiceItems.isLeft()) {
+        return left(
+          new Errors.InvoiceItemsNotFoundError(
+            request.invoiceId,
+            new Error(maybeInvoiceItems.value.message)
+          )
+        );
       }
 
+      const invoiceItems = maybeInvoiceItems.value;
+
       // * Associate the Invoice Items instances to the Invoice instance
-      invoiceItems.forEach((ii) => invoice.addInvoiceItem(ii));
+      invoice.addItems(invoiceItems);
 
       let assignedCoupons = 0;
       for (const invoiceItem of invoiceItems) {
@@ -142,53 +123,48 @@ export class ApplyCouponToInvoiceUsecase
           continue;
         }
 
-        const existingCoupons = await this.couponRepo.getCouponsByInvoiceItemId(
-          invoiceItem.invoiceItemId
-        );
-        if (
-          existingCoupons.coupons.some((c) =>
-            c.couponId.equals(coupon.couponId)
-          )
-        ) {
-          return left(new CouponAlreadyUsedForInvoiceError(request.couponCode));
-        }
-
-        invoiceItem.addAssignedCoupons(existingCoupons);
         const newCouponAssignment = CouponAssigned.create({
           invoiceItemId: invoiceItem.invoiceItemId,
           dateAssigned: null,
           coupon,
         });
+
+        if (invoiceItem.assignedCoupons.exists(newCouponAssignment)) {
+          return left(
+            new Errors.CouponAlreadyUsedForInvoiceError(request.couponCode)
+          );
+        }
+
         invoiceItem.addAssignedCoupon(newCouponAssignment);
 
-        await this.couponRepo.assignCouponToInvoiceItem(
+        const maybeAssigned = await this.couponRepo.assignCouponToInvoiceItem(
           coupon,
           invoiceItem.invoiceItemId
         );
+
+        if (maybeAssigned.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeAssigned.value.message))
+          );
+        }
+
         assignedCoupons++;
       }
 
       if (assignedCoupons === 0) {
         return left(
-          new CouponInvalidError(request.couponCode, request.invoiceId)
+          new Errors.CouponInvalidError(request.couponCode, request.invoiceId)
         );
       }
 
-      const total = invoice.invoiceItems
-        .getItems()
-        .reduce((sum, ii) => sum + ii.calculateNetPrice(), 0);
-
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
-      if (total <= 0) {
-        const manuscriptId = ManuscriptId.create(
-          new UniqueEntityID(
-            [...invoice.invoiceItems.getItems()]
-              .shift()
-              .manuscriptId.id.toString()
-          )
-        ).getValue();
+      if (invoice.invoiceTotal <= 0) {
+        const manuscriptId = invoice.invoiceItems.getItems()[0].manuscriptId;
 
-        const manuscriptResult = await this.getManuscript(manuscriptId);
+        const manuscriptResult = await this.getManuscript(
+          manuscriptId,
+          context
+        );
         if (manuscriptResult instanceof Error) {
           return left(manuscriptResult as any);
         }
@@ -210,12 +186,18 @@ export class ApplyCouponToInvoiceUsecase
         );
 
         // * create new address
-        const newAddress = AddressMap.toDomain({
+        const maybeAddress = AddressMap.toDomain({
           country: manuscript.authorCountry,
         });
 
+        if (maybeAddress.isLeft()) {
+          return left(maybeAddress.value);
+        }
+
+        const newAddress = maybeAddress.value;
+
         // * create new payer
-        const newPayer = PayerMap.toDomain({
+        const maybeNewPayer = PayerMap.toDomain({
           // * associate new payer to the invoice
           invoiceId: invoice.invoiceId.id.toString(),
           name: `${manuscript.authorFirstName} ${manuscript.authorSurname}`,
@@ -224,6 +206,12 @@ export class ApplyCouponToInvoiceUsecase
           organization: ' ',
           type: PayerType.INDIVIDUAL,
         });
+
+        if (maybeNewPayer.isLeft()) {
+          return left(maybeNewPayer.value);
+        }
+
+        const newPayer = maybeNewPayer.value;
 
         const confirmInvoiceArgs: ConfirmInvoiceDTO = {
           payer: {
@@ -234,7 +222,7 @@ export class ApplyCouponToInvoiceUsecase
           sanctionedCountryNotificationSender,
         };
 
-        const transaction = await this.getTransaction(invoice);
+        const transaction = await this.getTransaction(invoice, context);
         if (transaction instanceof Error) {
           return left(transaction as any);
         }
@@ -250,7 +238,7 @@ export class ApplyCouponToInvoiceUsecase
 
             if (result.isLeft()) {
               return left(
-                new InvoiceConfirmationFailed(result.value.errorValue().message)
+                new Errors.InvoiceConfirmationFailed(result.value.message)
               );
             }
           } catch (err) {
@@ -264,30 +252,28 @@ export class ApplyCouponToInvoiceUsecase
       invoice.generateInvoiceDraftAmountUpdatedEvent();
       DomainEvents.dispatchEventsForAggregate(invoice.id);
 
-      return right(Result.ok(coupon));
+      return right(coupon);
     } catch (error) {
       return left(new UnexpectedError(error));
     }
   }
 
-  private async getTransaction(invoice: Invoice) {
+  private async getTransaction(invoice: Invoice, context: Context) {
     const { transactionRepo } = this;
 
     const usecase = new GetTransactionUsecase(transactionRepo);
     const transactionId = invoice?.transactionId?.id?.toString();
 
-    const result = await usecase.execute({ transactionId }, {
-      roles: [Roles.SUPER_ADMIN],
-    } as UsecaseAuthorizationContext);
+    const result = await usecase.execute({ transactionId }, context);
 
-    if (result.isFailure) {
-      return new Error(result.error as any);
+    if (result.isLeft()) {
+      return new Error(result.value.message);
     }
 
-    return result.getValue();
+    return result.value;
   }
 
-  private async getManuscript(manuscriptId: ManuscriptId) {
+  private async getManuscript(manuscriptId: ManuscriptId, context: Context) {
     const { manuscriptRepo, loggerService } = this;
 
     loggerService.info(
@@ -298,32 +284,31 @@ export class ApplyCouponToInvoiceUsecase
 
     const result = await usecase.execute(
       { manuscriptId: manuscriptId?.id?.toString() },
-      {
-        roles: [Roles.SUPER_ADMIN],
-      } as UsecaseAuthorizationContext
+      context
     );
 
-    if (result.value.isFailure) {
-      return new Error(result.value.errorValue as any);
+    if (result.isLeft()) {
+      return new Error(result.value.message);
     }
 
-    return result.value.getValue();
+    return result.value;
   }
 
   private async getInvoice(request: Record<string, any>) {
     const { invoiceRepo } = this;
 
-    const invoiceId = InvoiceId.create(
-      new UniqueEntityID(request.invoiceId)
-    ).getValue();
+    const invoiceId = InvoiceId.create(new UniqueEntityID(request.invoiceId));
 
-    const invoice = await invoiceRepo.getInvoiceById(invoiceId);
-    if (!invoice) {
-      return new InvoiceNotFoundError(invoiceId.id.toString());
+    const maybeInvoice = await invoiceRepo.getInvoiceById(invoiceId);
+
+    if (maybeInvoice.isLeft()) {
+      return maybeInvoice.value;
     }
 
+    const invoice = maybeInvoice.value;
+
     if (invoice.status !== InvoiceStatus.DRAFT) {
-      return new InvoiceStatusInvalidError(
+      return new Errors.InvoiceStatusInvalidError(
         request.couponCode,
         invoice.persistentReferenceNumber
       );
@@ -336,27 +321,37 @@ export class ApplyCouponToInvoiceUsecase
     const { couponRepo } = this;
 
     request.couponCode = request.couponCode.toUpperCase().trim();
-    const couponCodeResult = CouponCode.create(request.couponCode);
+    const maybeCouponCode = CouponCode.create(request.couponCode);
+    if (maybeCouponCode.isLeft()) {
+      return maybeCouponCode.value;
+    }
+    const couponCode = maybeCouponCode.value;
 
-    let couponCode;
-    if (couponCodeResult.isSuccess) {
-      couponCode = couponCodeResult.getValue();
-    } else {
-      return new CouponNotFoundError(request.couponCode);
+    const maybeCoupon = await couponRepo.getCouponByCode(couponCode);
+
+    if (maybeCoupon.isLeft()) {
+      if (
+        maybeCoupon.value instanceof RepoError &&
+        maybeCoupon.value.code === RepoErrorCode.ENTITY_NOT_FOUND
+      ) {
+        return new Errors.CouponNotFoundError(request.couponCode);
+      }
+
+      return maybeCoupon.value;
     }
 
-    const coupon = await couponRepo.getCouponByCode(couponCode);
+    const coupon = maybeCoupon.value;
 
     if (!coupon) {
-      return new CouponNotFoundError(request.couponCode);
+      return new Errors.CouponNotFoundError(request.couponCode);
     }
 
     if (coupon.status === CouponStatus.INACTIVE) {
-      return new CouponInactiveError(request.couponCode);
+      return new Errors.CouponInactiveError(request.couponCode);
     }
 
     if (coupon.couponType === CouponType.SINGLE_USE && coupon.redeemCount > 0) {
-      return new CouponAlreadyUsedError(request.couponCode);
+      return new Errors.CouponAlreadyUsedError(request.couponCode);
     }
 
     const now = new Date();
@@ -365,9 +360,19 @@ export class ApplyCouponToInvoiceUsecase
       coupon.couponType === CouponType.MULTIPLE_USE &&
       coupon.expirationDate < now
     ) {
-      return new CouponExpiredError(request.couponCode);
+      return new Errors.CouponExpiredError(request.couponCode);
     }
 
     return coupon;
+  }
+
+  private async getInvoiceItems(invoiceId: InvoiceId, context: Context) {
+    const usecase = new GetItemsForInvoiceUsecase(
+      this.invoiceItemRepo,
+      this.couponRepo,
+      this.waiverRepo
+    );
+
+    return usecase.execute({ invoiceId: invoiceId.toString() }, context);
   }
 }

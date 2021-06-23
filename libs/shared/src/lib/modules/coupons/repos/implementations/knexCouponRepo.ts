@@ -1,3 +1,6 @@
+import { Either, flatten, right, left } from '../../../../core/logic/Either';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
+
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 import { RepoError } from '../../../../infrastructure/RepoError';
@@ -21,12 +24,13 @@ export class KnexCouponRepo
   implements CouponRepoContract {
   async getCouponsByInvoiceItemId(
     invoiceItemId: InvoiceItemId
-  ): Promise<CouponAssignedCollection> {
+  ): Promise<Either<GuardFailure | RepoError, CouponAssignedCollection>> {
     const { db } = this;
 
     const coupons = await db
       .select(
         `${TABLES.INVOICE_ITEMS_TO_COUPONS}.dateCreated as dateAssigned`,
+        `${TABLES.INVOICE_ITEMS_TO_COUPONS}.invoiceItemId`,
         `${TABLES.COUPONS}.invoiceItemType`,
         `${TABLES.COUPONS}.expirationDate`,
         `${TABLES.COUPONS}.dateCreated`,
@@ -51,20 +55,29 @@ export class KnexCouponRepo
     return CouponMap.toDomainCollection(coupons);
   }
 
-  async getCouponByCode(code: CouponCode): Promise<Coupon> {
+  async getCouponByCode(
+    code: CouponCode
+  ): Promise<Either<GuardFailure | RepoError, Coupon>> {
     const { db } = this;
     const coupon = await db
       .select()
       .from(TABLES.COUPONS)
       .where('code', code.value)
       .first();
-    return coupon ? CouponMap.toDomain(coupon) : null;
+
+    if (!coupon) {
+      return left(
+        RepoError.createEntityNotFoundError('coupon by code', code.toString())
+      );
+    }
+
+    return CouponMap.toDomain(coupon);
   }
 
   async assignCouponToInvoiceItem(
     coupon: Coupon,
     invoiceItemId: InvoiceItemId
-  ): Promise<Coupon> {
+  ): Promise<Either<GuardFailure | RepoError, Coupon>> {
     const { db } = this;
     await db(TABLES.INVOICE_ITEMS_TO_COUPONS).insert({
       invoiceItemId: invoiceItemId.id.toString(),
@@ -74,18 +87,24 @@ export class KnexCouponRepo
     return this.incrementRedeemedCount(coupon);
   }
 
-  async incrementRedeemedCount(coupon: Coupon): Promise<Coupon> {
+  async incrementRedeemedCount(
+    coupon: Coupon
+  ): Promise<Either<GuardFailure | RepoError, Coupon>> {
     const { db } = this;
     const updatedCoupon = await db(TABLES.COUPONS)
       .increment('redeemCount')
       .where('id', coupon.id.toString());
     if (!updatedCoupon) {
-      RepoError.createEntityNotFoundError('coupon', coupon.id.toString());
+      return left(
+        RepoError.createEntityNotFoundError('coupon', coupon.id.toString())
+      );
     }
     return this.getCouponById(coupon.couponId);
   }
 
-  async update(coupon: Coupon): Promise<Coupon> {
+  async update(
+    coupon: Coupon
+  ): Promise<Either<GuardFailure | RepoError, Coupon>> {
     const { db } = this;
 
     const updateObject = {
@@ -93,17 +112,21 @@ export class KnexCouponRepo
     };
 
     const updated = await db(TABLES.COUPONS)
-      .where({ id: coupon.couponId.id.toString() })
+      .where({ id: coupon.id.toString() })
       .update(updateObject);
 
     if (!updated) {
-      throw RepoError.createEntityNotFoundError('coupon', coupon.id.toString());
+      return left(
+        RepoError.createEntityNotFoundError('coupon', coupon.id.toString())
+      );
     }
 
     return this.getCouponById(coupon.couponId);
   }
 
-  async getCouponById(couponId: CouponId): Promise<Coupon> {
+  async getCouponById(
+    couponId: CouponId
+  ): Promise<Either<GuardFailure | RepoError, Coupon>> {
     const { db } = this;
 
     const couponRow = await db(TABLES.COUPONS)
@@ -111,23 +134,22 @@ export class KnexCouponRepo
       .where('id', couponId.id.toString())
       .first();
 
-    return couponRow ? CouponMap.toDomain(couponRow) : null;
+    return CouponMap.toDomain(couponRow);
   }
 
-  async getCouponCollection(): Promise<Coupon[]> {
+  async getCouponCollection(): Promise<
+    Either<GuardFailure | RepoError, Coupon[]>
+  > {
     const { db } = this;
 
-    const couponsRows = await db(TABLES.COUPONS);
+    const couponsRows: Array<any> = await db(TABLES.COUPONS);
 
-    return couponsRows.reduce((aggregator, t) => {
-      aggregator.push(CouponMap.toDomain(t));
-      return aggregator;
-    }, []);
+    return flatten(couponsRows.map(CouponMap.toDomain));
   }
 
   async getRecentCoupons(
     args?: GetRecentCouponsArguments
-  ): Promise<PaginatedCouponsResult> {
+  ): Promise<Either<GuardFailure | RepoError, PaginatedCouponsResult>> {
     const { pagination } = args;
     const { db } = this;
 
@@ -142,19 +164,23 @@ export class KnexCouponRepo
       .limit(pagination.limit)
       .select([`${TABLES.COUPONS}.*`]);
 
-    return {
+    return flatten(coupons.map(CouponMap.toDomain)).map((coupons) => ({
       totalCount,
-      coupons: coupons.map((c) => CouponMap.toDomain(c)),
-    };
+      coupons,
+    }));
   }
 
-  async exists(coupon: Coupon): Promise<boolean> {
+  async exists(
+    coupon: Coupon
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     const result = await this.getCouponById(coupon.couponId);
 
-    return !!result;
+    return right(!!result);
   }
 
-  async save(coupon: Coupon): Promise<Coupon> {
+  async save(
+    coupon: Coupon
+  ): Promise<Either<GuardFailure | RepoError, Coupon>> {
     const { db } = this;
     const data = CouponMap.toPersistence(coupon);
 
@@ -163,13 +189,15 @@ export class KnexCouponRepo
     return this.getCouponById(coupon.couponId);
   }
 
-  async isCodeUsed(code: CouponCode | string): Promise<boolean> {
+  async isCodeUsed(
+    code: CouponCode | string
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     const rawValue = code instanceof CouponCode ? code.value : code;
     const { db } = this;
     const result = await db(TABLES.COUPONS)
       .select('code')
       .where('code', rawValue);
 
-    return !!result.length;
+    return right(!!result.length);
   }
 }

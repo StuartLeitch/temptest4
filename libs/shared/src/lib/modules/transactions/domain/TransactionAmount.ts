@@ -1,5 +1,6 @@
-import {ValueObject} from '../../../core/domain/ValueObject';
-import {Result} from '../../../core/logic/Result';
+import { Either, right, left } from '../../../core/logic/Either';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { ValueObject } from '../../../core/domain/ValueObject';
 
 interface TransactionAmountProps {
   value: number;
@@ -14,11 +15,11 @@ export class TransactionAmount extends ValueObject<TransactionAmountProps> {
     super(props);
   }
 
-  public static create(value: number): Result<TransactionAmount> {
+  public static create(value: number): Either<GuardFailure, TransactionAmount> {
     if (isNaN(value) || value === 0 || value < 0) {
-      return Result.fail<TransactionAmount>('Must provide a valid amount');
+      return left(new GuardFailure('Must provide a valid amount'));
     } else {
-      return Result.ok<TransactionAmount>(new TransactionAmount({value}));
+      return right(new TransactionAmount({ value }));
     }
   }
 }

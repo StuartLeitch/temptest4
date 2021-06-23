@@ -1,6 +1,7 @@
-import {ValueObject} from '../core/domain/ValueObject';
-import {Result} from '../core/logic/Result';
-import {Guard} from '../core/logic/Guard';
+import { Either, right, left } from '../core/logic/Either';
+import { GuardFailure } from '../core/logic/GuardFailure';
+import { ValueObject } from '../core/domain/ValueObject';
+import { Guard } from '../core/logic/Guard';
 
 interface PhoneNumberProps {
   value: string;
@@ -15,12 +16,12 @@ export class PhoneNumber extends ValueObject<PhoneNumberProps> {
     super(props);
   }
 
-  public static create(number: string): Result<PhoneNumber> {
+  public static create(number: string): Either<GuardFailure, PhoneNumber> {
     const guardResult = Guard.againstNullOrUndefined(number, 'phone number');
     if (!guardResult.succeeded) {
-      return Result.fail<PhoneNumber>(guardResult.message);
+      return left(new GuardFailure(guardResult.message));
     } else {
-      return Result.ok<PhoneNumber>(new PhoneNumber({value: number}));
+      return right(new PhoneNumber({ value: number }));
     }
   }
 }

@@ -1,34 +1,28 @@
 // * Core Domain
+import { flatten, right, left } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
-import { right, left } from '../../../../core/logic/Result';
 
 // * Authorization Logic
 import {
+  UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
-  UsecaseAuthorizationContext,
   AccessControlContext,
 } from '../../../../domain/authorization';
 
+import { EventMappingRegistryContract } from '../../contracts/EventMappingRegistry';
+
 import { EventMap } from '../../mappers/EventMap';
+
 import { EventsRepoContract } from '../../repos/EventsRepo';
 
-import { SaveEventsDTO } from './saveEventsDTO';
-import { SaveEventsResponse } from './saveEventsResponse';
-import { EventMappingRegistryContract } from '../../contracts/EventMappingRegistry';
+import { SaveEventsResponse as Response } from './saveEventsResponse';
+import { SaveEventsDTO as DTO } from './saveEventsDTO';
 
 export class SaveEventsUsecase
   implements
-    UseCase<
-      SaveEventsDTO,
-      Promise<SaveEventsResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      SaveEventsDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
-  authorizationContext: UsecaseAuthorizationContext;
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  authorizationContext: Context;
 
   constructor(
     private eventsRepo: EventsRepoContract,
@@ -37,10 +31,7 @@ export class SaveEventsUsecase
     this.authorizationContext = { roles: [] };
   }
 
-  public async execute(
-    request: SaveEventsDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<SaveEventsResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       if (request.events.length === 0) {
         console.log('No events to save');
@@ -48,15 +39,25 @@ export class SaveEventsUsecase
       }
       await Promise.all(
         this.policyRegistry.mapEvents(request.events).map((mapping) => {
-          const persistenceEvents = mapping.events.map((raw) => {
-            return EventMap.toDomain({
-              id: raw.id,
-              time: raw.timestamp,
-              type: raw.event,
-              payload: JSON.stringify(raw.data),
-            });
-          });
-          return this.eventsRepo.upsertEvents(mapping.table, persistenceEvents);
+          const persistenceEvents = flatten(
+            mapping.events.map((raw) => {
+              return EventMap.toDomain({
+                id: raw.id,
+                time: raw.timestamp,
+                type: raw.event,
+                payload: JSON.stringify(raw.data),
+              });
+            })
+          );
+
+          if (persistenceEvents.isLeft()) {
+            return Promise.reject(persistenceEvents.value);
+          }
+
+          return this.eventsRepo.upsertEvents(
+            mapping.table,
+            persistenceEvents.value
+          );
         })
       );
     } catch (error) {

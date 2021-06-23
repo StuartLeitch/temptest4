@@ -1,29 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
-import { Result, right, left } from '../../../../../core/logic/Result';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
+import { Left, right, left } from '../../../../../core/logic/Either';
 import { UseCase } from '../../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  UsecaseAuthorizationContext,
-  AccessControlledUsecase,
-  AccessControlContext,
-} from '../../../../../domain/authorization';
-
-import { ErpServiceContract } from '../../../../../domain/services/ErpService';
-import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
-import { InvoiceItemRepoContract } from './../../../repos/invoiceItemRepo';
-import { PayerRepoContract } from '../../../../payers/repos/payerRepo';
-import { PublisherRepoContract } from '../../../../publishers/repos';
-import { ArticleRepoContract } from '../../../../manuscripts/repos';
-import { InvoiceRepoContract } from './../../../repos/invoiceRepo';
-import { CatalogRepoContract } from '../../../../journals/repos';
-import { CouponRepoContract } from '../../../../coupons/repos';
-import { WaiverRepoContract } from '../../../../waivers/repos';
-import { ErpReferenceRepoContract } from '../../../../vendors/repos';
+import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
 
 import { Manuscript } from '../../../../manuscripts/domain/Manuscript';
 import { JournalId } from '../../../../journals/domain/JournalId';
@@ -31,29 +12,30 @@ import { Address } from '../../../../addresses/domain/Address';
 import { Payer } from '../../../../payers/domain/Payer';
 import { InvoiceId } from '../../../domain/InvoiceId';
 import { Invoice } from '../../../domain/Invoice';
+
 import { ErpReferenceMap } from './../../../../vendors/mapper/ErpReference';
+
+import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
+import { InvoiceItemRepoContract } from './../../../repos/invoiceItemRepo';
+import { PayerRepoContract } from '../../../../payers/repos/payerRepo';
+import { ErpReferenceRepoContract } from '../../../../vendors/repos';
+import { PublisherRepoContract } from '../../../../publishers/repos';
+import { ArticleRepoContract } from '../../../../manuscripts/repos';
+import { InvoiceRepoContract } from './../../../repos/invoiceRepo';
+import { CatalogRepoContract } from '../../../../journals/repos';
+import { CouponRepoContract } from '../../../../coupons/repos';
+import { WaiverRepoContract } from '../../../../waivers/repos';
+
+import { ErpServiceContract } from '../../../../../domain/services/ErpService';
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 
 import { GetItemsForInvoiceUsecase } from './../../getItemsForInvoice/getItemsForInvoice';
 
-import { PublishRevenueRecognitionToErpResponse } from './publishRevenueRecognitionToErpResponse';
-
-export interface PublishRevenueRecognitionToErpRequestDTO {
-  invoiceId?: string;
-}
+import { PublishRevenueRecognitionToErpResponse as Response } from './publishRevenueRecognitionToErpResponse';
+import { PublishRevenueRecognitionToErpRequestDTO as DTO } from './publishRevenueRecognitionToErpDTO';
 
 export class PublishRevenueRecognitionToErpUsecase
-  implements
-    UseCase<
-      PublishRevenueRecognitionToErpRequestDTO,
-      Promise<PublishRevenueRecognitionToErpResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      PublishRevenueRecognitionToErpRequestDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -69,15 +51,7 @@ export class PublishRevenueRecognitionToErpUsecase
     private loggerService: LoggerContract
   ) {}
 
-  private async getAccessControlContext(request: any, context?: any) {
-    return {};
-  }
-
-  // @Authorize('zzz:zzz')
-  public async execute(
-    request: PublishRevenueRecognitionToErpRequestDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<PublishRevenueRecognitionToErpResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     let invoice: Invoice;
     let payer: Payer;
     let address: Address;
@@ -85,7 +59,7 @@ export class PublishRevenueRecognitionToErpUsecase
 
     const invoiceId: InvoiceId = InvoiceId.create(
       new UniqueEntityID(request.invoiceId)
-    ).getValue();
+    );
     const getItemsUsecase = new GetItemsForInvoiceUsecase(
       this.invoiceItemRepo,
       this.couponRepo,
@@ -93,7 +67,13 @@ export class PublishRevenueRecognitionToErpUsecase
     );
 
     try {
-      invoice = await this.invoiceRepo.getInvoiceById(invoiceId);
+      const maybeInvoice = await this.invoiceRepo.getInvoiceById(invoiceId);
+
+      if (maybeInvoice.isLeft()) {
+        return left(this.getReturnError(maybeInvoice));
+      }
+
+      invoice = maybeInvoice.value;
 
       const itemsResult = await getItemsUsecase.execute({
         invoiceId: request.invoiceId,
@@ -105,7 +85,7 @@ export class PublishRevenueRecognitionToErpUsecase
         );
       }
 
-      const invoiceItems = itemsResult.value.getValue();
+      const invoiceItems = itemsResult.value;
       if (invoiceItems.length === 0) {
         throw new Error(`Invoice ${invoice.id} has no invoice items.`);
       }
@@ -113,39 +93,53 @@ export class PublishRevenueRecognitionToErpUsecase
       invoice.addItems(invoiceItems);
 
       if (!invoice.isCreditNote()) {
-        payer = await this.payerRepo.getPayerByInvoiceId(invoice.invoiceId);
-        if (!payer) {
+        const maybePayer = await this.payerRepo.getPayerByInvoiceId(
+          invoice.invoiceId
+        );
+        if (maybePayer.isLeft()) {
           throw new Error(`Invoice ${invoice.id} has no payers.`);
         }
 
-        address = await this.addressRepo.findById(payer.billingAddressId);
-        if (!address) {
+        payer = maybePayer.value;
+
+        const maybeAddress = await this.addressRepo.findById(
+          payer.billingAddressId
+        );
+        if (maybeAddress.isLeft()) {
           throw new Error(`Invoice ${invoice.id} has no address associated.`);
         }
+
+        address = maybeAddress.value;
       }
 
-      manuscript = await this.manuscriptRepo.findById(
+      const maybeManuscript = await this.manuscriptRepo.findById(
         invoiceItems[0].manuscriptId
       );
-      if (!manuscript) {
+      if (maybeManuscript.isLeft()) {
         throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
       }
 
+      const manuscript = maybeManuscript.value;
+
       if (!manuscript.datePublished) {
-        return right(Result.ok<any>(null));
+        return right(null);
       }
 
       // * If it's a credit node and the manuscript has been published
       if (invoice.isCreditNote() && manuscript.datePublished) {
-        return right(Result.ok<any>(null));
+        return right(null);
       }
 
       const { customId } = manuscript;
 
       // * Get all invoices associated with this custom id
-      const referencedInvoicesByCustomId: any[] = await this.invoiceRepo.getInvoicesByCustomId(
-        customId
-      );
+      const maybeRef = await this.invoiceRepo.getInvoicesByCustomId(customId);
+
+      if (maybeRef.isLeft()) {
+        return left(this.getReturnError(maybeRef));
+      }
+
+      const referencedInvoicesByCustomId = maybeRef.value;
 
       // * If the invoice has a credit note
       // * and the manuscript has been published before its creation
@@ -155,33 +149,35 @@ export class PublishRevenueRecognitionToErpUsecase
       );
 
       if (associatedCreditNote) {
-        const creditNoteCreatedOn = new Date(
-          associatedCreditNote.invoiceDateCreated
-        );
+        const creditNoteCreatedOn = new Date(associatedCreditNote.dateCreated);
         const { datePublished: manuscriptPublishedOn } = manuscript;
 
         if (
           !invoice.isCreditNote() &&
           creditNoteCreatedOn.getTime() > manuscriptPublishedOn.getTime()
         ) {
-          return right(Result.ok<any>(null));
+          return right(null);
         }
       }
 
-      const catalog = await this.catalogRepo.getCatalogItemByJournalId(
-        JournalId.create(new UniqueEntityID(manuscript.journalId)).getValue()
+      const maybeCatalog = await this.catalogRepo.getCatalogItemByJournalId(
+        JournalId.create(new UniqueEntityID(manuscript.journalId))
       );
 
-      if (!catalog) {
+      if (maybeCatalog.isLeft()) {
         throw new Error(`Invoice ${invoice.id} has no catalog associated.`);
       }
 
-      const publisherCustomValues = await this.publisherRepo.getCustomValuesByPublisherId(
+      const catalog = maybeCatalog.value;
+
+      const maybePublisherCustomValues = await this.publisherRepo.getCustomValuesByPublisherId(
         catalog.publisherId
       );
-      if (!publisherCustomValues) {
+      if (maybePublisherCustomValues.isLeft()) {
         throw new Error(`Invoice ${invoice.id} has no publisher associated.`);
       }
+
+      const publisherCustomValues = maybePublisherCustomValues.value;
 
       const invoiceItem = invoice.invoiceItems.getItems().shift();
       const { assignedCoupons, assignedWaivers, price } = invoiceItem;
@@ -203,7 +199,7 @@ export class PublishRevenueRecognitionToErpUsecase
 
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (netCharges <= 0) {
-        const nonInvoiceableErpReference = ErpReferenceMap.toDomain({
+        const maybeNonInvoiceableErpReference = ErpReferenceMap.toDomain({
           entity_id: invoice.invoiceId.id.toString(),
           type: 'invoice',
           vendor: this.erpService.vendorName,
@@ -212,8 +208,23 @@ export class PublishRevenueRecognitionToErpUsecase
             'revenueRecognition',
           value: 'NON_INVOICEABLE',
         });
-        await this.erpReferenceRepo.save(nonInvoiceableErpReference);
-        return right(Result.ok<any>(null));
+
+        if (maybeNonInvoiceableErpReference.isLeft()) {
+          return left(this.getReturnError(maybeNonInvoiceableErpReference));
+        }
+
+        const nonInvoiceableErpReference =
+          maybeNonInvoiceableErpReference.value;
+
+        const maybeSaveResult = await this.erpReferenceRepo.save(
+          nonInvoiceableErpReference
+        );
+
+        if (maybeSaveResult.isLeft()) {
+          return left(this.getReturnError(maybeSaveResult));
+        }
+
+        return right(null);
       }
 
       const existingRevenueRecognition = await this.erpService.getExistingRevenueRecognition(
@@ -222,7 +233,7 @@ export class PublishRevenueRecognitionToErpUsecase
       );
 
       if (existingRevenueRecognition.count === 1) {
-        const erpReference = ErpReferenceMap.toDomain({
+        const maybeErpReference = ErpReferenceMap.toDomain({
           entity_id: invoice.invoiceId.id.toString(),
           type: 'invoice',
           vendor: this.erpService.vendorName,
@@ -231,8 +242,20 @@ export class PublishRevenueRecognitionToErpUsecase
             'revenueRecognition',
           value: String(existingRevenueRecognition.id),
         });
-        await this.erpReferenceRepo.save(erpReference);
-        return right(Result.ok<any>(null));
+
+        if (maybeErpReference.isLeft()) {
+          return left(this.getReturnError(maybeErpReference));
+        }
+
+        const erpReference = maybeErpReference.value;
+
+        const maybeSaveResult = await this.erpReferenceRepo.save(erpReference);
+
+        if (maybeSaveResult.isLeft()) {
+          return left(this.getReturnError(maybeSaveResult));
+        }
+
+        return right(null);
       }
 
       const erpResponse = await this.erpService.registerRevenueRecognition({
@@ -251,7 +274,7 @@ export class PublishRevenueRecognitionToErpUsecase
             erpResponse
           )}`
         );
-        const erpReference = ErpReferenceMap.toDomain({
+        const maybeErpReference = ErpReferenceMap.toDomain({
           entity_id: invoice.invoiceId.id.toString(),
           type: 'invoice',
           vendor: this.erpService.vendorName,
@@ -260,17 +283,33 @@ export class PublishRevenueRecognitionToErpUsecase
             'revenueRecognition',
           value: String(erpResponse?.journal?.id),
         });
-        await this.erpReferenceRepo.save(erpReference);
+
+        if (maybeErpReference.isLeft()) {
+          return left(this.getReturnError(maybeErpReference));
+        }
+
+        const erpReference = maybeErpReference.value;
+
+        const maybeSaveResult = await this.erpReferenceRepo.save(erpReference);
+
+        if (maybeSaveResult.isLeft()) {
+          return left(this.getReturnError(maybeSaveResult));
+        }
+
         this.loggerService.info(
           `ERP Revenue Recognized Invoice ${invoice.id.toString()}: Saved ERP reference -> ${JSON.stringify(
             erpResponse
           )}`
         );
       }
-      return right(Result.ok<any>(erpResponse));
+      return right(erpResponse);
     } catch (err) {
       console.log(err);
       return left(new UnexpectedError(err, err.toString()));
     }
+  }
+
+  private getReturnError(err: Left<any, any>): UnexpectedError {
+    return new UnexpectedError(new Error(err.value.message));
   }
 }

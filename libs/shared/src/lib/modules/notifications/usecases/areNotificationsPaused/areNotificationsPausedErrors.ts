@@ -1,38 +1,33 @@
 import { UseCaseError } from '../../../../core/logic/UseCaseError';
-import { Result } from '../../../../core/logic/Result';
 
 import { NotificationType } from '../../domain/Notification';
 
-export class InvalidNotificationType extends Result<UseCaseError> {
+export class InvalidNotificationType extends UseCaseError {
   constructor(type: string) {
-    super(false, {
-      message: `The provided type {${type}} is not a valid notification type, please use one of ${Object.keys(
+    super(
+      `The provided type {${type}} is not a valid notification type, please use one of ${Object.keys(
         NotificationType
-      )}`,
-    });
+      )}`
+    );
   }
 }
 
-export class NotificationTypeRequired extends Result<UseCaseError> {
+export class NotificationTypeRequired extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Notification type is required.`,
-    });
+    super(`Notification type is required.`);
   }
 }
 
-export class InvoiceIdRequired extends Result<UseCaseError> {
+export class InvoiceIdRequired extends UseCaseError {
   constructor() {
-    super(false, {
-      message: `Invoice id is required.`,
-    });
+    super(`Invoice id is required.`);
   }
 }
 
-export class EncounteredDbError extends Result<UseCaseError> {
+export class EncounteredDbError extends UseCaseError {
   constructor(invoiceId: string, e: Error) {
-    super(false, {
-      message: `While retrieving the notification pauses for invoice id {${invoiceId}} an error was encountered: ${e.message}.`,
-    });
+    super(
+      `While retrieving the notification pauses for invoice id {${invoiceId}} an error was encountered: ${e.message}.`
+    );
   }
 }

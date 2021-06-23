@@ -15,6 +15,7 @@ import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/l
 import { Context } from '../../builders';
 
 import { EventHandler } from '../event-handler';
+import { SubmissionSubmittedHelpers } from './submission-submitted/helpers';
 
 import { env } from '../../env';
 
@@ -52,6 +53,16 @@ export const SubmissionQualityCheckPassed: EventHandler<SQCP> = {
         return;
       }
 
+      const helpers = new SubmissionSubmittedHelpers(context);
+      const manuscript = await helpers.getExistingManuscript(submissionId);
+      if (manuscript) {
+        const { journalId } = manuscripts[0];
+
+        if (journalId !== manuscript.journalId) {
+          await helpers.updateInvoicePrice(manuscript.customId, journalId);
+        }
+      }
+
       const maxVersion = manuscripts.reduce((max, m) => {
         const version = VersionCompare.versionCompare(m.version, max)
           ? m.version
@@ -83,13 +94,11 @@ export const SubmissionQualityCheckPassed: EventHandler<SQCP> = {
       );
 
       if (maybeTransaction.isLeft()) {
-        logger.error(maybeTransaction.value.errorValue().message);
-        throw maybeTransaction.value.error;
+        logger.error(maybeTransaction.value.message);
+        throw maybeTransaction.value;
       }
 
-      if (
-        maybeTransaction.value.getValue().status !== TransactionStatus.DRAFT
-      ) {
+      if (maybeTransaction.value.status !== TransactionStatus.DRAFT) {
         return;
       }
 
@@ -136,8 +145,8 @@ export const SubmissionQualityCheckPassed: EventHandler<SQCP> = {
       );
 
       if (result.isLeft()) {
-        logger.error(result.value.errorValue().message);
-        throw result.value.error;
+        logger.error(result.value.message);
+        throw result.value;
       }
     };
   },

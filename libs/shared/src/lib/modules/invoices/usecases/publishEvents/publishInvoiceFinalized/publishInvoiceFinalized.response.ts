@@ -1,5 +1,5 @@
 import { UnexpectedError } from '../../../../../core/logic/AppError';
-import { Either } from '../../../../../core/logic/Result';
+import { Either } from '../../../../../core/logic/Either';
 
 import * as Errors from './publishInvoiceFinalized.errors';
 

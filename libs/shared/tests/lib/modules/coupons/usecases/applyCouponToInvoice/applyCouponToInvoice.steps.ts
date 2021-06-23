@@ -1,5 +1,5 @@
+import { Before, After, Given, When, Then } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
 import { MockLogger } from '../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
 import { EmailService } from '../../../../../../src/lib/infrastructure/communication-channels/EmailService';
@@ -8,10 +8,10 @@ import { setupVatService } from '../../../../../../src/lib/domain/services/mocks
 import { ApplyCouponToInvoiceUsecase } from '../../../../../../src/lib/modules/coupons/usecases/applyCouponToInvoice/applyCouponToInvoice';
 import { ApplyCouponToInvoiceResponse } from '../../../../../../src/lib/modules/coupons/usecases/applyCouponToInvoice/applyCouponToInvoiceResponse';
 
-import {
-  Coupon,
-  CouponType,
-} from '../../../../../../src/lib/modules/coupons/domain/Coupon';
+import { Coupon } from '../../../../../../src/lib/modules/coupons/domain/Coupon';
+
+import { PublisherMap } from '../../../../../../src/lib/modules/publishers/mappers/PublisherMap';
+
 import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import { MockCouponRepo } from '../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
@@ -22,26 +22,27 @@ import { MockCatalogRepo } from '../../../../../../src/lib/modules/journals/repo
 import { MockPayerRepo } from '../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
 import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
 import { MockPublisherRepo } from '../../../../../../src/lib/modules/publishers/repos/mocks/mockPublisherRepo';
-import { PublisherMap } from '../../../../../../src/lib/modules/publishers/mappers/PublisherMap';
 
 import {
-  AddressMap,
   ArticleMap,
   CatalogMap,
   CouponMap,
   Invoice,
   InvoiceMap,
   InvoiceItemMap,
-  PayerMap,
-  PayerType,
   Roles,
   TransactionMap,
   TransactionStatus,
   UsecaseAuthorizationContext,
+  InvoiceId,
+  UniqueEntityID,
+  VATService,
+  WaiverMap,
 } from '../../../../../../src/lib/shared';
+import { WaiverType } from '../../../../../../src/lib/modules/waivers/domain/Waiver';
 
 function makeCouponData(id: string, code: string, overwrites?: any): Coupon {
-  return CouponMap.toDomain({
+  const maybeCoupon = CouponMap.toDomain({
     id,
     code,
     status: 'ACTIVE',
@@ -51,9 +52,15 @@ function makeCouponData(id: string, code: string, overwrites?: any): Coupon {
     name: 'test-coupon',
     ...overwrites,
   });
+
+  if (maybeCoupon.isLeft()) {
+    throw maybeCoupon.value;
+  }
+
+  return maybeCoupon.value;
 }
 function makeInactiveCouponData(code: string, overwrites?: any): Coupon {
-  return CouponMap.toDomain({
+  const maybeCoupon = CouponMap.toDomain({
     id: 'inactivecoupon',
     code,
     status: 'INACTIVE',
@@ -63,20 +70,12 @@ function makeInactiveCouponData(code: string, overwrites?: any): Coupon {
     name: 'test-coupon',
     ...overwrites,
   });
-}
 
-function makeSingleUseCouponData(code: string, overwrites?: any): Coupon {
-  return CouponMap.toDomain({
-    id: 'usedcoupon',
-    code,
-    status: 'ACTIVE',
-    couponType: 'SINGLE_USE',
-    redeemCount: 1,
-    dateCreated: new Date(),
-    invoiceItemType: 'APC',
-    name: 'test-coupon',
-    ...overwrites,
-  });
+  if (maybeCoupon.isLeft()) {
+    throw maybeCoupon.value;
+  }
+
+  return maybeCoupon.value;
 }
 
 let mockInvoiceRepo: MockInvoiceRepo = null;
@@ -123,7 +122,9 @@ Before({ tags: '@ValidateApplyCoupon' }, () => {
     mockInvoiceItemRepo
   );
 
-  mockVatService = setupVatService();
+  setupVatService();
+
+  mockVatService = new VATService();
 
   usecase = new ApplyCouponToInvoiceUsecase(
     mockInvoiceRepo,
@@ -156,59 +157,85 @@ After({ tags: '@ValidateApplyCoupon' }, () => {
   mockVatService = null;
   usecase = null;
 });
+
 Given(
   /^we have an Invoice with id "([\w-]+)"/,
   async (testInvoiceId: string) => {
-    const transaction = TransactionMap.toDomain({
+    const maybeTransaction = TransactionMap.toDomain({
       status: TransactionStatus.ACTIVE,
       deleted: 0,
       dateCreated: new Date(),
       dateUpdated: new Date(),
     });
-    invoice = InvoiceMap.toDomain({
+
+    if (maybeTransaction.isLeft()) {
+      throw maybeTransaction.value;
+    }
+
+    const transaction = maybeTransaction.value;
+
+    const maybeInvoice = InvoiceMap.toDomain({
       transactionId: transaction.id.toValue(),
       status: 'DRAFT',
       dateCreated: new Date(),
       id: testInvoiceId,
     });
 
-    const publisher = PublisherMap.toDomain({
+    if (maybeInvoice.isLeft()) {
+      throw maybeInvoice.value;
+    }
+
+    invoice = maybeInvoice.value;
+
+    const maybePublisher = PublisherMap.toDomain({
       id: 'publisher1',
       customValues: {},
     } as any);
 
-    const catalog = CatalogMap.toDomain({
+    if (maybePublisher.isLeft()) {
+      throw maybePublisher.value;
+    }
+
+    const publisher = maybePublisher.value;
+
+    const maybeCatalog = CatalogMap.toDomain({
       publisherId: publisher.publisherId.id.toString(),
       isActive: true,
       journalId: 'journal1',
     });
 
+    if (maybeCatalog.isLeft()) {
+      throw maybeCatalog.value;
+    }
+
+    const catalog = maybeCatalog.value;
+
     const datePublished = new Date();
-    const manuscript = ArticleMap.toDomain({
+
+    const maybeManuscript = ArticleMap.toDomain({
       customId: '8888',
       journalId: catalog.journalId.id.toValue(),
       datePublished: datePublished.setDate(datePublished.getDate() - 1),
     });
 
-    const invoiceItem = InvoiceItemMap.toDomain({
+    if (maybeManuscript.isLeft()) {
+      throw maybeManuscript.value;
+    }
+
+    const manuscript = maybeManuscript.value;
+
+    const maybeInvoiceItem = InvoiceItemMap.toDomain({
       invoiceId: testInvoiceId,
       manuscriptId: manuscript.manuscriptId.id.toValue().toString(),
       price: 100,
       vat: 0,
     });
 
-    const address = AddressMap.toDomain({
-      country: 'RO',
-    });
-    const payer = PayerMap.toDomain({
-      name: 'Silvestru',
-      addressId: address.id.toValue(),
-      invoiceId: invoice.invoiceId.id.toValue(),
-      type: PayerType.INDIVIDUAL,
-    });
+    if (maybeInvoiceItem.isLeft()) {
+      throw maybeInvoiceItem.value;
+    }
 
-    mockPayerRepo.addMockItem(payer);
-    mockAddressRepo.addMockItem(address);
+    const invoiceItem = maybeInvoiceItem.value;
 
     mockPublisherRepo.addMockItem(publisher);
     mockCatalogRepo.addMockItem(catalog);
@@ -221,20 +248,31 @@ Given(
 );
 
 Given(
-  /^a coupon with id "([\w-]+)" with code "([\w-]+)"/,
-  async (testCouponId: string, testCode: string) => {
-    coupon = makeCouponData(testCouponId, testCode);
-    coupon = await mockCouponRepo.save(coupon);
+  /^a coupon with id "([\w-]+)" with code "([\w-]+)" and reduction "([\d]+)"/,
+  async (testCouponId: string, testCode: string, reduction: string) => {
+    coupon = makeCouponData(testCouponId, testCode, {
+      reduction: Number.parseInt(reduction),
+    });
+    const maybeCoupon = await mockCouponRepo.save(coupon);
+
+    if (maybeCoupon.isLeft()) {
+      throw maybeCoupon.value;
+    }
+
+    coupon = maybeCoupon.value;
   }
 );
 
 When(
   /^I apply coupon for invoice "([\w-]+)" with code "([\w-]+)"/,
   async (testInvoiceId: string, testCode: string) => {
-    response = await usecase.execute({
-      invoiceId: testInvoiceId,
-      couponCode: testCode,
-    });
+    response = await usecase.execute(
+      {
+        invoiceId: testInvoiceId,
+        couponCode: testCode,
+      },
+      context
+    );
   }
 );
 
@@ -249,15 +287,81 @@ When(
   /^I apply inactive coupon for invoice "([\w-]+)" with code "([\w-]+)"/,
   async (testInvoiceId: string, testCode: string) => {
     let inactiveCoupon = makeInactiveCouponData(testCode);
-    inactiveCoupon = await mockCouponRepo.save(inactiveCoupon);
+    const maybeInactiveCoupon = await mockCouponRepo.save(inactiveCoupon);
 
-    response = await usecase.execute({
-      invoiceId: testInvoiceId,
-      couponCode: testCode,
-    });
+    if (maybeInactiveCoupon.isLeft()) {
+      throw maybeInactiveCoupon.value;
+    }
+
+    inactiveCoupon = maybeInactiveCoupon.value;
+
+    response = await usecase.execute(
+      {
+        invoiceId: testInvoiceId,
+        couponCode: testCode,
+      },
+      context
+    );
   }
 );
 
 Then(/^I receive an error that coupon is inactive/, () => {
   expect(response.isLeft()).to.be.true;
 });
+
+Then(
+  /^The invoice with id "([\w-]+)" is auto-confirmed$/,
+  async (invoiceId: string) => {
+    const maybePayer = await mockPayerRepo.getPayerByInvoiceId(
+      InvoiceId.create(new UniqueEntityID(invoiceId))
+    );
+
+    expect(response.isRight()).to.be.true;
+
+    expect(maybePayer.isRight()).to.be.true;
+    if (maybePayer.isRight()) {
+      expect(maybePayer.value).to.exist;
+    }
+  }
+);
+
+Given(
+  /^A waiver of "([\d]+)" is applied to invoice "([\w-]+)"$/,
+  async (reduction: string, invoiceId: string) => {
+    const maybeWaiver = WaiverMap.toDomain({
+      waiverType: WaiverType.EDITOR_DISCOUNT,
+      reduction: Number.parseInt(reduction),
+      isActive: true,
+    });
+
+    if (maybeWaiver.isLeft()) {
+      throw maybeWaiver.value;
+    }
+
+    const waiver = maybeWaiver.value;
+
+    const maybeInvoiceItems = await mockInvoiceItemRepo.getItemsByInvoiceId(
+      InvoiceId.create(new UniqueEntityID(invoiceId))
+    );
+
+    if (maybeInvoiceItems.isLeft()) {
+      throw maybeInvoiceItems.value;
+    }
+
+    const invoiceItems = maybeInvoiceItems.value;
+
+    mockWaiverRepo.addMockWaiverForInvoiceItem(waiver, invoiceItems[0]);
+  }
+);
+
+Then(
+  /^I receive an error that coupon with code "([\w-]+)" is already applied$/,
+  (couponCode: string) => {
+    expect(response.isLeft()).to.be.true;
+    if (response.isLeft()) {
+      expect(response.value.message).to.equal(
+        `Coupon ${couponCode} has already been used for this invoice.`
+      );
+    }
+  }
+);

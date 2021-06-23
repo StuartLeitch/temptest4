@@ -20,7 +20,7 @@ let response: ChangeInvoiceStatusResponse;
 
 let useCase: ChangeInvoiceStatus;
 
-Before(function () {
+Before({ tags: '@ValidateChangeInvoice' }, function () {
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
   mockArticleRepo = new MockArticleRepo();
   mockErpReferenceRepo = new MockErpReferenceRepo();
@@ -32,16 +32,22 @@ Before(function () {
   useCase = new ChangeInvoiceStatus(mockInvoiceRepo);
 });
 
-Given(/^There is an Invoice with an existing ID "([\w-]+)"$/, async function (
-  testInvoiceId: string
-) {
-  const invoice = InvoiceMap.toDomain({
-    transactionId: 'transaction-id',
-    dateCreated: new Date(),
-    id: testInvoiceId,
-  });
-  mockInvoiceRepo.save(invoice);
-});
+Given(
+  /^There is an Invoice with an existing ID "([\w-]+)"$/,
+  async function (testInvoiceId: string) {
+    const invoice = InvoiceMap.toDomain({
+      transactionId: 'transaction-id',
+      dateCreated: new Date(),
+      id: testInvoiceId,
+    });
+
+    if (invoice.isLeft()) {
+      throw invoice.value;
+    }
+
+    mockInvoiceRepo.save(invoice.value);
+  }
+);
 
 Given(
   /^There is an Invoice with a non-existing ID "([\w-]+)"$/,
@@ -63,16 +69,18 @@ When(
 Then(
   /The Invoice with ID "([\w-]+)" is successfully updated to (.+)/,
   async function (testInvoiceId: string, status: string) {
-    const invoiceId = InvoiceId.create(
-      new UniqueEntityID(testInvoiceId)
-    ).getValue();
+    const invoiceId = InvoiceId.create(new UniqueEntityID(testInvoiceId));
 
     const invoice = await mockInvoiceRepo.getInvoiceById(invoiceId);
-    expect(invoice.status).to.equal(status);
+
+    if (invoice.isLeft()) {
+      throw invoice.value;
+    }
+
+    expect(invoice.value.status).to.equal(status);
   }
 );
 
 Then('An InvoiceNotFoundError error is returned', function () {
-  expect(response.value.isFailure).to.equal(true);
-  // expect(response.value.errorValue().message).to.equal(`Couldn't update invoice with id unknown-id.`);
+  expect(response.isLeft()).to.equal(true);
 });

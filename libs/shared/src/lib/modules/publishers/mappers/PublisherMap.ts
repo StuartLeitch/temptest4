@@ -1,4 +1,7 @@
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either } from '../../../core/logic/Either';
+
 import { Mapper } from '../../../infrastructure/Mapper';
 
 import { PublisherCustomValues } from '../domain/PublisherCustomValues';
@@ -13,22 +16,16 @@ export interface RawPublisher {
 }
 
 export class PublisherMap extends Mapper<Publisher> {
-  public static toDomain(raw: RawPublisher): Publisher | null {
+  public static toDomain(raw: RawPublisher): Either<GuardFailure, Publisher> {
     const now = new Date();
     const props = {
       customValues: raw.customValues,
       dateCreated: raw.dateCreated ? new Date(raw.dateCreated) : now,
       dateUpdated: raw.dateUpdated ? new Date(raw.dateUpdated) : now,
-      name: raw.name
+      name: raw.name,
     };
-    const maybePublisher = Publisher.create(props, new UniqueEntityID(raw.id));
 
-    if (maybePublisher.isSuccess) {
-      return maybePublisher.getValue();
-    }
-
-    console.log(maybePublisher.errorValue);
-    return null;
+    return Publisher.create(props, new UniqueEntityID(raw.id));
   }
 
   public static toPersistence(publisher: Publisher): RawPublisher | null {
@@ -41,7 +38,7 @@ export class PublisherMap extends Mapper<Publisher> {
       dateUpdated: publisher.dateUpdated.toISOString(),
       customValues: publisher.customValue,
       id: publisher.id.toString(),
-      name: publisher.name
+      name: publisher.name,
     };
   }
 }

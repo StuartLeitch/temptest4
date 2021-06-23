@@ -225,7 +225,7 @@
     "cucumber-html-reporter": "^5.2.0",
     "cucumber-junit-formatter": "^0.2.2",
     "cucumber-junit-reporter": "^0.0.1",
-    "cucumber-pretty": "6.0.0",
+    "cucumber-pretty": "^6.0.0",
     "cypress": "6.2.0",
     "cypress-cucumber-preprocessor": "4.0.0",
     "dotenv": "8.2.0",

@@ -1,12 +1,11 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 // * Core Domain
 import { Either, left, right } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  UsecaseAuthorizationContext,
   AccessControlledUsecase,
   AccessControlContext,
   Authorize,
@@ -44,8 +43,6 @@ interface WithProof {
 interface WithPayment {
   payment: Payment;
 }
-
-type Context = UsecaseAuthorizationContext;
 
 export class PayPalPaymentApprovedUsecase
   implements

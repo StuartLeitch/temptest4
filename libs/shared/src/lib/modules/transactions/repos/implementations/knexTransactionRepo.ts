@@ -1,19 +1,26 @@
 import Knex from 'knex';
-import { TABLES } from './../../../../infrastructure/database/knex/index';
 
-import { Transaction } from '../../domain/Transaction';
-import { TransactionId } from '../../domain/TransactionId';
-import { TransactionMap } from '../../mappers/TransactionMap';
-import { InvoiceId } from './../../../invoices/domain/InvoiceId';
+import { Either, flatten, right, left } from '../../../../core/logic/Either';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
+import { TABLES } from './../../../../infrastructure/database/knex/index';
 import { RepoError } from '../../../../infrastructure/RepoError';
+
+import { InvoiceId } from './../../../invoices/domain/InvoiceId';
+import { TransactionId } from '../../domain/TransactionId';
+import { Transaction } from '../../domain/Transaction';
+
+import { TransactionMap } from '../../mappers/TransactionMap';
+
 import { TransactionRepoContract } from '../transactionRepo';
 
 export class KnexTransactionRepo
   extends AbstractBaseDBRepo<Knex, Transaction>
   implements TransactionRepoContract {
-  async getTransactionById(transactionId: TransactionId): Promise<Transaction> {
+  async getTransactionById(
+    transactionId: TransactionId
+  ): Promise<Either<GuardFailure | RepoError, Transaction>> {
     const { db } = this;
 
     const transactionRow = await db(TABLES.TRANSACTIONS)
@@ -21,10 +28,21 @@ export class KnexTransactionRepo
       .where('id', transactionId.id.toString())
       .first();
 
-    return transactionRow ? TransactionMap.toDomain(transactionRow) : null;
+    if (!transactionRow) {
+      return left(
+        RepoError.createEntityNotFoundError(
+          'transaction',
+          transactionId.toString()
+        )
+      );
+    }
+
+    return TransactionMap.toDomain(transactionRow);
   }
 
-  async getTransactionByInvoiceId(invoiceId: InvoiceId): Promise<Transaction> {
+  async getTransactionByInvoiceId(
+    invoiceId: InvoiceId
+  ): Promise<Either<GuardFailure | RepoError, Transaction>> {
     const { db, logger } = this;
     const correlationId =
       'correlationId' in this ? (this as any).correlationId : null;
@@ -51,21 +69,31 @@ export class KnexTransactionRepo
       sql: transactionRow.toString(),
     });
 
-    return transactionRow ? TransactionMap.toDomain(transactionRow) : null;
+    if (!transactionRow) {
+      return left(
+        RepoError.createEntityNotFoundError(
+          'transaction for invoice',
+          invoiceId.toString()
+        )
+      );
+    }
+
+    return TransactionMap.toDomain(transactionRow);
   }
 
-  async getTransactionCollection(): Promise<Transaction[]> {
+  async getTransactionCollection(): Promise<
+    Either<GuardFailure | RepoError, Transaction[]>
+  > {
     const { db } = this;
 
     const transactionsRows = await db(TABLES.TRANSACTIONS);
 
-    return transactionsRows.reduce((aggregator: any[], t) => {
-      aggregator.push(TransactionMap.toDomain(t));
-      return aggregator;
-    }, []);
+    return flatten(transactionsRows.map(TransactionMap.toDomain));
   }
 
-  async delete(transaction: Transaction): Promise<void> {
+  async delete(
+    transaction: Transaction
+  ): Promise<Either<GuardFailure | RepoError, void>> {
     const { db } = this;
 
     const deletedRows = await db(TABLES.TRANSACTIONS)
@@ -73,14 +101,20 @@ export class KnexTransactionRepo
       .update({ ...TransactionMap.toPersistence(transaction), deleted: 1 });
 
     if (!deletedRows) {
-      throw RepoError.createEntityNotFoundError(
-        'transaction',
-        transaction.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError(
+          'transaction',
+          transaction.id.toString()
+        )
       );
     }
+
+    return right(null);
   }
 
-  async restore(transaction: Transaction): Promise<void> {
+  async restore(
+    transaction: Transaction
+  ): Promise<Either<GuardFailure | RepoError, void>> {
     const { db } = this;
 
     const restoredRows = await db(TABLES.TRANSACTIONS)
@@ -88,14 +122,20 @@ export class KnexTransactionRepo
       .update({ ...TransactionMap.toPersistence(transaction), deleted: 0 });
 
     if (!restoredRows) {
-      throw RepoError.createEntityNotFoundError(
-        'transaction',
-        transaction.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError(
+          'transaction',
+          transaction.id.toString()
+        )
       );
     }
+
+    return right(null);
   }
 
-  async update(transaction: Transaction): Promise<Transaction> {
+  async update(
+    transaction: Transaction
+  ): Promise<Either<GuardFailure | RepoError, Transaction>> {
     const { db } = this;
 
     const updated = await db(TABLES.TRANSACTIONS)
@@ -103,22 +143,28 @@ export class KnexTransactionRepo
       .update(TransactionMap.toPersistence(transaction));
 
     if (!updated) {
-      throw RepoError.createEntityNotFoundError(
-        'transaction',
-        transaction.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError(
+          'transaction',
+          transaction.id.toString()
+        )
       );
     }
 
-    return transaction;
+    return this.getTransactionById(transaction.transactionId);
   }
 
-  async exists(transaction: Transaction): Promise<boolean> {
+  async exists(
+    transaction: Transaction
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     const result = await this.getTransactionById(transaction.transactionId);
 
-    return !!result;
+    return right(!!result);
   }
 
-  async save(transaction: Transaction): Promise<Transaction> {
+  async save(
+    transaction: Transaction
+  ): Promise<Either<GuardFailure | RepoError, Transaction>> {
     const { db } = this;
 
     const data = TransactionMap.toPersistence(transaction);

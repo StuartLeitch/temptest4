@@ -1,5 +1,7 @@
 import { expect } from 'chai';
-import { Given, When, Then, BeforeAll, AfterAll } from '@cucumber/cucumber';
+import { Given, When, Then, Before, After } from '@cucumber/cucumber';
+
+import { UsecaseAuthorizationContext } from '../../../../../../src/lib/domain/authorization';
 
 import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
@@ -7,18 +9,22 @@ import { MockTransactionRepo } from '../../../../../../src/lib/modules/transacti
 import { MockCouponRepo } from './../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
 import { MockWaiverRepo } from './../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
 import { MockPausedReminderRepo } from '../../../../../../src/lib/modules/notifications/repos/mocks/mockPausedReminderRepo';
-import { MockEditorRepo } from './../../../../../../src/lib/modules/journals/repos/mocks/mockEditorRepo';
 import { MockErpReferenceRepo } from './../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
 
 import { InvoiceCollection } from './../../../../../../src/lib/modules/invoices/domain/Invoice';
+import {
+  InvoiceStatus,
+  Invoice,
+} from '../../../../../../src/lib/modules/invoices/domain/Invoice';
+import {
+  TransactionStatus,
+  Transaction,
+} from '../../../../../../src/lib/modules/transactions/domain/Transaction';
+
+import { TransactionMap } from '../../../../../../src/lib/modules/transactions/mappers/TransactionMap';
 import { InvoiceMap } from './../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 
 import { CreateCreditNoteUsecase } from './../../../../../../src/lib/modules/invoices/usecases/createCreditNote/createCreditNote';
-import { UsecaseAuthorizationContext } from '../../../../../../src/lib/domain/authorization';
-import { WaiverService } from './../../../../../../src/lib/domain/services/WaiverService';
-import { InvoiceStatus } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
-import { TransactionMap } from '../../../../../../src/lib/modules/transactions/mappers/TransactionMap';
-import { TransactionStatus } from '../../../../../../src/lib/modules/transactions/domain/Transaction';
 
 import { Roles } from '../../../../../../src/lib/modules/users/domain/enums/Roles';
 
@@ -32,34 +38,25 @@ let mockTransactionRepo: MockTransactionRepo;
 let mockCouponRepo: MockCouponRepo;
 let mockWaiverRepo: MockWaiverRepo;
 let mockPausedReminderRepo: MockPausedReminderRepo;
-let mockEditorRepo: MockEditorRepo;
 let mockErpReferenceRepo: MockErpReferenceRepo;
-
-let mockWaiverService: WaiverService;
 
 let useCase: CreateCreditNoteUsecase;
 
 let invoiceCollection: InvoiceCollection;
-let transaction;
-let invoice;
+let transaction: Transaction;
+let invoice: Invoice;
 
-BeforeAll(function () {
+Before({ tags: '@ValidateCreateCreditNote' }, function () {
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
   mockTransactionRepo = new MockTransactionRepo();
   mockCouponRepo = new MockCouponRepo();
   mockWaiverRepo = new MockWaiverRepo();
   mockPausedReminderRepo = new MockPausedReminderRepo();
-  mockEditorRepo = new MockEditorRepo();
   mockErpReferenceRepo = new MockErpReferenceRepo();
   mockInvoiceRepo = new MockInvoiceRepo(
     null,
     mockInvoiceItemRepo,
     mockErpReferenceRepo
-  );
-  mockWaiverService = new WaiverService(
-    mockInvoiceItemRepo,
-    mockEditorRepo,
-    mockWaiverRepo
   );
 
   useCase = new CreateCreditNoteUsecase(
@@ -68,12 +65,11 @@ BeforeAll(function () {
     mockTransactionRepo,
     mockCouponRepo,
     mockWaiverRepo,
-    mockPausedReminderRepo,
-    mockWaiverService
+    mockPausedReminderRepo
   );
 });
 
-AfterAll(function () {
+After({ tags: '@ValidateCreateCreditNote' }, function () {
   mockTransactionRepo.clear();
   mockInvoiceRepo.clear();
 });
@@ -81,18 +77,30 @@ AfterAll(function () {
 Given(
   /^There is an ACTIVE Invoice with an existing id "([\w-]+)"$/,
   async function (invoiceId: string) {
-    transaction = TransactionMap.toDomain({
+    const maybeTransaction = TransactionMap.toDomain({
       status: TransactionStatus.ACTIVE,
       deleted: 0,
       dateCreated: new Date(),
       dateUpdated: new Date(),
     });
 
-    invoice = InvoiceMap.toDomain({
+    if (maybeTransaction.isLeft()) {
+      throw maybeTransaction.value;
+    }
+
+    transaction = maybeTransaction.value;
+
+    const maybeInvoice = InvoiceMap.toDomain({
       id: invoiceId,
       status: InvoiceStatus.ACTIVE,
       transactionId: transaction.transactionId.id.toString(),
     });
+
+    if (maybeInvoice.isLeft()) {
+      throw maybeInvoice.value;
+    }
+
+    invoice = maybeInvoice.value;
 
     mockTransactionRepo.save(transaction);
     mockInvoiceRepo.save(invoice);
@@ -112,7 +120,7 @@ Then('The original Invoice is marked as final', async function () {
   invoiceCollection = await mockInvoiceRepo.getInvoiceCollection();
 
   expect(invoiceCollection[0].invoiceId.id.toString()).to.equal(
-    invoice.id.value
+    invoice.id.toString()
   );
   expect(invoiceCollection[0].status).to.equal(InvoiceStatus.FINAL);
 });

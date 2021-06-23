@@ -1,5 +1,6 @@
 Feature: Create Transaction Usecase
 
+    @ValidateCreateTransaction
     Scenario: Create Transaction
         Given A journal "foo-journal" with the APC of 100
         And A manuscript with id "foo-manuscript" is on journal "foo-journal"

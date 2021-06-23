@@ -1,5 +1,4 @@
 import { UseCaseError } from '../../../../../core/logic/UseCaseError';
-// import { Either } from '../../../../../core/logic/Either';
 
 export class JournalDoesNotExistError extends UseCaseError {
   constructor(editorId: string) {

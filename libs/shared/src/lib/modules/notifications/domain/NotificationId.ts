@@ -1,6 +1,5 @@
-import { Result } from './../../../core/logic/Result';
-import { Entity } from '../../../core/domain/Entity';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { Entity } from '../../../core/domain/Entity';
 
 export class NotificationId extends Entity<any> {
   get id(): UniqueEntityID {
@@ -11,7 +10,7 @@ export class NotificationId extends Entity<any> {
     super(null, id);
   }
 
-  public static create(id?: UniqueEntityID): Result<NotificationId> {
-    return Result.ok<NotificationId>(new NotificationId(id));
+  public static create(id?: UniqueEntityID): NotificationId {
+    return new NotificationId(id);
   }
 }

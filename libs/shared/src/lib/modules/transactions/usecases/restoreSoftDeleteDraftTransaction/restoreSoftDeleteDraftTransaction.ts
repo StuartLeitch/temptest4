@@ -1,12 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { Either, left, right } from '../../../../core/logic/Result';
+import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
   AccessControlledUsecase,
   AccessControlContext,
@@ -32,7 +30,6 @@ import { RestoreSoftDeleteDraftTransactionResponse as Response } from './restore
 import type { RestoreSoftDeleteDraftTransactionDTO as DTO } from './restoreSoftDeleteDraftTransaction.dto';
 import * as Errors from './restoreSoftDeleteDraftTransaction.errors';
 
-type Context = UsecaseAuthorizationContext;
 export class RestoreSoftDeleteDraftTransactionUsecase
   implements
     UseCase<DTO, Promise<Response>, Context>,
@@ -89,7 +86,7 @@ export class RestoreSoftDeleteDraftTransactionUsecase
       if (!maybeManuscript || maybeManuscript.isLeft()) {
         throw new Errors.ManuscriptNotFoundError(request.manuscriptId);
       }
-      const manuscript = maybeManuscript.value.getValue();
+      const manuscript = maybeManuscript.value;
 
       // * System obtains invoiceId by manuscript custom Id
       const customId = manuscript.customId;
@@ -98,7 +95,7 @@ export class RestoreSoftDeleteDraftTransactionUsecase
         throw new Errors.InvoiceIdNotFoundError(customId);
       }
 
-      const invoiceId = maybeInvoiceId.value.getValue().toString();
+      const invoiceId = maybeInvoiceId.value.toString();
 
       // * System identifies invoice by invoice Id
       const maybeInvoice = await getInvoice.execute({ invoiceId }, context);
@@ -106,7 +103,7 @@ export class RestoreSoftDeleteDraftTransactionUsecase
         throw new Errors.InvoiceNotFoundError(invoiceId);
       }
 
-      const invoice = maybeInvoice.value.getValue();
+      const invoice = maybeInvoice.value;
 
       // * System identifies invoice item by invoice Id
       const maybeInvoiceItems = await getInvoiceItems.execute(
@@ -116,7 +113,7 @@ export class RestoreSoftDeleteDraftTransactionUsecase
       if (!maybeInvoiceItems || maybeInvoiceItems.isLeft()) {
         throw new Errors.InvoiceItemNotFoundError(invoiceId);
       }
-      const invoiceItem = maybeInvoiceItems.value.getValue()[0];
+      const invoiceItem = maybeInvoiceItems.value[0];
 
       // * System identifies transaction by manuscript custom Id
       const maybeTransaction = await getTransaction.execute(
@@ -126,7 +123,7 @@ export class RestoreSoftDeleteDraftTransactionUsecase
       if (!maybeTransaction || maybeTransaction.isLeft()) {
         throw new Errors.TransactionNotFoundError(manuscriptId);
       }
-      const transaction = maybeTransaction.value.getValue();
+      const transaction = maybeTransaction.value;
       // This is where all the magic happens!
       // * System restores transaction
       try {

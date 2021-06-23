@@ -1,18 +1,17 @@
 import { UseCaseError } from '../../../../core/logic/UseCaseError';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { Result } from '../../../../core/logic/Result';
 
-import { GetArticleDetailsErrors } from '../../../manuscripts/usecases/getArticleDetails/getArticleDetailsErrors';
-import { GetAuthorDetailsErrors } from '../../../authors/usecases/getAuthorDetails/getAuthorDetailsErrors';
-import { GetPayerDetailsErrors } from '../../../payers/usecases/getPayerDetails/getPayerDetailsErrors';
-import { GetInvoiceDetailsErrors } from '../getInvoiceDetails/getInvoiceDetailsErrors';
+import { GetArticleDetailsErrors } from '../../../manuscripts/usecases/getArticleDetails';
+import { GetAuthorDetailsErrors } from '../../../authors/usecases/getAuthorDetails';
+import { GetPayerDetailsErrors } from '../../../payers/usecases/getPayerDetails';
+import { GetInvoiceDetailsErrors } from '../getInvoiceDetails';
 
 export namespace GetInvoicePdfErrors {
-  export class PdfInvoiceError extends Result<UseCaseError> {
+  export class PdfInvoiceError extends UseCaseError {
     constructor(message: string, invoiceId: string) {
-      super(false, {
-        message: `Error when generating the pdf for invoice with id {${invoiceId}}, with error message: ${message}`,
-      });
+      super(
+        `Error when generating the pdf for invoice with id {${invoiceId}}, with error message: ${message}`
+      );
     }
   }
 }

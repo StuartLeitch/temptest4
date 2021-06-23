@@ -1,34 +1,36 @@
-import { UseCase } from '../../../../core/domain/UseCase';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { Result, right, left } from '../../../../core/logic/Result';
+import { UseCase } from '../../../../core/domain/UseCase';
+import { left } from '../../../../core/logic/Either';
 
-import { Address } from '../../domain/Address';
-import { AddressMap } from '../../mappers/AddressMap';
+import { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+
 import { AddressRepoContract } from '../../repos/addressRepo';
-import { CreateAddressResponse } from './createAddressResponse';
-import { CreateAddressRequestDTO } from './createAddressDTO';
-import { CreateAddressErrors } from './createAddressErrors';
+import { AddressMap } from '../../mappers/AddressMap';
 
-export class CreateAddress
-  implements UseCase<CreateAddressRequestDTO, Promise<CreateAddressResponse>> {
+import { CreateAddressResponse as Response } from './createAddressResponse';
+import { CreateAddressRequestDTO as DTO } from './createAddressDTO';
+import * as Errors from './createAddressErrors';
+
+export class CreateAddressUsecase
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private addressRepo: AddressRepoContract) {}
 
-  public async execute(
-    request: CreateAddressRequestDTO
-  ): Promise<CreateAddressResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const { postalCode } = request;
     try {
       if (postalCode && !/^\d{5}$/.test(postalCode)) {
-        return left(
-          new CreateAddressErrors.InvalidPostalCode(request.postalCode)
-        );
+        return left(new Errors.InvalidPostalCode(request.postalCode));
       }
 
-      const address = AddressMap.toDomain(request);
+      const maybeAddress = AddressMap.toDomain(request);
 
-      await this.addressRepo.save(address);
+      if (maybeAddress.isLeft()) {
+        return left(new UnexpectedError(maybeAddress.value as Error));
+      }
 
-      return right(Result.ok<Address>(address));
+      await this.addressRepo.save(maybeAddress.value);
+
+      return maybeAddress;
     } catch (err) {
       return left(new UnexpectedError(err));
     }

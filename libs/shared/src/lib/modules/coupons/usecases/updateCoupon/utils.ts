@@ -1,9 +1,9 @@
-import { left, right, Either } from '../../../../core/logic/Result';
+import { Either, right, left } from '../../../../core/logic/Either';
 
 import { Coupon, CouponStatus, CouponType } from '../../domain/Coupon';
 
-import { UpdateCouponErrors } from './updateCouponErrors';
 import { UpdateCouponDTO } from './updateCouponDTO';
+import * as Errors from './updateCouponErrors';
 
 import { isExpirationDateValid } from '../utils';
 
@@ -11,15 +11,6 @@ export interface UpdateCouponData {
   coupon: Coupon;
   request: UpdateCouponDTO;
 }
-
-type SanityCheckResponse = Either<
-  | UpdateCouponErrors.ExpirationDateRequired
-  | UpdateCouponErrors.InvalidExpirationDate
-  | UpdateCouponErrors.InvalidCouponStatus
-  | UpdateCouponErrors.InvalidCouponType
-  | UpdateCouponErrors.IdRequired,
-  UpdateCouponDTO
->;
 
 export function updateCoupon({ coupon, request }: UpdateCouponData): Coupon {
   const { type, expirationDate, status, name, reduction } = request;
@@ -50,28 +41,37 @@ export function updateCoupon({ coupon, request }: UpdateCouponData): Coupon {
   return coupon;
 }
 
-export function sanityChecksRequestParameters(
+export async function sanityChecksRequestParameters(
   request: UpdateCouponDTO
-): SanityCheckResponse {
+): Promise<
+  Either<
+    | Errors.ExpirationDateRequired
+    | Errors.InvalidExpirationDate
+    | Errors.InvalidCouponStatus
+    | Errors.InvalidCouponType
+    | Errors.IdRequired,
+    UpdateCouponDTO
+  >
+> {
   const { type, status, expirationDate, id } = request;
   if (!id) {
-    return left(new UpdateCouponErrors.IdRequired());
+    return left(new Errors.IdRequired());
   }
   if (type && !(type in CouponType)) {
-    return left(new UpdateCouponErrors.InvalidCouponType(type));
+    return left(new Errors.InvalidCouponType(type));
   }
   if (status && !(status in CouponStatus)) {
-    return left(new UpdateCouponErrors.InvalidCouponStatus(status));
+    return left(new Errors.InvalidCouponStatus(status));
   }
   if (type && type === CouponType.MULTIPLE_USE && !expirationDate) {
-    return left(new UpdateCouponErrors.ExpirationDateRequired());
+    return left(new Errors.ExpirationDateRequired());
   }
   if (
     type &&
     type === CouponType.MULTIPLE_USE &&
     !isExpirationDateValid(new Date(expirationDate), CouponType[type])
   ) {
-    return left(new UpdateCouponErrors.InvalidExpirationDate(expirationDate));
+    return left(new Errors.InvalidExpirationDate(expirationDate));
   }
   return right(request);
 }

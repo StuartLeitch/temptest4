@@ -1,9 +1,10 @@
 // * Core Domain
-import {AggregateRoot} from '../../../core/domain/AggregateRoot';
-import {UniqueEntityID} from '../../../core/domain/UniqueEntityID';
-import {Result} from '../../../core/logic/Result';
+import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { AggregateRoot } from '../../../core/domain/AggregateRoot';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
+import { Either, right } from '../../../core/logic/Either';
 
-import {Editors} from './Editors';
+import { Editors } from './Editors';
 
 interface EditorialBoardProps {
   editors?: Editors;
@@ -26,7 +27,7 @@ export class EditorialBoard extends AggregateRoot<EditorialBoardProps> {
   public static create(
     props: EditorialBoardProps,
     id?: UniqueEntityID
-  ): Result<EditorialBoard> {
+  ): Either<GuardFailure, EditorialBoard> {
     const defaultValues: EditorialBoardProps = {
       ...props,
       editors: props.editors ? props.editors : Editors.create([]),
@@ -34,10 +35,10 @@ export class EditorialBoard extends AggregateRoot<EditorialBoardProps> {
         ? props.totalNumEditors
         : props.editors
         ? props.editors.getItems().length
-        : 0
+        : 0,
     };
     const editorialBoard = new EditorialBoard(defaultValues, id);
 
-    return Result.ok<EditorialBoard>(editorialBoard);
+    return right(editorialBoard);
   }
 }

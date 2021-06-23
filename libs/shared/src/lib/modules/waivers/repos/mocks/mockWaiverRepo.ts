@@ -1,11 +1,15 @@
 import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
+import { Either, right, left } from '../../../../core/logic/Either';
 
-import { InvoiceItemId } from '../../../invoices/domain/InvoiceItemId';
-import { Waiver, WaiverType } from '../../domain/Waiver';
+import { RepoError } from '../../../../infrastructure/RepoError';
 
 import { WaiverAssignedCollection } from '../../domain/WaiverAssignedCollection';
+import { InvoiceItemId } from '../../../invoices/domain/InvoiceItemId';
 import { WaiverAssigned } from '../../domain/WaiverAssigned';
+import { Waiver, WaiverType } from '../../domain/Waiver';
+
 import { WaiverRepoContract } from '../waiverRepo';
 
 export class MockWaiverRepo
@@ -24,32 +28,36 @@ export class MockWaiverRepo
     super();
   }
 
-  public async getWaiverById(waiverId: UniqueEntityID): Promise<Waiver> {
-    const matches = this._items.filter((i) => i.id.equals(waiverId));
-    if (matches.length !== 0) {
-      return matches[0];
-    } else {
-      return null;
-    }
-  }
-
-  public async getWaiversByTypes(waiverTypes: WaiverType[]): Promise<Waiver[]> {
+  public async getWaiversByTypes(
+    waiverTypes: WaiverType[]
+  ): Promise<Either<GuardFailure | RepoError, Waiver[]>> {
     const resultWaivers: Waiver[] = [];
 
     for (let index = 0; index < waiverTypes.length; index++) {
       const waiver = await this.getWaiverByType(waiverTypes[index]);
-      resultWaivers.push(waiver);
+      if (waiver.isLeft()) {
+        return left(waiver.value);
+      }
+      resultWaivers.push(waiver.value);
     }
-    return resultWaivers;
+    return right(resultWaivers);
   }
 
-  public async getWaivers(): Promise<Waiver[]> {
-    return this._items;
+  public async getWaivers(): Promise<
+    Either<GuardFailure | RepoError, Waiver[]>
+  > {
+    return right(this._items);
   }
 
-  public async getWaiverByType(type: WaiverType): Promise<Waiver> {
+  public async getWaiverByType(
+    type: WaiverType
+  ): Promise<Either<GuardFailure | RepoError, Waiver>> {
     const match = this._items.find((item) => item.waiverType === type);
-    return match ? match : null;
+    if (match) {
+      return right(match);
+    } else {
+      return left(RepoError.createEntityNotFoundError('waiver', type));
+    }
   }
 
   public addMockWaiverForInvoiceItem(
@@ -72,44 +80,46 @@ export class MockWaiverRepo
 
   public async getWaiversByInvoiceItemId(
     invoiceItemId: InvoiceItemId
-  ): Promise<WaiverAssignedCollection> {
+  ): Promise<Either<GuardFailure | RepoError, WaiverAssignedCollection>> {
     const waiverIds = this.invoiceItemToWaiverMapper[
       invoiceItemId.id.toString()
     ];
     if (!waiverIds) {
-      return WaiverAssignedCollection.create();
+      return right(WaiverAssignedCollection.create());
     }
     const waivers = this._items.filter((item) => waiverIds.includes(item.id));
 
-    return WaiverAssignedCollection.create(
-      waivers.map((i) => {
-        let dateAssigned: Date = null;
-        const datesForItemWaiver = this.invoiceItemToWaiverAssignedDate[
-          invoiceItemId.id.toString()
-        ];
-        if (datesForItemWaiver) {
-          dateAssigned = datesForItemWaiver[i.id.toString()];
-        }
-        return WaiverAssigned.create({
-          invoiceItemId,
-          dateAssigned,
-          waiver: i,
-        });
-      })
+    return right(
+      WaiverAssignedCollection.create(
+        waivers.map((i) => {
+          let dateAssigned: Date = null;
+          const datesForItemWaiver = this.invoiceItemToWaiverAssignedDate[
+            invoiceItemId.id.toString()
+          ];
+          if (datesForItemWaiver) {
+            dateAssigned = datesForItemWaiver[i.id.toString()];
+          }
+          return WaiverAssigned.create({
+            invoiceItemId,
+            dateAssigned,
+            waiver: i,
+          });
+        })
+      )
     );
   }
 
   public async attachWaiverToInvoiceItem(
     waiverType: WaiverType,
     invoiceItemId: InvoiceItemId
-  ): Promise<Waiver> {
+  ): Promise<Either<GuardFailure | RepoError, Waiver>> {
     if (!invoiceItemId) {
       return;
     }
-    const waiver: Waiver = await this.getWaiverByType(waiverType);
+    const waiver = await this.getWaiverByType(waiverType);
 
-    if (!waiver) {
-      return;
+    if (waiver.isLeft()) {
+      return left(waiver.value);
     }
 
     const invoiceIdValue = invoiceItemId.id.toString();
@@ -117,23 +127,31 @@ export class MockWaiverRepo
       this.invoiceItemToWaiverMapper[invoiceIdValue] = [];
     }
 
-    this.invoiceItemToWaiverMapper[invoiceIdValue].push(waiver.id);
+    this.invoiceItemToWaiverMapper[invoiceIdValue].push(waiver.value.id);
 
     return waiver;
   }
 
   public async removeInvoiceItemWaivers(
     invoiceItemId: InvoiceItemId
-  ): Promise<void> {
+  ): Promise<Either<GuardFailure | RepoError, void>> {
     delete this.invoiceItemToWaiverMapper[invoiceItemId.id.toValue()];
+
+    return right(null);
   }
 
-  public async getWaiverCollection(): Promise<Waiver[]> {
-    return this._items; // .filter(i => i.invoiceId.id.toString() === invoiceId);
-  }
+  public async save(
+    waiver: Waiver
+  ): Promise<Either<GuardFailure | RepoError, Waiver>> {
+    const maybeAlreadyExists = await this.exists(waiver);
 
-  public async save(waiver: Waiver): Promise<Waiver> {
-    const alreadyExists = await this.exists(waiver);
+    if (maybeAlreadyExists.isLeft()) {
+      return left(
+        RepoError.fromDBError(new Error(maybeAlreadyExists.value.message))
+      );
+    }
+
+    const alreadyExists = maybeAlreadyExists.value;
 
     if (alreadyExists) {
       this._items.map((i) => {
@@ -147,32 +165,14 @@ export class MockWaiverRepo
       this._items.push(waiver);
     }
 
-    return waiver;
+    return right(waiver);
   }
 
-  public async update(waiver: Waiver): Promise<Waiver> {
-    const alreadyExists = await this.exists(waiver);
-
-    if (alreadyExists) {
-      this._items.map((i) => {
-        if (this.compareMockItems(i, waiver)) {
-          return waiver;
-        } else {
-          return i;
-        }
-      });
-    }
-
-    return waiver;
-  }
-
-  public async delete(waiver: Waiver): Promise<void> {
-    this.removeMockItem(waiver);
-  }
-
-  public async exists(waiver: Waiver): Promise<boolean> {
+  public async exists(
+    waiver: Waiver
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     const found = this._items.filter((i) => this.compareMockItems(i, waiver));
-    return found.length !== 0;
+    return right(found.length !== 0);
   }
 
   public compareMockItems(a: Waiver, b: Waiver): boolean {

@@ -1,39 +1,26 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
-import { Result, left, right } from '../../../../core/logic/Result';
-
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { ValidateVATResponse } from './validateVATResponse';
-import { ValidateVATErrors } from './validateVATErrors';
-import { VATService } from '../../../../domain/services/VATService';
+import { right, left } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  Authorize,
   AccessControlledUsecase,
-  UsecaseAuthorizationContext,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
-export interface ValidateVATRequestDTO {
-  vatNumber: string;
-  countryCode: string;
-}
+import { VATService } from '../../../../domain/services/VATService';
+
+import { ValidateVATResponse as Response } from './validateVATResponse';
+import { ValidateVATRequestDTO as DTO } from './validateVATDTO';
+import * as Errors from './validateVATErrors';
 
 export class ValidateVATUsecase
   implements
-    UseCase<
-      ValidateVATRequestDTO,
-      Promise<ValidateVATResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      ValidateVATRequestDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(private vatService: VATService) {
     this.vatService = vatService;
   }
@@ -43,10 +30,7 @@ export class ValidateVATUsecase
   }
 
   @Authorize('validate:vatnumber')
-  public async execute(
-    request: ValidateVATRequestDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<ValidateVATResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const { vatNumber, countryCode } = request;
 
     try {
@@ -58,14 +42,15 @@ export class ValidateVATUsecase
       if (vatResponse instanceof Error) {
         switch (vatResponse.message) {
           case 'INVALID_INPUT':
-            return left(
-              new ValidateVATErrors.InvalidInputError(vatNumber, countryCode)
-            );
+            return left(new Errors.InvalidInputError(vatNumber, countryCode));
           case 'MS_UNAVAILABLE':
-            return left(new ValidateVATErrors.ServiceUnavailableError());
+            return left(new Errors.ServiceUnavailableError());
+          default:
+            return left(new UnexpectedError(vatResponse));
         }
+      } else {
+        return right(vatResponse);
       }
-      return right(Result.ok<any>(vatResponse));
     } catch (err) {
       return left(new UnexpectedError(err));
     }

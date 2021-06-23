@@ -1,16 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // * Core Domain
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { left } from '../../../../core/logic/Either';
 
 // * Authorization Logic
-import {
-  UsecaseAuthorizationContext as Context,
-  AccessControlledUsecase,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 
 // * Usecase specific
 import {
@@ -22,9 +16,7 @@ import { GenerateClientTokenResponse as Response } from './generateClientToken.r
 import { GenerateClientTokenDTO as DTO } from './generateClientToken.dto';
 
 export class GenerateClientTokenUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private strategyFactory: PaymentStrategyFactory) {}
 
   public async execute(request: DTO, context?: Context): Promise<Response> {
