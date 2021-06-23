@@ -1,7 +1,8 @@
 // * Core Domain
 import { AggregateRoot } from '../../../core/domain/AggregateRoot';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
-import { Result } from '../../../core/logic/Result';
+import { Either, flatten, right, left } from '../../../core/logic/Either';
+import { GuardFailure } from '../../../core/logic/GuardFailure';
 
 // *Subdomains
 import { InvoiceId } from '../../invoices/domain/InvoiceId';
@@ -106,7 +107,7 @@ export class CreditNote extends AggregateRoot<CreditNoteProps> {
   public static create(
     props: CreditNoteProps,
     id?: UniqueEntityID
-  ): Result<CreditNote> {
+  ): Either<GuardFailure, CreditNote> {
     const defaultValues = {
       ...props,
       dateCreated: props.dateCreated ? props.dateCreated : new Date(),
@@ -114,7 +115,7 @@ export class CreditNote extends AggregateRoot<CreditNoteProps> {
 
     const creditNote = new CreditNote(defaultValues, id);
 
-    return Result.ok<CreditNote>(creditNote);
+    return right(creditNote);
   }
 
   public getErpReference(): ErpReference {

@@ -1,27 +1,28 @@
 import { UseCaseError } from '../../../../core/logic/UseCaseError';
-import { Result } from '../../../../core/logic/Result';
 
 export namespace CreateCreditNoteErrors {
-  export class TransactionNotFoundError extends Result<UseCaseError> {
+  export class TransactionNotFoundError extends UseCaseError {
     constructor(invoiceId: string) {
-      super(false, {
-        message: `Couldn't find a Transaction for {${invoiceId}}.`,
-      } as UseCaseError);
+      super(`Couldn't find a Transaction for {${invoiceId}}.`);
     }
   }
-  export class InvoiceNotFoundError extends Result<UseCaseError> {
+  export class InvoiceNotFoundError extends UseCaseError {
     constructor(invoiceId: string) {
-      super(false, {
-        message: `Couldn't find a Invoice for {${invoiceId}}.`,
-      } as UseCaseError);
+      super(`Couldn't find a Invoice for {${invoiceId}}.`);
     }
   }
 
-  export class InvoiceIsDraftError extends Result<UseCaseError> {
+  export class InvoiceIsDraftError extends UseCaseError {
     constructor(invoiceId: string) {
-      super(false, {
-        message: `Invoice with id {${invoiceId}} is still in "DRAFT" status and cannot have a credit note created`,
-      });
+      super(
+        `Invoice with id {${invoiceId}} is still in "DRAFT" status and cannot have a credit note created`
+      );
+    }
+  }
+
+  export class InvoiceItemsNotFound extends UseCaseError {
+    constructor(invoiceId: string) {
+      super(`Items for invoice with id {${invoiceId}} were not found`);
     }
   }
 }

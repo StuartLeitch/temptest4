@@ -1,7 +1,7 @@
 // * Core Domain
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { Result, right, left } from '../../../../core/logic/Result';
+import { right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
@@ -34,19 +34,15 @@ import { TransactionRepoContract } from '../../../transactions/repos';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 
-import { CreateCreditNoteRequestDTO } from './createCreditNoteDTO';
-import { CreateCreditNoteResponse } from './createCreditNoteResponse';
-import { CreateCreditNoteErrors } from './createCreditNoteErrors';
+import { CreateCreditNoteRequestDTO as DTO } from './createCreditNoteDTO';
+import { CreateCreditNoteResponse as Response } from './createCreditNoteResponse';
+import { CreateCreditNoteErrors as Errors } from './createCreditNoteErrors';
 
 export class CreateCreditNoteUsecase
   implements
-    UseCase<
-      CreateCreditNoteRequestDTO,
-      Promise<CreateCreditNoteResponse>,
-      UsecaseAuthorizationContext
-    >,
+    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
     AccessControlledUsecase<
-      CreateCreditNoteRequestDTO,
+      DTO,
       UsecaseAuthorizationContext,
       AccessControlContext
     > {
@@ -61,7 +57,7 @@ export class CreateCreditNoteUsecase
   ) {}
 
   private async getAccessControlContext(
-    request: CreateCreditNoteRequestDTO,
+    request: DTO,
     context?: UsecaseAuthorizationContext
   ): Promise<AccessControlContext> {
     return {};
@@ -69,41 +65,45 @@ export class CreateCreditNoteUsecase
 
   @Authorize('create:credit_note')
   public async execute(
-    request: CreateCreditNoteRequestDTO,
+    request: DTO,
     context?: UsecaseAuthorizationContext
-  ): Promise<CreateCreditNoteResponse> {
+  ): Promise<Response> {
     let transaction: Transaction;
     let invoice: Invoice;
     let items: InvoiceItem[];
 
-    const invoiceId = InvoiceId.create(
-      new UniqueEntityID(request.invoiceId)
-    ).getValue();
+    const invoiceId = InvoiceId.create(new UniqueEntityID(request.invoiceId));
 
     try {
       // * Identify transaction by invoice id
       try {
-        transaction = await this.transactionRepo.getTransactionByInvoiceId(
+        const maybeTransaction = await this.transactionRepo.getTransactionByInvoiceId(
           invoiceId
         );
+        if (maybeTransaction.isLeft()) {
+          return left(new Errors.TransactionNotFoundError(request.invoiceId));
+        }
+        transaction = maybeTransaction.value;
       } catch (err) {
-        throw new CreateCreditNoteErrors.TransactionNotFoundError(
-          request.invoiceId
-        );
+        return left(new Errors.TransactionNotFoundError(request.invoiceId));
       }
 
       // * Identify Invoice
       try {
-        invoice = await this.invoiceRepo.getInvoiceById(invoiceId);
+        const maybeInvoice = await this.invoiceRepo.getInvoiceById(invoiceId);
+
+        if (maybeInvoice.isLeft()) {
+          return left(new Errors.InvoiceNotFoundError(request.invoiceId));
+        }
+
+        invoice = maybeInvoice.value;
       } catch (err) {
-        throw new CreateCreditNoteErrors.InvoiceNotFoundError(
-          request.invoiceId
-        );
+        return left(new Errors.InvoiceNotFoundError(request.invoiceId));
       }
 
       // * Check invoice status
       if (invoice.status === InvoiceStatus.DRAFT) {
-        throw new CreateCreditNoteErrors.InvoiceIsDraftError(request.invoiceId);
+        return left(new Errors.InvoiceIsDraftError(request.invoiceId));
       }
 
       // * Mark invoice as FINAL
@@ -112,7 +112,15 @@ export class CreateCreditNoteUsecase
       await this.invoiceRepo.update(invoice);
 
       try {
-        items = await this.invoiceItemRepo.getItemsByInvoiceId(invoiceId);
+        const maybeItems = await this.invoiceItemRepo.getItemsByInvoiceId(
+          invoiceId
+        );
+
+        if (maybeItems.isLeft()) {
+          return left(new Errors.InvoiceItemsNotFound(request.invoiceId));
+        }
+
+        items = maybeItems.value;
         for (const item of items) {
           const [coupons, waivers] = await Promise.all([
             this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
@@ -120,7 +128,7 @@ export class CreateCreditNoteUsecase
           ]);
         }
       } catch (err) {
-        throw new UnexpectedError('Bad Invoice Items');
+        return left(new Errors.InvoiceItemsNotFound(request.invoiceId));
       }
 
       invoice.addItems(items);
@@ -137,8 +145,12 @@ export class CreateCreditNoteUsecase
         dateUpdated: null,
       };
 
-      const creditNote = CreditNoteMap.toDomain(creditNoteProps);
+      const maybeCreditNote = CreditNoteMap.toDomain(creditNoteProps);
+      if (maybeCreditNote.isLeft()) {
+        return left(maybeCreditNote.value);
+      }
 
+      const creditNote = maybeCreditNote.value;
       await this.creditNoteRepo.save(creditNote);
 
       if (request.createDraft) {
@@ -156,7 +168,11 @@ export class CreateCreditNoteUsecase
         // * System creates DRAFT invoice
 
         // This is where all the magic happens
-        let draftInvoice = InvoiceMap.toDomain(invoiceProps);
+        const maybeDraftInvoice = InvoiceMap.toDomain(invoiceProps);
+        if (maybeDraftInvoice.isLeft()) {
+          return left(maybeDraftInvoice.value);
+        }
+        let draftInvoice = maybeDraftInvoice.value;
         if (items.length) {
           items.forEach(async (invoiceItem) => {
             const rawInvoiceItem = InvoiceItemMap.toPersistence(invoiceItem);
@@ -166,9 +182,12 @@ export class CreateCreditNoteUsecase
             delete rawInvoiceItem.id;
 
             const draftInvoiceItem = InvoiceItemMap.toDomain(rawInvoiceItem);
-            draftInvoice.addInvoiceItem(draftInvoiceItem);
+            if (draftInvoiceItem.isLeft()) {
+              return left(draftInvoiceItem.value);
+            }
+            draftInvoice.addInvoiceItem(draftInvoiceItem.value);
 
-            await this.invoiceItemRepo.save(draftInvoiceItem);
+            await this.invoiceItemRepo.save(draftInvoiceItem.value);
           });
         }
 
@@ -189,7 +208,7 @@ export class CreateCreditNoteUsecase
       DomainEvents.dispatchEventsForAggregate(invoice.id);
       DomainEvents.dispatchEventsForAggregate(creditNote.id);
 
-      return right(Result.ok<CreditNote>(creditNote));
+      return right(creditNote);
     } catch (err) {
       throw new UnexpectedError(err);
     }

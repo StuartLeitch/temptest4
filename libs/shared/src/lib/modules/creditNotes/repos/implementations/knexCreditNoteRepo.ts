@@ -1,8 +1,8 @@
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { Either, left, right } from '../../../../core/logic/Either';
-import { Guard } from '../../../../core/logic/Guard';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
-import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
+import { RepoError } from '../../../../infrastructure/RepoError';
 
 import { CreditNote } from '../../domain/CreditNote';
 import { CreditNoteId } from '../../domain/CreditNoteId';
@@ -45,7 +45,7 @@ export class KnexCreditNoteRepo
 
   public async getCreditNoteByInvoiceId(
     invoiceId: InvoiceId
-  ): Promise<CreditNote> {
+  ): Promise<Either<GuardFailure | RepoError, CreditNote>> {
     const { db } = this;
 
     const creditNote = await db(TABLES.CREDIT_NOTES)
@@ -65,7 +65,7 @@ export class KnexCreditNoteRepo
 
   public async getCreditNoteByReferenceNumber(
     referenceNumber: string
-  ): Promise<CreditNote> {
+  ): Promise<Either<GuardFailure | RepoError, CreditNote>> {
     const { db } = this;
     const creditNote = await db(TABLES.CREDIT_NOTES)
       .select()
@@ -81,7 +81,7 @@ export class KnexCreditNoteRepo
 
   public async getCreditNoteById(
     creditNoteId: CreditNoteId
-  ): Promise<CreditNote> {
+  ): Promise<Either<GuardFailure | RepoError, CreditNote>> {
     const { logger, db } = this;
 
     const creditNote = await db(TABLES.CREDIT_NOTES)
@@ -99,7 +99,9 @@ export class KnexCreditNoteRepo
     return CreditNoteMap.toDomain(creditNote);
   }
 
-  async getUnregisteredErpCreditNotes(): Promise<CreditNoteId[]> {
+  async getUnregisteredErpCreditNotes(): Promise<
+    Either<GuardFailure | RepoError, CreditNoteId[]>
+  > {
     const { db, logger } = this;
 
     const erpReferenceQuery = db(TABLES.CREDIT_NOTES)
@@ -131,7 +133,9 @@ export class KnexCreditNoteRepo
     );
   }
 
-  async update(creditNote: CreditNote): Promise<CreditNote> {
+  async update(
+    creditNote: CreditNote
+  ): Promise<Either<GuardFailure | RepoError, CreditNote>> {
     const { db } = this;
     const updateObject = CreditNoteMap.toPersistence(creditNote);
     const updated = await db(TABLES.CREDIT_NOTES)
@@ -145,22 +149,20 @@ export class KnexCreditNoteRepo
       );
     }
 
-    return creditNote;
+    return right(creditNote);
   }
 
-  async exists(creditNote: CreditNote): Promise<boolean> {
-    try {
-      await this.getCreditNoteById(creditNote.creditNoteId);
-    } catch (error) {
-      if (error.code === RepoErrorCode.ENTITY_NOT_FOUND) {
-        return false;
-      }
-      throw error;
-    }
-    return true;
+  async exists(
+    creditNote: CreditNote
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
+    const result = await this.getCreditNoteById(creditNote.creditNoteId);
+
+    return right(!!result);
   }
 
-  async save(creditNote: CreditNote): Promise<CreditNote> {
+  async save(
+    creditNote: CreditNote
+  ): Promise<Either<GuardFailure | RepoError, CreditNote>> {
     const { db } = this;
 
     const rawCreditNote = CreditNoteMap.toPersistence(creditNote);
@@ -174,16 +176,20 @@ export class KnexCreditNoteRepo
     return this.getCreditNoteById(creditNote.creditNoteId);
   }
 
-  async existsWithId(creditNoteId: CreditNoteId): Promise<boolean> {
+  async existsWithId(
+    creditNoteId: CreditNoteId
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     const result = await this.db(TABLES.CREDIT_NOTES)
       .where('id', creditNoteId.id.toString())
       .countDistinct({ creditNoteCount: 'id' })
       .first();
 
-    return result.creditNoteCount !== 0;
+    return right(result.creditNoteCount !== 0);
   }
 
-  async getCreditNoteByCustomId(customId: string): Promise<CreditNote> {
+  async getCreditNoteByCustomId(
+    customId: string
+  ): Promise<Either<GuardFailure | RepoError, CreditNote>> {
     const { db } = this;
 
     const result = await db
@@ -216,7 +222,9 @@ export class KnexCreditNoteRepo
     return result;
   }
 
-  async getRecentCreditNotes(args?: any): Promise<any> {
+  async getRecentCreditNotes(
+    args?: any
+  ): Promise<Either<GuardFailure | RepoError, any>> {
     const { pagination, filters } = args;
     const { db } = this;
 
@@ -234,9 +242,9 @@ export class KnexCreditNoteRepo
       .limit(pagination.limit)
       .select([`${TABLES.CREDIT_NOTES}.*`]);
 
-    return {
+    return right({
       totalCount: totalCount[0]['count'],
       creditNotes: creditNotes.map((i) => CreditNoteMap.toDomain(i)),
-    };
+    });
   }
 }
