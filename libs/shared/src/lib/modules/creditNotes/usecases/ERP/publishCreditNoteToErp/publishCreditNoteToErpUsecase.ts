@@ -1,5 +1,5 @@
 import { UseCase } from '../../../../../core/domain/UseCase';
-import { right, left } from '../../../../../core/logic/Result';
+import { right, left } from '../../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
 
 // * Authorization Logic
@@ -7,6 +7,7 @@ import {
   AccessControlledUsecase,
   UsecaseAuthorizationContext,
   AccessControlContext,
+  Authorize,
 } from '../../../../../domain/authorization';
 
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
@@ -23,19 +24,15 @@ import { ErpReferenceMap } from './../../../../vendors/mapper/ErpReference';
 import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
 
 import { GetItemsForInvoiceUsecase } from '../../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
-import { PublishCreditNoteToErpRequestDTO } from './publishCreditNoteToErpDTO';
-import { PublishCreditNoteToErpResponse } from './publishCreditNoteToErpResponse';
+import { PublishCreditNoteToErpRequestDTO as DTO } from './publishCreditNoteToErpDTO';
+import { PublishCreditNoteToErpResponse as Response } from './publishCreditNoteToErpResponse';
 import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
 
 export class PublishCreditNoteToErpUsecase
   implements
-    UseCase<
-      PublishCreditNoteToErpRequestDTO,
-      Promise<PublishCreditNoteToErpResponse>,
-      UsecaseAuthorizationContext
-    >,
+    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
     AccessControlledUsecase<
-      PublishCreditNoteToErpRequestDTO,
+      DTO,
       UsecaseAuthorizationContext,
       AccessControlContext
     > {
@@ -54,26 +51,40 @@ export class PublishCreditNoteToErpUsecase
     return {};
   }
 
+  @Authorize('')
   public async execute(
-    request: PublishCreditNoteToErpRequestDTO,
+    request: DTO,
     context?: UsecaseAuthorizationContext
-  ): Promise<PublishCreditNoteToErpResponse> {
+  ): Promise<Response> {
     this.loggerService.info('PublishCreditNoteToERP Request', request);
     let creditNote: CreditNote;
     let invoice: Invoice;
 
     try {
-      creditNote = await this.creditNoteRepo.getCreditNoteById(
+      // * Get CreditNote details
+      const maybeCreditNote = await this.creditNoteRepo.getCreditNoteById(
         CreditNoteId.create(new UniqueEntityID(request.creditNoteId)).getValue()
       );
+
+      if (maybeCreditNote.isLeft()) {
+        return left(maybeCreditNote.value);
+      }
+      creditNote = maybeCreditNote.value;
       this.loggerService.info('PublishCreditNoteToERP Credit Note', creditNote);
 
-      invoice = await this.invoiceRepo.getInvoiceById(creditNote.invoiceId);
+      // * Get Invoice details
+      const maybeInvoice = await this.invoiceRepo.getInvoiceById(
+        creditNote.invoiceId
+      );
+      if (maybeInvoice.isLeft()) {
+        return left(maybeInvoice.value);
+      }
       this.loggerService.info(
         'PublishCreditNoteToERP Original Invoice',
         invoice
       );
 
+      // *Get Invoice Items
       let invoiceItems = invoice.invoiceItems.currentItems;
       this.loggerService.debug(
         'PublishCreditNoteToERP Invoice Items',
@@ -99,19 +110,31 @@ export class PublishCreditNoteToErpUsecase
           );
         }
 
-        invoiceItems = response.value.getValue();
+        invoiceItems = response.value;
         this.loggerService.debug(
           'PublishCreditNoteToERP Invoice Items',
           invoiceItems
         );
 
         for (const item of invoiceItems) {
-          const [coupons, waivers] = await Promise.all([
+          const [maybeCoupons, maybeWaivers] = await Promise.all([
             this.couponRepo.getCouponsByInvoiceItemId(item.invoiceItemId),
             this.waiverRepo.getWaiversByInvoiceItemId(item.invoiceItemId),
           ]);
-          item.addAssignedCoupons(coupons);
-          item.addAssignedWaivers(waivers);
+
+          if (maybeCoupons.isLeft()) {
+            return left(
+              new UnexpectedError(new Error(maybeCoupons.value.message))
+            );
+          }
+
+          if (maybeWaivers.isLeft()) {
+            return left(
+              new UnexpectedError(new Error(maybeWaivers.value.message))
+            );
+          }
+          item.addAssignedCoupons(maybeCoupons.value);
+          item.addAssignedWaivers(maybeWaivers.value);
         }
       }
 
@@ -158,10 +181,16 @@ export class PublishCreditNoteToErpUsecase
               this.erpService?.referenceMappings?.creditNote || 'creditNote',
             value: String('NONEXISTENT_INVOICE'),
           });
-          await this.erpReferenceRepo.save(erpReference);
+          if (erpReference.isLeft()) {
+            return left(
+              new UnexpectedError(new Error(erpReference.value.message))
+            );
+          }
+          await this.erpReferenceRepo.save(erpReference.value);
+
           return left(
             new UnexpectedError(
-              'Non-existent Invoice',
+              new Error('Non-existent Invoice'),
               `Referenced credit note's invoice having reference ${invoiceErpReference.value} does not exist in the ERP system.`
             )
           );
@@ -183,7 +212,13 @@ export class PublishCreditNoteToErpUsecase
               this.erpService?.referenceMappings?.creditNote || 'creditNote',
             value: String(erpResponse),
           });
-          await this.erpReferenceRepo.save(erpReference);
+
+          if (erpReference.isLeft()) {
+            return left(
+              new UnexpectedError(new Error(erpReference.value.message))
+            );
+          }
+          await this.erpReferenceRepo.save(erpReference.value);
         }
 
         return right(erpResponse);
