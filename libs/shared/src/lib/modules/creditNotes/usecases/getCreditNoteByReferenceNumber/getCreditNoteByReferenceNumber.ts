@@ -2,7 +2,7 @@
 
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
-import { Result, left, right } from '../../../../core/logic/Result';
+import { left, right } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 
 // * Authorization Logic
@@ -49,9 +49,16 @@ export class GetCreditNoteByReferenceNumberUsecase
     try {
       try {
         // * System identifies credit note by  invoice reference number
-        creditNote = await this.creditNoteRepo.getCreditNoteByReferenceNumber(
+        const maybeCreditNote = await this.creditNoteRepo.getCreditNoteByReferenceNumber(
           referenceNumber
         );
+
+        if (maybeCreditNote.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeCreditNote.value.message))
+          );
+        }
+        creditNote = maybeCreditNote.value;
       } catch (err) {
         return left(
           new GetCreditNoteByReferenceNumberErrors.CreditNoteNotFoundError(
@@ -59,9 +66,9 @@ export class GetCreditNoteByReferenceNumberUsecase
           )
         );
       }
-      return right(Result.ok<CreditNote>(creditNote));
+      return right(creditNote);
     } catch (err) {
-      return left(new UnexpectedError(err));
+      return left(new UnexpectedError(err, err.toString()));
     }
   }
 }

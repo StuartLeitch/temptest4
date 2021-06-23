@@ -1,4 +1,5 @@
-import { Either, Result } from '../../../../core/logic/Result';
+import { Either } from '../../../../core/logic/Either';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 
 import { GetCreditNoteByReferenceNumberErrors } from './getCreditNoteByReferenceNumberErrors';
@@ -6,6 +7,7 @@ import { CreditNote } from '../../domain/CreditNote';
 
 export type GetCreditNoteByReferenceNumberResponse = Either<
   | GetCreditNoteByReferenceNumberErrors.CreditNoteNotFoundError
-  | UnexpectedError,
-  Result<CreditNote>
+  | UnexpectedError
+  | GuardFailure,
+  CreditNote
 >;
