@@ -1,7 +1,7 @@
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { Result, left, right } from '../../../../core/logic/Result';
+import { left, right } from '../../../../core/logic/Either';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
@@ -16,19 +16,15 @@ import { CreditNote } from '../../domain/CreditNote';
 import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
 
 // * Usecase specific
-import { GetCreditNoteByIdResponse } from './getCreditNoteByIdResponse';
-import { GetCreditNoteByIdErrors } from './getCreditNoteByIdErrors';
-import { GetCreditNoteByIdDTO } from './getCreditNoteByIdDTO';
+import { GetCreditNoteByIdResponse as Response } from './getCreditNoteByIdResponse';
+import { GetCreditNoteByIdErrors as Errors } from './getCreditNoteByIdErrors';
+import { GetCreditNoteByIdDTO as DTO } from './getCreditNoteByIdDTO';
 
 export class GetCreditNoteByIdUsecase
   implements
-    UseCase<
-      GetCreditNoteByIdDTO,
-      Promise<GetCreditNoteByIdResponse>,
-      UsecaseAuthorizationContext
-    >,
+    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
     AccessControlledUsecase<
-      GetCreditNoteByIdDTO,
+      DTO,
       UsecaseAuthorizationContext,
       AccessControlContext
     > {
@@ -39,27 +35,33 @@ export class GetCreditNoteByIdUsecase
   }
 
   public async execute(
-    request: GetCreditNoteByIdDTO,
+    request: DTO,
     context?: UsecaseAuthorizationContext
-  ): Promise<GetCreditNoteByIdResponse> {
+  ): Promise<Response> {
     const { creditNoteId } = request;
 
     let creditNote: CreditNote;
 
     try {
       try {
-        creditNote = await this.creditNoteRepo.getCreditNoteById(
+        const maybeCreditNote = await this.creditNoteRepo.getCreditNoteById(
           CreditNoteId.create(new UniqueEntityID(creditNoteId)).getValue()
         );
+
+        if (maybeCreditNote.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeCreditNote.value.message))
+          );
+        }
+
+        creditNote = maybeCreditNote.value;
       } catch (err) {
-        return left(
-          new GetCreditNoteByIdErrors.CreditNoteNotFoundError(creditNoteId)
-        );
+        return left(new Errors.CreditNoteNotFoundError(creditNoteId));
       }
 
-      return right(Result.ok<CreditNote>(creditNote));
+      return right(creditNote);
     } catch (err) {
-      return left(new UnexpectedError(err));
+      return left(new UnexpectedError(err, err.toString()));
     }
   }
 }
