@@ -4,12 +4,13 @@ import {
   UsecaseAuthorizationContext,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../../domain/authorization';
 
 // * Core domain imports
 import { ErpInvoiceResponse } from '../../../../../domain/services/ErpService';
 import { UseCase } from '../../../../../core/domain/UseCase';
-import { right, Result, left, Either } from '../../../../../core/logic/Result';
+import { right, left } from '../../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { ErrorUtils } from '../../../../../utils/ErrorUtils';
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
@@ -22,13 +23,13 @@ import { ErpServiceContract } from '../../../../../domain/services/ErpService';
 import { ErpReferenceRepoContract } from '../../../../vendors/repos';
 import { PublishCreditNoteToErpUsecase } from '../publishCreditNoteToErp/publishCreditNoteToErpUsecase';
 
-import { RetryCreditNotesResponse } from './retryCreditNotesResponse';
+import { RetryCreditNotesResponse as Response } from './retryCreditNotesResponse';
 
 export class RetryCreditNotesUsecase
   implements
     UseCase<
       Record<string, unknown>,
-      Promise<RetryCreditNotesResponse>,
+      Promise<Response>,
       UsecaseAuthorizationContext
     >,
     AccessControlledUsecase<
@@ -62,17 +63,28 @@ export class RetryCreditNotesUsecase
     return {};
   }
 
+  @Authorize('')
   public async execute(
     request?: Record<string, unknown>,
     context?: UsecaseAuthorizationContext
-  ): Promise<RetryCreditNotesResponse> {
+  ): Promise<Response> {
     try {
-      const unregisteredErpCreditNotesIds = await this.creditNoteRepo.getUnregisteredErpCreditNotes();
+      const maybeUnregisteredErpCreditNotesIds = await this.creditNoteRepo.getUnregisteredErpCreditNotes();
       const registeredCreditNotes: ErpInvoiceResponse[] = [];
+
+      if (maybeUnregisteredErpCreditNotesIds.isLeft()) {
+        return left(
+          new UnexpectedError(
+            new Error(maybeUnregisteredErpCreditNotesIds.value.message)
+          )
+        );
+      }
+      const unregisteredErpCreditNotesIds =
+        maybeUnregisteredErpCreditNotesIds.value;
 
       if (unregisteredErpCreditNotesIds.length === 0) {
         this.loggerService.info('No registered credit notes!');
-        return right(Result.ok<ErpInvoiceResponse[]>(registeredCreditNotes));
+        return right(registeredCreditNotes);
       }
 
       this.loggerService.info(
@@ -107,7 +119,7 @@ export class RetryCreditNotesUsecase
         return left(new UnexpectedError(errs, JSON.stringify(errs, null, 2)));
       }
 
-      return right(Result.ok<ErpInvoiceResponse[]>(registeredCreditNotes));
+      return right(registeredCreditNotes);
     } catch (err) {
       this.loggerService.error(err);
       return left(new UnexpectedError(err, err.toString()));
