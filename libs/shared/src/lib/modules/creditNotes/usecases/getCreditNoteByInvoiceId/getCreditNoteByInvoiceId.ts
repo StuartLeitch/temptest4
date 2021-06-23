@@ -3,7 +3,7 @@
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { Result, left, right } from '../../../../core/logic/Result';
+import { left, right } from '../../../../core/logic/Either';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
@@ -11,6 +11,7 @@ import {
   AccessControlledUsecase,
   UsecaseAuthorizationContext,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
@@ -18,20 +19,16 @@ import { CreditNote } from '../../domain/CreditNote';
 import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
 
 // * Usecase specific
-import { GetCreditNoteByInvoiceIdResponse } from './getCreditNoteByInvoiceIdResponse';
-import { GetCreditNoteByInvoiceIdErrors } from './getCreditNoteByInvoiceIdErrors';
-import { GetCreditNoteByInvoiceIdDTO } from './getCreditNoteByInvoiceIdDTO';
+import { GetCreditNoteByInvoiceIdResponse as Response } from './getCreditNoteByInvoiceIdResponse';
+import { GetCreditNoteByInvoiceIdErrors as Errors } from './getCreditNoteByInvoiceIdErrors';
+import { GetCreditNoteByInvoiceIdDTO as DTO } from './getCreditNoteByInvoiceIdDTO';
 
 // to be modified with Guard/Either
 export class GetCreditNoteByInvoiceIdUsecase
   implements
-    UseCase<
-      GetCreditNoteByInvoiceIdDTO,
-      Promise<GetCreditNoteByInvoiceIdResponse>,
-      UsecaseAuthorizationContext
-    >,
+    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
     AccessControlledUsecase<
-      GetCreditNoteByInvoiceIdDTO,
+      DTO,
       UsecaseAuthorizationContext,
       AccessControlContext
     > {
@@ -44,10 +41,11 @@ export class GetCreditNoteByInvoiceIdUsecase
     return {};
   }
 
+  @Authorize('')
   public async execute(
-    request: GetCreditNoteByInvoiceIdDTO,
+    request: DTO,
     context?: UsecaseAuthorizationContext
-  ): Promise<GetCreditNoteByInvoiceIdResponse> {
+  ): Promise<Response> {
     const { invoiceId } = request;
 
     let creditNote: CreditNote;
@@ -55,18 +53,22 @@ export class GetCreditNoteByInvoiceIdUsecase
     try {
       try {
         // * System identifies credit note by invoice id
-        creditNote = await this.creditNoteRepo.getCreditNoteByInvoiceId(
-          InvoiceId.create(new UniqueEntityID(invoiceId)).getValue()
+        const maybeCreditNote = await this.creditNoteRepo.getCreditNoteByInvoiceId(
+          InvoiceId.create(new UniqueEntityID(invoiceId))
         );
+        if (maybeCreditNote.isLeft()) {
+          return left(
+            new UnexpectedError(new Error(maybeCreditNote.value.message))
+          );
+        }
+        creditNote = maybeCreditNote.value;
       } catch (e) {
-        return left(
-          new GetCreditNoteByInvoiceIdErrors.CreditNoteNotFoundError(invoiceId)
-        );
+        return left(new Errors.CreditNoteNotFoundError(invoiceId));
       }
 
-      return right(Result.ok<CreditNote>(creditNote));
+      return right(creditNote);
     } catch (err) {
-      return left(new UnexpectedError(err));
+      return left(new UnexpectedError(err, err.toString()));
     }
   }
 }

@@ -9,6 +9,7 @@ import {
   AccessControlledUsecase,
   UsecaseAuthorizationContext,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
 import { CreditNoteId } from '../../domain/CreditNoteId';
@@ -34,6 +35,7 @@ export class GetCreditNoteByIdUsecase
     return {};
   }
 
+  @Authorize('')
   public async execute(
     request: DTO,
     context?: UsecaseAuthorizationContext

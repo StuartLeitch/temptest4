@@ -1,12 +1,9 @@
 import { UseCaseError } from '../../../../core/logic/UseCaseError';
-import { Result } from '../../../../core/logic/Result';
 
 export namespace GetCreditNoteByInvoiceIdErrors {
-  export class CreditNoteNotFoundError extends Result<UseCaseError> {
+  export class CreditNoteNotFoundError extends UseCaseError {
     constructor(invoiceId: string) {
-      super(false, {
-        message: `Couldn't find a Credit Note referencing invoice {${invoiceId}}.`
-      } as UseCaseError);
+      super(`Couldn't find a Credit Note referencing invoice {${invoiceId}}.`);
     }
   }
 }
