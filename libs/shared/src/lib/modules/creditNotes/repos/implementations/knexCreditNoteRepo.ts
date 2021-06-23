@@ -129,7 +129,7 @@ export class KnexCreditNoteRepo
     const creditNotes = await prepareIdsSQL;
 
     return creditNotes.map((cn) =>
-      CreditNoteId.create(new UniqueEntityID(cn.creditNoteId)).getValue()
+      CreditNoteId.create(new UniqueEntityID(cn.creditNoteId))
     );
   }
 

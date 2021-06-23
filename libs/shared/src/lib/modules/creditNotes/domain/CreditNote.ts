@@ -33,7 +33,7 @@ export type CreditNoteCollection = CreditNote[];
 
 export class CreditNote extends AggregateRoot<CreditNoteProps> {
   get creditNoteId(): CreditNoteId {
-    return CreditNoteId.create(this._id).getValue();
+    return CreditNoteId.create(this._id);
   }
 
   get invoiceId(): InvoiceId {
