@@ -69,7 +69,7 @@ export class PublishCreditNoteCreatedUsecase
 
       reason: creditNote.creationReason,
 
-      costs: formatCosts(invoiceItems, payments, invoice),
+      costs: formatCosts(invoiceItems, payments, invoice, creditNote),
 
       invoiceItems: formatInvoiceItems(invoiceItems, manuscript.customId),
 
