@@ -1,31 +1,31 @@
-import { HandleContract } from '../../../../core/domain/events/contracts/Handle';
-import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
-import { NoOpUseCase } from '../../../../core/domain/NoOpUseCase';
+import { HandleContract } from '../../../core/domain/events/contracts/Handle';
+import { DomainEvents } from '../../../core/domain/events/DomainEvents';
+import { NoOpUseCase } from '../../../core/domain/NoOpUseCase';
 
 import {
   Roles,
   UsecaseAuthorizationContext,
-} from '../../../../domain/authorization';
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+} from '../../../domain/authorization';
+import { LoggerContract } from '../../../infrastructure/logging/Logger';
 
-import { CreditNoteCreated as CreditNoteCreatedEvent } from '../../domain/events/CreditNoteCreated';
+import { CreditNoteCreated as CreditNoteCreatedEvent } from '../domain/events/CreditNoteCreated';
 
-import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
-import { PaymentMethodRepoContract } from '../../../payments/repos/paymentMethodRepo';
-import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
-import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
-import { PaymentRepoContract } from '../../../payments/repos/paymentRepo';
-import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
-import { PayerRepoContract } from '../../../payers/repos/payerRepo';
-import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
-import { CouponRepoContract } from '../../../coupons/repos';
-import { WaiverRepoContract } from '../../../waivers/repos';
+import { CreditNoteRepoContract } from '../repos/creditNoteRepo';
+import { PaymentMethodRepoContract } from '../../payments/repos/paymentMethodRepo';
+import { ArticleRepoContract } from '../../manuscripts/repos/articleRepo';
+import { AddressRepoContract } from '../../addresses/repos/addressRepo';
+import { PaymentRepoContract } from '../../payments/repos/paymentRepo';
+import { InvoiceItemRepoContract } from '../../invoices/repos/invoiceItemRepo';
+import { PayerRepoContract } from '../../payers/repos/payerRepo';
+import { InvoiceRepoContract } from '../../invoices/repos/invoiceRepo';
+import { CouponRepoContract } from '../../coupons/repos';
+import { WaiverRepoContract } from '../../waivers/repos';
 
-import { PublishCreditNoteCreatedUsecase } from '../publishEvents/publishCreditNoteCreated/publishCreditNoteCreated';
-import { PublishRevenueRecognitionReversalUsecase } from '../../../invoices/usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
-import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails';
-import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
-import { GetPaymentMethodsUseCase } from '../../../payments/usecases/getPaymentMethods';
+import { PublishCreditNoteCreatedUsecase } from '../usecases/publishEvents/publishCreditNoteCreated/publishCreditNoteCreated';
+import { PublishRevenueRecognitionReversalUsecase } from '../../invoices/usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
+import { GetInvoiceDetailsUsecase } from '../../invoices/usecases/getInvoiceDetails';
+import { GetItemsForInvoiceUsecase } from '../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
+import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
 
 const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.SUPER_ADMIN],

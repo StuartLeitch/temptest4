@@ -67,7 +67,7 @@ export class CreateCreditNoteUsecase
     return {};
   }
 
-  @Authorize('create: credit_note')
+  @Authorize('create:credit_note')
   public async execute(
     request: CreateCreditNoteRequestDTO,
     context?: UsecaseAuthorizationContext
@@ -123,34 +123,14 @@ export class CreateCreditNoteUsecase
         throw new UnexpectedError('Bad Invoice Items');
       }
 
-      const getVAT = (): Promise<number | null> => {
-        if (items.length) {
-          items.forEach(async (invoiceItem) => {
-            const vat = invoiceItem.vat;
-            return vat;
-          });
-        } else {
-          return null;
-        }
-      };
-
-      const getPrice = (): Promise<number | null> => {
-        if (items.length) {
-          items.forEach(async (invoiceItem) => {
-            const price = invoiceItem.price * -1;
-            return price;
-          });
-        } else {
-          return null;
-        }
-      };
+      invoice.addItems(items);
 
       let creditNoteProps = {
         id: new UniqueEntityID(),
         invoiceId: request.invoiceId,
         creationReason: request.reason,
-        vat: getVAT(),
-        price: getPrice(),
+        vat: invoice.invoiceVatTotal,
+        price: invoice.invoiceNetTotal,
         persistentReferenceNumber: invoice.persistentReferenceNumber,
         dateCreated: new Date(),
         dateIssued: new Date(),
@@ -163,7 +143,7 @@ export class CreateCreditNoteUsecase
 
       if (request.createDraft) {
         const invoiceProps = {
-          ...invoice,
+          ...invoice.props,
           status: InvoiceStatus.DRAFT,
           dateMovedToFinal: null,
           invoiceNumber: null,
@@ -193,10 +173,6 @@ export class CreateCreditNoteUsecase
         }
 
         await this.invoiceRepo.save(draftInvoice);
-
-        draftInvoice.dateAccepted = invoice.dateAccepted;
-
-        await this.invoiceRepo.update(draftInvoice);
 
         //* create notificationPause
         const reminderPause: NotificationPause = {
