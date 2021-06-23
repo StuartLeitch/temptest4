@@ -49,7 +49,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
     this.billingCountryCodeField = React.createRef();
     // this.braintree = React.createRef();
 
-    ["start", "getClientToken", "onFetchClientToken", "setupComponents", "setupForm", "enablePayNow", "onSubmit"].forEach(
+    ["start", "setupComponents", "setupForm", "enablePayNow", "onSubmit"].forEach(
       prop => (this[prop] = this[prop].bind(this)),
     );
   }
@@ -65,8 +65,6 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
   }
 
   start() {
-    // this.getClientToken();
-
     var self = this;
     const {ccToken } = this.props;
 
@@ -80,32 +78,32 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
     });
   }
 
-  getClientToken() {
-    var xhr = new XMLHttpRequest();
-    var self = this;
+  // getClientToken() {
+  //   var xhr = new XMLHttpRequest();
+  //   var self = this;
 
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState === 4 && xhr.status === 201) {
-        self.onFetchClientToken(JSON.parse(xhr.responseText).client_token);
-      }
-    };
-    xhr.open("GET", "https://braintree-sample-merchant.herokuapp.com/client_token", true);
+  //   xhr.onreadystatechange = function() {
+  //     if (xhr.readyState === 4 && xhr.status === 201) {
+  //       self.onFetchClientToken(JSON.parse(xhr.responseText).client_token);
+  //     }
+  //   };
+  //   xhr.open("GET", "https://braintree-sample-merchant.herokuapp.com/client_token", true);
 
-    xhr.send();
-  }
+  //   xhr.send();
+  // }
 
-  onFetchClientToken(clientToken) {
+  // onFetchClientToken(clientToken) {
 
-    var self = this;
-    return this.setupComponents(clientToken).then(function(instances) {
-      self.hf = instances[0];
-      self.threeDS = instances[1];
+  //   var self = this;
+  //   return this.setupComponents(clientToken).then(function(instances) {
+  //     self.hf = instances[0];
+  //     self.threeDS = instances[1];
 
-      self.setupForm();
-    }).catch(function (err) {
-       console.log('component error:', err);
-    });
-  }
+  //     self.setupForm();
+  //   }).catch(function (err) {
+  //      console.log('component error:', err);
+  //   });
+  // }
 
   setupComponents (clientToken) {
     return Promise.all([
@@ -262,7 +260,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
         onLookupComplete: function (data, next) {
           next();
         },
-        amount: '100.00',
+        amount: self.props.total,
         nonce: payload.nonce,
         bin: payload.details.bin,
         email: emailValue,
@@ -278,16 +276,26 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
           countryCodeAlpha2: billingCountryCodeValue
         }
       })
-    }).then(function (payload) {
-      if (!payload.liabilityShifted) {
-        console.log('Liability did not shift', payload);
-        console.info('Liability not shifted', payload);
+    }).then(function (token) {
+      if (!token.liabilityShifted) {
+        console.log('Liability did not shift', token);
+        console.info('Liability not shifted', token);
         return;
       }
 
-      console.log('verification success:', payload);
-      console.info('SUCCESS:', payload);
-        // send nonce and verification data to your server
+      this.setState(
+        state => ({ ...state, token, error: null }),
+        () => {
+          // send nonce and verification data to your server
+          const ccPayload = {
+            paymentMethodNonce: token.nonce,
+            paymentMethodId: this.props.paymentMethodId,
+            payerId: this.props.payerId,
+            amount: this.props.total,
+          };
+          this.props.handleSubmit(ccPayload);
+        },
+      );
     }).catch(function (err) {
       console.log(err);
       // enablePayNow();
