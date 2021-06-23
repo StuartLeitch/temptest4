@@ -47,7 +47,7 @@ export class GetCreditNoteByIdUsecase
     try {
       try {
         const maybeCreditNote = await this.creditNoteRepo.getCreditNoteById(
-          CreditNoteId.create(new UniqueEntityID(creditNoteId)).getValue()
+          CreditNoteId.create(new UniqueEntityID(creditNoteId))
         );
 
         if (maybeCreditNote.isLeft()) {

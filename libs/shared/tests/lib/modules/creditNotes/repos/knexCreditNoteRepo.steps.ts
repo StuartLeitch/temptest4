@@ -2,6 +2,9 @@ import { expect } from 'chai';
 import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
 import { UniqueEntityID } from '../../../../../src/lib/core/domain/UniqueEntityID';
+import { Either } from '../../../../../src/lib/core/logic/Either';
+import { GuardFailure } from '../../../../../src/lib/core/logic/GuardFailure';
+import { RepoError } from '../../../../../src/lib/infrastructure/RepoError';
 
 import { InvoiceId } from '../../../../../src/lib/modules/invoices/domain/InvoiceId';
 import { CreditNoteId } from '../../../../../src/lib/modules/creditNotes/domain/CreditNoteId';
@@ -10,12 +13,18 @@ import { CreditNoteMap } from '../../../../../src/lib/modules/creditNotes/mapper
 import { MockCreditNoteRepo } from '../../../../../src/lib/modules/creditNotes/repos/mocks/mockCreditNoteRepo';
 
 function makeCreditNoteData(overwrites?: any): CreditNote {
-  return CreditNoteMap.toDomain({
+  const creditNote = CreditNoteMap.toDomain({
     dateCreated: new Date(),
     vat: 20,
     price: -2000,
     ...overwrites,
   });
+
+  if (creditNote.isLeft()) {
+    throw creditNote.value;
+  }
+
+  return creditNote.value;
 }
 
 let mockCreditNoteRepo: MockCreditNoteRepo;
@@ -36,19 +45,29 @@ Given(
   /^a credit note with invoiceId "([\w-]+)" and id "([\w-]+)"$/,
   async (invoiceId: string, creditNoteId: string) => {
     creditNote = makeCreditNoteData({ invoiceId, id: creditNoteId });
-    creditNote = await mockCreditNoteRepo.save(creditNote);
+    const maybeCreditNote = await mockCreditNoteRepo.save(creditNote);
+
+    if (maybeCreditNote.isLeft()) {
+      throw maybeCreditNote.value;
+    }
+
+    creditNote = maybeCreditNote.value;
   }
 );
 
 When(
   /^we call getCreditNoteByInvoiceId for "([\w-]+)"$/,
   async (invoiceId: string) => {
-    const invoiceIdObj = InvoiceId.create(
-      new UniqueEntityID(invoiceId)
-    ).getValue();
-    foundCreditNote = await mockCreditNoteRepo.getCreditNoteByInvoiceId(
+    const invoiceIdObj = InvoiceId.create(new UniqueEntityID(invoiceId));
+    const maybeFoundCreditNote = await mockCreditNoteRepo.getCreditNoteByInvoiceId(
       invoiceIdObj
     );
+
+    if (maybeFoundCreditNote.isLeft()) {
+      throw maybeFoundCreditNote.value;
+    }
+
+    foundCreditNote = maybeFoundCreditNote.value;
   }
 );
 
@@ -61,10 +80,13 @@ Then('getCreditNoteByInvoiceId returns the credit note', async () => {
 When(
   /^we call getCreditNoteByInvoiceId for un-existent credit note "([\w-]+)"$/,
   async (wrongId: string) => {
-    const invoiceId = InvoiceId.create(new UniqueEntityID(wrongId)).getValue();
-    foundCreditNote = await mockCreditNoteRepo.getCreditNoteByInvoiceId(
+    const invoiceId = InvoiceId.create(new UniqueEntityID(wrongId));
+    const maybeFoundCreditNote = await mockCreditNoteRepo.getCreditNoteByInvoiceId(
       invoiceId
     );
+    if (maybeFoundCreditNote.isRight()) {
+      foundCreditNote = maybeFoundCreditNote.value;
+    }
   }
 );
 
@@ -77,10 +99,16 @@ When(
   async (creditNoteId: string) => {
     const creditNoteIdObj = CreditNoteId.create(
       new UniqueEntityID(creditNoteId)
-    ).getValue();
-    foundCreditNote = await mockCreditNoteRepo.getCreditNoteById(
+    );
+    const maybeFoundCreditNote = await mockCreditNoteRepo.getCreditNoteById(
       creditNoteIdObj
     );
+
+    if (maybeFoundCreditNote.isLeft()) {
+      throw maybeFoundCreditNote.value;
+    }
+
+    foundCreditNote = maybeFoundCreditNote.value;
   }
 );
 
@@ -91,12 +119,14 @@ Then('getCreditNoteById returns the credit note', async () => {
 When(
   /^we call getCreditNoteById for un-existent credit note "([\w-]+)"$/,
   async (wrongCreditNoteId: string) => {
-    const id = CreditNoteId.create(
-      new UniqueEntityID(wrongCreditNoteId)
-    ).getValue();
-    try {
-      foundCreditNote = await mockCreditNoteRepo.getCreditNoteById(id);
-    } catch (err) {}
+    const id = CreditNoteId.create(new UniqueEntityID(wrongCreditNoteId));
+
+    const maybeFoundCreditNote = await mockCreditNoteRepo.getCreditNoteById(id);
+    if (maybeFoundCreditNote.isLeft()) {
+      throw maybeFoundCreditNote.value;
+    }
+
+    foundCreditNote = maybeFoundCreditNote.value;
   }
 );
 
@@ -105,34 +135,57 @@ Then('getCreditNoteById returns null', async () => {
 });
 
 When(/^we call update for credit note "([\w-]+)"$/, async (id: string) => {
-  const creditNoteIdObj = CreditNoteId.create(
-    new UniqueEntityID(id)
-  ).getValue();
-  foundCreditNote = await mockCreditNoteRepo.getCreditNoteById(creditNoteIdObj);
+  const creditNoteIdObj = CreditNoteId.create(new UniqueEntityID(id));
+  const maybeFoundCreditNote = await mockCreditNoteRepo.getCreditNoteById(
+    creditNoteIdObj
+  );
+  if (maybeFoundCreditNote.isLeft()) {
+    throw maybeFoundCreditNote.value;
+  }
+
+  foundCreditNote = maybeFoundCreditNote.value;
   const price = -400;
   foundCreditNote.price = price;
   await mockCreditNoteRepo.update(foundCreditNote);
 });
 
 Then(/^update modifies the credit note "([\w-]+)"$/, async (id: string) => {
-  const creditNoteIdObj = CreditNoteId.create(
-    new UniqueEntityID(id)
-  ).getValue();
-  foundCreditNote = await mockCreditNoteRepo.getCreditNoteById(creditNoteIdObj);
+  const creditNoteIdObj = CreditNoteId.create(new UniqueEntityID(id));
+  const maybeFoundCreditNote = await mockCreditNoteRepo.getCreditNoteById(
+    creditNoteIdObj
+  );
+  if (maybeFoundCreditNote.isLeft()) {
+    throw maybeFoundCreditNote.value;
+  }
+
+  foundCreditNote = maybeFoundCreditNote.value;
   expect(foundCreditNote.price).to.equal(-400);
 });
 
 When(/^we call exists for ([\w-]+) credit note id$/, async (id: string) => {
-  const creditNoteIdObj = CreditNoteId.create(
-    new UniqueEntityID(id)
-  ).getValue();
-  foundCreditNote = await mockCreditNoteRepo.getCreditNoteById(creditNoteIdObj);
+  const creditNoteIdObj = CreditNoteId.create(new UniqueEntityID(id));
+  const maybeFoundCreditNote = await mockCreditNoteRepo.getCreditNoteById(
+    creditNoteIdObj
+  );
+
+  if (maybeFoundCreditNote.isLeft()) {
+    throw maybeFoundCreditNote.value;
+  }
+  foundCreditNote = maybeFoundCreditNote.value;
 
   if (!foundCreditNote) {
     foundCreditNote = makeCreditNoteData({ id });
   }
 
-  creditNoteExists = await mockCreditNoteRepo.exists(foundCreditNote);
+  const maybeCreditNoteExists = await mockCreditNoteRepo.exists(
+    foundCreditNote
+  );
+
+  if (maybeCreditNoteExists.isLeft()) {
+    throw maybeCreditNoteExists.value;
+  }
+
+  creditNoteExists = maybeCreditNoteExists.value;
 });
 
 Then(/^CreditNote.exists returns (.*)$/, async (exists: string) => {
@@ -147,7 +200,11 @@ Given(
 );
 
 When('we call CreditNote.save on the credit note object', async () => {
-  saveCreditNote = await mockCreditNoteRepo.save(creditNote);
+  const maybeSaveCreditNote = await mockCreditNoteRepo.save(creditNote);
+  if (maybeSaveCreditNote.isLeft()) {
+    throw maybeSaveCreditNote.value;
+  }
+  saveCreditNote = maybeSaveCreditNote.value;
 });
 
 Then('the credit note object should be saved', async () => {

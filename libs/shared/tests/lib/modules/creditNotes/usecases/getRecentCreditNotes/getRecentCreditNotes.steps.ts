@@ -14,12 +14,18 @@ import {
 } from '../../../../../../src/lib/shared';
 
 function makeCreditNoteData(overwrites?: any): CreditNote {
-  return CreditNoteMap.toDomain({
+  const maybeCreditNote = CreditNoteMap.toDomain({
     dateCreated: new Date(),
     vat: 20,
     price: -2000,
     ...overwrites,
   });
+
+  if (maybeCreditNote.isLeft()) {
+    throw maybeCreditNote.value;
+  }
+
+  return maybeCreditNote.value;
 }
 
 let mockCreditNoteRepo: MockCreditNoteRepo;
@@ -48,7 +54,13 @@ Given(
       id: testCreditNoteId,
       invoiceId: testInvoiceId,
     });
-    creditNote = await mockCreditNoteRepo.save(creditNote);
+    const maybeCreditNote = await mockCreditNoteRepo.save(creditNote);
+
+    if (maybeCreditNote.isLeft()) {
+      throw maybeCreditNote.value;
+    }
+
+    creditNote = maybeCreditNote.value;
   }
 );
 
@@ -60,10 +72,10 @@ When(/^I execute ValidateGetRecentCreditNotesUsecase/, async () => {
 
 Then(/^I should receive the added credit note/, () => {
   expect(result.isRight()).to.be.true;
-  expect(result.value.getValue()).to.have.property('totalCount').to.equal(1);
+  expect(result.value).to.have.property('totalCount').to.equal(1);
 });
 
 Then(/^I should not receive any credit note/, () => {
   expect(result.isRight()).to.be.true;
-  expect(result.value.getValue()).to.have.property('totalCount').to.equal(0);
+  expect(result.value).to.have.property('totalCount').to.equal(0);
 });

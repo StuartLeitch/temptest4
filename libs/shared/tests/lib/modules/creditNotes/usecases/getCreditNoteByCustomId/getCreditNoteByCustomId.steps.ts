@@ -21,12 +21,18 @@ import {
 } from '../../../../../../src';
 
 function makeCreditNoteData(overwrites?: any): CreditNote {
-  return CreditNoteMap.toDomain({
+  const maybeCreditNote = CreditNoteMap.toDomain({
     dateCreated: new Date(),
     vat: 20,
     price: -2000,
     ...overwrites,
   });
+
+  if (maybeCreditNote.isLeft()) {
+    throw maybeCreditNote.value;
+  }
+
+  return maybeCreditNote.value;
 }
 
 const testManuscriptCustomId = '88888';
@@ -62,28 +68,47 @@ const defaultContext: UsecaseAuthorizationContext = {
 Given(
   /^an article with the custom id "([\w-]+)"/,
   async (testCustomId: string) => {
-    const invoice = InvoiceMap.toDomain({
+    const maybeInvoice = InvoiceMap.toDomain({
       transactionId: 'transaction-id',
       dateCreated: new Date(),
       id: testInvoiceId,
       status: 'ACTIVE',
     });
-    const invoiceItem = InvoiceItemMap.toDomain({
+    if (maybeInvoice.isLeft()) {
+      throw maybeInvoice.value;
+    }
+
+    const maybeInvoiceItem = InvoiceItemMap.toDomain({
       invoiceId: testInvoiceId,
       manuscriptId: testManuscriptCustomId,
       price: 1000,
     });
-    const article = ArticleMap.toDomain({
+    if (maybeInvoiceItem.isLeft()) {
+      throw maybeInvoiceItem.value;
+    }
+
+    const maybeArticle = ArticleMap.toDomain({
       id: testManuscriptCustomId,
       customId: testCustomId,
     });
+    if (maybeArticle.isLeft()) {
+      throw maybeArticle.value;
+    }
 
     creditNote = makeCreditNoteData({ invoiceId: testInvoiceId });
 
+    const invoice = maybeInvoice.value;
+    const invoiceItem = maybeInvoiceItem.value;
+    const article = maybeArticle.value;
     await mockInvoiceRepo.save(invoice);
     await mockInvoiceItemRepo.save(invoiceItem);
     await mockArticleRepo.save(article);
-    creditNote = await mockCreditNoteRepo.save(creditNote);
+
+    const maybeCreditNote = await mockCreditNoteRepo.save(creditNote);
+    if (maybeCreditNote.isLeft()) {
+      throw maybeCreditNote.value;
+    }
+    creditNote = maybeCreditNote.value;
   }
 );
 

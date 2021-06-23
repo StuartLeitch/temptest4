@@ -1,7 +1,7 @@
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
 import { left, right } from '../../../../core/logic/Either';
-import { UnexpectedError } from 'libs/shared/src/lib/core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';

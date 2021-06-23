@@ -16,7 +16,7 @@ import {
   AccessControlledUsecase,
   AccessControlContext,
 } from '../../../../domain/authorization';
-import { UnexpectedError } from 'libs/shared/src/lib/core/logic/AppError';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 
 export class GetRecentCreditNotesUesecase
   implements

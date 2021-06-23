@@ -12,12 +12,18 @@ import { MockCreditNoteRepo } from '../../../../../../src/lib/modules/creditNote
 import { GetCreditNoteByReferenceNumberUsecase } from '../../../../../../src/lib/modules/creditNotes/usecases/getCreditNoteByReferenceNumber/getCreditNoteByReferenceNumber';
 
 function makeCreditNoteData(overwrites?: any): CreditNote {
-  return CreditNoteMap.toDomain({
+  const maybeCreditNote = CreditNoteMap.toDomain({
     dateCreated: new Date(),
     vat: 20,
     price: -2000,
     ...overwrites,
   });
+
+  if (maybeCreditNote.isLeft()) {
+    throw maybeCreditNote.value;
+  }
+
+  return maybeCreditNote.value;
 }
 
 let mockCreditNoteRepo: MockCreditNoteRepo;
@@ -43,7 +49,13 @@ Given(
       persistentReferenceNumber: testNumber,
     });
 
-    creditNote = await mockCreditNoteRepo.save(creditNote);
+    const maybeCreditNote = await mockCreditNoteRepo.save(creditNote);
+
+    if (maybeCreditNote.isLeft()) {
+      throw maybeCreditNote.value;
+    }
+
+    creditNote = maybeCreditNote.value;
   }
 );
 

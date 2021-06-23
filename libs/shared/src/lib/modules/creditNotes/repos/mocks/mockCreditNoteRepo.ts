@@ -1,7 +1,10 @@
 import { cloneDeep } from 'lodash';
+import { Either, right, left } from '../../../../core/logic/Either';
 import { BaseMockRepo } from '../../../../core/tests/mocks/BaseMockRepo';
+import { GuardFailure } from '../../../../core/logic/GuardFailure';
+import { RepoError } from '../../../../infrastructure/RepoError';
 
-import { GetRecentCreditNotesSuccessResponse } from '../../usecases/getRecentCreditNotes/getRecentCreditNotesResponse';
+import { GetRecentCreditNotesSuccessResponse as Response } from '../../usecases/getRecentCreditNotes/getRecentCreditNotesResponse';
 import { CreditNoteRepoContract } from './../creditNoteRepo';
 import { CreditNote } from '../../domain/CreditNote';
 import { CreditNoteId } from '../../domain/CreditNoteId';
@@ -18,15 +21,15 @@ export class MockCreditNoteRepo
 
   public async getCreditNoteByInvoiceId(
     invoiceId: InvoiceId
-  ): Promise<CreditNote> {
+  ): Promise<Either<GuardFailure | RepoError, CreditNote>> {
     const match = this._items.find((i) => i.invoiceId.id.equals(invoiceId.id));
 
-    return match ? match : null;
+    return right(match ? match : null);
   }
 
   public async getCreditNoteById(
     creditNoteId: CreditNoteId
-  ): Promise<CreditNote> {
+  ): Promise<Either<GuardFailure | RepoError, CreditNote>> {
     let filterCreditNoteById = null;
     filterCreditNoteById = this.filterCreditNoteById(creditNoteId);
     if (!filterCreditNoteById) {
@@ -40,35 +43,53 @@ export class MockCreditNoteRepo
 
   public async getCreditNoteByReferenceNumber(
     referenceNumber: string
-  ): Promise<CreditNote> {
+  ): Promise<Either<GuardFailure | RepoError, CreditNote>> {
     const match = this._items.find((i) =>
       i.persistentReferenceNumber.includes(referenceNumber)
     );
-    return match ? match : null;
+    return right(match ? match : null);
   }
 
-  async existsWithId(creditNoteId: CreditNoteId): Promise<boolean> {
+  async existsWithId(
+    creditNoteId: CreditNoteId
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     const match = this._items.filter((i) => i.invoiceId.equals(creditNoteId));
-    return match.length !== 0;
+    return right(match.length !== 0);
   }
 
-  public async getUnregisteredErpCreditNotes(): Promise<CreditNoteId[]> {
+  public async getUnregisteredErpCreditNotes(): Promise<
+    Either<GuardFailure | RepoError, CreditNoteId[]>
+  > {
     return null;
   }
 
-  public async getCreditNoteByCustomId(customId: string): Promise<CreditNote> {
+  public async getCreditNoteByCustomId(
+    customId: string
+  ): Promise<Either<GuardFailure | RepoError, CreditNote>> {
     return null;
   }
 
-  async getRecentCreditNotes(): Promise<GetRecentCreditNotesSuccessResponse> {
-    return {
+  async getRecentCreditNotes(): Promise<
+    Either<GuardFailure | RepoError, Response>
+  > {
+    return right({
       totalCount: this._items.length,
       creditNotes: this._items,
-    };
+    });
   }
 
-  public async update(creditNote: CreditNote): Promise<CreditNote> {
-    const alreadyExists = await this.exists(creditNote);
+  public async update(
+    creditNote: CreditNote
+  ): Promise<Either<GuardFailure | RepoError, CreditNote>> {
+    const maybeAlreadyExists = await this.exists(creditNote);
+
+    if (maybeAlreadyExists.isLeft()) {
+      return left(
+        RepoError.fromDBError(new Error(maybeAlreadyExists.value.message))
+      );
+    }
+
+    const alreadyExists = maybeAlreadyExists.value;
 
     if (alreadyExists) {
       this._items = this._items.map((i) => {
@@ -80,11 +101,21 @@ export class MockCreditNoteRepo
       });
     }
 
-    return cloneDeep(creditNote);
+    return right(cloneDeep(creditNote));
   }
 
-  public async save(creditNote: CreditNote): Promise<CreditNote> {
-    const alreadyExists = await this.exists(creditNote);
+  public async save(
+    creditNote: CreditNote
+  ): Promise<Either<GuardFailure | RepoError, CreditNote>> {
+    const maybeAlreadyExists = await this.exists(creditNote);
+
+    if (maybeAlreadyExists.isLeft()) {
+      return left(
+        RepoError.fromDBError(new Error(maybeAlreadyExists.value.message))
+      );
+    }
+
+    const alreadyExists = maybeAlreadyExists.value;
 
     if (alreadyExists) {
       this._items = this._items.map((i) => {
@@ -97,14 +128,16 @@ export class MockCreditNoteRepo
     } else {
       this._items.push(creditNote);
     }
-    return cloneDeep(creditNote);
+    return right(cloneDeep(creditNote));
   }
 
-  public async exists(creditNote: CreditNote): Promise<boolean> {
+  public async exists(
+    creditNote: CreditNote
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     const found = this._items.filter((i) =>
       this.compareMockItems(i, creditNote)
     );
-    return found.length !== 0;
+    return right(found.length !== 0);
   }
 
   public compareMockItems(a: CreditNote, b: CreditNote): boolean {
