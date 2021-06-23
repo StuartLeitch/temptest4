@@ -1,13 +1,13 @@
 // * Core Domain
 import { UseCase } from '../../../../core/domain/UseCase';
-import { Result, left, right } from '../../../../core/logic/Result';
+import { left, right } from '../../../../core/logic/Either';
 
 import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
 
 // * Usecase specifics
-import { GetRecentCreditNotesResponse } from './getRecentCreditNotesResponse';
-import { GetRecentCreditNotesDTO } from './getRecentCreditNotesDTO';
-import { GetRecentCreditNotesErrors } from './getRecentCreditNotesErrors';
+import { GetRecentCreditNotesResponse as Response } from './getRecentCreditNotesResponse';
+import { GetRecentCreditNotesDTO as DTO } from './getRecentCreditNotesDTO';
+import { GetRecentCreditNotesErrors as Errors } from './getRecentCreditNotesErrors';
 
 // * Authorization logic
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
@@ -16,16 +16,13 @@ import {
   AccessControlledUsecase,
   AccessControlContext,
 } from '../../../../domain/authorization';
+import { UnexpectedError } from 'libs/shared/src/lib/core/logic/AppError';
 
 export class GetRecentCreditNotesUesecase
   implements
-    UseCase<
-      GetRecentCreditNotesDTO,
-      Promise<GetRecentCreditNotesResponse>,
-      UsecaseAuthorizationContext
-    >,
+    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
     AccessControlledUsecase<
-      GetRecentCreditNotesDTO,
+      DTO,
       UsecaseAuthorizationContext,
       AccessControlContext
     > {
@@ -37,16 +34,24 @@ export class GetRecentCreditNotesUesecase
 
   @Authorize('credit_note:read')
   public async execute(
-    request: GetRecentCreditNotesDTO,
+    request: DTO,
     context?: UsecaseAuthorizationContext
-  ): Promise<GetRecentCreditNotesResponse> {
+  ): Promise<Response> {
     try {
-      const paginatedResult = await this.creditNoteRepo.getRecentCreditNotes(
+      const maybePaginatedResult = await this.creditNoteRepo.getRecentCreditNotes(
         request
       );
-      return right(Result.ok(paginatedResult));
+
+      if (maybePaginatedResult.isLeft()) {
+        return left(
+          new UnexpectedError(new Error(maybePaginatedResult.value.message))
+        );
+      }
+
+      let paginatedResult = maybePaginatedResult.value;
+      return right(paginatedResult);
     } catch (err) {
-      return left(new GetRecentCreditNotesErrors.CreditNotesListFailure(err));
+      return left(new Errors.CreditNotesListFailure(err));
     }
   }
 }

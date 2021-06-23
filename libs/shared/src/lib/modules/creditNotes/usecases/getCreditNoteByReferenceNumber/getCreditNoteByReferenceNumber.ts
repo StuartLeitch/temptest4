@@ -16,20 +16,16 @@ import { CreditNote } from '../../domain/CreditNote';
 import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
 
 // * Usecase specific
-import { GetCreditNoteByReferenceNumberResponse } from './getCreditNoteByReferenceNumberResponse';
-import { GetCreditNoteByReferenceNumberErrors } from './getCreditNoteByReferenceNumberErrors';
-import { GetCreditNoteByReferenceNumberDTO } from './getCreditNoteByReferenceNumberDTO';
+import { GetCreditNoteByReferenceNumberResponse as Response } from './getCreditNoteByReferenceNumberResponse';
+import { GetCreditNoteByReferenceNumberErrors as Errors } from './getCreditNoteByReferenceNumberErrors';
+import { GetCreditNoteByReferenceNumberDTO as DTO } from './getCreditNoteByReferenceNumberDTO';
 
 // to be modified with Guard/Either
 export class GetCreditNoteByReferenceNumberUsecase
   implements
-    UseCase<
-      GetCreditNoteByReferenceNumberDTO,
-      Promise<GetCreditNoteByReferenceNumberResponse>,
-      UsecaseAuthorizationContext
-    >,
+    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
     AccessControlledUsecase<
-      GetCreditNoteByReferenceNumberDTO,
+      DTO,
       UsecaseAuthorizationContext,
       AccessControlContext
     > {
@@ -40,9 +36,9 @@ export class GetCreditNoteByReferenceNumberUsecase
   }
 
   public async execute(
-    request: GetCreditNoteByReferenceNumberDTO,
+    request: DTO,
     context?: UsecaseAuthorizationContext
-  ): Promise<GetCreditNoteByReferenceNumberResponse> {
+  ): Promise<Response> {
     const { referenceNumber } = request;
 
     let creditNote: CreditNote;
@@ -60,11 +56,7 @@ export class GetCreditNoteByReferenceNumberUsecase
         }
         creditNote = maybeCreditNote.value;
       } catch (err) {
-        return left(
-          new GetCreditNoteByReferenceNumberErrors.CreditNoteNotFoundError(
-            referenceNumber
-          )
-        );
+        return left(new Errors.CreditNoteNotFoundError(referenceNumber));
       }
       return right(creditNote);
     } catch (err) {
