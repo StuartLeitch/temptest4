@@ -70,5 +70,5 @@ When(
 );
 
 Then(/^the credit note is returned/, async () => {
-  expect(result.value.isSuccess).to.equal(true);
+  expect(result.isRight()).to.equal(true);
 });

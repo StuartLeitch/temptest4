@@ -122,11 +122,10 @@ When(
     const id = CreditNoteId.create(new UniqueEntityID(wrongCreditNoteId));
 
     const maybeFoundCreditNote = await mockCreditNoteRepo.getCreditNoteById(id);
-    if (maybeFoundCreditNote.isLeft()) {
-      throw maybeFoundCreditNote.value;
-    }
 
-    foundCreditNote = maybeFoundCreditNote.value;
+    if (maybeFoundCreditNote.isRight()) {
+      foundCreditNote = maybeFoundCreditNote.value;
+    }
   }
 );
 

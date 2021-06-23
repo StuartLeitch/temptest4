@@ -77,6 +77,7 @@ Given(
     if (maybeInvoice.isLeft()) {
       throw maybeInvoice.value;
     }
+    const invoice = maybeInvoice.value;
 
     const maybeInvoiceItem = InvoiceItemMap.toDomain({
       invoiceId: testInvoiceId,
@@ -86,6 +87,7 @@ Given(
     if (maybeInvoiceItem.isLeft()) {
       throw maybeInvoiceItem.value;
     }
+    const invoiceItem = maybeInvoiceItem.value;
 
     const maybeArticle = ArticleMap.toDomain({
       id: testManuscriptCustomId,
@@ -94,12 +96,10 @@ Given(
     if (maybeArticle.isLeft()) {
       throw maybeArticle.value;
     }
+    const article = maybeArticle.value;
 
     creditNote = makeCreditNoteData({ invoiceId: testInvoiceId });
 
-    const invoice = maybeInvoice.value;
-    const invoiceItem = maybeInvoiceItem.value;
-    const article = maybeArticle.value;
     await mockInvoiceRepo.save(invoice);
     await mockInvoiceItemRepo.save(invoiceItem);
     await mockArticleRepo.save(article);
@@ -122,6 +122,6 @@ When(
 Then(
   /^I should receive the credit note for "([\w-]+)"/,
   (testCustomId: string) => {
-    expect(result.value.isSuccess).to.equal(true);
+    expect(result.isRight()).to.equal(true);
   }
 );

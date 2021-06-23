@@ -78,5 +78,5 @@ When(
 );
 
 Then('I should not get the credit note', async () => {
-  expect(result.value.getValue()).to.be.null;
+  expect(result.value).to.be.null;
 });

@@ -33,7 +33,7 @@ export class MockCreditNoteRepo
     let filterCreditNoteById = null;
     filterCreditNoteById = this.filterCreditNoteById(creditNoteId);
     if (!filterCreditNoteById) {
-      return null;
+      return right(null);
     }
 
     return CreditNoteMap.toDomain({
@@ -60,13 +60,13 @@ export class MockCreditNoteRepo
   public async getUnregisteredErpCreditNotes(): Promise<
     Either<GuardFailure | RepoError, CreditNoteId[]>
   > {
-    return null;
+    return right(null);
   }
 
   public async getCreditNoteByCustomId(
     customId: string
   ): Promise<Either<GuardFailure | RepoError, CreditNote>> {
-    return null;
+    return right(null);
   }
 
   async getRecentCreditNotes(): Promise<
