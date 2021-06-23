@@ -2,18 +2,14 @@
 import { InvoiceCreditNoteCreated as CreditNoteCreatedEvent } from '@hindawi/phenom-events';
 // *
 
-import { Either, right, left } from '../../../../../core/logic/Result';
+import { Either, right, left } from '../../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { UseCase } from '../../../../../core/domain/UseCase';
 
 import { EventUtils } from '../../../../../utils/EventUtils';
 
 //* Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-} from '../../../../../domain/authorization';
+import { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
 
 import { SQSPublishServiceContract } from '../../../../../domain/services/SQSPublishService';
 import {
@@ -27,24 +23,14 @@ import {
 import { PublishCreditNoteCreatedResponse as Response } from './publishCreditNoteCreatedResponse';
 import { PublishCreditNoteCreatedDTO as DTO } from './publishCreditNoteCreatedDTO';
 import * as Errors from './publishCreditNoteCreatedErrors';
-import { CreditNote } from '../../../domain/CreditNote';
 
 const CREDIT_NOTE_CREATED = 'CreditNoteCreated';
 
 export class PublishCreditNoteCreatedUsecase
-  implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private publishService: SQSPublishServiceContract) {}
 
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const validRequest = this.verifyInput(request);
     if (validRequest.isLeft()) {
       return validRequest;
