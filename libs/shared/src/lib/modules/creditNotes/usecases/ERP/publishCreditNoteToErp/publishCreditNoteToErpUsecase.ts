@@ -21,7 +21,7 @@ import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferen
 import { GetItemsForInvoiceUsecase } from '../../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 import { PublishCreditNoteToErpRequestDTO as DTO } from './publishCreditNoteToErpDTO';
 import { PublishCreditNoteToErpResponse as Response } from './publishCreditNoteToErpResponse';
-import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
+import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 
 export class PublishCreditNoteToErpUsecase
   implements UseCase<DTO, Promise<Response>, Context> {
