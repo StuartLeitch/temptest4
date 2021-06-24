@@ -1,5 +1,5 @@
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
-import { Either, left, right } from '../../../../core/logic/Either';
+import { Either, flatten, right, left } from '../../../../core/logic/Either';
 import { GuardFailure } from '../../../../core/logic/GuardFailure';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 import { RepoError } from '../../../../infrastructure/RepoError';
@@ -10,6 +10,7 @@ import { CreditNoteRepoContract } from './../creditNoteRepo';
 import { CreditNoteMap } from '../../mappers/CreditNoteMap';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { PaginatedCreditNoteResult } from '../creditNoteRepo';
 import { applyFilters } from './utils';
 
 // to be updated with GuardFailure
@@ -224,7 +225,7 @@ export class KnexCreditNoteRepo
 
   async getRecentCreditNotes(
     args?: any
-  ): Promise<Either<GuardFailure | RepoError, any>> {
+  ): Promise<Either<GuardFailure | RepoError, PaginatedCreditNoteResult>> {
     const { pagination, filters } = args;
     const { db } = this;
 
@@ -236,15 +237,20 @@ export class KnexCreditNoteRepo
 
     const offset = pagination.offset * pagination.limit;
 
-    const creditNotes = await applyFilters(getModel(), filters)
+    const creditNotes: Array<any> = await applyFilters(getModel(), filters)
       .orderBy(`${TABLES.CREDIT_NOTES}.dateCreated`, 'desc')
       .offset(offset < totalCount[0].count ? offset : 0)
       .limit(pagination.limit)
       .select([`${TABLES.CREDIT_NOTES}.*`]);
 
+    const maybeInvoices = flatten(creditNotes.map(CreditNoteMap.toDomain));
+    if (maybeInvoices.isLeft()) {
+      return left(maybeInvoices.value);
+    }
+
     return right({
       totalCount: totalCount[0]['count'],
-      creditNotes: creditNotes.map((i) => CreditNoteMap.toDomain(i)),
+      creditNotes: maybeInvoices.value,
     });
   }
 }

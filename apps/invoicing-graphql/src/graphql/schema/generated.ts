@@ -1,3 +1,4 @@
+import { PaginatedCreditNoteResult } from '@hindawi/shared';
 import {
   GraphQLResolveInfo,
   GraphQLScalarType,
@@ -84,6 +85,14 @@ export enum PaymentStatus {
   CREATED = 'CREATED',
 }
 
+export enum CreationReason {
+  WITHDRAWN_MANUSCRIPT = 'withdrawn-manuscript',
+  REDUCTION_APPLIED = 'reduction-applied',
+  WAIVED_MANUSCRIPT = 'waived-manuscript',
+  CHANGED_PAYER_DETAILS = 'changed-payer-details',
+  BAD_DEBT = 'bad-debt',
+  OTHER = 'other',
+}
 export type InvoiceItem = {
   __typename?: 'InvoiceItem';
   id?: Maybe<Scalars['String']>;
@@ -125,7 +134,7 @@ export type Invoice = {
   type?: Maybe<Scalars['String']>;
   payment?: Maybe<Payment>;
   payments?: Maybe<Array<Maybe<Payment>>>;
-  creditNote?: Maybe<Invoice>;
+  creditNote?: Maybe<CreditNote>;
   transaction?: Maybe<Transaction>;
 };
 
@@ -218,10 +227,23 @@ export type PayPalOrderId = {
   id: Scalars['String'];
 };
 
+// export type CreditNote = {
+//   __typename?: 'CreditNote';
+//   id: Scalars['String'];
+//   cancelledInvoiceReference: Scalars['ID'];
+// };
+
 export type CreditNote = {
   __typename?: 'CreditNote';
-  id: Scalars['String'];
-  cancelledInvoiceReference: Scalars['ID'];
+  id: Maybe<Scalars['String']>;
+  invoiceId: Maybe<Scalars['ID']>;
+  creationReason: Maybe<CreationReason>;
+  vat: Maybe<Scalars['Float']>;
+  price: Maybe<Scalars['Float']>;
+  persistentReferenceNumber?: Maybe<Scalars['ReferenceNumber']>;
+  dateCreated?: Maybe<Scalars['Date']>;
+  dateIssued?: Maybe<Scalars['Date']>;
+  dateUpdated?: Maybe<Scalars['Date']>;
 };
 
 export type PaymentMethod = {
@@ -283,6 +305,12 @@ export type PaginatedCoupons = {
   __typename?: 'PaginatedCoupons';
   totalCount?: Maybe<Scalars['Int']>;
   coupons?: Maybe<Array<Maybe<Coupon>>>;
+};
+
+export type PaginatedCreditNotes = {
+  __typename?: 'PaginatedCreditNotes';
+  totalCount?: Maybe<Scalars['Int']>;
+  creditNotes?: Maybe<Array<Maybe<CreditNote>>>;
 };
 
 export type RemindersStatus = {
@@ -356,6 +384,9 @@ export type MigrateApc = {
 
 export type Query = {
   __typename?: 'Query';
+  getCreditNoteById?: Maybe<CreditNote>;
+  getRecentCreditNotes?: Maybe<PaginatedCreditNotes>;
+  getCreditNoteByReferenceNumber?: Maybe<CreditNote>;
   getPaymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
   getClientToken?: Maybe<ClientToken>;
   generateCouponCode?: Maybe<CouponCode>;
@@ -373,6 +404,19 @@ export type Query = {
 
 export type QueryInvoiceArgs = {
   invoiceId?: Maybe<Scalars['ID']>;
+};
+
+export type QueryCreditNoteByIdArgs = {
+  creditNoteId?: Maybe<Scalars['ID']>;
+};
+
+export type QueryRecentCreditNotesArgs = {
+  filters?: Maybe<InvoiceFilters>;
+  pagination?: Maybe<Pagination>;
+};
+
+export type QueryCreditNoteByReferenceNumberArgs = {
+  referenceNumber?: Maybe<Scalars['String']>;
 };
 
 export type QueryInvoiceVatArgs = {
@@ -658,6 +702,7 @@ export type ResolversTypes = {
   ErpReference: ResolverTypeWrapper<ErpReference>;
   TransactionStatus: TransactionStatus;
   PaymentStatus: PaymentStatus;
+  CreationReason: CreationReason;
   InvoiceItem: ResolverTypeWrapper<InvoiceItem>;
   Float: ResolverTypeWrapper<Scalars['Float']>;
   Invoice: ResolverTypeWrapper<Invoice>;
@@ -683,6 +728,7 @@ export type ResolversTypes = {
   ClientToken: ResolverTypeWrapper<ClientToken>;
   PaginatedInvoices: ResolverTypeWrapper<PaginatedInvoices>;
   PaginatedCoupons: ResolverTypeWrapper<PaginatedCoupons>;
+  PaginatedCreditNotes: ResolverTypeWrapper<PaginatedCreditNotes>;
   RemindersStatus: ResolverTypeWrapper<RemindersStatus>;
   ReminderType: ReminderType;
   SentReminder: ResolverTypeWrapper<SentReminder>;
@@ -732,6 +778,7 @@ export type ResolversParentTypes = {
   ClientToken: ClientToken;
   PaginatedInvoices: PaginatedInvoices;
   PaginatedCoupons: PaginatedCoupons;
+  PaginatedCreditNotes: PaginatedCreditNotes;
   RemindersStatus: RemindersStatus;
   SentReminder: SentReminder;
   ArticleFilters: ArticleFilters;
@@ -981,10 +1028,16 @@ export type InvoiceResolvers<
     ParentType,
     ContextType
   >;
+  // creditNote?: Resolver<
+  //   Maybe<ResolversTypes['Invoice']>,
+  //   ParentType,
+  //   ContextType
+  // >;
   creditNote?: Resolver<
-    Maybe<ResolversTypes['Invoice']>,
+    Maybe<ResolversTypes['CreditNote']>,
     ParentType,
-    ContextType
+    ContextType,
+    RequireFields<QueryInvoiceArgs, never>
   >;
   transaction?: Resolver<
     Maybe<ResolversTypes['Transaction']>,
@@ -1120,47 +1173,47 @@ export type PayPalOrderIdResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type CreditNoteResolvers<
-  ContextType = any,
-  ParentType extends ResolversParentTypes['CreditNote'] = ResolversParentTypes['CreditNote']
-> = {
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  cancelledInvoiceReference?: Resolver<
-    ResolversTypes['ID'],
-    ParentType,
-    ContextType
-  >;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
 // export type CreditNoteResolvers<
 //   ContextType = any,
 //   ParentType extends ResolversParentTypes['CreditNote'] = ResolversParentTypes['CreditNote']
 // > = {
 //   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-//   invoiceId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-//   creationReason?: Resolver<
-//     ResolversTypes['CreationReason'],
-//     ParentType,
-//     ContextType
-//   >;
-//   vat?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-//   price?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-//   persistentReferenceNumber?: Resolver<
-//     ResolversTypes['ReferenceNumber'],
-//     ParentType,
-//     ContextType
-//   >;
-//   dateCreated?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
-//   dateIssued?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
-//   dateUpdated?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
-//   erpReference?: Resolver<
-//     ResolversTypes['ErpReference'],
+//   cancelledInvoiceReference?: Resolver<
+//     ResolversTypes['ID'],
 //     ParentType,
 //     ContextType
 //   >;
 //   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 // };
+
+export type CreditNoteResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['CreditNote'] = ResolversParentTypes['CreditNote']
+> = {
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  invoiceId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  creationReason?: Resolver<
+    ResolversTypes['CreationReason'],
+    ParentType,
+    ContextType
+  >;
+  vat?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  price?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  persistentReferenceNumber?: Resolver<
+    ResolversTypes['ReferenceNumber'],
+    ParentType,
+    ContextType
+  >;
+  dateCreated?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  dateIssued?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  dateUpdated?: Resolver<ResolversTypes['Date'], ParentType, ContextType>;
+  erpReference?: Resolver<
+    ResolversTypes['ErpReference'],
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
 
 export type PaymentMethodResolvers<
   ContextType = any,
@@ -1261,6 +1314,19 @@ export type PaginatedCouponsResolvers<
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type PaginatedCreditNotesResolvers<
+  ContextType = any,
+  ParentType extends ResolversParentTypes['PaginatedCreditNotes'] = ResolversParentTypes['PaginatedCreditNotes']
+> = {
+  totalCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  coupons?: Resolver<
+    Maybe<Array<Maybe<ResolversTypes['CreditNote']>>>,
+    ParentType,
+    ContextType
+  >;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type RemindersStatusResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['RemindersStatus'] = ResolversParentTypes['RemindersStatus']
@@ -1293,6 +1359,24 @@ export type QueryResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
 > = {
+  getCreditNoteById?: Resolver<
+    Maybe<ResolversTypes['CreditNote']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryCreditNoteByIdArgs, never>
+  >;
+  getRecentCreditNotes?: Resolver<
+    Maybe<ResolversTypes['PaginatedCreditNotes']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryRecentCreditNotesArgs, never>
+  >;
+  getCreditNoteByReferenceNumber?: Resolver<
+    Maybe<ResolversTypes['CreditNote']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryCreditNoteByReferenceNumberArgs, never>
+  >;
   getPaymentMethods?: Resolver<
     Maybe<Array<Maybe<ResolversTypes['PaymentMethod']>>>,
     ParentType,
@@ -1531,6 +1615,7 @@ export type Resolvers<ContextType = any> = {
   ClientToken?: ClientTokenResolvers<ContextType>;
   PaginatedInvoices?: PaginatedInvoicesResolvers<ContextType>;
   PaginatedCoupons?: PaginatedCouponsResolvers<ContextType>;
+  PaginatedCreditNotes?: PaginatedCreditNotesResolvers<ContextType>;
   RemindersStatus?: RemindersStatusResolvers<ContextType>;
   SentReminder?: SentReminderResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;

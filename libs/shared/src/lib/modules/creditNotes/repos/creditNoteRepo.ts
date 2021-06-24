@@ -9,6 +9,10 @@ import { CreditNoteId } from '../domain/CreditNoteId';
 import { InvoiceId } from '../../invoices/domain/InvoiceId';
 
 // to be updated with GuardFailure
+export interface PaginatedCreditNoteResult {
+  totalCount: string;
+  creditNotes: Array<CreditNote>;
+}
 export interface CreditNoteRepoContract extends Repo<CreditNote> {
   getCreditNoteByInvoiceId(
     invoiceId: InvoiceId
@@ -21,7 +25,7 @@ export interface CreditNoteRepoContract extends Repo<CreditNote> {
   ): Promise<Either<GuardFailure | RepoError, CreditNote>>;
   getRecentCreditNotes(
     args?: any
-  ): Promise<Either<GuardFailure | RepoError, any>>;
+  ): Promise<Either<GuardFailure | RepoError, PaginatedCreditNoteResult>>;
   getUnregisteredErpCreditNotes(): Promise<
     Either<GuardFailure | RepoError, CreditNoteId[]>
   >;

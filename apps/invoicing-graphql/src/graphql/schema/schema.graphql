@@ -107,22 +107,22 @@ type Invoice @model(id: "invoices") {
   type: String
   payment: Payment
   payments: [Payment]
-  creditNote: Invoice
+  creditNote: CreditNote
   transaction: Transaction
 }
 
-# type CreditNote @model(id: "credit_notes") {
-#   id: String
-#   invoiceId: ID
-#   creationReason: CreationReason
-#   vat: Float
-#   price: Float
-#   persistentReferenceNumber: ReferenceNumber @filter
-#   dateCreated: Date
-#   dateIssued: Date
-#   dateUpdated: Date
-#   erpReference: ErpReference
-# }
+type CreditNote @model(id: "credit_notes") {
+  id: String
+  invoiceId: ID
+  creationReason: CreationReason
+  vat: Float
+  price: Float
+  persistentReferenceNumber: ReferenceNumber @filter
+  dateCreated: Date
+  dateIssued: Date
+  dateUpdated: Date
+  erpReference: ErpReference
+}
 
 type InvoiceVat {
   vatPercentage: Float

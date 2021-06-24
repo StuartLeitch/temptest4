@@ -29,10 +29,17 @@ import {
   GetTransactionByInvoiceIdUsecase,
   GetPaymentsByInvoiceIdUsecase,
   GetVATNoteUsecase,
+  CreditNoteMap,
   // Payer
 } from '@hindawi/shared';
 
-import { Resolvers, Invoice, PayerType, InvoiceStatus } from '../schema';
+import {
+  Resolvers,
+  Invoice,
+  CreditNote,
+  PayerType,
+  InvoiceStatus,
+} from '../schema';
 
 import { Context } from '../../builders';
 
@@ -433,15 +440,21 @@ export const invoice: Resolvers<Context> = {
 
       return payments.map((p) => PaymentMap.toPersistence(p));
     },
+
+    // * to look forward
     async creditNote(parent: Invoice, args, context) {
       const {
-        repos: { invoice: invoiceRepo, erpReference: erpReferenceRepo },
+        repos: {
+          creditNote: creditNoteRepo,
+          invoice: invoiceRepo,
+          erpReference: erpReferenceRepo,
+        },
       } = context;
-      const usecase = new GetCreditNoteByInvoiceIdUsecase(invoiceRepo);
+      const usecase = new GetCreditNoteByInvoiceIdUsecase(creditNoteRepo);
       const getAssocInvoice = new GetInvoiceDetailsUsecase(invoiceRepo);
 
       const request: GetInvoiceDetailsDTO = {
-        invoiceId: parent.invoiceId,
+        invoiceId: args.invoiceId,
       };
 
       const usecaseContext = {
@@ -468,7 +481,7 @@ export const invoice: Resolvers<Context> = {
       const erpRef = maybeErpRef.value;
 
       const assocInvoiceResponse = await getAssocInvoice.execute(
-        { invoiceId: creditNoteDetails.cancelledInvoiceReference },
+        { invoiceId: creditNoteDetails.invoiceId.id.toString() },
         usecaseContext
       );
       if (assocInvoiceResponse.isLeft()) {
@@ -478,13 +491,7 @@ export const invoice: Resolvers<Context> = {
       const assocInvoice = assocInvoiceResponse.value;
 
       return {
-        invoiceId: creditNoteDetails.id.toString(),
-        cancelledInvoiceReference: creditNoteDetails.cancelledInvoiceReference,
-        status: creditNoteDetails.status,
-        dateCreated: creditNoteDetails?.dateCreated?.toISOString(),
-        erpReferences: erpRef.getItems(),
-        creationReason: creditNoteDetails.creationReason,
-        dateIssued: creditNoteDetails?.dateIssued?.toISOString(),
+        ...CreditNoteMap.toPersistence(creditNoteDetails),
         referenceNumber: assocInvoice.persistentReferenceNumber
           ? `CN-${assocInvoice.persistentReferenceNumber}`
           : '---',
@@ -653,69 +660,69 @@ export const invoice: Resolvers<Context> = {
 
       return CouponMap.toPersistence(result.value);
     },
-    async createCreditNote(parent, args, context): Promise<any> {
-      const {
-        repos: {
-          invoice: invoiceRepo,
-          invoiceItem: invoiceItemRepo,
-          transaction: transactionRepo,
-          coupon: couponRepo,
-          waiver: waiverRepo,
-          pausedReminder: pausedReminderRepo,
-        },
-        services: { waiverService },
-      } = context;
+    // async createCreditNote(parent, args, context): Promise<any> {
+    //   const {
+    //     repos: {
+    //       invoice: invoiceRepo,
+    //       invoiceItem: invoiceItemRepo,
+    //       transaction: transactionRepo,
+    //       coupon: couponRepo,
+    //       waiver: waiverRepo,
+    //       pausedReminder: pausedReminderRepo,
+    //     },
+    //     services: { waiverService },
+    //   } = context;
 
-      const { invoiceId, createDraft, reason } = args;
+    //   const { invoiceId, createDraft, reason } = args;
 
-      const createCreditNoteUsecase = new CreateCreditNoteUsecase(
-        invoiceRepo,
-        invoiceItemRepo,
-        transactionRepo,
-        couponRepo,
-        waiverRepo,
-        pausedReminderRepo
-      );
-      const usecaseContext = { roles: [Roles.ADMIN] };
+    //   const createCreditNoteUsecase = new CreateCreditNoteUsecase(
+    //     invoiceRepo,
+    //     invoiceItemRepo,
+    //     transactionRepo,
+    //     couponRepo,
+    //     waiverRepo,
+    //     pausedReminderRepo
+    //   );
+    //   const usecaseContext = { roles: [Roles.ADMIN] };
 
-      const result = await createCreditNoteUsecase.execute(
-        {
-          invoiceId,
-          createDraft,
-          reason,
-        },
-        usecaseContext
-      );
+    //   const result = await createCreditNoteUsecase.execute(
+    //     {
+    //       invoiceId,
+    //       createDraft,
+    //       reason,
+    //     },
+    //     usecaseContext
+    //   );
 
-      if (result.isLeft()) {
-        throw new Error(result.value.message);
-      }
+    //   if (result.isLeft()) {
+    //     throw new Error(result.value.message);
+    //   }
 
-      const creditNote = result.value;
+    //   const creditNote = result.value;
 
-      const getInvoiceUsecase = new GetInvoiceDetailsUsecase(invoiceRepo);
-      const retrieveInvoice = await getInvoiceUsecase.execute(
-        { invoiceId },
-        usecaseContext
-      );
+    //   const getInvoiceUsecase = new GetInvoiceDetailsUsecase(invoiceRepo);
+    //   const retrieveInvoice = await getInvoiceUsecase.execute(
+    //     { invoiceId },
+    //     usecaseContext
+    //   );
 
-      if (retrieveInvoice.isLeft()) {
-        console.log('Error getting associate invoice', invoiceId);
-      }
+    //   if (retrieveInvoice.isLeft()) {
+    //     console.log('Error getting associate invoice', invoiceId);
+    //   }
 
-      const invoice = result.value;
+    //   const invoice = result.value;
 
-      return {
-        id: creditNote.invoiceId.id.toString(),
-        cancelledInvoiceReference: creditNote.cancelledInvoiceReference,
-        status: creditNote.status,
-        dateCreated: creditNote?.dateCreated?.toISOString(),
-        creationReason: creditNote.creationReason,
-        dateIssued: creditNote?.dateIssued?.toISOString(),
-        referenceNumber: invoice
-          ? `CN-${invoice.persistentReferenceNumber}`
-          : '---',
-      };
-    },
+    //   return {
+    //     id: creditNote.invoiceId.id.toString(),
+    //     cancelledInvoiceReference: creditNote.cancelledInvoiceReference,
+    //     status: creditNote.status,
+    //     dateCreated: creditNote?.dateCreated?.toISOString(),
+    //     creationReason: creditNote.creationReason,
+    //     dateIssued: creditNote?.dateIssued?.toISOString(),
+    //     referenceNumber: invoice
+    //       ? `CN-${invoice.persistentReferenceNumber}`
+    //       : '---',
+    //   };
+    // },
   },
 };
