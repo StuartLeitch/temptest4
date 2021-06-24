@@ -10,7 +10,7 @@ import { InvoiceId } from '../../invoices/domain/InvoiceId';
 
 // to be updated with GuardFailure
 export interface PaginatedCreditNoteResult {
-  totalCount: string;
+  totalCount: number | string;
   creditNotes: Array<CreditNote>;
 }
 export interface CreditNoteRepoContract extends Repo<CreditNote> {

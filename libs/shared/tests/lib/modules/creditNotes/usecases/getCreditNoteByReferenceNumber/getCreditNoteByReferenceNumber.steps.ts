@@ -41,6 +41,10 @@ After({ tags: '@ValidateGetCreditNoteByReferenceNumberUsecase' }, () => {
   usecase = null;
 });
 
+const defaultContext: UsecaseAuthorizationContext = {
+  roles: [Roles.SUPER_ADMIN],
+};
+
 Given(
   /^the credit note with id "([\w-]+)" and reference number "([\w-]+)"/,
   async (creditNoteId: string, testNumber: string) => {
@@ -62,7 +66,10 @@ Given(
 When(
   /^I execute GetCreditNoteByReferenceNumberUsecase with "([\w-]+)"/,
   async (testNumber: string) => {
-    result = await usecase.execute({ referenceNumber: testNumber });
+    result = await usecase.execute(
+      { referenceNumber: testNumber },
+      defaultContext
+    );
   }
 );
 
@@ -73,7 +80,10 @@ Then('I should get the credit note', async () => {
 When(
   /^I execute GetCreditNoteByReferenceNumberUsecase with unexistent ref no "([\w-]+)"/,
   async (wrongNumber: string) => {
-    result = await usecase.execute({ referenceNumber: wrongNumber });
+    result = await usecase.execute(
+      { referenceNumber: wrongNumber },
+      defaultContext
+    );
   }
 );
 
