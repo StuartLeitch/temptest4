@@ -1,11 +1,6 @@
 // * Authorization imports
 
-import {
-  UsecaseAuthorizationContext,
-  AccessControlledUsecase,
-  AccessControlContext,
-  Authorize,
-} from '../../../../../domain/authorization';
+import { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
 
 // * Core domain imports
 import { ErpInvoiceResponse } from '../../../../../domain/services/ErpService';
@@ -26,17 +21,7 @@ import { PublishCreditNoteToErpUsecase } from '../publishCreditNoteToErp/publish
 import { RetryCreditNotesResponse as Response } from './retryCreditNotesResponse';
 
 export class RetryCreditNotesUsecase
-  implements
-    UseCase<
-      Record<string, unknown>,
-      Promise<Response>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      Record<string, unknown>,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<Record<string, unknown>, Promise<Response>, Context> {
   private publishCreditNoteToErpUsecase: PublishCreditNoteToErpUsecase;
   constructor(
     private creditNoteRepo: CreditNoteRepoContract,
@@ -63,10 +48,9 @@ export class RetryCreditNotesUsecase
     return {};
   }
 
-  @Authorize('')
   public async execute(
     request?: Record<string, unknown>,
-    context?: UsecaseAuthorizationContext
+    context?: Context
   ): Promise<Response> {
     try {
       const maybeUnregisteredErpCreditNotesIds = await this.creditNoteRepo.getUnregisteredErpCreditNotes();

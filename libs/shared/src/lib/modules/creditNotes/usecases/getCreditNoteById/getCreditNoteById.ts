@@ -35,7 +35,7 @@ export class GetCreditNoteByIdUsecase
     return {};
   }
 
-  @Authorize('')
+  @Authorize('read:credit_note')
   public async execute(
     request: DTO,
     context?: UsecaseAuthorizationContext

@@ -4,7 +4,10 @@ import { left, right } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 
 // * Authorization Logic
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import {
+  Authorize,
+  UsecaseAuthorizationContext,
+} from '../../../../domain/authorization';
 import {
   AccessControlledUsecase,
   AccessControlContext,
@@ -33,6 +36,7 @@ export class GetCreditNoteByCustomIdUsecase
     return {};
   }
 
+  @Authorize('read:credit_note')
   public async execute(
     request: DTO,
     context?: UsecaseAuthorizationContext

@@ -3,12 +3,7 @@ import { right, left } from '../../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
 
 // * Authorization Logic
-import {
-  AccessControlledUsecase,
-  UsecaseAuthorizationContext,
-  AccessControlContext,
-  Authorize,
-} from '../../../../../domain/authorization';
+import { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
 
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
@@ -29,13 +24,7 @@ import { PublishCreditNoteToErpResponse as Response } from './publishCreditNoteT
 import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
 
 export class PublishCreditNoteToErpUsecase
-  implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private creditNoteRepo: CreditNoteRepoContract,
     private invoiceRepo: InvoiceRepoContract,
@@ -51,11 +40,7 @@ export class PublishCreditNoteToErpUsecase
     return {};
   }
 
-  @Authorize('')
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     this.loggerService.info('PublishCreditNoteToERP Request', request);
     let creditNote: CreditNote;
     let invoice: Invoice;
@@ -63,7 +48,7 @@ export class PublishCreditNoteToErpUsecase
     try {
       // * Get CreditNote details
       const maybeCreditNote = await this.creditNoteRepo.getCreditNoteById(
-        CreditNoteId.create(new UniqueEntityID(request.creditNoteId)).getValue()
+        CreditNoteId.create(new UniqueEntityID(request.creditNoteId))
       );
 
       if (maybeCreditNote.isLeft()) {
