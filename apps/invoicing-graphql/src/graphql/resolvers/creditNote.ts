@@ -130,14 +130,7 @@ export const creditNote: Resolvers<Context> = {
       const invoice = retrieveInvoice.value;
 
       return {
-        id: creditNote.id.toString(),
-        invoiceId: creditNote.invoiceId.id.toString(),
-        creationReason: creditNote.creationReason,
-        vat: invoice.invoiceVatTotal,
-        price: invoice.invoiceNetTotal,
-        persistentReferenceNumber: invoice.persistentReferenceNumber,
-        dateCreated: creditNote?.dateCreated?.toISOString(),
-        dateIssued: creditNote?.dateIssued?.toISOString(),
+        ...CreditNoteMap.toPersistence(creditNote),
         referenceNumber: `CN-${invoice.persistentReferenceNumber}`,
       };
     },

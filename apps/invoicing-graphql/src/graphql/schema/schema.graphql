@@ -207,10 +207,10 @@ type PayPalOrderId {
   id: String!
 }
 
-type CreditNote {
-  id: String!
-  cancelledInvoiceReference: ID!
-}
+# type CreditNote {
+#   id: String!
+#   cancelledInvoiceReference: ID!
+# }
 
 type PaymentMethod {
   id: String!
@@ -266,6 +266,10 @@ type PaginatedCoupons {
   coupons: [Coupon]
 }
 
+type PaginatedCreditNotes {
+  totalCount: Int
+  creditNotes: [CreditNote]
+}
 type RemindersStatus {
   confirmation: Boolean
   payment: Boolean
@@ -332,6 +336,12 @@ input MigrateAPC {
 }
 
 type Query {
+  getCreditNoteById(creditNoteId: ID): CreditNote
+  getRecentCreditNotes(
+    filters: InvoiceFilters
+    pagination: Pagination
+  ): PaginatedCreditNotes
+  getCreditNoteByReferenceNumber(referenceNumber: String): CreditNote
   getPaymentMethods: [PaymentMethod]
   getClientToken: ClientToken
   generateCouponCode: CouponCode

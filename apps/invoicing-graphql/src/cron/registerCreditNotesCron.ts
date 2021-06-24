@@ -22,11 +22,12 @@ export class RegisterCreditNotesCron {
     }
 
     const {
-      repos: { invoiceItem, invoice, coupon, waiver, erpReference },
+      repos: { creditNote, invoiceItem, invoice, coupon, waiver, erpReference },
       services: { erp },
     } = context;
 
     const retryRevenueRecognizedInvoicesToNetsuiteErpUsecase = new RetryCreditNotesUsecase(
+      creditNote,
       invoice,
       invoiceItem,
       coupon,

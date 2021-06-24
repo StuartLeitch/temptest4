@@ -138,7 +138,7 @@ export class CreateCreditNoteUsecase
         invoiceId: request.invoiceId,
         creationReason: request.reason,
         vat: invoice.invoiceVatTotal,
-        price: invoice.invoiceNetTotal,
+        price: invoice.invoiceNetTotal * -1,
         persistentReferenceNumber: invoice.persistentReferenceNumber,
         dateCreated: new Date(),
         dateIssued: new Date(),

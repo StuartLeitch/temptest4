@@ -114,13 +114,11 @@ export const INVOICE_QUERY = `
     datePublished
     preprintValue
   }
-  fragment creditNoteFragment on Invoice {
+  fragment creditNoteFragment on CreditNote {
     invoiceId
     dateCreated
-    cancelledInvoiceReference
-    referenceNumber
     creationReason
-    erpReferences {
+    erpReference {
      ...erpReferenceFragment
     }
   }

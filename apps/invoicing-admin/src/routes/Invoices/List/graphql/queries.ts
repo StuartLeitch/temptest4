@@ -84,10 +84,9 @@ fragment articleFragment on Article {
   authorFirstName
   journalTitle
 }
-fragment creditNoteFragment on Invoice {
+fragment creditNoteFragment on CreditNote {
   invoiceId
   dateCreated
-  cancelledInvoiceReference
-  referenceNumber
+  
 }
 `;

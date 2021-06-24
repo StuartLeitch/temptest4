@@ -272,7 +272,7 @@ export * from './modules/creditNotes/usecases/getCreditNoteByReferenceNumber/get
 // * Export user Subdomain
 export * from './modules/invoices/usecases/ERP/retryFailedNetsuiteErpInvoices/retryFailedNetsuiteErpInvoices';
 export * from './modules/payments/usecases/retryPaymentsRegistration/retryPaymentRegistration';
-export * from './modules/invoices/usecases/ERP/retryCreditNotes/retryCreditNotes';
+export * from './modules/creditNotes/usecases/ERP/retryCreditNotes/retryCreditNotesUsecase';
 export * from './modules/invoices/usecases/ERP/retryFailedSageErpInvoices/retryFailedSageErpInvoices';
 export * from './modules/invoices/usecases/ERP/retryRevenueRecognizedSageErpInvoices/retryRevenueRecognitionSageErpInvoices';
 
