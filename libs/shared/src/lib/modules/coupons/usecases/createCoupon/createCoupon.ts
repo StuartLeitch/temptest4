@@ -5,16 +5,21 @@ import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { CouponRepoContract } from '../../repos/couponRepo';
 
 // * Usecase specific
 import { InvoiceItemType } from '../../../invoices/domain/InvoiceItem';
 
-import { CreateCouponResponse } from './createCouponResponse';
-import { CouponNotSavedError } from './createCouponErrors';
-import { CreateCouponDTO } from './createCouponDTO';
+import { CreateCouponResponse as Response } from './createCouponResponse';
+import { CreateCouponDTO as DTO } from './createCouponDTO';
+import * as Errors from './createCouponErrors';
 
 import { CouponCode } from '../../domain/CouponCode';
 import {
@@ -27,21 +32,16 @@ import {
 import { sanityChecksRequestParameters } from './utils';
 
 export class CreateCouponUsecase
-  implements
-    UseCase<
-      CreateCouponDTO,
-      Promise<CreateCouponResponse>,
-      UsecaseAuthorizationContext
-    > {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private couponRepo: CouponRepoContract) {
+    super();
     this.createCoupon = this.createCoupon.bind(this);
     this.saveCoupon = this.saveCoupon.bind(this);
   }
 
-  public async execute(
-    request: CreateCouponDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<CreateCouponResponse> {
+  @Authorize('coupon:create')
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const finalResult = await new AsyncEither(request)
         .then(sanityChecksRequestParameters(this.couponRepo))
@@ -55,7 +55,7 @@ export class CreateCouponUsecase
     }
   }
 
-  private async createCoupon(request: CreateCouponDTO) {
+  private async createCoupon(request: DTO) {
     const { code, invoiceItemType, expirationDate, type, status } = request;
 
     return CouponCode.create(code)
@@ -79,15 +79,17 @@ export class CreateCouponUsecase
 
   private async saveCoupon(
     coupon: Coupon
-  ): Promise<Either<CouponNotSavedError, Coupon>> {
+  ): Promise<Either<Errors.CouponNotSavedError, Coupon>> {
     try {
       const result = await this.couponRepo.save(coupon);
       if (result.isLeft()) {
-        return left(new CouponNotSavedError(new Error(result.value.message)));
+        return left(
+          new Errors.CouponNotSavedError(new Error(result.value.message))
+        );
       }
       return right(result.value);
     } catch (err) {
-      return left(new CouponNotSavedError(err));
+      return left(new Errors.CouponNotSavedError(err));
     }
   }
 }

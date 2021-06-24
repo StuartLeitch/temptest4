@@ -1,6 +1,5 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
-import { AuthenticationError, ForbiddenError } from 'apollo-server'
 import {
   GetInvoiceIdByManuscriptCustomIdUsecase,
   GetInvoiceIdByManuscriptCustomIdDTO,
@@ -30,7 +29,6 @@ import {
   GetTransactionByInvoiceIdUsecase,
   GetPaymentsByInvoiceIdUsecase,
   GetVATNoteUsecase,
-  // Payer
 } from '@hindawi/shared';
 
 import { Resolvers, Invoice, PayerType, InvoiceStatus } from '../schema';
@@ -38,6 +36,8 @@ import { Resolvers, Invoice, PayerType, InvoiceStatus } from '../schema';
 import { Context } from '../../builders';
 
 import { env } from '../../env';
+
+import { handleForbiddenUsecase, getAuthRoles } from './utils';
 
 export const invoice: Resolvers<Context> = {
   Query: {
@@ -123,13 +123,7 @@ export const invoice: Resolvers<Context> = {
     },
 
     async invoices(parent, args, context) {
-      if (!(context as any).kauth.accessToken) {
-        throw new AuthenticationError('You must be logged in!');
-      }
-
-      const authRoles = (context as any).kauth.accessToken.content.resource_access['invoicing-admin'].roles;
-      const contextRoles = authRoles.map(role => Roles[role.toUpperCase()]);
-      // const contextRoles = [ 'foo' /*Roles.ADMIN*/ ];
+      const contextRoles = getAuthRoles(context);
 
       const { repos } = context;
       const getCreditNoteByInvoiceIdUsecase = new GetInvoiceDetailsUsecase(
@@ -141,9 +135,7 @@ export const invoice: Resolvers<Context> = {
       };
       const result = await usecase.execute(args, usecaseContext);
 
-      if (result && (result as any).isFailure && (result as any).error === 'UNAUTHORIZED'){
-        throw new ForbiddenError('You must be authorized');
-      }
+      handleForbiddenUsecase(result);
 
       if (result.isLeft()) {
         return undefined;
@@ -668,6 +660,8 @@ export const invoice: Resolvers<Context> = {
       return CouponMap.toPersistence(result.value);
     },
     async createCreditNote(parent, args, context): Promise<any> {
+      const roles = getAuthRoles(context);
+
       const {
         repos: {
           invoice: invoiceRepo,
@@ -677,7 +671,6 @@ export const invoice: Resolvers<Context> = {
           waiver: waiverRepo,
           pausedReminder: pausedReminderRepo,
         },
-        services: { waiverService },
       } = context;
 
       const { invoiceId, createDraft, reason } = args;
@@ -690,7 +683,7 @@ export const invoice: Resolvers<Context> = {
         waiverRepo,
         pausedReminderRepo
       );
-      const usecaseContext = { roles: [Roles.ADMIN] };
+      const usecaseContext = { roles };
 
       const result = await createCreditNoteUsecase.execute(
         {
@@ -700,6 +693,8 @@ export const invoice: Resolvers<Context> = {
         },
         usecaseContext
       );
+
+      handleForbiddenUsecase(result);
 
       if (result.isLeft()) {
         throw new Error(result.value.message);

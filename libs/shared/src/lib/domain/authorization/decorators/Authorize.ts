@@ -1,6 +1,7 @@
 import { left } from '../../../core/logic/Either';
-import { accessControl } from '../AccessControl';
+
 import type { AccessControlContext } from '../AccessControlContext';
+import { accessControl } from '../AccessControl';
 
 type Authorization = 'Authorization';
 
@@ -9,11 +10,15 @@ interface AuthorizationContext<T = string> {
 }
 
 interface AccessControlledUsecaseContract<R, C, ACC> {
-  getAccessControlContext?(r: R, c: C): Promise<ACC>;
+  getAccessControlContext?(r: R, c: C, a?: ACC): Promise<ACC>;
 }
 
 abstract class AccessControlledUsecase<R, C, ACC>
-  implements AccessControlledUsecaseContract<R, C, ACC> {}
+  implements AccessControlledUsecaseContract<R, C, ACC> {
+  async getAccessControlContext?(r: R, c: C, a?: ACC): Promise<ACC> {
+    return {} as ACC;
+  }
+}
 
 const Authorize = <R, C extends AuthorizationContext>(action: string) => (
   _target: AccessControlledUsecase<R, C, AccessControlContext>, // Class of the decorated method
@@ -23,13 +28,15 @@ const Authorize = <R, C extends AuthorizationContext>(action: string) => (
   const method = propertyDescriptor.value;
   propertyDescriptor.value = async function (request: R, context: C) {
     const { roles } = context;
-    const accessControlContext = await (_target as any).getAccessControlContext(
-      request,
-      context,
-      {} as AccessControlContext
-    );
+    let accessControlContext = {};
 
-    // Object.assign({}, accessControlContext, context);
+    if (typeof _target.getAccessControlContext === 'function') {
+      accessControlContext = await _target.getAccessControlContext(
+        request,
+        context,
+        {} as AccessControlContext
+      );
+    }
 
     const permission = await accessControl.can(
       roles,

@@ -15,7 +15,8 @@ export const env = {
   node: process.env.NODE_ENV || 'development',
   isProduction: process.env.NODE_ENV === 'production',
   isTest: process.env.NODE_ENV === 'test',
-  isDevelopment: process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'qa',
+  isDevelopment:
+    process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'qa',
   app: {
     name: getOsEnv('SERVICE_NAME'),
     version: (pkg as any).version,
@@ -69,6 +70,7 @@ export const env = {
     ),
     assistanceEmail: getOsEnv('ASSISTANCE_EMAIL'),
     doiNumber: getOsEnv('DOI_NUMBER'),
+    keycloakSessionSecret: getOsEnv('SESSION_SECRET_STRING'),
   },
   loaders: {
     knexEnabled: toBool(getOsEnvOptional('KNEX_LOADER_ENABLED')),
@@ -171,8 +173,12 @@ export const env = {
     tokenSecret: getOsEnv('NETSUITE_TOKEN_SECRET'),
     netSuiteEnabled: toBool(getOsEnv('NETSUITE_ENABLED')),
     customSegmentFieldName: nonEmptyOsEnv('NETSUITE_CUSTOM_SEGMENT_FIELD_NAME'),
-    customExternalPaymentReference: nonEmptyOsEnv('NETSUITE_CUSTOM_EXTERNAL_PAYMENT_REFERENCE'),
-    customUniquePaymentReference: nonEmptyOsEnv('NETSUITE_CUSTOM_UNIQUE_PAYMENT_REFERENCE'),
+    customExternalPaymentReference: nonEmptyOsEnv(
+      'NETSUITE_CUSTOM_EXTERNAL_PAYMENT_REFERENCE'
+    ),
+    customUniquePaymentReference: nonEmptyOsEnv(
+      'NETSUITE_CUSTOM_UNIQUE_PAYMENT_REFERENCE'
+    ),
   },
   migration: {
     token: getOsEnv('MIGRATION_TOKEN'),

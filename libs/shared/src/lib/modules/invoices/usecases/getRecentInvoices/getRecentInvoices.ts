@@ -6,8 +6,8 @@ import { UseCase } from '../../../../core/domain/UseCase';
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
 // * Usecase specifics
-import { GetRecentInvoicesResponse } from './getRecentInvoicesResponse';
-import type { GetRecentInvoicesDTO } from './getRecentInvoicesDTO';
+import { GetRecentInvoicesResponse as Response } from './getRecentInvoicesResponse';
+import type { GetRecentInvoicesDTO as DTO } from './getRecentInvoicesDTO';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
@@ -19,23 +19,16 @@ import {
 
 export class GetRecentInvoicesUsecase
   implements
-    UseCase<GetRecentInvoicesDTO, Promise<GetRecentInvoicesResponse>, Context>,
-    AccessControlledUsecase<
-      GetRecentInvoicesDTO,
-      Context,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(private invoiceRepo: InvoiceRepoContract) {}
 
-  private async getAccessControlContext(request, context?) {
+  async getAccessControlContext(request, context?) {
     return {};
   }
 
   @Authorize('invoice:read')
-  public async execute(
-    request: GetRecentInvoicesDTO,
-    context?: Context
-  ): Promise<GetRecentInvoicesResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     // TODO: add proper DDD types to the paginated result
     try {
       const maybePaginatedResult = await this.invoiceRepo.getRecentInvoices(

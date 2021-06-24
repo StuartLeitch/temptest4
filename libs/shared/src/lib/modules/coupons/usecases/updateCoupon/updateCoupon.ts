@@ -6,7 +6,12 @@ import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 // * Usecase specific
 import { CouponId } from '../../domain/CouponId';
@@ -14,8 +19,8 @@ import { Coupon } from '../../domain/Coupon';
 
 import { CouponRepoContract } from '../../repos/couponRepo';
 
-import { UpdateCouponResponse } from './updateCouponResponse';
-import { UpdateCouponDTO } from './updateCouponDTO';
+import { UpdateCouponResponse as Response } from './updateCouponResponse';
+import type { UpdateCouponDTO as DTO } from './updateCouponDTO';
 import * as Errors from './updateCouponErrors';
 
 import {
@@ -25,21 +30,16 @@ import {
 } from './utils';
 
 export class UpdateCouponUsecase
-  implements
-    UseCase<
-      UpdateCouponDTO,
-      Promise<UpdateCouponResponse>,
-      UsecaseAuthorizationContext
-    > {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private couponRepo: CouponRepoContract) {
+    super();
     this.getCouponWithInput = this.getCouponWithInput.bind(this);
     this.saveCoupon = this.saveCoupon.bind(this);
   }
 
-  public async execute(
-    request: UpdateCouponDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<UpdateCouponResponse> {
+  @Authorize('coupon:update')
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const maybeCoupon = await new AsyncEither(request)
       .then(sanityChecksRequestParameters)
       .then(this.getCouponWithInput)
@@ -51,7 +51,7 @@ export class UpdateCouponUsecase
   }
 
   private async getCouponWithInput(
-    request: UpdateCouponDTO
+    request: DTO
   ): Promise<
     Either<Errors.CouponNotFoundError | GuardFailure, UpdateCouponData>
   > {
