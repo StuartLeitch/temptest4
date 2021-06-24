@@ -16,7 +16,7 @@ import { PublishInvoiceFinalizedUsecase } from '../../../../libs/shared/src/lib/
 import { PublishInvoicePaidUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoicePaid';
 import { PublishRevenueRecognitionReversalUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
 
-import { AfterCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/creditNotes/usecases/subscriptions/AfterCreditNoteCreatedEvent';
+import { AfterCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/creditNotes/subscriptions/AfterCreditNoteCreatedEvent';
 import { AfterInvoiceCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
 import { AfterInvoiceDraftDueAmountUpdatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDueAmountUpdateEvent';
 import { AfterInvoiceDraftDeletedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDraftDeletedEvent';

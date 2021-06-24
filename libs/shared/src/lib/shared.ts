@@ -258,6 +258,7 @@ export * from './modules/creditNotes/domain/CreditNoteId';
 export * from './modules/creditNotes/mappers/CreditNoteMap';
 export * from './modules/creditNotes/repos/creditNoteRepo';
 export * from './modules/creditNotes/repos/implementations/knexCreditNoteRepo';
+export * from './modules/creditNotes/repos/mocks/mockCreditNoteRepo';
 export * from './modules/creditNotes/usecases/getCreditNoteById/getCreditNoteById';
 export * from './modules/creditNotes/usecases/getCreditNoteById/getCreditNoteByIdDTO';
 export * from './modules/creditNotes/usecases/getCreditNoteByCustomId/getCreditNoteByCustomId';
