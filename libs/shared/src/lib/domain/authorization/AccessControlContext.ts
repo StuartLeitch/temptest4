@@ -3,4 +3,5 @@ export interface AccessControlContext {
   userTenantId?: string;
   entityOwnerId?: string;
   entityTenantId?: string;
+  paymentType?: string;
 }

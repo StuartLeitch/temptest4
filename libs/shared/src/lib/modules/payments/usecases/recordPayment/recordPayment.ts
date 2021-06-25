@@ -7,19 +7,20 @@ import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
+import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
-  UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
 // * Usecase specific
 import { PaymentStrategyFactory } from '../../domain/strategies/payment-strategy-factory';
+import { PaymentStatus, PaymentTypes, Payment } from '../../domain/Payment';
 import { PaymentStrategy } from '../../domain/strategies/payment-strategy';
 import { InvoiceStatus } from '../../../invoices/domain/Invoice';
 import { ExternalOrderId } from '../../domain/external-order-id';
 import { PaymentDTO } from '../../domain/strategies/behaviors';
-import { PaymentStatus, Payment } from '../../domain/Payment';
 
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos';
@@ -53,10 +54,13 @@ import { RecordPaymentResponse as Response } from './recordPaymentResponse';
 import { RecordPaymentDTO as DTO } from './recordPaymentDTO';
 import * as Errors from './recordPaymentErrors';
 
+export type Context = UsecaseAuthorizationContext & {
+  paymentType: PaymentTypes;
+};
+
 export class RecordPaymentUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private strategyFactory: PaymentStrategyFactory,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -68,6 +72,7 @@ export class RecordPaymentUsecase
     private payerRepo: PayerRepoContract,
     private logger: LoggerContract
   ) {
+    super();
     this.attachExistingPayments = this.attachExistingPayments.bind(this);
     this.attachPaymentIfExists = this.attachPaymentIfExists.bind(this);
     this.attachInvoiceItems = this.attachInvoiceItems.bind(this);
@@ -82,6 +87,13 @@ export class RecordPaymentUsecase
     this.pay = this.pay.bind(this);
   }
 
+  async getAccessControlContext(r: DTO, c: Context, a?: AccessControlContext) {
+    return {
+      paymentType: c.paymentType,
+    };
+  }
+
+  @Authorize('payment:create')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const result = await new AsyncEither(request)

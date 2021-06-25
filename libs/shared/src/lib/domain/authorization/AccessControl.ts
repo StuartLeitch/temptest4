@@ -1,25 +1,46 @@
 import { AccessControlPlus } from 'accesscontrol-plus';
 
+import { PaymentTypes } from '../../modules/payments/domain/Payment';
 import { Roles } from '../../modules/users/domain/enums/Roles';
+
 import { AccessControlContext } from './AccessControlContext';
 
-const userOwnsEntity = (context: AccessControlContext): boolean => {
+function userOwnsEntity(context: AccessControlContext): boolean {
   return context.entityOwnerId === context.userId;
-};
+}
 
-const tenantMatches = (context: AccessControlContext): boolean =>
-  context.entityTenantId === context.userTenantId;
+function tenantMatches(context: AccessControlContext): boolean {
+  return context.entityTenantId === context.userTenantId;
+}
+
+function paymentIsPaypalOrCreditCard(context: AccessControlContext): boolean {
+  if (
+    context.paymentType === PaymentTypes.CREDIT_CARD ||
+    context.paymentType === PaymentTypes.PAYPAL
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function paymentIsBankTransfer(context: AccessControlContext): boolean {
+  if (context.paymentType === PaymentTypes.BANK_TRANSFER) {
+    return true;
+  }
+
+  return false;
+}
 
 const accessControl = new AccessControlPlus();
 
+accessControl.deny('public').resource('*').action('*');
 accessControl
-  .deny('public')
-  .resource('*')
-  .action('*')
   .grant(Roles.CUSTOMER)
   .resource('invoice')
   .action('create')
-  .where(userOwnsEntity)
+  .where(userOwnsEntity);
+accessControl
   .grant(Roles.PAYER)
   .resource('invoice')
   .action('read')
@@ -27,32 +48,27 @@ accessControl
   .action('update')
   .resource('payments')
   .action('read')
-  // .where(userOwnsEntity)
   .resource('payment')
   .action('create')
-  // .where(userOwnsEntity)
+  .where(paymentIsPaypalOrCreditCard)
   .resource('payments')
   .action('create')
   .action('update')
   .action('read')
   .resource('transaction')
-  .action('read')
-  // .where(userOwnsEntity)
-  .grant(Roles.AUTHOR)
-  .inherits(Roles.CUSTOMER)
+  .action('read');
+accessControl.grant(Roles.AUTHOR).inherits(Roles.CUSTOMER);
+accessControl
   .grant(Roles.ADMIN)
   .inherits(Roles.CUSTOMER)
   .resource('*')
   .action('*')
-  .where(tenantMatches)
-  .grant(Roles.SUPER_ADMIN)
-  .resource('*')
-  .action('*')
-  .grant(Roles.EVENT_HANDLER)
-  .resource('invoice')
-  .action('read')
-  .grant(Roles.SERVICE)
-  .resource('payments')
-  .action('read');
+  .resource('payment')
+  .action('create')
+  .where(paymentIsBankTransfer)
+  .where(tenantMatches);
+accessControl.grant(Roles.SUPER_ADMIN).resource('*').action('*');
+accessControl.grant(Roles.EVENT_HANDLER).resource('invoice').action('read');
+accessControl.grant(Roles.SERVICE).resource('payments').action('read');
 
 export { accessControl };
