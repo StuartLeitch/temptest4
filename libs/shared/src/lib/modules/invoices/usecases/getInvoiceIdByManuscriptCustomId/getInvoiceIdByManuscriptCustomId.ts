@@ -5,6 +5,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { InvoiceItem } from '../../domain/InvoiceItem';
@@ -18,12 +23,16 @@ import { GetInvoiceIdByManuscriptCustomIdDTO as DTO } from './getInvoiceIdByManu
 import * as Errors from './getInvoiceIdByManuscriptCustomIdErrors';
 
 export class GetInvoiceIdByManuscriptCustomIdUsecase
+  extends AccessControlledUsecase<unknown, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private articleRepo: ArticleRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract
-  ) {}
+  ) {
+    super();
+  }
 
+  @Authorize('invoice:readByCustomId')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const { customId } = request;
 

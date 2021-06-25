@@ -5,10 +5,6 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
-// * Usecase specifics
-import { GetRecentInvoicesResponse as Response } from './getRecentInvoicesResponse';
-import type { GetRecentInvoicesDTO as DTO } from './getRecentInvoicesDTO';
-
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
@@ -16,18 +12,19 @@ import {
   AccessControlContext,
   Authorize,
 } from '../../../../domain/authorization';
+// * Usecase specifics
+
+import { GetRecentInvoicesResponse as Response } from './getRecentInvoicesResponse';
+import type { GetRecentInvoicesDTO as DTO } from './getRecentInvoicesDTO';
 
 export class GetRecentInvoicesUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
-  constructor(private invoiceRepo: InvoiceRepoContract) {}
-
-  async getAccessControlContext(request, context?) {
-    return {};
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
+  constructor(private invoiceRepo: InvoiceRepoContract) {
+    super();
   }
 
-  @Authorize('invoice:read')
+  @Authorize('invoices:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     // TODO: add proper DDD types to the paginated result
     try {

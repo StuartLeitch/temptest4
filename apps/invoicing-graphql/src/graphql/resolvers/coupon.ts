@@ -6,9 +6,8 @@ import {
   CreateCouponUsecase,
   GetRecentCouponsDTO,
   UpdateCouponUsecase,
-  CouponMap,
-  Roles,
   CreateCouponDTO,
+  CouponMap,
 } from '@hindawi/shared';
 
 import { Context } from '../../builders';
@@ -20,6 +19,7 @@ import { handleForbiddenUsecase, getAuthRoles } from './utils';
 export const coupon: Resolvers<Context> = {
   Query: {
     async coupon(parent, args, context) {
+      const roles = getAuthRoles(context);
       const { repos } = context;
       const usecase = new GetCouponDetailsByCodeUsecase(repos.coupon);
 
@@ -28,10 +28,12 @@ export const coupon: Resolvers<Context> = {
       };
 
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles,
       };
 
       const result = await usecase.execute(request, usecaseContext);
+
+      handleForbiddenUsecase(result);
 
       if (result.isLeft()) {
         throw new Error(result.value.message);
@@ -40,14 +42,18 @@ export const coupon: Resolvers<Context> = {
       return CouponMap.toPersistence(result.value);
     },
     async coupons(parent, args: GetRecentCouponsDTO, context) {
+      const roles = getAuthRoles(context);
       const { repos } = context;
       const usecase = new GetRecentCouponsUsecase(repos.coupon);
 
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles,
       };
 
       const result = await usecase.execute(args, usecaseContext);
+
+      handleForbiddenUsecase(result);
+
       if (result.isLeft()) {
         throw new Error(result.value.message);
       }
@@ -60,13 +66,19 @@ export const coupon: Resolvers<Context> = {
       };
     },
     async generateCouponCode(parent, args, context) {
+      const roles = getAuthRoles(context);
+
       const { repos } = context;
       const usecase = new GenerateCouponCodeUsecase(repos.coupon);
 
-      const result = await usecase.execute();
+      const usecaseContext = { roles };
+
+      const result = await usecase.execute(null, usecaseContext);
       if (result.isLeft()) {
         throw new Error(result.value.message);
       }
+
+      handleForbiddenUsecase(result);
 
       const code = result.value.value;
       return { code };

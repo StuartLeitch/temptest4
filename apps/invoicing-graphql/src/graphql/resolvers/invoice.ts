@@ -1,9 +1,9 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
 import {
   GetInvoiceIdByManuscriptCustomIdUsecase,
   GetInvoiceIdByManuscriptCustomIdDTO,
+  GetTransactionByInvoiceIdUsecase,
   GetCreditNoteByInvoiceIdUsecase,
+  GetPaymentsByInvoiceIdUsecase,
   ApplyCouponToInvoiceUsecase,
   GetPaymentMethodByIdUsecase,
   GetItemsForInvoiceUsecase,
@@ -12,6 +12,7 @@ import {
   GetRecentInvoicesUsecase,
   CreateCreditNoteUsecase,
   GetInvoiceDetailsDTO,
+  GetVATNoteUsecase,
   PaymentMethodMap,
   InvoiceItemMap,
   TransactionMap,
@@ -26,15 +27,10 @@ import {
   WaiverMap,
   PayerMap,
   Roles,
-  GetTransactionByInvoiceIdUsecase,
-  GetPaymentsByInvoiceIdUsecase,
-  GetVATNoteUsecase,
 } from '@hindawi/shared';
 
-import { Resolvers, Invoice, PayerType, InvoiceStatus } from '../schema';
-
+import { InvoiceStatus, PayerType, Resolvers, Invoice } from '../schema';
 import { Context } from '../../builders';
-
 import { env } from '../../env';
 
 import { handleForbiddenUsecase, getAuthRoles } from './utils';
@@ -58,6 +54,8 @@ export const invoice: Resolvers<Context> = {
       };
 
       const result = await usecase.execute(request, usecaseContext);
+
+      handleForbiddenUsecase(result);
 
       if (result.isLeft()) {
         const err = result.value;
@@ -184,6 +182,7 @@ export const invoice: Resolvers<Context> = {
     },
 
     async invoiceIdByManuscriptCustomId(parent, args, context) {
+      const roles = getAuthRoles(context);
       const {
         repos: { manuscript: articleRepo, invoiceItem: invoiceItemRepo },
       } = context;
@@ -197,10 +196,12 @@ export const invoice: Resolvers<Context> = {
       };
 
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles,
       };
 
       const result = await usecase.execute(request, usecaseContext);
+
+      handleForbiddenUsecase(result);
 
       if (result.isLeft()) {
         return undefined;
@@ -232,6 +233,9 @@ export const invoice: Resolvers<Context> = {
       };
 
       const result = await usecase.execute(request, usecaseContext);
+
+      handleForbiddenUsecase(result);
+
       if (result.isLeft()) {
         return undefined;
       }
