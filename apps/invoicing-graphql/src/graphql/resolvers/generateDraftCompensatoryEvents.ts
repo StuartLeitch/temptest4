@@ -1,6 +1,3 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-
 import {
   GenerateDraftCompensatoryEventsUsecase,
   GetInvoicesIdsUsecase,
@@ -8,12 +5,14 @@ import {
 } from '@hindawi/shared';
 
 import { Context } from '../../builders';
-
 import { Resolvers } from '../schema';
+
+import { handleForbiddenUsecase, getAuthRoles } from './utils';
 
 export const generateDraftCompensatoryEvents: Resolvers<Context> = {
   Mutation: {
     async generateDraftCompensatoryEvents(parent, args, context) {
+      const roles = getAuthRoles(context);
       const { invoiceIds, journalIds } = args;
       const {
         repos: { invoiceItem, manuscript, invoice, coupon, waiver },
@@ -39,7 +38,7 @@ export const generateDraftCompensatoryEvents: Resolvers<Context> = {
         throw new Error(maybeResult.value.message);
       }
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles,
       };
 
       const ids = maybeResult.value;
@@ -48,6 +47,9 @@ export const generateDraftCompensatoryEvents: Resolvers<Context> = {
 
       for await (const invoiceId of ids) {
         const result = await usecase.execute({ invoiceId }, usecaseContext);
+
+        handleForbiddenUsecase(result);
+
         if (result.isLeft()) {
           errors.push(result.value);
         }

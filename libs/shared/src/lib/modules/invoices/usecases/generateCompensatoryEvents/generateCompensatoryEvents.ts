@@ -7,6 +7,12 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+  Roles,
+} from '../../../../domain/authorization';
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 
@@ -82,6 +88,7 @@ function originalInvoiceId(invoice: Invoice): string {
 }
 
 export class GenerateCompensatoryEventsUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private paymentMethodRepo: PaymentMethodRepoContract,
@@ -96,6 +103,7 @@ export class GenerateCompensatoryEventsUsecase
     private payerRepo: PayerRepoContract,
     private loggerService: LoggerContract
   ) {
+    super();
     this.publishInvoiceConfirmed = this.publishInvoiceConfirmed.bind(this);
     this.publishInvoiceFinalized = this.publishInvoiceFinalized.bind(this);
     this.removeCouponsAndWaivers = this.removeCouponsAndWaivers.bind(this);
@@ -124,6 +132,7 @@ export class GenerateCompensatoryEventsUsecase
     this.verifyInput = this.verifyInput.bind(this);
   }
 
+  @Authorize('invoice:generateCompensatoryEvents')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const execution = await new AsyncEither<null, DTO>(request)

@@ -65,10 +65,27 @@ accessControl
   .action('*')
   .resource('payment')
   .action('create')
-  .where(paymentIsBankTransfer)
-  .where(tenantMatches);
-accessControl.grant(Roles.SUPER_ADMIN).resource('*').action('*');
+  .where(paymentIsBankTransfer);
+// .where(tenantMatches);
+accessControl
+  .grant(Roles.SUPER_ADMIN)
+  .resource('*')
+  .action('*')
+  .resource('payment')
+  .action('create')
+  .where(paymentIsBankTransfer);
+accessControl
+  .deny(Roles.SUPER_ADMIN)
+  .resource('invoice')
+  .action('migrate')
+  .action('generateCompensatoryEvents');
 accessControl.grant(Roles.EVENT_HANDLER).resource('invoice').action('read');
-accessControl.grant(Roles.SERVICE).resource('payments').action('read');
+accessControl
+  .grant(Roles.SERVICE)
+  .resource('payments')
+  .action('read')
+  .resource('invoice')
+  .action('migrate')
+  .action('generateCompensatoryEvents');
 
 export { accessControl };

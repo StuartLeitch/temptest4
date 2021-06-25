@@ -1,18 +1,19 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
 import {
   MigrateEntireInvoiceUsecase,
   MigrateEntireInvoiceDTO,
   Roles,
 } from '@hindawi/shared';
 
-import { Resolvers } from '../schema';
 import { Context } from '../../builders';
+import { Resolvers } from '../schema';
 import { env } from '../../env';
+
+import { handleForbiddenUsecase, getAuthRoles } from './utils';
 
 export const migrateEntireInvoice: Resolvers<Context> = {
   Mutation: {
     async migrateEntireInvoice(parent, args, context) {
+      const roles = getAuthRoles(context);
       const {
         repos: {
           paymentMethod,
@@ -63,7 +64,7 @@ export const migrateEntireInvoice: Resolvers<Context> = {
       }
 
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles,
       };
 
       try {
@@ -71,6 +72,8 @@ export const migrateEntireInvoice: Resolvers<Context> = {
           usecaseRequest,
           usecaseContext
         );
+
+        handleForbiddenUsecase(maybeResult);
 
         if (maybeResult.isLeft()) {
           console.log(maybeResult.value);

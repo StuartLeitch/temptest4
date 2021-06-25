@@ -8,10 +8,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
 // * Authorization Logic
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
   Roles,
 } from '../../../../domain/authorization';
 
@@ -81,9 +82,8 @@ import * as Errors from './migrateEntireInvoiceErrors';
 import { validateRequest } from './utils';
 
 export class MigrateEntireInvoiceUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private paymentMethodRepo: PaymentMethodRepoContract,
     private sqsPublishService: SQSPublishServiceContract,
@@ -98,6 +98,7 @@ export class MigrateEntireInvoiceUsecase
     private payerRepo: PayerRepoContract,
     private loggerService: LoggerContract
   ) {
+    super();
     this.addItemsToInvoice = this.addItemsToInvoice.bind(this);
     this.calculateVatPercentage = this.calculateVatPercentage.bind(this);
     this.confirmInvoice = this.confirmInvoice.bind(this);
@@ -158,11 +159,7 @@ export class MigrateEntireInvoiceUsecase
     this.getPaymentMethods = this.getPaymentMethods.bind(this);
   }
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  // @Authorize('invoice:read')
+  @Authorize('invoice:migrate')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const requestExecution = new AsyncEither<null, DTO>(request).then(
       validateRequest
