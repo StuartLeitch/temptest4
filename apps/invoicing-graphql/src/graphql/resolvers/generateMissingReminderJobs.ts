@@ -1,5 +1,3 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
 import {
   ScheduleRemindersForExistingInvoicesUsecase,
   Roles,
@@ -9,9 +7,12 @@ import { Resolvers } from '../schema';
 import { Context } from '../../builders';
 import { env } from '../../env';
 
+import { handleForbiddenUsecase, getAuthRoles } from './utils';
+
 export const generateMissingReminderJobs: Resolvers<Context> = {
   Mutation: {
     async generateMissingReminderJobs(parent, args, context) {
+      const roles = getAuthRoles(context);
       const {
         repos: {
           pausedReminder,
@@ -24,7 +25,7 @@ export const generateMissingReminderJobs: Resolvers<Context> = {
         services: { logger: loggerService, schedulingService },
       } = context;
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles,
       };
       const usecase = new ScheduleRemindersForExistingInvoicesUsecase(
         pausedReminder,
@@ -48,6 +49,8 @@ export const generateMissingReminderJobs: Resolvers<Context> = {
         },
         usecaseContext
       );
+
+      handleForbiddenUsecase(maybeResult);
 
       if (maybeResult.isLeft()) {
         throw maybeResult.value;

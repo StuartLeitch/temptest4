@@ -65,7 +65,10 @@ accessControl
   .action('*')
   .resource('payment')
   .action('create')
-  .where(paymentIsBankTransfer);
+  .where(paymentIsBankTransfer)
+  .resource('reminder')
+  .action('toggle')
+  .action('read');
 // .where(tenantMatches);
 accessControl
   .grant(Roles.SUPER_ADMIN)
@@ -78,7 +81,8 @@ accessControl
   .deny(Roles.SUPER_ADMIN)
   .resource('invoice')
   .action('migrate')
-  .action('generateCompensatoryEvents');
+  .action('generateCompensatoryEvents')
+  .action('createReminders');
 accessControl.grant(Roles.EVENT_HANDLER).resource('invoice').action('read');
 accessControl
   .grant(Roles.SERVICE)
@@ -86,6 +90,7 @@ accessControl
   .action('read')
   .resource('invoice')
   .action('migrate')
-  .action('generateCompensatoryEvents');
+  .action('generateCompensatoryEvents')
+  .action('createReminders');
 
 export { accessControl };

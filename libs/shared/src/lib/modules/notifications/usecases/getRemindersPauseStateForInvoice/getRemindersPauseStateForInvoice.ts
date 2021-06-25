@@ -6,10 +6,11 @@ import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
 import { NotificationPause } from '../../domain/NotificationPause';
@@ -26,17 +27,21 @@ import { GetRemindersPauseStateForInvoiceDTO as DTO } from './getRemindersPauseS
 import * as Errors from './getRemindersPauseStateForInvoiceErrors';
 
 export class GetRemindersPauseStateForInvoiceUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private pausedRemindersRepo: PausedReminderRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private loggerService: LoggerContract
   ) {
+    super();
+
     this.existsInvoiceWithId = this.existsInvoiceWithId.bind(this);
     this.fetchPauseState = this.fetchPauseState.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
   }
 
+  @Authorize('reminder:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const execution = await new AsyncEither<null, DTO>(request)

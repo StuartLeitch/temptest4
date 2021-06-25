@@ -6,6 +6,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
@@ -53,6 +58,7 @@ interface InvoiceIdDTO extends DTO {
 }
 
 export class ScheduleRemindersForExistingInvoicesUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
@@ -64,6 +70,8 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     private loggerService: LoggerContract,
     private scheduler: SchedulerContract
   ) {
+    super();
+
     this.shouldScheduleCreditControl = this.shouldScheduleCreditControl.bind(
       this
     );
@@ -81,6 +89,7 @@ export class ScheduleRemindersForExistingInvoicesUsecase
     this.logError = this.logError.bind(this);
   }
 
+  @Authorize('invoice:createReminders')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const validation = await new AsyncEither(request)

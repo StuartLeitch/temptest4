@@ -6,10 +6,11 @@ import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
@@ -26,17 +27,21 @@ import { PauseInvoicePaymentRemindersDTO as DTO } from './pauseInvoicePaymentRem
 import * as Errors from './pauseInvoicePaymentRemindersErrors';
 
 export class PauseInvoicePaymentRemindersUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private loggerService: LoggerContract
   ) {
+    super();
+
     this.existsInvoiceWithId = this.existsInvoiceWithId.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
     this.pause = this.pause.bind(this);
   }
 
+  @Authorize('reminder:toggle')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const execution = await new AsyncEither(request)

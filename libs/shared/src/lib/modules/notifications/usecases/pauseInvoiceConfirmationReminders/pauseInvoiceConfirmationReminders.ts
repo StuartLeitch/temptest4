@@ -10,6 +10,7 @@ import {
   UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
@@ -26,17 +27,21 @@ import { PauseInvoiceConfirmationRemindersDTO as DTO } from './pauseInvoiceConfi
 import * as Errors from './pauseInvoiceConfirmationRemindersErrors';
 
 export class PauseInvoiceConfirmationRemindersUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private loggerService: LoggerContract
   ) {
+    super();
+
     this.existsInvoiceWithId = this.existsInvoiceWithId.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
     this.pause = this.pause.bind(this);
   }
 
+  @Authorize('reminder:toggle')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const execution = await new AsyncEither(request)
