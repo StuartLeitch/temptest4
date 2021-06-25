@@ -49,7 +49,6 @@ export class PublishCreditNoteCreatedUsecase
     } = request;
 
     const erpReference = creditNote.getErpReference();
-    console.log(request.invoice);
     const data: CreditNoteCreatedEvent = {
       ...EventUtils.createEventObject(),
 
