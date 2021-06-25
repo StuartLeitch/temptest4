@@ -51,7 +51,7 @@ export class KnexCreditNoteRepo
 
     const creditNote = await db(TABLES.CREDIT_NOTES)
       .select()
-      .where('id', invoiceId.id.toString())
+      .where('invoiceId', invoiceId.id.toString())
       .first();
 
     if (!creditNote) {

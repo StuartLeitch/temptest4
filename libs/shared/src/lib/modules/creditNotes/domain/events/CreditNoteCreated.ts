@@ -1,15 +1,12 @@
 import { DomainEventContract } from '../../../../core/domain/events/contracts/DomainEvent';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
-import { CreditNoteId } from '../CreditNoteId';
+import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 
 export class CreditNoteCreated implements DomainEventContract {
-  constructor(
-    public creditNoteId: CreditNoteId,
-    public dateTimeOccurred: Date
-  ) {}
+  constructor(public invoiceId: InvoiceId, public dateTimeOccurred: Date) {}
 
   public getAggregateId(): UniqueEntityID {
-    return this.creditNoteId.id;
+    return this.invoiceId.id;
   }
 }

@@ -135,7 +135,6 @@ export class CreateCreditNoteUsecase
 
       let creditNoteProps = {
         id: new UniqueEntityID(),
-        invoiceId: request.invoiceId,
         creationReason: request.reason,
         vat: invoice.invoiceVatTotal,
         price: invoice.invoiceNetTotal * -1,
@@ -151,6 +150,10 @@ export class CreateCreditNoteUsecase
       }
 
       const creditNote = maybeCreditNote.value;
+
+      // * This assignment will trigger a CREDIT_NOTE_CREATED event
+
+      creditNote.invoiceId = invoice.invoiceId;
       await this.creditNoteRepo.save(creditNote);
 
       if (request.createDraft) {

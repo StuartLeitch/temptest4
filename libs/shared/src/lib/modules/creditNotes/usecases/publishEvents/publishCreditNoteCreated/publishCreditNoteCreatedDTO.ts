@@ -8,13 +8,13 @@ import { Invoice } from '../../../../invoices/domain/Invoice';
 import { CreditNote } from '../../../domain/CreditNote';
 
 export interface PublishCreditNoteCreatedDTO {
-  paymentMethods: PaymentMethod[];
-  invoiceItems: InvoiceItem[];
-  billingAddress?: Address;
-  messageTimestamp?: Date;
-  manuscript: Manuscript;
-  payments?: Payment[];
-  creditNote: CreditNote;
   payer?: Payer;
   invoice?: Invoice;
+  payments?: Payment[];
+  manuscript: Manuscript;
+  creditNote: CreditNote;
+  invoiceItems: InvoiceItem[];
+  paymentMethods: PaymentMethod[];
+  billingAddress?: Address;
+  messageTimestamp?: Date;
 }

@@ -67,8 +67,8 @@ export class AfterCreditNoteCreatedEvent
   ): Promise<any> {
     const getInvoiceDetails = new GetInvoiceDetailsUsecase(this.invoiceRepo);
     try {
-      const maybeCreditNote = await this.creditNoteRepo.getCreditNoteById(
-        event.creditNoteId
+      const maybeCreditNote = await this.creditNoteRepo.getCreditNoteByInvoiceId(
+        event.invoiceId
       );
       if (maybeCreditNote.isLeft()) {
         return left(
@@ -206,14 +206,14 @@ export class AfterCreditNoteCreatedEvent
 
       //* Run publish Credit Note created usecase
       const publishResult = await this.publishCreditNoteCreated.execute({
+        payer,
+        invoice: invoiceDetails,
+        payments,
+        manuscript,
+        creditNote,
+        invoiceItems,
         paymentMethods,
         billingAddress,
-        invoiceItems,
-        creditNote,
-        manuscript,
-        payments,
-        invoiceDetails,
-        payer,
       });
 
       if (publishResult.isLeft()) {

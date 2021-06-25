@@ -8,6 +8,7 @@ import { GuardFailure } from '../../../core/logic/GuardFailure';
 import { InvoiceId } from '../../invoices/domain/InvoiceId';
 import { CreditNoteId } from '../domain/CreditNoteId';
 import { ErpReference } from '../../vendors/domain/ErpReference';
+import { CreditNoteCreated } from './events/CreditNoteCreated';
 
 export enum CreationReason {
   WITHDRAWN_MANUSCRIPT = 'withdrawn-manuscript',
@@ -42,6 +43,10 @@ export class CreditNote extends AggregateRoot<CreditNoteProps> {
 
   set invoiceId(invoiceId: InvoiceId) {
     this.props.invoiceId = invoiceId;
+
+    if (invoiceId) {
+      this.addDomainEvent(new CreditNoteCreated(this.invoiceId, new Date()));
+    }
   }
 
   get creationReason(): CreationReason {

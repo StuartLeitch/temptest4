@@ -37,19 +37,19 @@ export class PublishCreditNoteCreatedUsecase
     }
 
     const {
-      messageTimestamp,
-      billingAddress,
-      paymentMethods,
-      invoiceItems,
-      creditNote,
-      manuscript,
-      payments,
       payer,
       invoice,
+      payments,
+      manuscript,
+      creditNote,
+      invoiceItems,
+      paymentMethods,
+      billingAddress,
+      messageTimestamp,
     } = request;
 
     const erpReference = creditNote.getErpReference();
-
+    console.log(request.invoice);
     const data: CreditNoteCreatedEvent = {
       ...EventUtils.createEventObject(),
 
