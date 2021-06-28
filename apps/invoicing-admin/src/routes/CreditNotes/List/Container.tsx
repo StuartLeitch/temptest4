@@ -142,11 +142,11 @@ const InvoicesContainer: React.FC = () => {
   return (
     <React.Fragment>
       <Container fluid={true}>
-        <HeaderMain title='Invoices' className='mb-5 mt-4' />
+        <HeaderMain title='Credit Notes' className='mb-5 mt-4' />
         <Row>
-          <Col lg={3}>
+          {/* <Col lg={3}>
             <InvoicesLeftNav filters={filters} setFilter={setFilter} />
-          </Col>
+          </Col> */}
           <Col lg={9} className='mt-n4 mb-5'>
             <ButtonToolbar className='d-flex justify-content-end'>
               <ButtonGroup className='mr-2'>

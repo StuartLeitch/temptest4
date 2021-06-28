@@ -23,7 +23,7 @@ const RecentInvoicesList: React.FC<RecentCreditNotesListProps> = (props) => {
     'creditNotesList',
     { pagination:  defaultPaginator, filters }
   );
-  console.log(pagination)
+
   const [fetchCreditNotes, { loading, error, data }] = useManualQuery(
     CREDIT_NOTES_QUERY
   );
@@ -31,6 +31,7 @@ const RecentInvoicesList: React.FC<RecentCreditNotesListProps> = (props) => {
   const onPageChanged = ({ currentPage }: any) => {
     props.setPage('page', currentPage);
   };
+
   useEffect(() => {
     async function fetchData() {
       const { filters, pagination } = props.state;
@@ -45,42 +46,45 @@ const RecentInvoicesList: React.FC<RecentCreditNotesListProps> = (props) => {
   }, [fetchCreditNotes, props.state]);
 
   if (loading) return <Loading />;
-
   if (error) return <Error data={error as any} />;
+  
+  if(data) {
+    return (
+      <Card className='mb-0'>
+        {/* START Table */}
+        <div className='table-responsive-xl'>
+          <Table className='mb-0 table-striped' hover>
+            <thead>
+              <tr>
+                <th className='align-middle bt-0'>Reason</th>
+                <th className='align-middle bt-0'>Reference</th>
+                <th className='align-middle bt-0'>Price</th>
+                <th className='align-middle bt-0'>Vat</th>
+                <th className='align-middle bt-0'>Date Issued</th>
+                <th className='align-middle bt-0'>Date Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              <TrTableCreditNotesList creditNotes={data?.getRecentCreditNotes} />
+            </tbody>
+          </Table>
+        </div>
+        {/* END Table */}
+        <CardFooter className='d-flex justify-content-center pb-0'>
+          <ListPagination
+            totalRecords={data?.creditNotes?.totalCount}
+            pageNeighbours={1}
+            onPageChanged={onPageChanged}
+            pageLimit={pagination.limit}
+            // to be changed from 1 to value
+            currentPage={1}
+          />
+        </CardFooter>
+      </Card>
+    );
+  }
 
-  return (
-    <Card className='mb-0'>
-      {/* START Table */}
-      <div className='table-responsive-xl'>
-        <Table className='mb-0 table-striped' hover>
-          <thead>
-            <tr>
-              <th className='align-middle bt-0'>Reason</th>
-              <th className='align-middle bt-0'>Reference</th>
-              <th className='align-middle bt-0'>Price</th>
-              <th className='align-middle bt-0'>Vat</th>
-              <th className='align-middle bt-0'>Issue Date</th>
-              <th className='align-middle bt-0'>Acceptance Date</th>
-              <th className='align-middle bt-0'>Updated Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            <TrTableCreditNotesList creditNotes={data?.creditNotes?.creditNotes || []} />
-          </tbody>
-        </Table>
-      </div>
-      {/* END Table */}
-      <CardFooter className='d-flex justify-content-center pb-0'>
-        <ListPagination
-          totalRecords={data?.creditNotes?.totalCount}
-          pageNeighbours={1}
-          onPageChanged={onPageChanged}
-          pageLimit={pagination.limit}
-          currentPage={1}
-        />
-      </CardFooter>
-    </Card>
-  );
+    return <Loading />
 };
 
 interface RecentCreditNotesListProps {
