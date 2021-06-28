@@ -454,7 +454,7 @@ export const invoice: Resolvers<Context> = {
       const getAssocInvoice = new GetInvoiceDetailsUsecase(invoiceRepo);
 
       const request: GetInvoiceDetailsDTO = {
-        invoiceId: args.invoiceId,
+        invoiceId: parent.invoiceId,
       };
 
       const usecaseContext = {
