@@ -59,14 +59,14 @@ enum PaymentStatus {
   CREATED
 }
 
-enum CreationReason {
-  WITHDRAWN_MANUSCRIPT
-  REDUCTION_APPLIED
-  WAIVED_MANUSCRIPT
-  CHANGED_PAYER_DETAILS
-  BAD_DEBT
-  OTHER
-}
+# enum CreationReason {
+#   WITHDRAWN_MANUSCRIPT
+#   REDUCTION_APPLIED
+#   WAIVED_MANUSCRIPT
+#   CHANGED_PAYER_DETAILS
+#   BAD_DEBT
+#   OTHER
+# }
 
 type InvoiceItem @model(id: "invoice_items") {
   id: String
@@ -114,7 +114,7 @@ type Invoice @model(id: "invoices") {
 type CreditNote @model(id: "credit_notes") {
   id: String
   invoiceId: ID
-  creationReason: CreationReason
+  creationReason: String
   vat: Float
   price: Float
   persistentReferenceNumber: ReferenceNumber @filter

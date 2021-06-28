@@ -85,14 +85,14 @@ export enum PaymentStatus {
   CREATED = 'CREATED',
 }
 
-export enum CreationReason {
-  WITHDRAWN_MANUSCRIPT = 'withdrawn-manuscript',
-  REDUCTION_APPLIED = 'reduction-applied',
-  WAIVED_MANUSCRIPT = 'waived-manuscript',
-  CHANGED_PAYER_DETAILS = 'changed-payer-details',
-  BAD_DEBT = 'bad-debt',
-  OTHER = 'other',
-}
+// export enum CreationReason {
+//   WITHDRAWN_MANUSCRIPT = 'withdrawn-manuscript',
+//   REDUCTION_APPLIED = 'reduction-applied',
+//   WAIVED_MANUSCRIPT = 'waived-manuscript',
+//   CHANGED_PAYER_DETAILS = 'changed-payer-details',
+//   BAD_DEBT = 'bad-debt',
+//   OTHER = 'other',
+// }
 export type InvoiceItem = {
   __typename?: 'InvoiceItem';
   id?: Maybe<Scalars['String']>;
@@ -237,7 +237,7 @@ export type CreditNote = {
   __typename?: 'CreditNote';
   id: Maybe<Scalars['String']>;
   invoiceId: Maybe<Scalars['ID']>;
-  creationReason: Maybe<CreationReason>;
+  creationReason: Maybe<Scalars['String']>;
   vat: Maybe<Scalars['Float']>;
   price: Maybe<Scalars['Float']>;
   persistentReferenceNumber?: Maybe<Scalars['ReferenceNumber']>;
@@ -702,7 +702,7 @@ export type ResolversTypes = {
   ErpReference: ResolverTypeWrapper<ErpReference>;
   TransactionStatus: TransactionStatus;
   PaymentStatus: PaymentStatus;
-  CreationReason: CreationReason;
+  // CreationReason: CreationReason;
   InvoiceItem: ResolverTypeWrapper<InvoiceItem>;
   Float: ResolverTypeWrapper<Scalars['Float']>;
   Invoice: ResolverTypeWrapper<Invoice>;
@@ -1192,11 +1192,7 @@ export type CreditNoteResolvers<
 > = {
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   invoiceId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  creationReason?: Resolver<
-    ResolversTypes['CreationReason'],
-    ParentType,
-    ContextType
-  >;
+  creationReason?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   vat?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   price?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   persistentReferenceNumber?: Resolver<
