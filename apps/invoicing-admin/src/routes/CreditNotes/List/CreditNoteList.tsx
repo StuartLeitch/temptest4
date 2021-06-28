@@ -23,7 +23,7 @@ const RecentInvoicesList: React.FC<RecentCreditNotesListProps> = (props) => {
     'creditNotesList',
     { pagination:  defaultPaginator, filters }
   );
-
+  console.log(pagination)
   const [fetchCreditNotes, { loading, error, data }] = useManualQuery(
     CREDIT_NOTES_QUERY
   );
@@ -55,14 +55,13 @@ const RecentInvoicesList: React.FC<RecentCreditNotesListProps> = (props) => {
         <Table className='mb-0 table-striped' hover>
           <thead>
             <tr>
-              <th className='align-middle bt-0'>Creation Reason</th>
+              <th className='align-middle bt-0'>Reason</th>
               <th className='align-middle bt-0'>Reference</th>
-              <th className='align-middle bt-0'>Manuscript Custom ID</th>
+              <th className='align-middle bt-0'>Price</th>
+              <th className='align-middle bt-0'>Vat</th>
               <th className='align-middle bt-0'>Issue Date</th>
-              <th className='align-middle bt-0'>APC</th>
-              <th className='align-middle bt-0'>Journal Title</th>
-              <th className='align-middle bt-0'>Manuscript Title</th>
-              <th className='align-middle bt-0'>Manuscript Acceptance Date</th>
+              <th className='align-middle bt-0'>Acceptance Date</th>
+              <th className='align-middle bt-0'>Updated Date</th>
             </tr>
           </thead>
           <tbody>
@@ -77,7 +76,7 @@ const RecentInvoicesList: React.FC<RecentCreditNotesListProps> = (props) => {
           pageNeighbours={1}
           onPageChanged={onPageChanged}
           pageLimit={pagination.limit}
-          currentPage={pagination.page}
+          currentPage={1}
         />
       </CardFooter>
     </Card>

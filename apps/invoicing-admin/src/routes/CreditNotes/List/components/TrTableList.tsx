@@ -7,80 +7,51 @@ import numeral from 'numeral';
 import { Badge } from '../../../../components';
 
 /*eslint-disable */
-const INVOICE_STATUS = {
-  FINAL: (
-    <Badge pill color='success'>
-      Final
-    </Badge>
-  ),
-  ACTIVE: (
-    <Badge pill color='primary'>
-      Active
-    </Badge>
-  ),
-  DRAFT: (
-    <Badge pill color='secondary'>
-      Draft
-    </Badge>
-  ),
+const CREATION_REASON = {
+  WITHDRAWN_MANUSCRIPT : 'withdrawn-manuscript',
+  REDUCTION_APPLIED : 'reduction-applied',
+  WAIVED_MANUSCRIPT : 'waived-manuscript',
+  CHANGED_PAYER_DETAILS : 'changed-payer-details',
+  BAD_DEBT : 'bad-debt',
+  OTHER : 'other',
 };
 
-const TrTableInvoicesList = ({ invoices }) => (
+const TrTableCreditNotesList = ( {creditNotes} ) => (
   <React.Fragment>
-    {invoices.map(
+    {creditNotes.map(
       ({
         id,
-        status,
-        referenceNumber,
-        cancelledInvoiceReference,
-        customId,
-        manuscriptTitle,
-        invoiceItem,
+        creationReason,
+        persistentReferenceNumber,
+        price,
         dateIssued,
         dateAccepted,
       }) => (
-        <tr
-          key={id}
-          className={cancelledInvoiceReference ? 'table-warning' : ''}
-        >
+        <tr key={id}>
           <td className='align-middle'>
-            <div>{INVOICE_STATUS[status]}</div>
+            <div>{CREATION_REASON[creationReason]}</div>
           </td>
           <td className='align-middle'>
             <Link
-              to={
-                cancelledInvoiceReference
-                  ? `/credit-notes/details/${id}`
-                  : `/invoices/details/${id}`
-              }
+              to={`/credit-notes/details/${id}`}
               className='text-decoration-none'
             >
               <span
-                className={
-                  cancelledInvoiceReference
-                    ? 'badge badge-warning'
-                    : 'text-secondary'
-                }
+                className={ 'text-secondary'}
               >
                 <strong>
-                  {(cancelledInvoiceReference
-                    ? `CN-${referenceNumber}`
-                    : referenceNumber) || ' '}
+                    `CN-${persistentReferenceNumber}`
                 </strong>
               </span>
             </Link>
           </td>
           <td className='align-middle'>
             <Link
-              to={
-                cancelledInvoiceReference
-                  ? `/credit-notes/details/${id}`
-                  : `/invoices/details/${id}`
-              }
+              to={`/credit-notes/details/${id}`}
               className='text-decoration-none'
             >
               <span className='text-secondary'>
-                {invoiceItem?.article?.customId}
+             
               </span>
             </Link>
           </td>
@@ -90,16 +61,16 @@ const TrTableInvoicesList = ({ invoices }) => (
           <td className='align-middle'>
             <strong
               className={
-                invoiceItem?.price < 0 ? 'text-danger' : 'text-success'
+                price < 0 ? 'text-danger' : 'text-success'
               }
             >
-              {numeral(invoiceItem && invoiceItem.price).format('$0.00')}
+              {numeral(price).format('$0.00')}
             </strong>
           </td>
           <td className='align-left text-truncate' style={{maxWidth: 200}}>
-            {invoiceItem?.article?.journalTitle}
+          
           </td>
-          <td className='align-left text-truncate' style={{maxWidth: 200}}>{invoiceItem?.article?.title}</td>
+          <td className='align-left text-truncate' style={{maxWidth: 200}}></td>
           <td className='align-middle text-nowrap'>
             {dateAccepted && format(new Date(dateAccepted), 'dd MMM yyyy')}
           </td>
@@ -109,4 +80,4 @@ const TrTableInvoicesList = ({ invoices }) => (
   </React.Fragment>
 );
 
-export { TrTableInvoicesList };
+export { TrTableCreditNotesList };

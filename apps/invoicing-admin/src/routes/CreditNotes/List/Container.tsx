@@ -17,7 +17,7 @@ import {
 } from './../../../components';
 import { HeaderMain } from '../../components/HeaderMain';
 import { InvoicesLeftNav } from '../../components/Invoices/InvoicesLeftNav';
-import InvoicesList from './List';
+import CreditNoteList from './CreditNoteList';
 import SuccessfulUrlCopiedToClipboardToast from './components/SuccessfulUrlCopiedToClipboardToast';
 
 const InvoicesContainer: React.FC = () => {
@@ -169,7 +169,7 @@ const InvoicesContainer: React.FC = () => {
                 </UncontrolledTooltip>
               </ButtonGroup>
             </ButtonToolbar>
-            <InvoicesList
+            <CreditNoteList
               state={listState}
               setPage={setFilter}
             />
@@ -273,13 +273,13 @@ const InvoicesContainer: React.FC = () => {
         break;
 
       default:
-        setCustomId(value as string);
-        setPage(1);
+        setPage(value as string);
         writeStorage('invoicesList', {
-          filters: { ...filters, customId: value },
-          pagination: {
+          filters,
+          pagination:{
             ...pagination,
-            page: 1,
+            page: value,
+            offset: Number(value) - 1,
           }
         });
     }
