@@ -1,16 +1,31 @@
 export const CREDIT_NOTE_QUERY = `
-  query getCreditNoteData($id: ID) {
-    invoice(invoiceId: $id) {
-      ...invoiceFragment
-    }
-    getPaymentMethods {
-      ...paymentMethodFragment
-    }
+  query getCreditNoteById($id: ID) {
     getCreditNoteById(creditNoteId: $id) {
       ...creditNoteFragment
     }
   }
-  
+  fragment creditNoteFragment on CreditNote {
+    id
+    invoiceId
+    creationReason
+    vat
+    price
+    persistentReferenceNumber
+    dateCreated
+    dateIssued
+    dateUpdated
+  }
+`;
+
+export const INVOICE_QUERY = `
+query invoice($id: ID) {
+  invoice(invoiceId: $id) {
+    ...invoiceFragment
+  }
+  getPaymentMethods {
+    ...paymentMethodFragment
+  }
+} 
   fragment invoiceFragment on Invoice {
     id: invoiceId
     erpReferences {
@@ -28,6 +43,9 @@ export const CREDIT_NOTE_QUERY = `
     invoiceItem {
       id
       type
+      vat
+      price
+      vatnote
       coupons {
         ...couponFragment
       }
@@ -102,17 +120,6 @@ export const CREDIT_NOTE_QUERY = `
     journalTitle
     datePublished
     preprintValue
-  }
-  fragment creditNoteFragment on CreditNote {
-    id
-    invoiceId
-    creationReason
-    vat
-    price
-    persistentReferenceNumber
-    dateCreated
-    dateIssued
-    dateUpdated
   }
   fragment transactionFragment on Transaction {
     id

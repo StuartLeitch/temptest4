@@ -26,7 +26,7 @@ import {
 import { HeaderMain } from '../components/HeaderMain'
 import { TimelineMini } from '../components/Timeline/TimelineMini';
 
-import { CREDIT_NOTE_QUERY } from './graphql';
+import { CREDIT_NOTE_QUERY, INVOICE_QUERY } from './graphql';
 import CreditNoteDetailsTab from './components/CreditNoteDetailsTab';
 import ArticleDetailsTab from '../Invoice/Details/components/ArticleDetailsTab'
 import PayerDetailsTab from '../Invoice/Details/components/PayerDetailsTab';
@@ -34,12 +34,27 @@ import PayerDetailsTab from '../Invoice/Details/components/PayerDetailsTab';
 const Details: React.FC = () => {
   const { id } = useParams() as any;
 
-  const { loading, error, data } = useQuery(CREDIT_NOTE_QUERY, {
+  const { loading, error, data: creditNoteData } = useQuery(CREDIT_NOTE_QUERY, {
     variables: {
       id,
     },
   });
-  console.log(data)
+
+  const invoiceId = creditNoteData?.getCreditNoteById?.invoiceId
+  
+  const { loading: loadingInvoiceData, error: invoiceDataError, data: invoiceData } = useQuery(INVOICE_QUERY, { variables:{ id: invoiceId} })
+  if (loadingInvoiceData)
+    return (
+      <LoadingOverlay
+        active={loading}
+        spinner={
+          <Spinner style={{ width: '12em', height: '12em' }} color='primary' />
+        }
+      />
+    );
+
+  if (invoiceDataError) return <div>Something Bad Happened</div>;
+ 
   if (loading)
     return (
       <LoadingOverlay
@@ -52,12 +67,14 @@ const Details: React.FC = () => {
 
   if (error) return <div>Something Bad Happened</div>;
 
-  const { invoice } = data;
-  const { status: invoiceStatus, id: invoiceId } = invoice;
+  const { invoice } = invoiceData;
+  const creditNote = creditNoteData?.getCreditNoteById
 
-  const { coupons, waivers, price } = invoice?.invoiceItem;
-  let netCharges = price;
 
+  const { coupons, waivers } = invoice?.invoiceItem;
+  const price = creditNote.price
+  let netCharges = creditNote.price;
+  
   if (coupons?.length) {
     netCharges -= coupons.reduce(
       (acc, coupon) => acc + (coupon.reduction / 100) * price,
@@ -70,22 +87,14 @@ const Details: React.FC = () => {
       0
     );
   }
-  const vat = (netCharges / 100) * invoice?.invoiceItem?.vat;
+  const vat = (netCharges / 100) * creditNote.vat
   const total = netCharges + vat;
-
-  let statusClassName = 'warning';
-  if (invoiceStatus === 'ACTIVE') {
-    statusClassName = 'primary';
-  }
-  if (invoiceStatus === 'FINAL') {
-    statusClassName = 'success';
-  }
 
   return (
     <React.Fragment>
       <Container fluid={true}>
         <HeaderMain
-          title={`Credit Note #CN-${invoice.referenceNumber ?? '---'}`}
+          title={`Credit Note #CN-${creditNote.persistentReferenceNumber ?? '---'}`}
           className='mb-5 mt-4'
         />
         {/* START Header 1 */}
@@ -94,7 +103,7 @@ const Details: React.FC = () => {
             <div className='d-flex mb-3'>
               <ButtonToolbar className='ml-auto'>
                 <UncontrolledButtonDropdown className='mr-3'>
-                  <DropdownToggle
+                  {/* <DropdownToggle
                     color='link'
                     className='p-0 text-decoration-none'
                   >
@@ -103,7 +112,7 @@ const Details: React.FC = () => {
                     ></i>
                     {invoiceStatus}
                     <i className='fas fa-angle-down ml-2' />
-                  </DropdownToggle>
+                  </DropdownToggle> */}
                   <DropdownMenu right>
                     <DropdownItem header>Select Status</DropdownItem>
                     <DropdownItem>
@@ -151,6 +160,7 @@ const Details: React.FC = () => {
                   <CreditNoteDetailsTab
                     invoiceId={invoiceId}
                     invoice={invoice}
+                    creditNote={creditNote}
                     netCharges={netCharges}
                     vat={vat}
                     total={total}

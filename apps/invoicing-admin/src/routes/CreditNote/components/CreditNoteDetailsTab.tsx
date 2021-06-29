@@ -22,11 +22,13 @@ import {
 const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
   invoiceId,
   invoice,
+  creditNote,
   netCharges,
   vat,
   total
 }) => {
-
+  console.log(invoice)
+  console.log(creditNote)
   const creditNoteDetails = () => (
     <>
       <CardTitle tag='h6' className='mb-4'>
@@ -50,7 +52,7 @@ const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
               <DatePicker
               disabled
                 customInput={<ButtonInput />}
-                selected={new Date(invoice.dateIssued)}
+                selected={new Date(creditNote.dateIssued)}
               />
             </Col>
           </FormGroup>
@@ -62,26 +64,10 @@ const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
               <Input
                 plaintext
                 readOnly
-                value={`CN-${invoice.referenceNumber}`}
+                value={`CN-${creditNote.persistentReferenceNumber}`}
               />
             </Col>
           </FormGroup>
-          {invoice.cancelledInvoiceReference && (
-            <FormGroup row>
-              <Label for='staticText' sm={12}>
-                Cancelled Invoice
-                <Link
-                  to={`/invoices/details/${invoice.cancelledInvoiceReference}`}
-                >
-                  {
-                    <span className='ml-1 font-weight-bold text-warning'>
-                      {invoice.referenceNumber}
-                    </span>
-                  }
-                </Link>
-              </Label>
-            </FormGroup>
-          )}
         </div>
       </Form>
     </>
@@ -110,7 +96,7 @@ const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
               </td>
               <td colSpan={2} className='align-middle text-right'>
                 <span>
-                  {numeral(invoice?.invoiceItem?.price).format(
+                  {numeral(creditNote?.price).format(
                     '$0.00'
                   )}
                 </span>
@@ -119,7 +105,7 @@ const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
                 colSpan={2}
                 className='align-middle text-right text-dark font-weight-bold'
               >
-                {numeral(invoice?.invoiceItem?.price).format(
+                {numeral(creditNote?.price).format(
                   '$0.00'
                 )}
               </td>
@@ -132,7 +118,7 @@ const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
                 </span>
               </td>
               <td className='align-middle text-right text-dark font-weight-bold'>
-                {numeral(invoice?.invoiceItem?.price).format(
+                {numeral(creditNote?.price).format(
                   '$0.00'
                 )}
               </td>
@@ -322,6 +308,7 @@ const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
 interface CreditNoteDetailsTabProps {
   invoiceId: string;
   invoice: Invoice;
+  creditNote;
   netCharges: number;
   vat: number;
   total: number;
