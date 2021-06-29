@@ -11,6 +11,8 @@ import {
   GetCreditNoteByReferenceNumberUsecase,
   GetCreditNoteByReferenceNumberDTO,
   GetInvoiceDetailsUsecase,
+  GetCreditNoteByInvoiceIdUsecase,
+  GetCreditNoteByInvoiceIdDTO,
 } from '@hindawi/shared';
 
 import { CreateCreditNoteUsecase } from '../../../../../libs/shared/src/lib/modules/creditNotes/usecases/createCreditNote/createCreditNote';
@@ -25,6 +27,24 @@ export const creditNote: Resolvers<Context> = {
       const request: GetCreditNoteByIdDTO = { creditNoteId: args.creditNoteId };
 
       const usecaseContext = { roles: [Roles.ADMIN] };
+      console.log(request);
+      const result = await usecase.execute(request, usecaseContext);
+
+      if (result.isLeft()) {
+        throw new Error(result.value.message);
+      }
+
+      return CreditNoteMap.toPersistence(result.value);
+    },
+    async getCreditNoteByInvoiceId(parent, args, context) {
+      const { repos } = context;
+      const usecase = new GetCreditNoteByInvoiceIdUsecase(repos.creditNote);
+
+      const request: GetCreditNoteByInvoiceIdDTO = {
+        invoiceId: args.invoiceId,
+      };
+
+      const usecaseContext = { roles: [Roles.ADMIN] };
 
       const result = await usecase.execute(request, usecaseContext);
 
@@ -34,7 +54,6 @@ export const creditNote: Resolvers<Context> = {
 
       return CreditNoteMap.toPersistence(result.value);
     },
-
     async getRecentCreditNotes(parent, args: GetRecentCreditNotesDTO, context) {
       const { repos } = context;
       const usecase = new GetRecentCreditNotesUesecase(repos.creditNote);

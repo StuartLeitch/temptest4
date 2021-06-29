@@ -384,6 +384,7 @@ export type MigrateApc = {
 
 export type Query = {
   __typename?: 'Query';
+  getCreditNoteByInvoiceId?: Maybe<CreditNote>;
   getCreditNoteById?: Maybe<CreditNote>;
   getRecentCreditNotes?: Maybe<PaginatedCreditNotes>;
   getCreditNoteByReferenceNumber?: Maybe<CreditNote>;
@@ -408,6 +409,10 @@ export type QueryInvoiceArgs = {
 
 export type QueryCreditNoteByIdArgs = {
   creditNoteId?: Maybe<Scalars['ID']>;
+};
+
+export type QueryCreditNoteByInvoiceIdArgs = {
+  invoiceId?: Maybe<Scalars['ID']>;
 };
 
 export type QueryRecentCreditNotesArgs = {
@@ -1355,6 +1360,12 @@ export type QueryResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
 > = {
+  getCreditNoteByInvoiceId?: Resolver<
+    Maybe<ResolversTypes['CreditNote']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryCreditNoteByInvoiceIdArgs, never>
+  >;
   getCreditNoteById?: Resolver<
     Maybe<ResolversTypes['CreditNote']>,
     ParentType,

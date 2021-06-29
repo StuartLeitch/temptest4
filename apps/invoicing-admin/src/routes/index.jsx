@@ -7,7 +7,7 @@ import { useAuth } from '../contexts/Auth';
 import CreditNotesList from './CreditNotes/List'
 import InvoicesList from './Invoices/List';
 import InvoiceDetails from './Invoice/Details';
-import CreditNoteDetails from './Invoice/Details/CreditNote';
+import CreditNoteDetails from './CreditNote/CreditNote';
 import CouponsList from './Coupons';
 import { CouponDetails, CouponCreate } from './Coupon';
 

@@ -266,6 +266,7 @@ export * from './modules/creditNotes/usecases/getRecentCreditNotes/getRecentCred
 export * from './modules/creditNotes/usecases/getRecentCreditNotes/getRecentCreditNotesDTO';
 export * from './modules/creditNotes/usecases/createCreditNote/createCreditNote';
 export * from './modules/creditNotes/usecases/getCreditNoteByInvoiceId/getCreditNoteByInvoiceId';
+export * from './modules/creditNotes/usecases/getCreditNoteByInvoiceId/getCreditNoteByInvoiceIdDTO';
 export * from './modules/creditNotes/usecases/getCreditNoteByReferenceNumber/getCreditNoteByReferenceNumber';
 export * from './modules/creditNotes/usecases/getCreditNoteByReferenceNumber/getCreditNoteByReferenceNumberDTO';
 

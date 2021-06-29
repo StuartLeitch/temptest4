@@ -336,6 +336,7 @@ input MigrateAPC {
 }
 
 type Query {
+  getCreditNoteByInvoiceId(invoiceId: ID): CreditNote
   getCreditNoteById(creditNoteId: ID): CreditNote
   getRecentCreditNotes(
     filters: InvoiceFilters
