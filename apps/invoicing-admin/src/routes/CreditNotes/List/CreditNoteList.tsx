@@ -16,11 +16,11 @@ import { Loading } from '../../components';
 
 import { CREDIT_NOTES_QUERY } from './graphql';
 
-const RecentInvoicesList: React.FC<RecentCreditNotesListProps> = (props) => {
+const RecentCreditNotesList: React.FC<RecentCreditNotesListProps> = (props) => {
   const { pagination: defaultPaginator, filters } = props.state;
 
   const [{ pagination }] = useLocalStorage(
-    'creditNotesList',
+    'invoicesList',
     { pagination:  defaultPaginator, filters }
   );
 
@@ -47,8 +47,9 @@ const RecentInvoicesList: React.FC<RecentCreditNotesListProps> = (props) => {
 
   if (loading) return <Loading />;
   if (error) return <Error data={error as any} />;
-  
+
   if(data) {
+    
     return (
       <Card className='mb-0'>
         {/* START Table */}
@@ -58,7 +59,7 @@ const RecentInvoicesList: React.FC<RecentCreditNotesListProps> = (props) => {
               <tr>
                 <th className='align-middle bt-0'>Reason</th>
                 <th className='align-middle bt-0'>Reference</th>
-                <th className='align-middle bt-0'>Price</th>
+                <th className='align-middle bt-0'>APC</th>
                 <th className='align-middle bt-0'>Vat</th>
                 <th className='align-middle bt-0'>Date Issued</th>
                 <th className='align-middle bt-0'>Date Created</th>
@@ -72,12 +73,11 @@ const RecentInvoicesList: React.FC<RecentCreditNotesListProps> = (props) => {
         {/* END Table */}
         <CardFooter className='d-flex justify-content-center pb-0'>
           <ListPagination
-            totalRecords={data?.creditNotes?.totalCount}
+            totalRecords={data?.getRecentCreditNotes?.totalCount}
             pageNeighbours={1}
             onPageChanged={onPageChanged}
             pageLimit={pagination.limit}
-            // to be changed from 1 to value
-            currentPage={1}
+            currentPage={pagination.page}
           />
         </CardFooter>
       </Card>
@@ -105,4 +105,4 @@ interface RecentCreditNotesListProps {
   setPage(key: string, value: string | boolean | any[]): void;
 }
 
-export default RecentInvoicesList;
+export default RecentCreditNotesList;

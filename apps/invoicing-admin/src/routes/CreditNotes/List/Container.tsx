@@ -20,7 +20,7 @@ import { InvoicesLeftNav } from '../../components/Invoices/InvoicesLeftNav';
 import CreditNoteList from './CreditNoteList';
 import SuccessfulUrlCopiedToClipboardToast from './components/SuccessfulUrlCopiedToClipboardToast';
 
-const InvoicesContainer: React.FC = () => {
+const CreditNoteContainer: React.FC = () => {
   const defaultFilters = {
     invoiceStatus: [],
     transactionStatus: [],
@@ -34,35 +34,17 @@ const InvoicesContainer: React.FC = () => {
     limit: 10,
   };
 
-  const [invoiceStatus, setInvoiceStatus] = useQueryState(
-    'invoiceStatus',
-    (defaultFilters as any).invoiceStatus
-  );
-  const [transactionStatus, setTransactionStatus] = useQueryState(
-    'transactionStatus',
-    (defaultFilters as any).transactionStatus
-  );
-  const [journalId, setJournalId] = useQueryState(
-    'journalId',
-    (defaultFilters as any).journalId
-  );
+  
   const [referenceNumber, setReferenceNumber] = useQueryState(
     'referenceNumber',
     (defaultFilters as any).referenceNumber
   );
-  const [customId, setCustomId] = useQueryState(
-    'customId',
-    (defaultFilters as any).customId
-  );
+  
 
   const [listState] = useLocalStorage('invoicesList', { filters:defaultFilters, pagination: defaultPagination});
   let { filters, pagination } = listState;
   const queryFilters = {
-    invoiceStatus,
-    transactionStatus,
-    journalId,
     referenceNumber,
-    customId,
   };
 
   // * When no query strings provided in the URL
@@ -96,11 +78,7 @@ const InvoicesContainer: React.FC = () => {
 
   const buildURLWithFilters = (_filters, _pagination) => {
     const {
-      invoiceStatus: _invoiceStatus,
-      transactionStatus: _transactionStatus,
-      journalId: _journalId,
       referenceNUmber: _referenceNumber,
-      customId: _customId,
     } = _filters;
     const { page: _page } = _pagination;
 
@@ -108,25 +86,10 @@ const InvoicesContainer: React.FC = () => {
     let queryString = '';
     if (Object.keys(Object.assign({}, _filters, _pagination)).length) {
       queryString += '?';
-      queryString += _invoiceStatus.reduce(
-        (qs, is) => (qs += `invoiceStatus=${is}&`),
-        ''
-      );
-      queryString += _transactionStatus.reduce(
-        (qs, ts) => (qs += `transactionStatus=${ts}&`),
-        ''
-      );
-      queryString += _journalId.reduce(
-        (qs, ji) => (qs += `journalId=${ji}&`),
-        ''
-      );
+    
 
       if (_referenceNumber) {
         queryString += `referenceNumber=${_referenceNumber}&`;
-      }
-
-      if (_customId) {
-        queryString += `customId=${_customId}&`;
       }
 
       if (_page) {
@@ -186,67 +149,8 @@ const InvoicesContainer: React.FC = () => {
    * @param value The value of the filter being updated (varies by input type)
    */
   function setFilter(key: string, value: boolean | string | any[]) {
-    const [name, status] = ParseUtils.parseEvent(key);
-    let newStatus = [];
-    let newTransactionStatus = [];
-    let newJournalId = [];
-
+    const [name] = ParseUtils.parseEvent(key);
     switch (name) {
-      case 'invoiceStatus':
-        if (filters.invoiceStatus.includes(status)) {
-          newStatus = filters.invoiceStatus.filter((s) => s !== status);
-        } else {
-          newStatus = [...filters.invoiceStatus, status];
-        }
-
-        setInvoiceStatus(newStatus);
-        setPage(1);
-        writeStorage('invoicesList', {
-          filters: {
-            ...filters,
-            invoiceStatus: newStatus,
-          },
-          pagination: {
-            ...pagination,
-            page: 1
-          }
-        });
-
-        break;
-
-      case 'transactionStatus':
-        if (filters.transactionStatus.includes(status)) {
-          newTransactionStatus = filters.transactionStatus.filter(
-            (s) => s !== status
-          );
-        } else {
-          newTransactionStatus = [...filters.transactionStatus, status];
-        }
-        setTransactionStatus(newTransactionStatus);
-        setPage(1);
-
-        writeStorage('invoicesList', {
-          filters: {
-          ...filters,
-          transactionStatus: newTransactionStatus,
-        }, pagination: {
-          ...pagination,
-          page: 1,
-        }});
-        break;
-
-      case 'journalTitle':
-        newJournalId = (value as any[]).map((j) => j.journalId);
-        setJournalId(newJournalId);
-        setPage(1);
-        writeStorage('invoicesList', { filters: {
-          ...filters,
-          journalId: newJournalId,
-        }, pagination: {
-          ...pagination,
-          page: 1,
-        }});
-        break;
 
       case 'referenceNumber':
         setPage(1);
@@ -286,4 +190,4 @@ const InvoicesContainer: React.FC = () => {
   }
 };
 
-export default InvoicesContainer;
+export default CreditNoteContainer;
