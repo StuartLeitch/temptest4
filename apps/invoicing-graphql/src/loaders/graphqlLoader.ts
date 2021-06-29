@@ -34,9 +34,17 @@ export const graphqlLoader: MicroframeworkLoader = (
       schemaDirectives: KeycloakSchemaDirectives, // 2. Add the KeycloakSchemaDirectives
       resolvers,
       context: ({ req }) => {
+        let aa;
+        try {
+          aa = new KeycloakContext({ req } as any); // 3. add the KeycloakContext to `kAuth`
+        } catch (e) {
+          console.log('--------------------------------');
+          console.log(e);
+          console.log('--------------------------------');
+        }
         return {
           ...context,
-          keycloakAuth: new KeycloakContext({ req } as any), // 3. add the KeycloakContext to `kAuth`
+          keycloakAuth: aa,
         };
       },
       playground: env.graphql.editor,
@@ -51,21 +59,22 @@ export const graphqlLoader: MicroframeworkLoader = (
 };
 
 function configureKeycloak(app, graphqlPath) {
-  const keycloakConfig = JSON.parse(
-    fs.readFileSync(path.resolve(__dirname, './keycloak.json')).toString()
-  );
+  // const keycloakConfig = JSON.parse(
+  //   fs.readFileSync(path.resolve(__dirname, './keycloak.json')).toString()
+  // );
+  const keycloakConfig = env.app.keycloakConfig;
   const memoryStore = new session.MemoryStore();
 
-  app.use(
-    session({
-      secret:
-        process.env.SESSION_SECRET_STRING ||
-        'th1s 5h0u1d b3 a we11-h1dden s3cr3t',
-      resave: false,
-      saveUninitialized: true,
-      store: memoryStore,
-    })
-  );
+  // app.use(
+  //   session({
+  //     secret:
+  //       process.env.SESSION_SECRET_STRING ||
+  //       'th1s 5h0u1d b3 a we11-h1dden s3cr3t',
+  //     resave: false,
+  //     saveUninitialized: true,
+  //     store: memoryStore,
+  //   })
+  // );
 
   const keycloak = new Keycloak(
     {

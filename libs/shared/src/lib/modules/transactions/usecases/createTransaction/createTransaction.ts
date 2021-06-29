@@ -46,9 +46,8 @@ import {
 } from './helper-types';
 
 export class CreateTransactionUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -58,6 +57,8 @@ export class CreateTransactionUsecase
     private invoiceRepo: InvoiceRepoContract,
     private waiverService: WaiverService
   ) {
+    super();
+
     this.createInvoiceItems = this.createInvoiceItems.bind(this);
     this.saveRemindersState = this.saveRemindersState.bind(this);
     this.createTransaction = this.createTransaction.bind(this);
@@ -69,10 +70,6 @@ export class CreateTransactionUsecase
     this.getManuscript = this.getManuscript.bind(this);
     this.saveInvoice = this.saveInvoice.bind(this);
     this.getCatalog = this.getCatalog.bind(this);
-  }
-
-  private async getAccessControlContext(request, context?) {
-    return {};
   }
 
   @Authorize('transaction:create')

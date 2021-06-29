@@ -7,8 +7,8 @@ import { UseCase } from '../../../../../core/domain/UseCase';
 import { EventUtils } from '../../../../../utils/EventUtils';
 
 // * Authorization Logic
+import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
 import {
-  UsecaseAuthorizationContext,
   AccessControlledUsecase,
   AccessControlContext,
 } from '../../../../../domain/authorization';
@@ -28,19 +28,13 @@ import * as Errors from './publishInvoiceConfirmed.errors';
 const INVOICE_CONFIRMED = 'InvoiceConfirmed';
 
 export class PublishInvoiceConfirmedUsecase
-  implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
-  constructor(private publishService: SQSPublishServiceContract) {}
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
+  constructor(private publishService: SQSPublishServiceContract) {
+    super();
+  }
 
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const validRequest = this.verifyInput(request);
     if (validRequest.isLeft()) {
       return validRequest;

@@ -18,7 +18,7 @@ import { CouponRepoContract } from '../../repos/couponRepo';
 import { InvoiceItemType } from '../../../invoices/domain/InvoiceItem';
 
 import { CreateCouponResponse as Response } from './createCouponResponse';
-import { CreateCouponDTO as DTO } from './createCouponDTO';
+import type { CreateCouponDTO as DTO } from './createCouponDTO';
 import * as Errors from './createCouponErrors';
 
 import { CouponCode } from '../../domain/CouponCode';

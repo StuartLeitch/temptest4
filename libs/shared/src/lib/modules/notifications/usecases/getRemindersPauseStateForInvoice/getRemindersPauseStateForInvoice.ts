@@ -23,7 +23,7 @@ import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
 // * Usecase specific
 import { GetRemindersPauseStateForInvoiceResponse as Response } from './getRemindersPauseStateForInvoiceResponse';
-import { GetRemindersPauseStateForInvoiceDTO as DTO } from './getRemindersPauseStateForInvoiceDTO';
+import type { GetRemindersPauseStateForInvoiceDTO as DTO } from './getRemindersPauseStateForInvoiceDTO';
 import * as Errors from './getRemindersPauseStateForInvoiceErrors';
 
 export class GetRemindersPauseStateForInvoiceUsecase

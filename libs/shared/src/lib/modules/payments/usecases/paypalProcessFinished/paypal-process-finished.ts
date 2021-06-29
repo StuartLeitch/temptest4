@@ -35,19 +35,16 @@ interface WithPayment {
 }
 
 export class PayPalProcessFinishedUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private paymentRepo: PaymentRepoContract) {
+    super();
+
     this.dispatchEvents = this.dispatchEvents.bind(this);
     this.updatePaymentStatus = this.updatePaymentStatus.bind(this);
     this.savePaymentChanges = this.savePaymentChanges.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
     this.attachPayment = this.attachPayment.bind(this);
-  }
-
-  private async getAccessControlContext(request, context?) {
-    return {};
   }
 
   @Authorize('payments:update')

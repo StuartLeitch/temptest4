@@ -46,18 +46,15 @@ interface DomainEventsDispatchData extends WithPayment {
 }
 
 export class CreatePaymentUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private paymentRepo: PaymentRepoContract) {
+    super();
+
     this.setAndDispatchEvents = this.setAndDispatchEvents.bind(this);
     this.validateRequired = this.validateRequired.bind(this);
     this.createPayment = this.createPayment.bind(this);
     this.savePayment = this.savePayment.bind(this);
-  }
-
-  private async getAccessControlContext(request, context?) {
-    return {};
   }
 
   @Authorize('payments:create')

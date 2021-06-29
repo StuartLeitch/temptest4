@@ -72,3 +72,7 @@ export function normalizePort(port: string): number | string | boolean {
   }
   return false;
 }
+
+export function toObject(value: string): any {
+  return JSON.parse(value);
+}

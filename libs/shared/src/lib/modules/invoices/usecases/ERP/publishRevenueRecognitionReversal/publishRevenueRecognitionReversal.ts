@@ -39,9 +39,8 @@ import { PublishRevenueRecognitionReversalDTO as DTO } from './publishRevenueRec
 import * as Errors from './publishRevenueRecognitionReversal.errors';
 
 export class PublishRevenueRecognitionReversalUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -55,10 +54,8 @@ export class PublishRevenueRecognitionReversalUsecase
     private erpReferenceRepo: ErpReferenceRepoContract,
     private erpService: ErpServiceContract,
     private loggerService: LoggerContract
-  ) {}
-
-  private async getAccessControlContext(request: any, context?: any) {
-    return {};
+  ) {
+    super();
   }
 
   public async execute(request: DTO, context?: Context): Promise<Response> {

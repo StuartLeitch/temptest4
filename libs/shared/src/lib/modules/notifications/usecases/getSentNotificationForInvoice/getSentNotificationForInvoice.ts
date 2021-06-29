@@ -23,7 +23,7 @@ import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
 // * Usecase specific
 import { GetSentNotificationForInvoiceResponse as Response } from './getSentNotificationForInvoiceResponse';
-import { GetSentNotificationForInvoiceDTO as DTO } from './getSentNotificationForInvoiceDTO';
+import type { GetSentNotificationForInvoiceDTO as DTO } from './getSentNotificationForInvoiceDTO';
 import * as Errors from './getSentNotificationForInvoiceErrors';
 
 export class GetSentNotificationForInvoiceUsecase

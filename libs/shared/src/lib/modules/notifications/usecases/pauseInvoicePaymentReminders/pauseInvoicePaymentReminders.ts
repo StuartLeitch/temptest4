@@ -23,7 +23,7 @@ import { InvoiceRepoContract } from '../../../invoices/repos';
 
 // * Usecase specific
 import { PauseInvoicePaymentRemindersResponse as Response } from './pauseInvoicePaymentRemindersResponse';
-import { PauseInvoicePaymentRemindersDTO as DTO } from './pauseInvoicePaymentRemindersDTO';
+import type { PauseInvoicePaymentRemindersDTO as DTO } from './pauseInvoicePaymentRemindersDTO';
 import * as Errors from './pauseInvoicePaymentRemindersErrors';
 
 export class PauseInvoicePaymentRemindersUsecase

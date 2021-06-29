@@ -4,10 +4,11 @@ import { right, left } from '../../../../../core/logic/Either';
 import { UseCase } from '../../../../../core/domain/UseCase';
 
 // * Authorization Logic
+import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
 import {
-  UsecaseAuthorizationContext,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../../domain/authorization';
 
 import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
@@ -37,21 +38,12 @@ import { InvoiceId } from '../../../domain/InvoiceId';
 import { Invoice } from '../../../domain/Invoice';
 
 import { GetItemsForInvoiceUsecase } from '../../getItemsForInvoice/getItemsForInvoice';
-import { PublishInvoiceToErpResponse } from './publishInvoiceToErpResponse';
-import { PublishInvoiceToErpRequestDTO } from './publishInvoiceToErpDTO';
+import { PublishInvoiceToErpResponse as Response } from './publishInvoiceToErpResponse';
+import { PublishInvoiceToErpRequestDTO as DTO } from './publishInvoiceToErpDTO';
 
 export class PublishInvoiceToErpUsecase
-  implements
-    UseCase<
-      PublishInvoiceToErpRequestDTO,
-      Promise<PublishInvoiceToErpResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      PublishInvoiceToErpRequestDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -66,17 +58,12 @@ export class PublishInvoiceToErpUsecase
     private publisherRepo: PublisherRepoContract,
     private loggerService: LoggerContract,
     private vatService: VATService
-  ) {}
-
-  private async getAccessControlContext(request: any, context?: any) {
-    return {};
+  ) {
+    super();
   }
 
   // @Authorize('zzz:zzz')
-  public async execute(
-    request: PublishInvoiceToErpRequestDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<PublishInvoiceToErpResponse> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     this.loggerService.setScope('PublishInvoiceToERP');
     this.loggerService.info('PublishInvoiceToERP Request', request);
 

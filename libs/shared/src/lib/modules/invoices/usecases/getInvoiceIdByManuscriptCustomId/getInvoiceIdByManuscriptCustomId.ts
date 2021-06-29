@@ -19,7 +19,7 @@ import { InvoiceItemRepoContract } from './../../repos/invoiceItemRepo';
 
 // * Usecase specific
 import { GetInvoiceIdByManuscriptCustomIdResponse as Response } from './getInvoiceIdByManuscriptCustomIdResponse';
-import { GetInvoiceIdByManuscriptCustomIdDTO as DTO } from './getInvoiceIdByManuscriptCustomIdDTO';
+import type { GetInvoiceIdByManuscriptCustomIdDTO as DTO } from './getInvoiceIdByManuscriptCustomIdDTO';
 import * as Errors from './getInvoiceIdByManuscriptCustomIdErrors';
 
 export class GetInvoiceIdByManuscriptCustomIdUsecase

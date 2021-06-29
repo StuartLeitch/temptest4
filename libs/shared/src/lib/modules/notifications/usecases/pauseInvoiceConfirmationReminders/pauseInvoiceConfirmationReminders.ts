@@ -6,8 +6,8 @@ import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
   AccessControlContext,
   Authorize,
@@ -23,7 +23,7 @@ import { InvoiceRepoContract } from '../../../invoices/repos';
 
 // * Usecase specific
 import { PauseInvoiceConfirmationRemindersResponse as Response } from './pauseInvoiceConfirmationRemindersResponse';
-import { PauseInvoiceConfirmationRemindersDTO as DTO } from './pauseInvoiceConfirmationRemindersDTO';
+import type { PauseInvoiceConfirmationRemindersDTO as DTO } from './pauseInvoiceConfirmationRemindersDTO';
 import * as Errors from './pauseInvoiceConfirmationRemindersErrors';
 
 export class PauseInvoiceConfirmationRemindersUsecase

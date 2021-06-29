@@ -11,6 +11,8 @@ export function handleForbiddenUsecase(result: Either<UseCaseError, unknown>) {
 }
 
 export function getAuthRoles(context: Context): Array<Roles> {
+  // console.log(JSON.stringify(context, null, 2));
+  console.log('accessToken', context.keycloakAuth.accessToken);
   if (!context.keycloakAuth.accessToken) {
     throw new AuthenticationError('You must be logged in!');
   }

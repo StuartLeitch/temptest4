@@ -50,7 +50,7 @@ import { PauseInvoicePaymentRemindersUsecase } from '../pauseInvoicePaymentRemin
 
 // * Usecase specific
 import { ScheduleRemindersForExistingInvoicesResponse as Response } from './scheduleRemindersForExistingInvoicesResponse';
-import { ScheduleRemindersForExistingInvoicesDTO as DTO } from './scheduleRemindersForExistingInvoicesDTO';
+import type { ScheduleRemindersForExistingInvoicesDTO as DTO } from './scheduleRemindersForExistingInvoicesDTO';
 import * as Errors from './scheduleRemindersForExistingInvoicesErrors';
 
 interface InvoiceIdDTO extends DTO {

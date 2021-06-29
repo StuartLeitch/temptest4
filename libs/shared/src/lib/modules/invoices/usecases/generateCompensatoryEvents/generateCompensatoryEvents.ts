@@ -62,7 +62,7 @@ import {
 
 // * Usecase specific
 import { GenerateCompensatoryEventsResponse as Response } from './generateCompensatoryEventsResponse';
-import { GenerateCompensatoryEventsDTO as DTO } from './generateCompensatoryEventsDTO';
+import type { GenerateCompensatoryEventsDTO as DTO } from './generateCompensatoryEventsDTO';
 import * as Errors from './generateCompensatoryEventsErrors';
 
 import {

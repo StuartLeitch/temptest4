@@ -21,19 +21,13 @@ import type { GetManuscriptByManuscriptIdDTO as DTO } from './getManuscriptByMan
 import * as Errors from './getManuscriptByManuscriptIdErrors';
 
 export class GetManuscriptByManuscriptIdUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
-  constructor(private manuscriptRepo: ManuscriptRepoContract) {}
-
-  private async getAccessControlContext(
-    request: DTO,
-    context?: Context
-  ): Promise<AccessControlContext> {
-    return {};
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
+  constructor(private manuscriptRepo: ManuscriptRepoContract) {
+    super();
   }
 
-  @Authorize('read:manuscript')
+  @Authorize('manuscript:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const manuscriptId = ManuscriptId.create(
       new UniqueEntityID(request.manuscriptId)

@@ -51,7 +51,7 @@ import {
 } from './helper-types';
 
 import { RecordPaymentResponse as Response } from './recordPaymentResponse';
-import { RecordPaymentDTO as DTO } from './recordPaymentDTO';
+import type { RecordPaymentDTO as DTO } from './recordPaymentDTO';
 import * as Errors from './recordPaymentErrors';
 
 export type Context = UsecaseAuthorizationContext & {

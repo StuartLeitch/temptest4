@@ -46,7 +46,7 @@ import { AreNotificationsPausedUsecase } from '../areNotificationsPaused';
 
 // * Usecase specific
 import { ResumeInvoicePaymentRemindersResponse as Response } from './resumeInvoicePaymentRemindersResponse';
-import { ResumeInvoicePaymentRemindersDTO as DTO } from './resumeInvoicePaymentRemindersDTO';
+import type { ResumeInvoicePaymentRemindersDTO as DTO } from './resumeInvoicePaymentRemindersDTO';
 import * as Errors from './resumeInvoicePaymentRemindersErrors';
 
 interface CompoundDTO extends DTO {

@@ -62,9 +62,8 @@ interface PayerDataDomain {
 }
 
 export class ConfirmInvoiceUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   receiverEmail: string;
   senderEmail: string;
 
@@ -80,6 +79,8 @@ export class ConfirmInvoiceUsecase
     private emailService: EmailService,
     private vatService: VATService
   ) {
+    super();
+
     this.isFromSanctionedCountry = this.isFromSanctionedCountry.bind(this);
     this.getTransactionDetails = this.getTransactionDetails.bind(this);
     this.markInvoiceAsPending = this.markInvoiceAsPending.bind(this);
