@@ -27,7 +27,7 @@ export const creditNote: Resolvers<Context> = {
       const request: GetCreditNoteByIdDTO = { creditNoteId: args.creditNoteId };
 
       const usecaseContext = { roles: [Roles.ADMIN] };
-      console.log(request);
+
       const result = await usecase.execute(request, usecaseContext);
 
       if (result.isLeft()) {

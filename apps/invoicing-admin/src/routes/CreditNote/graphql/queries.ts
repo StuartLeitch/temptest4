@@ -45,7 +45,6 @@ query invoice($id: ID) {
       type
       vat
       price
-      vatnote
       coupons {
         ...couponFragment
       }

@@ -3,7 +3,7 @@ import numeral from 'numeral';
 import format from 'date-fns/format';
 import { Link } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
-import { Invoice } from '../../Invoice/Details/types';
+import { Invoice, CreditNote } from '../../Invoice/Details/types';
 import { ButtonInput } from '../../Forms/DatePicker/components/ButtonInput'
 import {
   Badge,
@@ -27,8 +27,7 @@ const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
   vat,
   total
 }) => {
-  console.log(invoice)
-  console.log(creditNote)
+  
   const creditNoteDetails = () => (
     <>
       <CardTitle tag='h6' className='mb-4'>
@@ -308,7 +307,7 @@ const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
 interface CreditNoteDetailsTabProps {
   invoiceId: string;
   invoice: Invoice;
-  creditNote;
+  creditNote: CreditNote;
   netCharges: number;
   vat: number;
   total: number;
