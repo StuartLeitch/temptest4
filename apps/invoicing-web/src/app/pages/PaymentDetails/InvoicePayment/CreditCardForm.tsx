@@ -283,7 +283,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
         return;
       }
 
-      this.setState(
+      self.setState(
         state => ({ ...state, token, error: null }),
         () => {
           // send nonce and verification data to your server
