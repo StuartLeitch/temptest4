@@ -1,3 +1,16 @@
+export const CREDIT_NOTE_QUERY = `
+  query getCreditNoteByInvoiceId($id: ID) {
+    getCreditNoteByInvoiceId(invoiceId: $id) {
+      ...creditNoteFragment
+    }
+  }
+  fragment creditNoteFragment on CreditNote {
+    id
+    invoiceId
+    persistentReferenceNumber
+  }
+`;
+
 export const INVOICE_QUERY = `
   query invoice($id: ID) {
     invoice(invoiceId: $id) {

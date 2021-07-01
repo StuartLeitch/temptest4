@@ -127,9 +127,6 @@ const CreditNoteContainer: React.FC = () => {
                 >
                   <i className='text-blue fas fa-fw fa-share-square'></i>
                 </Button>
-                <UncontrolledTooltip placement='bottom' target='tooltipFav'>
-                  Share Search Filters
-                </UncontrolledTooltip>
               </ButtonGroup>
             </ButtonToolbar>
             <CreditNoteList
@@ -151,30 +148,6 @@ const CreditNoteContainer: React.FC = () => {
   function setFilter(key: string, value: boolean | string | any[]) {
     const [name] = ParseUtils.parseEvent(key);
     switch (name) {
-
-      case 'referenceNumber':
-        setPage(1);
-        setReferenceNumber(value as string);
-        writeStorage('invoicesList',{ filters: {
-          ...filters,
-          referenceNumber: value,
-        }, pagination: {
-          ...pagination,
-          page: 1,
-        }});
-        break;
-
-      case 'page':
-        setPage(value as string);
-        writeStorage('invoicesList', {
-          filters,
-          pagination:{
-            ...pagination,
-            page: value,
-            offset: Number(value) - 1,
-          }
-        });
-        break;
 
       default:
         setPage(value as string);

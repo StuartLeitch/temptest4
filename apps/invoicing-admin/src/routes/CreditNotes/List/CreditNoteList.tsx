@@ -20,9 +20,17 @@ const RecentCreditNotesList: React.FC<RecentCreditNotesListProps> = (props) => {
   const { pagination: defaultPaginator, filters } = props.state;
 
   const [{ pagination }] = useLocalStorage(
-    'invoicesList',
+    'creditNotesList',
     { pagination:  defaultPaginator, filters }
   );
+
+  const defaultFilters = {
+    invoiceStatus: [],
+    transactionStatus: [],
+    journalId: [],
+    referenceNumber: '',
+    customId: '',
+  };
 
   const [fetchCreditNotes, { loading, error, data }] = useManualQuery(
     CREDIT_NOTES_QUERY

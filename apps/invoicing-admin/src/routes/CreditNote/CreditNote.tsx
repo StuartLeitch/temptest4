@@ -34,7 +34,7 @@ import PayerDetailsTab from '../Invoice/Details/components/PayerDetailsTab';
 const Details: React.FC = () => {
   const { id } = useParams() as any;
 
-  const { loading, error, data: creditNoteData } = useQuery(CREDIT_NOTE_QUERY, {
+  const { loading: loadingCreditNoteData, error: creditNoteDataError, data: creditNoteData } = useQuery(CREDIT_NOTE_QUERY, {
     variables: {
       id,
     },
@@ -42,30 +42,34 @@ const Details: React.FC = () => {
 
   const invoiceId = creditNoteData?.getCreditNoteById?.invoiceId
   
-  const { loading: loadingInvoiceData, error: invoiceDataError, data: invoiceData } = useQuery(INVOICE_QUERY, { variables:{ id: invoiceId} })
+  const { loading: loadingInvoiceData, error: invoiceDataError, data: invoiceData } = useQuery(INVOICE_QUERY, {
+     variables: { 
+       id: invoiceId, 
+    }, 
+  });
+
+  if (loadingCreditNoteData)
+    return (
+      <LoadingOverlay
+        active={loadingCreditNoteData}
+        spinner={
+          <Spinner style={{ width: '12em', height: '12em' }} color='primary' />
+        }
+      />
+    );
+
   if (loadingInvoiceData)
     return (
       <LoadingOverlay
-        active={loading}
+        active={loadingInvoiceData}
         spinner={
           <Spinner style={{ width: '12em', height: '12em' }} color='primary' />
         }
       />
     );
 
-  if (invoiceDataError) return <div>Something Bad Happened</div>;
+  if (loadingCreditNoteData || invoiceDataError) return <div>Something Bad Happened</div>;
  
-  if (loading)
-    return (
-      <LoadingOverlay
-        active={loading}
-        spinner={
-          <Spinner style={{ width: '12em', height: '12em' }} color='primary' />
-        }
-      />
-    );
-
-  if (error) return <div>Something Bad Happened</div>;
 
   const { invoice } = invoiceData;
   const creditNote = creditNoteData?.getCreditNoteById
@@ -103,16 +107,6 @@ const Details: React.FC = () => {
             <div className='d-flex mb-3'>
               <ButtonToolbar className='ml-auto'>
                 <UncontrolledButtonDropdown className='mr-3'>
-                  {/* <DropdownToggle
-                    color='link'
-                    className='p-0 text-decoration-none'
-                  >
-                    <i
-                      className={`fas fa-circle text-${statusClassName} mr-2`}
-                    ></i>
-                    {invoiceStatus}
-                    <i className='fas fa-angle-down ml-2' />
-                  </DropdownToggle> */}
                   <DropdownMenu right>
                     <DropdownItem header>Select Status</DropdownItem>
                     <DropdownItem>

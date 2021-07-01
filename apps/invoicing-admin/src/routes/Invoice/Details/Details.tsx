@@ -32,7 +32,7 @@ import PayerDetailsTab from './components/PayerDetailsTab';
 import InvoiceTimeline from './components/InvoiceTimeline';
 import ErpReferencesTab from './components/ErpReferencesTab'
 
-import { INVOICE_QUERY } from '../graphql';
+import { INVOICE_QUERY, CREDIT_NOTE_QUERY } from '../graphql';
 import AddPaymentModal from './components/AddPaymentModal';
 
 const APPLY_COUPON_MODAL_TARGET = 'applyCouponModal';
@@ -50,6 +50,15 @@ const Details: React.FC = (props) => {
     }
   );
 
+  const { data: creditNoteData} = useQuery(
+    CREDIT_NOTE_QUERY,
+    {
+      variables: {
+        id,
+      },
+    }
+  );
+  
   if (loading) return <Loading />;
 
   if (error || typeof data === undefined)
@@ -57,8 +66,8 @@ const Details: React.FC = (props) => {
 
   const { invoice, getPaymentMethods } = data;
   const { status, id: invoiceId, transaction } = invoice;
-
-  // console.info(invoice);
+  
+  const creditNote = creditNoteData.getCreditNoteByInvoiceId
 
   // * -> Net and total charges computing
   const { vat, coupons, waivers, price } = invoice?.invoiceItem;
@@ -241,6 +250,7 @@ const Details: React.FC = (props) => {
                   <InvoiceDetailsTab
                     invoiceId={invoiceId}
                     invoice={invoice}
+                    creditNote={creditNote}
                     netCharges={netCharges}
                     vatAmount={vatAmount}
                     totalCharges={totalCharges}
