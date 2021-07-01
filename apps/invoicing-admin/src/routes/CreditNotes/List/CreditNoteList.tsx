@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useManualQuery } from 'graphql-hooks';
-import { Filters } from '@utils';
-import { useLocalStorage } from '@rehooks/local-storage';
+import { useQueryState } from 'react-router-use-location-state';
 
 import {
+  Container,
   Card,
   CardFooter,
   Error,
@@ -13,45 +13,47 @@ import {
 
 import { TrTableCreditNotesList } from './components/TrTableList';
 import { Loading } from '../../components';
+import { HeaderMain } from '../../components/HeaderMain';
 
 import { CREDIT_NOTES_QUERY } from './graphql';
 
-const RecentCreditNotesList: React.FC<RecentCreditNotesListProps> = (props) => {
-  const { pagination: defaultPaginator, filters } = props.state;
+const defaultPaginationSettings = { page: 1, offset: 0, limit: 10 };
 
-  const [{ pagination }] = useLocalStorage(
-    'creditNotesList',
-    { pagination:  defaultPaginator, filters }
-  );
-
-  const defaultFilters = {
-    invoiceStatus: [],
-    transactionStatus: [],
-    journalId: [],
-    referenceNumber: '',
-    customId: '',
-  };
+const RecentCreditNotesList: React.FC = () => {
 
   const [fetchCreditNotes, { loading, error, data }] = useManualQuery(
     CREDIT_NOTES_QUERY
   );
 
-  const onPageChanged = ({ currentPage }: any) => {
-    props.setPage('page', currentPage);
+  const [page, setPageInUrl] = useQueryState(
+    'page',
+    defaultPaginationSettings.page
+  );
+  const fetchData = useCallback(
+    async (currentPage) => {
+      await fetchCreditNotes({
+        variables: {
+          pagination: {
+            ...defaultPaginationSettings,
+            page: currentPage,
+            offset: currentPage - 1,
+          },
+        },
+      });
+    },
+    [fetchCreditNotes]
+  );
+
+  const onPageChange = (paginationData: { currentPage: number }) => {
+    const { currentPage } = paginationData;
+
+    fetchData(currentPage);
+    setPageInUrl(currentPage);
   };
 
   useEffect(() => {
-    async function fetchData() {
-      const { filters, pagination } = props.state;
-      await fetchCreditNotes({
-        variables: {
-          filters: Filters.collect(filters),
-          pagination,
-        },
-      });
-    }
-    fetchData();
-  }, [fetchCreditNotes, props.state]);
+    fetchData(page);
+  }, [fetchData, page, fetchCreditNotes]);
 
   if (loading) return <Loading />;
   if (error) return <Error data={error as any} />;
@@ -59,6 +61,8 @@ const RecentCreditNotesList: React.FC<RecentCreditNotesListProps> = (props) => {
   if(data) {
     
     return (
+    <Container fluid = {true}>
+      <HeaderMain title='Credit Notes' className='mb-5 mt-4' />
       <Card className='mb-0'>
         {/* START Table */}
         <div className='table-responsive-xl'>
@@ -83,12 +87,13 @@ const RecentCreditNotesList: React.FC<RecentCreditNotesListProps> = (props) => {
           <ListPagination
             totalRecords={data?.getRecentCreditNotes?.totalCount}
             pageNeighbours={1}
-            onPageChanged={onPageChanged}
-            pageLimit={pagination.limit}
-            currentPage={pagination.page}
+            onPageChanged={onPageChange}
+            pageLimit={defaultPaginationSettings.limit}
+            currentPage={page}
           />
         </CardFooter>
       </Card>
+    </Container>
     );
   }
 
