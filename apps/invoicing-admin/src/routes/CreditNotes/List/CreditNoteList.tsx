@@ -100,22 +100,4 @@ const RecentCreditNotesList: React.FC = () => {
     return <Loading />
 };
 
-interface RecentCreditNotesListProps {
-  state: {
-    pagination: {
-      page: number;
-      offset: number;
-      limit: number;
-    },
-    filters: {
-      invoiceStatus: string[];
-      transactionStatus: string[];
-      journalId: string[];
-      referenceNumber: string;
-      customId: string;
-    }
-};
-  setPage(key: string, value: string | boolean | any[]): void;
-}
-
 export default RecentCreditNotesList;
