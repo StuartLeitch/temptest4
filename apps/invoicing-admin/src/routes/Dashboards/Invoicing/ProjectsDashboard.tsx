@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { useManualQuery } from 'graphql-hooks';
+
 import {
   Container,
   Row,
@@ -11,6 +13,11 @@ import {
   Button,
   ListGroup,
   ListGroupItem,
+  Input,
+  InputGroup,
+  InputGroupAddon,
+  FormGroup,
+  Label,
   Media,
   Col,
 } from './../../../components';
@@ -18,21 +25,79 @@ import { setupPage } from './../../../components/Layout/setupPage';
 
 import { HeaderMain } from '../../components/HeaderMain';
 
+import { INVOICES_QUERY } from '../../Invoices/List/graphql';
+
 import { TrTableInvoices } from '../../components/Financial/TrTableInvoices';
 import { TinyDonutChart } from '../../components/ProjectsDashboards/TinyDonutChart';
 import { TinyDonutChartAllProjects } from '../../components/ProjectsDashboards/TinyDonutChartAllProjects';
 import { StackedAreaChart } from '../../components/Financial/StackedAreaChart';
-const ProjectsDashboard = () => (
+const ProjectsDashboard = () => {
+  // const [{ pagination }] = useLocalStorage(
+  //   'invoicesList',
+  //   { pagination:  defaultPaginator, filters }
+  // );
+
+  const [fetchInvoices, { loading, error, data }] = useManualQuery(
+    INVOICES_QUERY
+  );
+
+  const onSearchHandler = async (eventTarget: any) => {
+    const searchValue = (document.getElementById('search') as any).value;
+    const bubu = await fetchInvoices({
+      variables: {
+        filters: [],
+        pagination: {},
+      },
+    });
+
+    console.info(bubu)
+  };
+
+  return (
   <Container>
     <Row className='mb-5'>
       <Col lg={12}>
         <HeaderMain title='Invoicing' className='mb-4 mb-lg-5' />
-        <p>
+        {/* <p>
           Some words about how great <strong>Phenom Invoicing</strong> is and
           what you'll see in here&hellip;
-        </p>
+        </p> */}
       </Col>
-      <Col lg={3}>
+      <Col lg={12}>
+        <InputGroup>
+          <Input placeholder='Search for...' className='bg-white' id="search" />
+          <InputGroupAddon addonType='append'>
+            <Button color='primary' onClick={onSearchHandler}>
+              <i className='fa fa-search'></i>
+            </Button>
+          </InputGroupAddon>
+        </InputGroup>
+      </Col>
+      <Col lg={12}>
+        <FormGroup row>
+          <Label for='operatingSystem11' sm={1} className='pt-0 mt-2'>
+            Search by
+          </Label>
+          <Col sm={11} className='pt-0 mt-2'>
+            <CustomInput
+              type='radio'
+              id='searchByReferenceNumber'
+              name='searchBy'
+              label='Reference Number'
+              inline
+              defaultChecked
+            />
+            <CustomInput
+              type='radio'
+              id='searchByManuscriptId'
+              name='searchBy'
+              label='Manuscript ID'
+              inline
+            />
+          </Col>
+        </FormGroup>
+      </Col>
+      {/* <Col lg={12}>
         <div className='hr-text hr-text-center my-2'>
           <span>Payments</span>
         </div>
@@ -359,10 +424,10 @@ const ProjectsDashboard = () => (
             </ListGroupItem>
           </ListGroup>
         </Card>
-      </Col>
-    </Row> */}
+    </Col> */}
+    </Row>
   </Container>
-);
+)};
 
 export default setupPage({
   pageTitle: 'Invoicing Dashboard'

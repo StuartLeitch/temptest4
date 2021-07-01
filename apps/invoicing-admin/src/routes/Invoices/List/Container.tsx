@@ -235,30 +235,30 @@ const InvoicesContainer: React.FC = () => {
         }});
         break;
 
-      case 'journalTitle':
-        newJournalId = (value as any[]).map((j) => j.journalId);
-        setJournalId(newJournalId);
-        setPage(1);
-        writeStorage('invoicesList', { filters: {
-          ...filters,
-          journalId: newJournalId,
-        }, pagination: {
-          ...pagination,
-          page: 1,
-        }});
-        break;
+      // case 'journalTitle':
+      //   newJournalId = (value as any[]).map((j) => j.journalId);
+      //   setJournalId(newJournalId);
+      //   setPage(1);
+      //   writeStorage('invoicesList', { filters: {
+      //     ...filters,
+      //     journalId: newJournalId,
+      //   }, pagination: {
+      //     ...pagination,
+      //     page: 1,
+      //   }});
+      //   break;
 
-      case 'referenceNumber':
-        setPage(1);
-        setReferenceNumber(value as string);
-        writeStorage('invoicesList',{ filters: {
-          ...filters,
-          referenceNumber: value,
-        }, pagination: {
-          ...pagination,
-          page: 1,
-        }});
-        break;
+      // case 'referenceNumber':
+      //   setPage(1);
+      //   setReferenceNumber(value as string);
+      //   writeStorage('invoicesList',{ filters: {
+      //     ...filters,
+      //     referenceNumber: value,
+      //   }, pagination: {
+      //     ...pagination,
+      //     page: 1,
+      //   }});
+      //   break;
 
       case 'page':
         setPage(value as string);
