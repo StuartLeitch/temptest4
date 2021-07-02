@@ -323,7 +323,7 @@ export const invoice: Resolvers<Context> = {
       } = context;
 
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles: [Roles.PAYER],
       };
 
       const getItemsUseCase = new GetItemsForInvoiceUsecase(
@@ -385,7 +385,7 @@ export const invoice: Resolvers<Context> = {
       } = context;
 
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles: [Roles.PAYER],
       };
 
       const usecase = new GetPaymentsByInvoiceIdUsecase(
@@ -417,7 +417,7 @@ export const invoice: Resolvers<Context> = {
       } = context;
 
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles: [Roles.PAYER],
       };
 
       const usecase = new GetPaymentsByInvoiceIdUsecase(
@@ -444,6 +444,8 @@ export const invoice: Resolvers<Context> = {
       return payments.map((p) => PaymentMap.toPersistence(p));
     },
     async creditNote(parent: Invoice, args, context) {
+      const roles = getAuthRoles(context);
+
       const {
         repos: { invoice: invoiceRepo, erpReference: erpReferenceRepo },
       } = context;
@@ -455,10 +457,12 @@ export const invoice: Resolvers<Context> = {
       };
 
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles,
       };
 
       const result = await usecase.execute(request, usecaseContext);
+
+      handleForbiddenUsecase(result);
 
       if (result.isLeft()) {
         return undefined;
@@ -630,7 +634,7 @@ export const invoice: Resolvers<Context> = {
       } = env.app;
 
       const usecaseContext = {
-        roles: [Roles.SUPER_ADMIN],
+        roles: [Roles.PAYER],
       };
 
       const applyCouponUsecase = new ApplyCouponToInvoiceUsecase(

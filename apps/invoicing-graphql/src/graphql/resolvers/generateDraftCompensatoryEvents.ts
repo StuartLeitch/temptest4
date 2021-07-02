@@ -1,7 +1,6 @@
 import {
   GenerateDraftCompensatoryEventsUsecase,
   GetInvoicesIdsUsecase,
-  Roles,
 } from '@hindawi/shared';
 
 import { Context } from '../../builders';

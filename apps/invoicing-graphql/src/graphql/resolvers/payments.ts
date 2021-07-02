@@ -6,8 +6,8 @@ import {
   PaymentMethodMap,
   ExternalOrderId,
   CorrelationID,
-  Roles,
   PaymentTypes,
+  Roles,
 } from '@hindawi/shared';
 import {
   RepoErrorCode,
@@ -32,10 +32,14 @@ export const payments: Resolvers<Context> = {
         loggerService
       );
 
-      const result = await usecase.execute(null, {
+      const usecaseContext = {
+        roles: [Roles.PAYER],
         correlationId,
-        roles: null,
-      });
+      };
+
+      const result = await usecase.execute(null, usecaseContext);
+
+      handleForbiddenUsecase(result);
 
       if (result.isRight()) {
         return result.value.map(PaymentMethodMap.toPersistence);
@@ -49,7 +53,13 @@ export const payments: Resolvers<Context> = {
       } = context;
       const usecase = new GenerateClientTokenUsecase(paymentStrategyFactory);
 
-      const result = await usecase.execute();
+      const usecaseContext = {
+        roles: [Roles.PAYER],
+      };
+
+      const result = await usecase.execute(null, usecaseContext);
+
+      handleForbiddenUsecase(result);
 
       if (result.isRight()) {
         const paymentClientToken = result.value;

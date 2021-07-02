@@ -338,7 +338,6 @@ type Mutation {
   createCoupon(coupon: CouponInput): Coupon
   createInvoice(totalAmount: Float): Invoice
   deleteInvoice(id: ID!): Boolean
-  setTransactionToActive(customId: ID): Transaction
   creditCardPayment(
     invoiceId: ID!
     payerId: String!
