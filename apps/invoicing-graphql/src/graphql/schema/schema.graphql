@@ -122,6 +122,7 @@ type CreditNote @model(id: "credit_notes") {
   dateIssued: Date
   dateUpdated: Date
   erpReference: ErpReference
+  invoice: Invoice
 }
 
 type InvoiceVat {

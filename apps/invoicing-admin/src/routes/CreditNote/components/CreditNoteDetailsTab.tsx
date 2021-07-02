@@ -27,7 +27,6 @@ const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
   vat,
   total
 }) => {
-  
   const creditNoteDetails = () => (
     <>
       <CardTitle tag='h6' className='mb-4'>

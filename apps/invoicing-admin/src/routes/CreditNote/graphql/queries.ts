@@ -3,6 +3,9 @@ export const CREDIT_NOTE_QUERY = `
     getCreditNoteById(creditNoteId: $id) {
       ...creditNoteFragment
     }
+    getPaymentMethods {
+      ...paymentMethodFragment
+    }
   }
   fragment creditNoteFragment on CreditNote {
     id
@@ -14,18 +17,10 @@ export const CREDIT_NOTE_QUERY = `
     dateCreated
     dateIssued
     dateUpdated
+    invoice {
+     ...invoiceFragment
+    }
   }
-`;
-
-export const INVOICE_QUERY = `
-query invoice($id: ID) {
-  invoice(invoiceId: $id) {
-    ...invoiceFragment
-  }
-  getPaymentMethods {
-    ...paymentMethodFragment
-  }
-} 
   fragment invoiceFragment on Invoice {
     id: invoiceId
     erpReferences {
@@ -124,4 +119,5 @@ query invoice($id: ID) {
     id
     status
   }
+
 `;

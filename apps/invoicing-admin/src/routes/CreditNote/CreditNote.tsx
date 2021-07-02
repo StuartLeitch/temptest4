@@ -25,7 +25,7 @@ import {
 import { HeaderMain } from '../components/HeaderMain'
 import { TimelineMini } from '../components/Timeline/TimelineMini';
 
-import { CREDIT_NOTE_QUERY, INVOICE_QUERY } from './graphql';
+import { CREDIT_NOTE_QUERY } from './graphql';
 import CreditNoteDetailsTab from './components/CreditNoteDetailsTab';
 import ArticleDetailsTab from '../Invoice/Details/components/ArticleDetailsTab'
 import PayerDetailsTab from '../Invoice/Details/components/PayerDetailsTab';
@@ -38,15 +38,7 @@ const Details: React.FC = () => {
       id,
     },
   });
-
-  const invoiceId = creditNoteData?.getCreditNoteById?.invoiceId
-
-  const { loading: loadingInvoiceData, error: invoiceDataError, data: invoiceData } = useQuery(INVOICE_QUERY, {
-     variables: { 
-       id: invoiceId, 
-    }, 
-  });
-
+ 
   if (loadingCreditNoteData)
     return (
       <LoadingOverlay
@@ -57,23 +49,14 @@ const Details: React.FC = () => {
       />
     );
 
-  if (loadingInvoiceData)
-    return (
-      <LoadingOverlay
-        active={loadingInvoiceData}
-        spinner={
-          <Spinner style={{ width: '12em', height: '12em' }} color='primary' />
-        }
-      />
-    );
 
-  if (creditNoteDataError || invoiceDataError) return <div>Something Bad Happened</div>;
+  if (creditNoteDataError) return <div>Something Bad Happened</div>;
  
 
-  const { invoice } = invoiceData;
+ 
   const creditNote = creditNoteData?.getCreditNoteById
-
-
+  const { invoice } = creditNote
+        
   const { coupons, waivers } = invoice?.invoiceItem;
   const price = creditNote.price
   let netCharges = creditNote.price;
@@ -151,7 +134,7 @@ const Details: React.FC = () => {
               <UncontrolledTabs.TabContent>
                 <TabPane tabId='creditNote'>
                   <CreditNoteDetailsTab
-                    invoiceId={invoiceId}
+                    invoiceId={creditNote.invoiceId}
                     invoice={invoice}
                     creditNote={creditNote}
                     netCharges={netCharges}

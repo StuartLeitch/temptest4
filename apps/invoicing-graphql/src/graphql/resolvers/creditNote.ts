@@ -5,12 +5,14 @@ import {
   GetCreditNoteByIdUsecase,
   GetCreditNoteByIdDTO,
   CreditNoteMap,
+  InvoiceMap,
   Roles,
   GetRecentCreditNotesUesecase,
   GetRecentCreditNotesDTO,
   GetCreditNoteByReferenceNumberUsecase,
   GetCreditNoteByReferenceNumberDTO,
   GetInvoiceDetailsUsecase,
+  GetInvoiceDetailsDTO,
   GetCreditNoteByInvoiceIdUsecase,
   GetCreditNoteByInvoiceIdDTO,
 } from '@hindawi/shared';
@@ -23,6 +25,7 @@ export const creditNote: Resolvers<Context> = {
     async getCreditNoteById(parent, args, context) {
       const { repos } = context;
       const usecase = new GetCreditNoteByIdUsecase(repos.creditNote);
+      const associatedInvoice = new GetInvoiceDetailsUsecase(repos.invoice);
 
       const request: GetCreditNoteByIdDTO = { creditNoteId: args.creditNoteId };
 
@@ -34,7 +37,24 @@ export const creditNote: Resolvers<Context> = {
         throw new Error(result.value.message);
       }
 
-      return CreditNoteMap.toPersistence(result.value);
+      const invoiceRequest: GetInvoiceDetailsDTO = {
+        invoiceId: result.value.invoiceId.toString(),
+      };
+      const invoiceResult = await associatedInvoice.execute(
+        invoiceRequest,
+        usecaseContext
+      );
+
+      if (invoiceResult.isLeft()) {
+        throw new Error(invoiceResult.value.message);
+      }
+      return {
+        ...CreditNoteMap.toPersistence(result.value),
+        invoice: {
+          ...InvoiceMap.toPersistence(invoiceResult.value),
+          invoiceId: invoiceResult.value.id.toString(),
+        },
+      };
     },
     async getCreditNoteByInvoiceId(parent, args, context) {
       const { repos } = context;
