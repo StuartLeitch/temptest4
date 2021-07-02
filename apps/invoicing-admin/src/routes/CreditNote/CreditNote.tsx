@@ -11,7 +11,6 @@ import {
   CardTitle,
   Col,
   Container,
-  DropdownToggle,
   DropdownMenu,
   DropdownItem,
   Row,
@@ -41,7 +40,7 @@ const Details: React.FC = () => {
   });
 
   const invoiceId = creditNoteData?.getCreditNoteById?.invoiceId
-  
+
   const { loading: loadingInvoiceData, error: invoiceDataError, data: invoiceData } = useQuery(INVOICE_QUERY, {
      variables: { 
        id: invoiceId, 
@@ -68,7 +67,7 @@ const Details: React.FC = () => {
       />
     );
 
-  if (loadingCreditNoteData || invoiceDataError) return <div>Something Bad Happened</div>;
+  if (creditNoteDataError || invoiceDataError) return <div>Something Bad Happened</div>;
  
 
   const { invoice } = invoiceData;

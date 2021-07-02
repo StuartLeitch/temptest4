@@ -89,8 +89,6 @@ export * from './modules/invoices/usecases/getInvoicesIds';
 export * from './modules/invoices/usecases/getRecentInvoices/getRecentInvoices';
 export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
 export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomIdDTO';
-// export * from './modules/invoices/usecases/createCreditNote/createCreditNote';
-// export * from './modules/invoices/usecases/getCreditNoteByInvoiceId/getCreditNoteByInvoiceId';
 export * from './modules/invoices/usecases/ERP/retryRevenueRecognizedNetsuiteErpInvoices/retryRevenueRecognitionNetsuiteErpInvoices';
 
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceConfirmed/publishInvoiceConfirmed';
