@@ -7,7 +7,9 @@ export const CREDIT_NOTE_QUERY = `
   fragment creditNoteFragment on CreditNote {
     id
     invoiceId
+    creationReason
     persistentReferenceNumber
+    dateCreated
   }
 `;
 

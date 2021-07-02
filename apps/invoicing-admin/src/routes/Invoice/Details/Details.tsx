@@ -272,7 +272,7 @@ const Details: React.FC = (props) => {
             </UncontrolledTabs>
           </Col>
           <Col lg={4}>
-            <InvoiceTimeline invoice={invoice} />
+            <InvoiceTimeline creditNote={creditNote} invoice={invoice} />
           </Col>
         </Row>
       </Container>
