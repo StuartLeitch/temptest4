@@ -19,7 +19,7 @@ import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
 // * Usecase specific
 import { GetCreditNoteByReferenceNumberResponse as Response } from './getCreditNoteByReferenceNumberResponse';
 import { GetCreditNoteByReferenceNumberErrors as Errors } from './getCreditNoteByReferenceNumberErrors';
-import { GetCreditNoteByReferenceNumberDTO as DTO } from './getCreditNoteByReferenceNumberDTO';
+import type { GetCreditNoteByReferenceNumberDTO as DTO } from './getCreditNoteByReferenceNumberDTO';
 
 // to be modified with Guard/Either
 export class GetCreditNoteByReferenceNumberUsecase

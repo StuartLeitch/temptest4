@@ -5,9 +5,9 @@ import { left, right } from '../../../../core/logic/Either';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
+import { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
   AccessControlledUsecase,
-  UsecaseAuthorizationContext,
   AccessControlContext,
   Authorize,
 } from '../../../../domain/authorization';
@@ -19,7 +19,7 @@ import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
 // * Usecase specific
 import { GetCreditNoteByIdResponse as Response } from './getCreditNoteByIdResponse';
 import { GetCreditNoteByIdErrors as Errors } from './getCreditNoteByIdErrors';
-import { GetCreditNoteByIdDTO as DTO } from './getCreditNoteByIdDTO';
+import type { GetCreditNoteByIdDTO as DTO } from './getCreditNoteByIdDTO';
 
 export class GetCreditNoteByIdUsecase
   implements

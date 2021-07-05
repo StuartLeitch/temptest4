@@ -183,7 +183,7 @@ const Details: React.FC = (props) => {
                   />
                 )}
 
-                {invoice.creditNote === null &&
+                {creditNote === null &&
                   (status === 'ACTIVE' || status === 'FINAL') &&
                   invoice.payments.every((p) => p.status !== 'PENDING') && (
                     <>

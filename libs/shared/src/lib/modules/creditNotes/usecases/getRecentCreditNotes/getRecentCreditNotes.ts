@@ -6,7 +6,7 @@ import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
 
 // * Usecase specifics
 import { GetRecentCreditNotesResponse as Response } from './getRecentCreditNotesResponse';
-import { GetRecentCreditNotesDTO as DTO } from './getRecentCreditNotesDTO';
+import type { GetRecentCreditNotesDTO as DTO } from './getRecentCreditNotesDTO';
 import { GetRecentCreditNotesErrors as Errors } from './getRecentCreditNotesErrors';
 
 // * Authorization logic

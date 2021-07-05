@@ -34,7 +34,7 @@ import { TransactionRepoContract } from '../../../transactions/repos';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 
-import { CreateCreditNoteRequestDTO as DTO } from './createCreditNoteDTO';
+import type { CreateCreditNoteRequestDTO as DTO } from './createCreditNoteDTO';
 import { CreateCreditNoteResponse as Response } from './createCreditNoteResponse';
 import { CreateCreditNoteErrors as Errors } from './createCreditNoteErrors';
 

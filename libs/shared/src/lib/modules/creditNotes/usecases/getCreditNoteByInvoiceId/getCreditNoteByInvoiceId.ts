@@ -21,7 +21,7 @@ import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
 // * Usecase specific
 import { GetCreditNoteByInvoiceIdResponse as Response } from './getCreditNoteByInvoiceIdResponse';
 import { GetCreditNoteByInvoiceIdErrors as Errors } from './getCreditNoteByInvoiceIdErrors';
-import { GetCreditNoteByInvoiceIdDTO as DTO } from './getCreditNoteByInvoiceIdDTO';
+import type { GetCreditNoteByInvoiceIdDTO as DTO } from './getCreditNoteByInvoiceIdDTO';
 
 // to be modified with Guard/Either
 export class GetCreditNoteByInvoiceIdUsecase
