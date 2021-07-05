@@ -73,7 +73,9 @@ export function applyFilters(src: QueryBuilder, filters: Filters) {
         break;
 
       case '/invoiceItem/article/customId':
-        here = here.whereIn(`${TABLES.ARTICLES}.customId`, filter);
+        if (filter[0] !== '') {
+          here = here.whereIn(`${TABLES.ARTICLES}.customId`, filter);
+        }
         break;
 
       case '/transactionStatus':
@@ -91,6 +93,5 @@ export function applyFilters(src: QueryBuilder, filters: Filters) {
         break;
     }
   }
-
   return here;
 }

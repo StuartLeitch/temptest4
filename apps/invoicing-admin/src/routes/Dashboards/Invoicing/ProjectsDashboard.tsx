@@ -1,5 +1,10 @@
-import React, { useRef } from 'react';
+import _ from 'lodash';
+import React, { useRef, useEffect, useState } from 'react';
 import { useManualQuery } from 'graphql-hooks';
+import { useQueryState } from 'react-router-use-location-state';
+import { useLocalStorage, writeStorage } from '@rehooks/local-storage';
+
+import { ParseUtils, Filters } from '@utils';
 
 import {
   Container,
@@ -24,410 +29,205 @@ import {
 import { setupPage } from './../../../components/Layout/setupPage';
 
 import { HeaderMain } from '../../components/HeaderMain';
+import SearchList from './SearchList';
 
-import { INVOICES_QUERY } from '../../Invoices/List/graphql';
+import { INVOICES_AND_CREDIT_NOTES_QUERY } from '../../Invoices/List/graphql';
 
-import { TrTableInvoices } from '../../components/Financial/TrTableInvoices';
-import { TinyDonutChart } from '../../components/ProjectsDashboards/TinyDonutChart';
-import { TinyDonutChartAllProjects } from '../../components/ProjectsDashboards/TinyDonutChartAllProjects';
-import { StackedAreaChart } from '../../components/Financial/StackedAreaChart';
-const ProjectsDashboard = () => {
-  // const [{ pagination }] = useLocalStorage(
-  //   'invoicesList',
-  //   { pagination:  defaultPaginator, filters }
-  // );
+// import { TrTableInvoices } from '../../components/Financial/TrTableInvoices';
+// import { TinyDonutChart } from '../../components/ProjectsDashboards/TinyDonutChart';
+// import { TinyDonutChartAllProjects } from '../../components/ProjectsDashboards/TinyDonutChartAllProjects';
+// import { StackedAreaChart } from '../../components/Financial/StackedAreaChart';
 
-  const [fetchInvoices, { loading, error, data }] = useManualQuery(
-    INVOICES_QUERY
+const ProjectsDashboard: React.FC = () => {
+  const [searchResults, setSearchResults] = useState(null);
+
+  const defaultFilters = {
+    referenceNumber: '',
+    customId: '',
+  };
+  const defaultPagination = {
+    page: 1,
+    offset: 0,
+    limit: 10,
+  };
+  const [referenceNumber, setReferenceNumber] = useQueryState(
+    'referenceNumber',
+    (defaultFilters as any).referenceNumber
+  );
+  const [customId, setCustomId] = useQueryState(
+    'customId',
+    (defaultFilters as any).customId
   );
 
-  const onSearchHandler = async (eventTarget: any) => {
-    const searchValue = (document.getElementById('search') as any).value;
-    const bubu = await fetchInvoices({
-      variables: {
-        filters: [],
-        pagination: {},
-      },
-    });
 
-    console.info(bubu)
+  const [listState] = useLocalStorage('searchList', { filters:defaultFilters, pagination: defaultPagination});
+  let { filters, pagination } = listState;
+  const queryFilters = {
+    referenceNumber,
+    customId,
+  };
+
+  // * When no query strings provided in the URL
+  if (!_.isEqual(defaultFilters, queryFilters)) {
+    filters = Object.assign({}, defaultFilters, queryFilters);
+  }
+
+  const [searchFilters, setSearchFilters] = useState(filters);
+
+  const [page, setPage] = useQueryState(
+    'page',
+    (defaultPagination as any).page
+  );
+
+  if (!_.isEqual(defaultPagination, { page, offset: 0, limit: 10 })) {
+    pagination = Object.assign({}, defaultPagination, {
+      page,
+      offset: page > 0 ? page - 1 : 0,
+    });
+  }
+
+  const [fetchResults, { loading, error, data }] = useManualQuery(
+    INVOICES_AND_CREDIT_NOTES_QUERY
+  );
+
+  useEffect(() => {
+    async function fetchData() {
+      const results = await fetchResults({
+        variables: {
+          filters: Filters.collect(filters),
+          pagination,
+        },
+      });
+
+      setSearchResults(results.data);
+    }
+
+    fetchData();
+  }, [searchFilters]);
+
+  const handleSearch = async (eventTarget: any) => {
+    const searchValue = (document.getElementById('search') as any).value;
+    const isSearchByRefNumberChecked = (document.getElementById('searchByReferenceNumber') as any).checked;
+    const isSearchByManuscriptIdChecked = (document.getElementById('searchByManuscriptId') as any).checked;
+
+    if (isSearchByRefNumberChecked) {
+      filters['referenceNumber'] = searchValue;
+    }
+
+    if (isSearchByManuscriptIdChecked) {
+      filters['customId'] = searchValue;
+    }
+
+    setSearchFilters(filters);
   };
 
   return (
-  <Container>
-    <Row className='mb-5'>
-      <Col lg={12}>
-        <HeaderMain title='Invoicing' className='mb-4 mb-lg-5' />
-        {/* <p>
-          Some words about how great <strong>Phenom Invoicing</strong> is and
-          what you'll see in here&hellip;
-        </p> */}
-      </Col>
-      <Col lg={12}>
-        <InputGroup>
-          <Input placeholder='Search for...' className='bg-white' id="search" />
-          <InputGroupAddon addonType='append'>
-            <Button color='primary' onClick={onSearchHandler}>
-              <i className='fa fa-search'></i>
-            </Button>
-          </InputGroupAddon>
-        </InputGroup>
-      </Col>
-      <Col lg={12}>
-        <FormGroup row>
-          <Label for='operatingSystem11' sm={1} className='pt-0 mt-2'>
-            Search by
-          </Label>
-          <Col sm={11} className='pt-0 mt-2'>
-            <CustomInput
-              type='radio'
-              id='searchByReferenceNumber'
-              name='searchBy'
-              label='Reference Number'
-              inline
-              defaultChecked
-            />
-            <CustomInput
-              type='radio'
-              id='searchByManuscriptId'
-              name='searchBy'
-              label='Manuscript ID'
-              inline
-            />
-          </Col>
-        </FormGroup>
-      </Col>
-      {/* <Col lg={12}>
-        <div className='hr-text hr-text-center my-2'>
-          <span>Payments</span>
-        </div>
-        <Row>
-          <Col xs={6} className='text-center'>
-            <p className='text-center mb-0'>
-              <i className='fa fa-circle text-primary mr-2'></i>
-              Today
-            </p>
-            <h4 className='mt-2 mb-0'>$3,267</h4>
-          </Col>
-          <Col xs={6} className='text-center'>
-            <p className='text-center mb-0'>
-              <i className='fa fa-circle text-info mr-2'></i>
-              This Month
-            </p>
-            <h4 className='mt-2 mb-0'>$8,091</h4>
-          </Col>
-        </Row>
-        <div className='hr-text hr-text-center mb-2 mt-3'>
-          <span>Invoices</span>
-        </div>
-        <Row className='mb-4 mb-xl-0'>
-          <Col xs={6} className='text-center'>
-            <p className='text-center mb-0'>
-              <i className='fa fa-circle text-warning mr-2'></i>
-              Due
-            </p>
-            <h4 className='mt-2 mb-0'>$4,007</h4>
-          </Col>
-          <Col xs={6} className='text-center'>
-            <p className='text-center mb-0'>
-              <i className='fa fa-circle text-danger mr-2'></i>
-              Overdue
-            </p>
-            <h4 className='mt-2 mb-0'>$11,091</h4>
-          </Col>
-        </Row>
-      </Col>
-      <Col lg={3} md={6}>
-        <div className='hr-text hr-text-left my-2'>
-          <span>Dummy Title</span>
-        </div>
-        <Media>
-          <Media left className='mr-3'>
-            <TinyDonutChart />
-          </Media>
-          <Media body>
-            <div>
-              <i className='fa fa-circle mr-1 text-yellow'></i>
-              <span className='text-inverse'>23</span> Pending
-            </div>
-            <div>
-              <i className='fa fa-circle mr-1 text-danger'></i>
-              <span className='text-inverse'>3</span> Behind
-            </div>
-            <div>
-              <i className='fa fa-circle mr-1 text-success'></i>
-              <span className='text-inverse'>34</span> Final
-            </div>
-          </Media>
-        </Media>
-      </Col>
-      <Col lg={3} md={6} className='mb-4 mb-lg-0'>
-        <div className='hr-text hr-text-left my-2'>
-          <span>Another Title</span>
-        </div>
-        <Media>
-          <Media left className='mr-3'>
-            <TinyDonutChartAllProjects />
-          </Media>
-          <Media body>
-            <div>
-              <i className='fa fa-circle mr-1 text-warning'></i>
-              <span className='text-inverse'>14</span> Draft
-            </div>
-            <div>
-              <i className='fa fa-circle mr-1 text-primary'></i>
-              <span className='text-inverse'>24</span> Active
-            </div>
-            <div>
-              <i className='fa fa-circle mr-1 text-success'></i>
-              <span className='text-inverse'>2</span> Final
-            </div>
-          </Media>
-        </Media>
-      </Col>
-      <Col lg={3}>
-        <div className='hr-text hr-text-left my-2'>
-          <span>Statistics</span>
-        </div>
-        <Table size='sm'>
-          <tbody>
-            <tr>
-              <td className='text-inverse bt-0'>Active Invoices</td>
-              <td className='text-right bt-0'>
-                <Badge color='success' pill>
-                  16
-                </Badge>
-              </td>
-            </tr>
-            <tr>
-              <td className='text-inverse'>Invoice Items</td>
-              <td className='text-right'>
-                <Badge color='primary' pill>
-                  34
-                </Badge>
-              </td>
-            </tr>
-            <tr>
-              <td className='text-inverse'>Support Tickets</td>
-              <td className='text-right'>
-                <Badge color='info' pill>
-                  5
-                </Badge>
-              </td>
-            </tr>
-            <tr>
-              <td className='text-inverse'>Active Transactions</td>
-              <td className='text-right'>
-                <Badge color='secondary' pill>
-                  0
-                </Badge>
-              </td>
-            </tr>
-          </tbody>
-        </Table>
-      </Col>
-    </Row>
-    {/* <Row>
-      <Col lg={12}>
-        <div className='hr-text hr-text-center mt-4 mb-4'>
-          <span>Your Cash</span>
-        </div>
-      </Col>
-      <Col lg={3}>
-        <Card className='mb-3'>
-          <CardBody>
-            <CardTitle tag='h6' className='mb-4'>
-              Main Fundings
-            </CardTitle>
-            <div>
-              <div className='mb-3'>
-                <h2>$ 188.00</h2>
-              </div>
-              <div>
-                <i className='fas fa-caret-down fa-fw text-danger'></i> $464.00
-              </div>
-            </div>
-          </CardBody>
-        </Card>
-      </Col>
-      <Col lg={3}>
-        <Card className='mb-3'>
-          <CardBody>
-            <CardTitle tag='h6' className='mb-4'>
-              Invoices
-            </CardTitle>
-            <div>
-              <div className='mb-3'>
-                <h2>$ 553.00</h2>
-              </div>
-              <div>
-                <i className='fas fa-caret-down fa-fw text-danger'></i> $994.00
-              </div>
-            </div>
-          </CardBody>
-        </Card>
-      </Col>
-      <Col lg={3}>
-        <Card className='mb-3'>
-          <CardBody>
-            <CardTitle tag='h6' className='mb-4'>
-              Accounts Receivable
-            </CardTitle>
-            <div>
-              <div className='mb-3'>
-                <h2>$ 451.00</h2>
-              </div>
-              <div>
-                <i className='fas fa-caret-up fa-fw text-success'></i> $938.00
-              </div>
-            </div>
-          </CardBody>
-        </Card>
-      </Col>
-      <Col lg={3}>
-        <Card className='mb-3'>
-          <CardBody>
-            <CardTitle tag='h6' className='mb-4'>
-              Accounts Receivable
-            </CardTitle>
-            <div>
-              <div className='mb-3'>
-                <h2>$ 194.00</h2>
-              </div>
-              <div>
-                <i className='fas fa-caret-up fa-fw text-success'></i> $519.00
-              </div>
-            </div>
-          </CardBody>
-        </Card>
-      </Col>
-      <Col lg={12}>
-        <Card className='mb-3'>
-          <CardBody>
-            <CardTitle className='mb-1 d-flex'>
-              <h6>Invoices</h6>
-              <Button color='link' size='sm' className='pt-0 ml-auto'>
-                View All <i className='fas fa-angle-right'></i>
+    <Container>
+      <Row className='mb-5'>
+        <Col lg={12}>
+          <HeaderMain title='Invoicing' className='mb-4 mb-lg-5' />
+          {/* <p>
+            Some words about how great <strong>Phenom Invoicing</strong> is and
+            what you'll see in here&hellip;
+          </p> */}
+        </Col>
+        <Col lg={12}>
+          <InputGroup>
+            <Input placeholder='Search for...' className='bg-white' id="search" />
+            <InputGroupAddon addonType='append'>
+              <Button color='primary' onClick={handleSearch}>
+                <i className='fa fa-search'></i>
               </Button>
-            </CardTitle>
-          </CardBody>
-          <Table responsive striped className='mb-0'>
-            <thead>
-              <tr>
-                <th className='bt-0'>Company</th>
-                <th className='bt-0'>Amount</th>
-                <th className='bt-0'>Date</th>
-                <th className='bt-0'>Contact</th>
-                <th className='bt-0'>Email</th>
-                <th className='bt-0 text-right'>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <TrTableInvoices />
-            </tbody>
-          </Table>
-        </Card>
-      </Col>
-      <Col lg={8}>
-        <Card className='mb-3'>
-          <CardBody>
-            <CardTitle className='mb-4 d-flex'>
-              <h6>Account Performance</h6>
-            </CardTitle>
-            <div className='d-flex justify-content-center'>
-              <StackedAreaChart />
-            </div>
-          </CardBody>
-        </Card>
-      </Col>
-      <Col lg={4}>
-        <Card className='mb-3'>
-          <CardBody>
-            <CardTitle className='mb-1'>
-              <h6 className='mb-0'>Settings</h6>
-            </CardTitle>
-          </CardBody>
-          <ListGroup flush>
-            <ListGroupItem className='d-flex'>
-              <span>My Cash</span>
+            </InputGroupAddon>
+          </InputGroup>
+        </Col>
+        <Col lg={12}>
+          <FormGroup row>
+            <Label for='operatingSystem11' sm={1} className='pt-0 mt-2'>
+              Search by
+            </Label>
+            <Col sm={11} className='pt-0 mt-2'>
               <CustomInput
-                type='switch'
-                id='exampleCustomSwitch'
-                name='customSwitch'
-                label=''
-                className='ml-auto'
-              />
-            </ListGroupItem>
-            <ListGroupItem className='d-flex'>
-              <span>My Cap</span>
-              <CustomInput
-                type='switch'
-                id='exampleCustomSwitch1'
-                name='customSwitch'
-                label=''
-                className='ml-auto'
+                type='radio'
+                id='searchByReferenceNumber'
+                name='searchBy'
+                label='Reference Number'
+                inline
                 defaultChecked
               />
-            </ListGroupItem>
-            <ListGroupItem className='d-flex'>
-              <span>Client List</span>
               <CustomInput
-                type='switch'
-                id='exampleCustomSwitch2'
-                name='customSwitch'
-                label=''
-                className='ml-auto'
-                defaultChecked
+                type='radio'
+                id='searchByManuscriptId'
+                name='searchBy'
+                label='Manuscript ID'
+                inline
               />
-            </ListGroupItem>
-            <ListGroupItem className='d-flex'>
-              <span>Recent Fundings</span>
-              <CustomInput
-                type='switch'
-                id='exampleCustomSwitch3'
-                name='customSwitch'
-                label=''
-                className='ml-auto'
+            </Col>
+          </FormGroup>
+        </Col>
+        <Col lg={12} style={{ marginTop: '10px' }}>
+          {
+            searchResults && Object.keys(searchResults).map((category) =>
+              <SearchList
+                loading={loading}
+                title={category}
+                searchResults={searchResults[category]}
+                state={listState}
+                setPage={setFilter}
               />
-            </ListGroupItem>
-            <ListGroupItem className='d-flex'>
-              <span>Invoice Creator</span>
-              <CustomInput
-                type='switch'
-                id='exampleCustomSwitch4'
-                name='customSwitch'
-                label=''
-                className='ml-auto'
-              />
-            </ListGroupItem>
-            <ListGroupItem className='d-flex'>
-              <span>Sales Lead</span>
-              <CustomInput
-                type='switch'
-                id='exampleCustomSwitch5'
-                name='customSwitch'
-                label=''
-                className='ml-auto'
-                defaultChecked
-              />
-            </ListGroupItem>
-            <ListGroupItem className='d-flex'>
-              <span>Q&A</span>
-              <CustomInput
-                type='switch'
-                id='exampleCustomSwitch6'
-                name='customSwitch'
-                label=''
-                className='ml-auto'
-                defaultChecked
-              />
-            </ListGroupItem>
-          </ListGroup>
-        </Card>
-    </Col> */}
-    </Row>
-  </Container>
-)};
+            )
+          }
+        </Col>
+      </Row>
+    </Container>
+  )
+
+  /**
+ * Updates the filter given by `key` to the new `value`.
+ *
+ * @param key The key of the filter to be updated (e.g. 'invoiceStatus.FINAL')
+ * @param value The value of the filter being updated (varies by input type)
+ */
+function setFilter(key: string, value: boolean | string | any[]) {
+  const [name, status] = ParseUtils.parseEvent(key);
+
+  switch (name) {
+    case 'page':
+      setPage(value as string);
+      writeStorage('searchList', {
+        filters,
+        pagination:{
+          ...pagination,
+          page: value,
+          offset: Number(value) - 1,
+        }
+      });
+      break;
+
+    case 'customId':
+      setCustomId(value as string);
+      setPage(1);
+      writeStorage('searchList', {
+        filters: { ...filters, customId: value },
+        pagination: {
+          ...pagination,
+          page: 1,
+        }
+      });
+    default:
+      setPage(1);
+      setReferenceNumber(value as string);
+      writeStorage('searchList',{ filters: {
+        ...filters,
+        referenceNumber: value,
+      }, pagination: {
+        ...pagination,
+        page: 1,
+      }});
+      break;
+    }
+  };
+};
 
 export default setupPage({
   pageTitle: 'Invoicing Dashboard'

@@ -217,11 +217,13 @@ export class KnexInvoiceRepo
 
     const offset = pagination.offset * pagination.limit;
 
-    const invoices: Array<any> = await applyFilters(getModel(), filters)
+    const sql = applyFilters(getModel(), filters)
       .orderBy(`${TABLES.INVOICES}.dateCreated`, 'desc')
       .offset(offset < totalCount[0].count ? offset : 0)
       .limit(pagination.limit)
       .select([`${TABLES.INVOICES}.*`]);
+
+    const invoices: Array<any> = await sql;
 
     const maybeInvoices = flatten(invoices.map(InvoiceMap.toDomain));
 

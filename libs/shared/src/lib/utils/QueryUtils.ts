@@ -5,13 +5,13 @@ function wrap(value) {
 export class Filters {
   static collect(src) {
     return {
-      invoiceStatus: [...src.invoiceStatus],
-      transactionStatus: [...src.transactionStatus],
-      referenceNumber: wrap(src.referenceNumber),
+      invoiceStatus: src.invoiceStatus && [...src.invoiceStatus],
+      transactionStatus: src.transactionStatus && [...src.transactionStatus],
+      referenceNumber: src.referenceNumber && wrap(src.referenceNumber),
       invoiceItem: {
         article: {
-          journalId: src.journalId,
-          customId: wrap(src.customId),
+          journalId: src && src.journalId,
+          customId: src.customId && wrap(src.customId),
         },
       },
     };
