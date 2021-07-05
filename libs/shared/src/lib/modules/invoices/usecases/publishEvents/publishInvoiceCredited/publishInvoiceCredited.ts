@@ -35,41 +35,39 @@ export class PublishInvoiceCreditedUsecase
     }
 
     const {
-      messageTimestamp,
-      billingAddress,
-      paymentMethods,
-      invoiceItems,
-      creditNote,
-      manuscript,
-      payments,
       payer,
       invoice,
+      payments,
+      manuscript,
+      creditNote,
+      invoiceItems,
+      paymentMethods,
+      billingAddress,
+      messageTimestamp,
     } = request;
 
-    const erpReference = creditNote
-      .getErpReferences()
-      .getItems()
-      .filter((er) => er.vendor === 'netsuite' && er.attribute === 'creditNote')
-      .find(Boolean);
+    const erpReference = creditNote.getErpReference();
 
     const data: InvoiceCreditNoteCreatedEvent = {
       ...EventUtils.createEventObject(),
 
-      creditNoteForInvoice: creditNote.cancelledInvoiceReference,
-      referenceNumber: `CN-${invoice.persistentReferenceNumber}` ?? null,
-      transactionId: creditNote.transactionId.toString(),
+      creditNoteForInvoice: creditNote.invoiceId.id.toString(),
+      referenceNumber: `CN-${creditNote.persistentReferenceNumber}` ?? null,
+      transactionId: invoice.transactionId.toString(),
       erpReference: erpReference?.value ?? null,
       invoiceId: creditNote.id.toString(),
-      invoiceStatus: creditNote.status,
+      invoiceStatus: invoice.status,
       isCreditNote: true,
 
       lastPaymentDate: calculateLastPaymentDate(payments)?.toISOString(),
-      invoiceFinalizedDate: creditNote?.dateMovedToFinal?.toISOString(),
-      manuscriptAcceptedDate: creditNote?.dateAccepted?.toISOString(),
-      invoiceCreatedDate: creditNote?.dateCreated?.toISOString(),
-      invoiceIssuedDate: creditNote?.dateIssued?.toISOString(),
+      invoiceFinalizedDate: invoice?.dateMovedToFinal?.toISOString(),
+      manuscriptAcceptedDate: invoice?.dateAccepted?.toISOString(),
+      invoiceCreatedDate: invoice?.dateCreated?.toISOString(),
+      invoiceIssuedDate: invoice?.dateIssued?.toISOString(),
 
-      costs: formatCosts(invoiceItems, payments, creditNote),
+      reason: creditNote.creationReason,
+
+      costs: formatCosts(invoiceItems, payments, invoice, creditNote),
 
       invoiceItems: formatInvoiceItems(invoiceItems, manuscript.customId),
 

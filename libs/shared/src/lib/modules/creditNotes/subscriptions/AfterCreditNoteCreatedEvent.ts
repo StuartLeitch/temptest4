@@ -21,7 +21,7 @@ import { InvoiceRepoContract } from '../../invoices/repos/invoiceRepo';
 import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
 
-import { PublishCreditNoteCreatedUsecase } from '../usecases/publishEvents/publishCreditNoteCreated/publishCreditNoteCreated';
+import { PublishInvoiceCreditedUsecase } from '../../invoices/usecases/publishEvents/publishInvoiceCredited';
 import { PublishRevenueRecognitionReversalUsecase } from '../../invoices/usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
 import { GetInvoiceDetailsUsecase } from '../../invoices/usecases/getInvoiceDetails';
 import { GetItemsForInvoiceUsecase } from '../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
@@ -47,7 +47,7 @@ export class AfterCreditNoteCreatedEvent
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
     private publishCreditNoteCreated:
-      | PublishCreditNoteCreatedUsecase
+      | PublishInvoiceCreditedUsecase
       | NoOpUseCase,
     private publishRevenueRecognitionReversal: PublishRevenueRecognitionReversalUsecase,
     private loggerService: LoggerContract

@@ -17,7 +17,6 @@ import { PublishInvoicePaidUsecase } from '../../../../libs/shared/src/lib/modul
 import { PublishRevenueRecognitionReversalUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
 
 import { AfterCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/creditNotes/subscriptions/AfterCreditNoteCreatedEvent';
-import { AfterInvoiceCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
 import { AfterInvoiceDraftDueAmountUpdatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDueAmountUpdateEvent';
 import { AfterInvoiceDraftDeletedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDraftDeletedEvent';
 import { AfterInvoiceDraftCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDraftCreatedEvent';
@@ -128,22 +127,6 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       schedulingService,
       env.scheduler.confirmationReminderDelay,
       env.scheduler.emailRemindersQueue
-    );
-
-    // tslint:disable-next-line: no-unused-expression
-    new AfterInvoiceCreditNoteCreatedEvent(
-      paymentMethod,
-      invoiceItem,
-      manuscript,
-      address,
-      invoice,
-      payment,
-      coupon,
-      waiver,
-      payer,
-      publishInvoiceCredited,
-      publishRevenueRecognitionReversal,
-      loggerService
     );
 
     // tslint:disable-next-line: no-unused-expression
