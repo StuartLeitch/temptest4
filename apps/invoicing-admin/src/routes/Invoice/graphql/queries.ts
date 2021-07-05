@@ -62,9 +62,6 @@ export const INVOICE_QUERY = `
         ...articleFragment
       }
     }
-    creditNote {
-      ...creditNoteFragment
-    }
   }
   fragment payerFragment on Payer {
     id
@@ -128,14 +125,6 @@ export const INVOICE_QUERY = `
     journalTitle
     datePublished
     preprintValue
-  }
-  fragment creditNoteFragment on CreditNote {
-    invoiceId
-    dateCreated
-    creationReason
-    erpReference {
-     ...erpReferenceFragment
-    }
   }
   fragment transactionFragment on Transaction {
     id

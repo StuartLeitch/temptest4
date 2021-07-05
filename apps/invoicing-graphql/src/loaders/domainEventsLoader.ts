@@ -190,7 +190,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       coupon,
       waiver,
       payer,
-      publishCreditNoteCreated,
+      publishInvoiceCredited,
       publishRevenueRecognitionReversal,
       loggerService
     );

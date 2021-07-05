@@ -119,7 +119,6 @@ export type Invoice = {
   type?: Maybe<Scalars['String']>;
   payment?: Maybe<Payment>;
   payments?: Maybe<Array<Maybe<Payment>>>;
-  creditNote?: Maybe<CreditNote>;
   transaction?: Maybe<Transaction>;
 };
 
@@ -866,7 +865,6 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
   type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   payment?: Resolver<Maybe<ResolversTypes['Payment']>, ParentType, ContextType>;
   payments?: Resolver<Maybe<Array<Maybe<ResolversTypes['Payment']>>>, ParentType, ContextType>;
-  creditNote?: Resolver<Maybe<ResolversTypes['CreditNote']>, ParentType, ContextType>;
   transaction?: Resolver<Maybe<ResolversTypes['Transaction']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };

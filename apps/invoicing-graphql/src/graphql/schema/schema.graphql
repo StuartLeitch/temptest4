@@ -59,15 +59,6 @@ enum PaymentStatus {
   CREATED
 }
 
-# enum CreationReason {
-#   WITHDRAWN_MANUSCRIPT
-#   REDUCTION_APPLIED
-#   WAIVED_MANUSCRIPT
-#   CHANGED_PAYER_DETAILS
-#   BAD_DEBT
-#   OTHER
-# }
-
 type InvoiceItem @model(id: "invoice_items") {
   id: String
   invoiceId: ID
@@ -107,7 +98,6 @@ type Invoice @model(id: "invoices") {
   type: String
   payment: Payment
   payments: [Payment]
-  creditNote: CreditNote
   transaction: Transaction
 }
 
@@ -207,11 +197,6 @@ type Payment {
 type PayPalOrderId {
   id: String!
 }
-
-# type CreditNote {
-#   id: String!
-#   cancelledInvoiceReference: ID!
-# }
 
 type PaymentMethod {
   id: String!

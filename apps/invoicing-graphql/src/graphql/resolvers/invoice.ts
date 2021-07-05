@@ -442,61 +442,7 @@ export const invoice: Resolvers<Context> = {
     },
 
     // * to look forward
-    async creditNote(parent: Invoice, args, context) {
-      const {
-        repos: {
-          creditNote: creditNoteRepo,
-          invoice: invoiceRepo,
-          erpReference: erpReferenceRepo,
-        },
-      } = context;
-      const usecase = new GetCreditNoteByInvoiceIdUsecase(creditNoteRepo);
-      const getAssocInvoice = new GetInvoiceDetailsUsecase(invoiceRepo);
 
-      const request: GetInvoiceDetailsDTO = {
-        invoiceId: parent.invoiceId,
-      };
-
-      const usecaseContext = {
-        roles: [Roles.ADMIN],
-      };
-
-      const result = await usecase.execute(request, usecaseContext);
-
-      if (result.isLeft()) {
-        return undefined;
-      }
-
-      // There is a TSLint error for when try to use a shadowed variable!
-      const creditNoteDetails = result.value;
-
-      let maybeErpRef = await erpReferenceRepo.getErpReferencesByInvoiceId(
-        creditNoteDetails.invoiceId
-      );
-
-      if (maybeErpRef.isLeft()) {
-        throw new Error(maybeErpRef.value.message);
-      }
-
-      const erpRef = maybeErpRef.value;
-
-      const assocInvoiceResponse = await getAssocInvoice.execute(
-        { invoiceId: creditNoteDetails.invoiceId.id.toString() },
-        usecaseContext
-      );
-      if (assocInvoiceResponse.isLeft()) {
-        return undefined;
-      }
-
-      const assocInvoice = assocInvoiceResponse.value;
-
-      return {
-        ...CreditNoteMap.toPersistence(creditNoteDetails),
-        referenceNumber: assocInvoice.persistentReferenceNumber
-          ? `CN-${assocInvoice.persistentReferenceNumber}`
-          : '---',
-      };
-    },
     async transaction(parent: Invoice, args, context) {
       const {
         repos: { transaction: transactionRepo },

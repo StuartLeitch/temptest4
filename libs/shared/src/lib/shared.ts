@@ -105,7 +105,6 @@ export * from './modules/invoices/usecases/getVATNote/getVATNoteDTO';
 export * from './modules/invoices/usecases/getVATNote/getVATNote';
 
 export * from './modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
-export * from './modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
 export * from './modules/invoices/subscriptions/AfterInvoiceFinalizedEvent';
 export * from './modules/invoices/subscriptions/AfterInvoicePaidEvents';
 export * from './modules/invoices/subscriptions/afterInvoiceConfirmedEvent';
