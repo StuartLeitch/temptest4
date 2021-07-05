@@ -75,25 +75,30 @@ export class Logger implements LoggerContract {
       format: null,
     };
 
-    const customFormat = printf(({ message, args, metadata, level }) => {
-      const { scope: metascope } = metadata;
-      const justLevel = level.replace(
-        // eslint-disable-next-line no-control-regex
-        /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
-        ''
-      );
+    const customFormat = printf((data) => {
+      try {
+        const { message, args, metadata, level } = data;
+        const { scope: metascope } = metadata;
+        const justLevel = level.replace(
+          // eslint-disable-next-line no-control-regex
+          /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
+          ''
+        );
 
-      const toShowArgs = args.length > 0;
-      const isError = args.length > 0 && args[0] && args[0].name === 'error';
-      return `${LOG_ICONS[justLevel]} ${
-        metascope ? `[${metascope}] ` : ''
-      } ➜ \x1b[37m${message} ${
-        toShowArgs && !isError ? JSON.stringify(args) : ''
-      } ${
-        isError
-          ? `${COLORS[justLevel]}Error: ${args[0].error}\nStack: ${args[0].stack}\x1b[0m`
-          : ''
-      }`;
+        const toShowArgs = args.length > 0;
+        const isError = args.length > 0 && args[0] && args[0].name === 'error';
+        return `${LOG_ICONS[justLevel]} ${
+          metascope ? `[${metascope}] ` : ''
+        } ➜ \x1b[37m${message} ${
+          toShowArgs && !isError ? JSON.stringify(args) : ''
+        } ${
+          isError
+            ? `${COLORS[justLevel]}Error: ${args[0].error}\nStack: ${args[0].stack}\x1b[0m`
+            : ''
+        }`;
+      } catch (error) {
+        console.log(error);
+      }
     });
 
     if (logLevel === 'debug' && isDevelopment) {
@@ -146,6 +151,7 @@ export class Logger implements LoggerContract {
           return arg;
         });
       }
+
       this.protocol[level]({ message, args: newArgs, metadata });
     }
   }

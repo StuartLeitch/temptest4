@@ -7,13 +7,15 @@ import { ErpReference } from '../domain/ErpReference';
 
 export class ErpReferenceMap implements Mapper<ErpReference> {
   public static toDomain(raw: any): Either<GuardFailure, ErpReference> {
-    const maybeErpReference = ErpReference.create({
+    const data = {
       entity_id: raw.entity_id,
       vendor: raw.vendor,
       entity_type: raw.type || raw.entity_type,
       attribute: raw.attribute ?? null,
       value: raw.value ?? null,
-    });
+    };
+
+    const maybeErpReference = ErpReference.create(data);
 
     return maybeErpReference;
   }
