@@ -25,12 +25,16 @@ export interface Coupon {
 }
 
 export interface CreditNote {
-  cancelledInvoiceReference: string;
-  dateCreated: string;
+  id: string;
   invoiceId: string;
-  referenceNumber: string;
   creationReason?: string;
-  erpReferences: ERPReferences[];
+  price?: number;
+  vat?: number;
+  dateCreated: string;
+  dateIssued: string;
+  dateUpdated: string;
+  persistentReferenceNumber: string;
+  erpReference?: ERPReferences[];
 }
 
 export interface ERPReferences {
@@ -42,7 +46,6 @@ export interface ERPReferences {
 }
 export interface Invoice {
   cancelledInvoiceReference: string | null;
-  creditNote: CreditNote | null;
   dateCreated: string;
   dateIssued: string;
   dateMovedToFinal: string | null;

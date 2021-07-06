@@ -142,7 +142,6 @@ export class KnexInvoiceRepo
     });
 
     const invoice = await sql;
-
     if (!invoice) {
       return left(
         RepoError.createEntityNotFoundError('invoice', invoiceId.id.toString())

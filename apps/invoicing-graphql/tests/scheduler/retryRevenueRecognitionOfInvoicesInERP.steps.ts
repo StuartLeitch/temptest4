@@ -20,8 +20,10 @@ import {
   ManuscriptMap,
   MockErpReferenceRepo,
   ErpReferenceMap,
+  MockCreditNoteRepo,
 } from '@hindawi/shared';
 
+let mockCreditNoteRepo: MockCreditNoteRepo;
 let mockInvoiceItemRepo: MockInvoiceItemRepo;
 let mockManuscriptRepo: MockArticleRepo;
 let mockInvoiceRepo: MockInvoiceRepo;
@@ -39,6 +41,7 @@ let invoiceId: string;
 let manuscript: any;
 
 Before({ tags: '@ValidateRetryRevRec' }, function () {
+  mockCreditNoteRepo = new MockCreditNoteRepo();
   mockManuscriptRepo = new MockArticleRepo();
   mockErpReferenceRepo = new MockErpReferenceRepo();
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
@@ -72,6 +75,7 @@ Before({ tags: '@ValidateRetryRevRec' }, function () {
   );
 
   createCreditNoteUsecase = new CreateCreditNoteUsecase(
+    mockCreditNoteRepo,
     mockInvoiceRepo,
     mockInvoiceItemRepo,
     mockTransactionRepo,

@@ -4,7 +4,7 @@ import numeral from 'numeral';
 import format from 'date-fns/format';
 import DatePicker from 'react-datepicker';
 import { ButtonInput } from '../../../Forms/DatePicker/components/ButtonInput';
-import { Invoice } from '../types';
+import { Invoice, CreditNote } from '../types';
 import {
   Badge,
   Card,
@@ -24,6 +24,7 @@ import Config from '../../../../config';
 const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
   invoiceId,
   invoice,
+  creditNote,
   netCharges,
   vatAmount,
   totalCharges,
@@ -87,16 +88,16 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
               <Input readOnly plaintext value='Payable upon Receipt' />
             </Col>
           </FormGroup>
-          {invoice.creditNote && (
+          {creditNote && (
             <FormGroup row>
               <Label for='staticText' sm={12}>
                 Credit Note
                 <Link
-                  to={`/credit-notes/details/${invoice.creditNote.invoiceId}`}
+                  to={`/credit-notes/details/${creditNote.id}`}
                 >
                   {
                     <span className='ml-1 font-weight-bold text-warning'>
-                     {invoice.creditNote.referenceNumber}
+                     {creditNote.persistentReferenceNumber}
                     </span>
                   }
                 </Link>
@@ -342,6 +343,7 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
 interface InvoiceDetailsTabProps {
   invoiceId: string;
   invoice: Invoice;
+  creditNote: CreditNote;
   netCharges: number;
   vatAmount: number;
   totalCharges: number;

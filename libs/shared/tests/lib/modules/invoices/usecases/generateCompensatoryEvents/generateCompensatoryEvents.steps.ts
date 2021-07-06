@@ -18,6 +18,7 @@ import { MockInvoiceItemRepo } from './../../../../../../src/lib/modules/invoice
 import { MockPayerRepo } from './../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
 import { MockInvoiceRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
 import { MockErpReferenceRepo } from './../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
+import { MockCreditNoteRepo } from './../../../../../../src/lib/modules/creditNotes/repos/mocks/mockCreditNoteRepo';
 
 import { GenerateCompensatoryEventsUsecase } from './../../../../../../src/lib/modules/invoices/usecases/generateCompensatoryEvents/generateCompensatoryEvents';
 
@@ -26,6 +27,7 @@ import {
   addPaymentMethods,
   addInvoiceItems,
   addManuscripts,
+  addCreditNote,
   addInvoices,
   addPayments,
   addCoupons,
@@ -42,6 +44,7 @@ let mockInvoiceItemRepo: MockInvoiceItemRepo;
 let mockManuscriptRepo: MockArticleRepo;
 let mockAddressRepo: MockAddressRepo;
 let mockInvoiceRepo: MockInvoiceRepo;
+let mockCreditNoteRepo: MockCreditNoteRepo;
 let mockPaymentRepo: MockPaymentRepo;
 let mockCouponRepo: MockCouponRepo;
 let mockWaiverRepo: MockWaiverRepo;
@@ -66,6 +69,7 @@ Before({ tags: '@ValidateGenerateCompensatoryEvents' }, function () {
   mockWaiverRepo = new MockWaiverRepo();
   mockPayerRepo = new MockPayerRepo();
   mockErpReferenceRepo = new MockErpReferenceRepo();
+  mockCreditNoteRepo = new MockCreditNoteRepo();
   mockInvoiceRepo = new MockInvoiceRepo(
     mockManuscriptRepo,
     mockInvoiceItemRepo,
@@ -76,12 +80,12 @@ Before({ tags: '@ValidateGenerateCompensatoryEvents' }, function () {
     roles: [Roles.ADMIN],
   };
   loggerService = new MockLogger();
-
   addPaymentMethods(mockPaymentMethodRepo);
   addBillingAddresses(mockAddressRepo);
   addInvoiceItems(mockInvoiceItemRepo);
   addManuscripts(mockManuscriptRepo);
   addInvoices(mockInvoiceRepo);
+  addCreditNote(mockCreditNoteRepo);
   addPayments(mockPaymentRepo);
   addCoupons(mockCouponRepo);
   addWaivers(mockWaiverRepo);
@@ -95,6 +99,7 @@ Before({ tags: '@ValidateGenerateCompensatoryEvents' }, function () {
     mockManuscriptRepo,
     mockAddressRepo,
     mockInvoiceRepo,
+    mockCreditNoteRepo,
     mockPaymentRepo,
     mockCouponRepo,
     mockWaiverRepo,
