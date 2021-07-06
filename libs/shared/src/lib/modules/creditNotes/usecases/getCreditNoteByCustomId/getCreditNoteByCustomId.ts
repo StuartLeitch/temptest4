@@ -4,10 +4,8 @@ import { left, right } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 
 // * Authorization Logic
-import {
-  Authorize,
-  UsecaseAuthorizationContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import { Authorize } from '../../../../domain/authorization';
 import {
   AccessControlledUsecase,
   AccessControlContext,
@@ -24,12 +22,8 @@ import { GetCreditNoteByCustomIdErrors as Errors } from './getCreditNoteByCustom
 
 export class GetCreditNoteByCustomIdUsecase
   implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(private creditNoteRepo: CreditNoteRepoContract) {}
 
   private async getAccessControlContext(request, context?) {
@@ -37,10 +31,7 @@ export class GetCreditNoteByCustomIdUsecase
   }
 
   @Authorize('read:credit_note')
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const { customId } = request;
 
     let creditNote: CreditNote;
