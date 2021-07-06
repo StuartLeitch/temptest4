@@ -98,12 +98,13 @@ query search(
       ...invoiceFragment
     }
   }
-  coupons(
+  getRecentCreditNotes(
+    filters: $filters
     pagination: $pagination
   ) {
     totalCount
-    coupons {
-      ...couponFragment
+    creditNotes {
+      ...creditNoteFragment
     }
   }
 }
@@ -134,9 +135,6 @@ fragment invoiceFragment on Invoice {
     article {
       ...articleFragment
     }
-  }
-  creditNote {
-    ...creditNoteFragment
   }
 }
 fragment payerFragment on Payer {
@@ -178,10 +176,13 @@ fragment articleFragment on Article {
   authorFirstName
   journalTitle
 }
-fragment creditNoteFragment on Invoice {
+fragment creditNoteFragment on CreditNote {
+  id
   invoiceId
   dateCreated
-  cancelledInvoiceReference
-  referenceNumber
+  dateIssued
+  dateUpdated
+  persistentReferenceNumber
+  creationReason
 }
 `;

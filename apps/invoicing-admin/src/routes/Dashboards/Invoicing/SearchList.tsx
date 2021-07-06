@@ -45,22 +45,17 @@ const SearchList: React.FC<SearchListProps> = (props) => {
   //   fetchData();
   // }, [fetchResults, props.state]);
 
-  const data = props.searchResults;
-
-  if (!data) return null;
-
-  if ((data as any).totalCount === 0) return null;
-
   if (props.loading) return <Loading />;
 
   // if (error) return <Error data={error as any} />;
 
-  return ([
-    <span className='bt-6 mt-4 ml-2' style={{ display: 'inline-block'}}><strong>{props.title.toUpperCase()}</strong></span>,
-    <Card className='mb-0'>
+  return (
+    // <span className='bt-6 mt-4 ml-2' style={{ display: 'inline-block'}}><strong>{props.title.toUpperCase()}</strong></span>,
+    <Card className='mb-0' style={{ marginTop: '16px'}}>
       {/* START Table */}
       <div className='table-responsive-xl'>
-        <Table className='mb-0 table-striped' hover>
+        {props.component}
+        {/* <Table className='mb-0 table-striped' hover>
           <thead>
             <tr>
               <th className='align-middle bt-0'>Status</th>
@@ -76,10 +71,10 @@ const SearchList: React.FC<SearchListProps> = (props) => {
           <tbody>
             <TrTableInvoicesList invoices={data[props.title] || []} />
           </tbody>
-        </Table>
+        </Table> */}
       </div>
       {/* END Table */}
-      <CardFooter className='d-flex justify-content-center pb-0'>
+      {/* <CardFooter className='d-flex justify-content-center pb-0'>
         <ListPagination
           totalRecords={data[props.title].totalCount}
           pageNeighbours={1}
@@ -87,15 +82,14 @@ const SearchList: React.FC<SearchListProps> = (props) => {
           pageLimit={pagination.limit}
           currentPage={pagination.page}
         />
-      </CardFooter>
+      </CardFooter> */}
     </Card>
-  ]);
+  );
 };
 
 interface SearchListProps {
+  component: React.FC,
   loading: boolean,
-  title: string,
-  searchResults: any[],
   state: {
     pagination: {
       page: number;

@@ -32,6 +32,8 @@ import { HeaderMain } from '../../components/HeaderMain';
 import SearchList from './SearchList';
 
 import { INVOICES_AND_CREDIT_NOTES_QUERY } from '../../Invoices/List/graphql';
+import InvoicesSearchResults from '../Invoicing/InvoicesSearchResults';
+import CreditNotesSearchResults from '../Invoicing/CreditNotesSearchResults';
 
 // import { TrTableInvoices } from '../../components/Financial/TrTableInvoices';
 // import { TinyDonutChart } from '../../components/ProjectsDashboards/TinyDonutChart';
@@ -165,15 +167,27 @@ const ProjectsDashboard: React.FC = () => {
         </Col>
         <Col lg={12} style={{ marginTop: '10px' }}>
           {
-            searchResults && Object.keys(searchResults).map((category) =>
-              <SearchList
-                loading={loading}
-                title={category}
-                searchResults={searchResults[category]}
-                state={listState}
-                setPage={setFilter}
-              />
-            )
+            searchResults && Object.keys(searchResults).map((category) => {
+              let searchResultsToRender = null;
+              switch (category) {
+                case 'invoices':
+                  searchResultsToRender = <InvoicesSearchResults title={'invoices'} searchResults={searchResults['invoices']} />;
+                  break;
+                case 'getRecentCreditNotes':
+                  searchResultsToRender = <CreditNotesSearchResults title={'credit notes'} searchResults={searchResults['getRecentCreditNotes']} />
+                  break;
+              }
+
+              return (
+                <SearchList
+                  key={category}
+                  component={searchResultsToRender}
+                  loading={loading}
+                  state={listState}
+                  setPage={setFilter}
+                />
+              );
+            })
           }
         </Col>
       </Row>

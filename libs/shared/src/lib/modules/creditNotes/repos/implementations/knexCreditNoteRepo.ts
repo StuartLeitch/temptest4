@@ -237,11 +237,14 @@ export class KnexCreditNoteRepo
 
     const offset = pagination.offset * pagination.limit;
 
-    const creditNotes: Array<any> = await applyFilters(getModel(), filters)
-      .orderBy(`${TABLES.CREDIT_NOTES}.dateCreated`, 'desc')
-      .offset(offset < totalCount[0].count ? offset : 0)
-      .limit(pagination.limit)
-      .select([`${TABLES.CREDIT_NOTES}.*`]);
+    const sql = applyFilters(getModel(), filters)
+    .orderBy(`${TABLES.CREDIT_NOTES}.dateCreated`, 'desc')
+    .offset(offset < totalCount[0].count ? offset : 0)
+    .limit(pagination.limit)
+    .select([`${TABLES.CREDIT_NOTES}.*`]);
+
+    console.info(sql.toString());
+    const creditNotes: Array<any> = await sql;
 
     const maybeInvoices = flatten(creditNotes.map(CreditNoteMap.toDomain));
     if (maybeInvoices.isLeft()) {
