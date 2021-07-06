@@ -16,7 +16,7 @@ import { Loading } from '../../components';
 
 import { INVOICES_AND_CREDIT_NOTES_QUERY } from '../../Invoices/List/graphql';
 
-const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
+const SearchList: React.FC<SearchListProps> = (props) => {
   const { pagination: defaultPaginator, filters } = props.state;
 
   const [{ pagination }] = useLocalStorage(
@@ -92,7 +92,7 @@ const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
   ]);
 };
 
-interface RecentInvoicesListProps {
+interface SearchListProps {
   loading: boolean,
   title: string,
   searchResults: any[],
@@ -110,4 +110,4 @@ interface RecentInvoicesListProps {
   setPage(key: string, value: string | boolean | any[]): void;
 }
 
-export default RecentInvoicesList;
+export default SearchList;
