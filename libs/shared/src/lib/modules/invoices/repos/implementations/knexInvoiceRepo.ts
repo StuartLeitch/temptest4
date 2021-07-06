@@ -222,6 +222,7 @@ export class KnexInvoiceRepo
       .offset(offset < totalCount[0].count ? offset : 0)
       .limit(pagination.limit)
       .select([`${TABLES.INVOICES}.*`]);
+    console.info(sql.toString());
 
     const invoices: Array<any> = await sql;
 

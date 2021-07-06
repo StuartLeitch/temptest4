@@ -192,6 +192,8 @@ const InvoicesContainer: React.FC = () => {
     let newJournalId = [];
 
     switch (name) {
+
+      // * invoices status filter
       case 'invoiceStatus':
         if (filters.invoiceStatus.includes(status)) {
           newStatus = filters.invoiceStatus.filter((s) => s !== status);
@@ -214,7 +216,23 @@ const InvoicesContainer: React.FC = () => {
 
         break;
 
-      case 'transactionStatus':
+
+      // * pagination
+      case 'page':
+        setPage(value as string);
+        writeStorage('invoicesList', {
+          filters,
+          pagination:{
+            ...pagination,
+            page: value,
+            offset: Number(value) - 1,
+          }
+        });
+        break;
+
+
+      // * transaction status filter
+      default:
         if (filters.transactionStatus.includes(status)) {
           newTransactionStatus = filters.transactionStatus.filter(
             (s) => s !== status
@@ -260,28 +278,16 @@ const InvoicesContainer: React.FC = () => {
       //   }});
       //   break;
 
-      case 'page':
-        setPage(value as string);
-        writeStorage('invoicesList', {
-          filters,
-          pagination:{
-            ...pagination,
-            page: value,
-            offset: Number(value) - 1,
-          }
-        });
-        break;
-
-      default:
-        setCustomId(value as string);
-        setPage(1);
-        writeStorage('invoicesList', {
-          filters: { ...filters, customId: value },
-          pagination: {
-            ...pagination,
-            page: 1,
-          }
-        });
+      // default:
+      //   setCustomId(value as string);
+      //   setPage(1);
+      //   writeStorage('invoicesList', {
+      //     filters: { ...filters, customId: value },
+      //     pagination: {
+      //       ...pagination,
+      //       page: 1,
+      //     }
+      //   });
     }
   }
 };

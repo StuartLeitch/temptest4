@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useManualQuery } from 'graphql-hooks';
 import { useQueryState } from 'react-router-use-location-state';
 import { useLocalStorage, writeStorage } from '@rehooks/local-storage';
@@ -90,22 +90,7 @@ const ProjectsDashboard: React.FC = () => {
     INVOICES_AND_CREDIT_NOTES_QUERY
   );
 
-  useEffect(() => {
-    async function fetchData() {
-      const results = await fetchResults({
-        variables: {
-          filters: Filters.collect(filters),
-          pagination,
-        },
-      });
-
-      setSearchResults(results.data);
-    }
-
-    fetchData();
-  }, [searchFilters]);
-
-  const handleSearch = async (eventTarget: any) => {
+  const handleSearch = useCallback(async (eventTarget: any) => {
     const searchValue = (document.getElementById('search') as any).value;
     const isSearchByRefNumberChecked = (document.getElementById('searchByReferenceNumber') as any).checked;
     const isSearchByManuscriptIdChecked = (document.getElementById('searchByManuscriptId') as any).checked;
@@ -119,7 +104,20 @@ const ProjectsDashboard: React.FC = () => {
     }
 
     setSearchFilters(filters);
-  };
+
+    async function fetchData() {
+      const results = await fetchResults({
+        variables: {
+          filters: Filters.collect(filters),
+          pagination,
+        },
+      });
+
+      setSearchResults(results.data);
+    }
+
+    fetchData();
+  }, [searchFilters]);
 
   return (
     <Container>

@@ -7,11 +7,11 @@ export class Filters {
     return {
       invoiceStatus: src.invoiceStatus && [...src.invoiceStatus],
       transactionStatus: src.transactionStatus && [...src.transactionStatus],
-      referenceNumber: src.referenceNumber && wrap(src.referenceNumber),
+      referenceNumber: wrap(src.referenceNumber),
       invoiceItem: {
         article: {
-          journalId: src && src.journalId,
-          customId: src.customId && wrap(src.customId),
+          // journalId: src.journalId,
+          customId: wrap(src.customId),
         },
       },
     };

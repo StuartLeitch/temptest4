@@ -106,7 +106,7 @@ interface RecentInvoicesListProps {
       referenceNumber: string;
       customId: string;
     }
-};
+  },
   setPage(key: string, value: string | boolean | any[]): void;
 }
 
