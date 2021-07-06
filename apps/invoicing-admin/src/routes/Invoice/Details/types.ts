@@ -45,7 +45,6 @@ export interface ERPReferences {
   value: string;
 }
 export interface Invoice {
-  cancelledInvoiceReference: string | null;
   dateCreated: string;
   dateIssued: string;
   dateMovedToFinal: string | null;
