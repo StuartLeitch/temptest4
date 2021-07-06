@@ -461,7 +461,7 @@ export const invoice: Resolvers<Context> = {
       );
 
       if (creditNote.isLeft()) {
-        throw new Error(creditNote.value.message);
+        return null;
       }
 
       return {

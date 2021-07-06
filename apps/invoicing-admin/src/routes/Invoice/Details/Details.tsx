@@ -50,7 +50,6 @@ const Details: React.FC = (props) => {
     }
   );
   
-  console.log(data)
   if (loading) return <Loading />;
 
   if (error || typeof data === undefined)
