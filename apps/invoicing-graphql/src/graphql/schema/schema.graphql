@@ -99,6 +99,7 @@ type Invoice @model(id: "invoices") {
   payment: Payment
   payments: [Payment]
   transaction: Transaction
+  creditNote: CreditNote
 }
 
 type CreditNote @model(id: "credit_notes") {

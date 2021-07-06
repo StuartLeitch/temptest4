@@ -1,4 +1,4 @@
-import { INVOICE_QUERY, CREDIT_NOTE_QUERY } from './queries';
+import { INVOICE_QUERY } from './queries';
 
 import {
   APPLY_COUPON_MUTATION,
@@ -9,7 +9,6 @@ import {
 export {
   // queries
   INVOICE_QUERY,
-  CREDIT_NOTE_QUERY,
   // mutations
   CREATE_CREDIT_NOTE_MUTATION,
   APPLY_COUPON_MUTATION,
