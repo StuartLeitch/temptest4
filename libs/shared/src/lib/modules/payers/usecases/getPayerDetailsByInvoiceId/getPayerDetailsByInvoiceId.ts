@@ -7,6 +7,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
@@ -21,15 +26,19 @@ import { GetPayerDetailsByInvoiceIdDTO as DTO } from './getPayerDetailsByInvoice
 import * as Errors from './getPayerDetailsByInvoiceIdErrors';
 
 export class GetPayerDetailsByInvoiceIdUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private payerRepo: PayerRepoContract,
     private loggerService: LoggerContract
   ) {
+    super();
+
     this.validateRequest = this.validateRequest.bind(this);
     this.fetchPayer = this.fetchPayer.bind(this);
   }
 
+  @Authorize('payer:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const execution = await new AsyncEither(request)

@@ -44,7 +44,7 @@ export const invoicePaymentHandler = (
     emailService
   );
   const usecaseContext = {
-    roles: [Roles.ADMIN],
+    roles: [Roles.SYSTEM],
   };
 
   const request: SendInvoicePaymentReminderDTO = {

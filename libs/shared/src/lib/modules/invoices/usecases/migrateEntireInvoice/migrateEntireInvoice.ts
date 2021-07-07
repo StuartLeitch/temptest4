@@ -99,6 +99,7 @@ export class MigrateEntireInvoiceUsecase
     private loggerService: LoggerContract
   ) {
     super();
+
     this.addItemsToInvoice = this.addItemsToInvoice.bind(this);
     this.calculateVatPercentage = this.calculateVatPercentage.bind(this);
     this.confirmInvoice = this.confirmInvoice.bind(this);

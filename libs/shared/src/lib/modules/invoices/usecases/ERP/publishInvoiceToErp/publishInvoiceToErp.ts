@@ -62,7 +62,7 @@ export class PublishInvoiceToErpUsecase
     super();
   }
 
-  // @Authorize('zzz:zzz')
+  @Authorize('erp:publish')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     this.loggerService.setScope('PublishInvoiceToERP');
     this.loggerService.info('PublishInvoiceToERP Request', request);
@@ -87,9 +87,12 @@ export class PublishInvoiceToErpUsecase
         this.waiverRepo
       );
 
-      const resp = await getItemsUsecase.execute({
-        invoiceId: request.invoiceId,
-      });
+      const resp = await getItemsUsecase.execute(
+        {
+          invoiceId: request.invoiceId,
+        },
+        context
+      );
       this.loggerService.info(
         'PublishInvoiceToERP getItemsUsecase response',
         resp

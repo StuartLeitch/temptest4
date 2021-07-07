@@ -4,10 +4,11 @@ import { right, left } from '../../../../../core/logic/Either';
 import { UseCase } from '../../../../../core/domain/UseCase';
 
 // * Authorization Logic
+import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
 import {
-  UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../../domain/authorization';
 
 import { JournalId } from '../../../../journals/domain/JournalId';
@@ -58,6 +59,7 @@ export class PublishRevenueRecognitionReversalUsecase
     super();
   }
 
+  @Authorize('erp:publish')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const invoiceId = request.invoiceId;
     const getItemsUsecase = new GetItemsForInvoiceUsecase(

@@ -8,6 +8,11 @@ import { RepoError } from '../../../../../infrastructure/RepoError';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../../domain/authorization';
 
 import { JournalId } from '../../../domain/JournalId';
 
@@ -20,12 +25,16 @@ import { RemoveEditorsFromJournalResponse as Response } from './removeEditorsFro
 import { RemoveEditorsFromJournalDTO as DTO } from './removeEditorsFromJournalDTO';
 
 export class RemoveEditorsFromJournalUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private editorRepo: EditorRepoContract,
     private catalogRepo: CatalogRepoContract
-  ) {}
+  ) {
+    super();
+  }
 
+  @Authorize('editor:assign')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const { journalId: journalIdString, allEditors: editors } = request;
     const allEditors = editors.map((e) => ({

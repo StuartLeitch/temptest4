@@ -93,7 +93,7 @@ export class RecordPaymentUsecase
     };
   }
 
-  @Authorize('payment:create')
+  @Authorize('payment:register')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const result = await new AsyncEither(request)

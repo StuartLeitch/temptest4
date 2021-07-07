@@ -11,6 +11,7 @@ import { MockErpReferenceRepo } from './../../../../../../src/lib/modules/vendor
 import { InvoiceMap } from './../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceId';
 import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEntityID';
+import { Roles } from '../../../../../../src/lib/shared';
 
 let mockInvoiceRepo: MockInvoiceRepo;
 let mockInvoiceItemRepo: MockInvoiceItemRepo;
@@ -19,6 +20,10 @@ let mockErpReferenceRepo: MockErpReferenceRepo;
 let response: ChangeInvoiceStatusResponse;
 
 let useCase: ChangeInvoiceStatus;
+
+const usecaseContext = {
+  roles: [Roles.PAYER],
+};
 
 Before({ tags: '@ValidateChangeInvoice' }, function () {
   mockInvoiceItemRepo = new MockInvoiceItemRepo();
@@ -59,10 +64,13 @@ Given(
 When(
   /I try update the status for the Invoice with ID "([\w-]+)" to (.+)/,
   async function (testInvoiceId, status: string) {
-    response = await useCase.execute({
-      invoiceId: testInvoiceId,
-      status,
-    });
+    response = await useCase.execute(
+      {
+        invoiceId: testInvoiceId,
+        status,
+      },
+      usecaseContext
+    );
   }
 );
 

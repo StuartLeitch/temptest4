@@ -32,7 +32,7 @@ export class GetPaymentInfoUsecase
     super();
   }
 
-  @Authorize('invoice:read')
+  @Authorize('payment:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     if (!request.invoiceId) {
       return left(new Errors.InvoiceIdRequiredError());

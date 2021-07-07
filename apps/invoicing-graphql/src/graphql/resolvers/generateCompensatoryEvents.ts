@@ -27,6 +27,11 @@ export const generateCompensatoryEvents: Resolvers<Context> = {
         },
         services: { logger: loggerService, qq: sqsQueService },
       } = context;
+
+      const usecaseContext = {
+        roles,
+      };
+
       const usecase = new GenerateCompensatoryEventsUsecase(
         paymentMethod,
         invoiceItem,
@@ -41,18 +46,18 @@ export const generateCompensatoryEvents: Resolvers<Context> = {
         loggerService
       );
       const getIdsUsecase = new GetInvoicesIdsUsecase(invoice);
-      const maybeResult = await getIdsUsecase.execute({
-        invoiceIds,
-        journalIds,
-        omitDeleted: true,
-      });
+      const maybeResult = await getIdsUsecase.execute(
+        {
+          invoiceIds,
+          journalIds,
+          omitDeleted: true,
+        },
+        usecaseContext
+      );
 
       if (maybeResult.isLeft()) {
         throw new Error(maybeResult.value.message);
       }
-      const usecaseContext = {
-        roles,
-      };
 
       const ids = maybeResult.value;
 

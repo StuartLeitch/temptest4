@@ -7,6 +7,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { ManuscriptId } from '../../domain/ManuscriptId';
 
@@ -18,9 +23,13 @@ import { ExistsManuscriptByIdDTO as DTO } from './existsManuscriptByIdDTO';
 import * as Errors from './existsManuscriptByIdErrors';
 
 export class ExistsManuscriptByIdUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
-  constructor(private manuscriptRepo: ArticleRepoContract) {}
+  constructor(private manuscriptRepo: ArticleRepoContract) {
+    super();
+  }
 
+  @Authorize('manuscript:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       if (!request.manuscriptId) {

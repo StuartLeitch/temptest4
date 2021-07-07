@@ -7,6 +7,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
@@ -21,11 +26,14 @@ import { GetManuscriptByInvoiceIdDTO as DTO } from './getManuscriptByInvoiceIdDT
 import * as Errors from './getManuscriptByInvoiceIdErrors';
 
 export class GetManuscriptByInvoiceIdUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private manuscriptRepo: ArticleRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract
   ) {
+    super();
+
     this.getManuscriptsForInvoiceItems = this.getManuscriptsForInvoiceItems.bind(
       this
     );
@@ -33,6 +41,7 @@ export class GetManuscriptByInvoiceIdUsecase
     this.sanitizeInput = this.sanitizeInput.bind(this);
   }
 
+  @Authorize('manuscript:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const execution = await new AsyncEither(request)
       .then(this.sanitizeInput)

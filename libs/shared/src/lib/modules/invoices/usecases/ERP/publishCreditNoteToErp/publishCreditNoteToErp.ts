@@ -5,6 +5,11 @@ import { UseCase } from '../../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../../domain/authorization';
 
 import { InvoiceId } from '../../../domain/InvoiceId';
 import { Invoice } from '../../../domain/Invoice';
@@ -26,6 +31,7 @@ import { PublishCreditNoteToErpResponse as Response } from './publishCreditNoteT
 import { PublishCreditNoteToErpRequestDTO as DTO } from './publishCreditNoteToErpDTO';
 
 export class PublishCreditNoteToErpUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
@@ -35,8 +41,11 @@ export class PublishCreditNoteToErpUsecase
     private erpReferenceRepo: ErpReferenceRepoContract,
     private erpService: ErpServiceContract,
     private loggerService: LoggerContract
-  ) {}
+  ) {
+    super();
+  }
 
+  @Authorize('erp:publish')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     this.loggerService.info('PublishCreditNoteToERP Request', request);
 
@@ -94,9 +103,12 @@ export class PublishCreditNoteToErpUsecase
           this.waiverRepo
         );
 
-        const resp = await getItemsUsecase.execute({
-          invoiceId: request.creditNoteId,
-        });
+        const resp = await getItemsUsecase.execute(
+          {
+            invoiceId: request.creditNoteId,
+          },
+          context
+        );
         this.loggerService.debug(
           'PublishCreditNoteToERP getItemsUsecase response',
           resp

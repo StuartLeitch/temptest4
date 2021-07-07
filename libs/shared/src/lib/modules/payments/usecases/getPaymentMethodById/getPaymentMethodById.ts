@@ -6,6 +6,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { PaymentMethodId } from '../../domain/PaymentMethodId';
 
@@ -17,9 +22,13 @@ import { GetPaymentMethodByIdDTO as DTO } from './getPaymentMethodByIdDTO';
 import * as Errors from './getPaymentMethodByIdErrors';
 
 export class GetPaymentMethodByIdUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
-  constructor(private paymentMethodRepo: PaymentMethodRepoContract) {}
+  constructor(private paymentMethodRepo: PaymentMethodRepoContract) {
+    super();
+  }
 
+  @Authorize('paymentMethod:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const paymentMethodId = request.paymentMethodId;
 

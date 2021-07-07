@@ -6,6 +6,11 @@ import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../../domain/authorization';
 
 import { ArticleRepoContract } from '../../../../manuscripts/repos/articleRepo';
 import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
@@ -29,6 +34,7 @@ import { RetryFailedSageErpInvoicesResponse as Response } from './retryFailedSag
 import { RetryFailedSageErpInvoicesDTO as DTO } from './retryFailedSageErpInvoicesDTO';
 
 export class RetryFailedSageErpInvoicesUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   private publishToErpUsecase: PublishInvoiceToErpUsecase;
   constructor(
@@ -46,6 +52,8 @@ export class RetryFailedSageErpInvoicesUsecase
     private loggerService: LoggerContract,
     private vatService: VATService
   ) {
+    super();
+
     this.publishToErpUsecase = new PublishInvoiceToErpUsecase(
       this.invoiceRepo,
       this.invoiceItemRepo,
@@ -63,6 +71,7 @@ export class RetryFailedSageErpInvoicesUsecase
     );
   }
 
+  @Authorize('erp:publish')
   public async execute(request?: DTO, context?: Context): Promise<Response> {
     try {
       const maybeFailedErpInvoicesIds = await this.invoiceRepo.getFailedSageErpInvoices();
@@ -95,17 +104,19 @@ export class RetryFailedSageErpInvoicesUsecase
         const maybeUpdatedInvoiceResponse = await this.publishToErpUsecase.execute(
           {
             invoiceId: failedInvoice.id.toString(),
-          }
+          },
+          context
         );
-
-        const updatedInvoiceResponse = maybeUpdatedInvoiceResponse.value;
 
         if (
           typeof maybeUpdatedInvoiceResponse.isLeft === 'function' &&
           maybeUpdatedInvoiceResponse.isLeft()
         ) {
-          return left(updatedInvoiceResponse);
+          return left(maybeUpdatedInvoiceResponse.value);
         }
+
+        const updatedInvoiceResponse = maybeUpdatedInvoiceResponse.value;
+
         const assignedErpReference = updatedInvoiceResponse as ErpInvoiceResponse;
 
         if (assignedErpReference) {

@@ -57,7 +57,7 @@ export class CreatePaymentUsecase
     this.savePayment = this.savePayment.bind(this);
   }
 
-  @Authorize('payments:create')
+  @Authorize('payment:create')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const result = await new AsyncEither(request)

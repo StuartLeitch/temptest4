@@ -5,6 +5,11 @@ import { left } from '../../../../core/logic/Either';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 // * Usecase specific
 import {
@@ -16,9 +21,13 @@ import { GenerateClientTokenResponse as Response } from './generateClientToken.r
 import { GenerateClientTokenDTO as DTO } from './generateClientToken.dto';
 
 export class GenerateClientTokenUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
-  constructor(private strategyFactory: PaymentStrategyFactory) {}
+  constructor(private strategyFactory: PaymentStrategyFactory) {
+    super();
+  }
 
+  @Authorize('payment:generateToken')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const strategy = await this.strategyFactory.getStrategy(
       PaymentStrategySelection.Braintree

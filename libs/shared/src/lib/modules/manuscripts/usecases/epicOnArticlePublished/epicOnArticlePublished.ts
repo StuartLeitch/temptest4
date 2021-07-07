@@ -6,6 +6,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { InvoiceStatus } from '../../../invoices/domain/Invoice';
@@ -46,6 +51,7 @@ interface CorrelationContext {
 
 type Context = UsecaseAuthorizationContext & CorrelationContext;
 export class EpicOnArticlePublishedUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -59,8 +65,11 @@ export class EpicOnArticlePublishedUsecase
     private emailService: EmailService,
     private vatService: VATService,
     private loggerService: LoggerContract
-  ) {}
+  ) {
+    super();
+  }
 
+  @Authorize('manuscript:update')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     let manuscript: Manuscript;
 

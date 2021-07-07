@@ -7,6 +7,11 @@ import { UseCase } from '../../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../../domain/authorization';
 
 import { EditorRole } from './../../../../../domain/EditorRole';
 import { Email } from './../../../../../domain/Email';
@@ -21,9 +26,14 @@ import { EditorRepoContract } from '../../../repos/editorRepo';
 import { CreateEditorResponse as Response } from './createEditorResponse';
 import { CreateEditorDTO as DTO } from './createEditorDTO';
 
-export class CreateEditor implements UseCase<DTO, Promise<Response>, Context> {
-  constructor(private editorRepo: EditorRepoContract) {}
+export class CreateEditor
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
+  constructor(private editorRepo: EditorRepoContract) {
+    super();
+  }
 
+  @Authorize('editor:create')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     let editor: Editor;
     let editorRole: EditorRole;

@@ -8,12 +8,11 @@ Feature: Authorization
     Then I should be <Action>
 
     Examples:
-      | Role        | Action  |
-      | ADMIN       | allowed |
-      | SUPER_ADMIN | allowed |
-      | CUSTOMER    | allowed |
-      | PAYER       | denied  |
-      | AUTHOR      | allowed |
+      | Role                | Action  |
+      | ADMIN               | denied  |
+      | SUPER_ADMIN         | allowed |
+      | PAYER               | denied  |
+      | QUEUE_EVENT_HANDLER | allowed |
 
 
   Scenario Outline: Create Invoice (as Tenant)
@@ -23,12 +22,11 @@ Feature: Authorization
     Then I should be <Action>
 
     Examples:
-      | Role        | Action  |
-      | ADMIN       | allowed |
-      | SUPER_ADMIN | allowed |
-      | CUSTOMER    | denied  |
-      | PAYER       | denied  |
-      | AUTHOR      | denied  |
+      | Role                | Action  |
+      | ADMIN               | denied  |
+      | SUPER_ADMIN         | allowed |
+      | PAYER               | denied  |
+      | QUEUE_EVENT_HANDLER | allowed |
 
 
   Scenario Outline: Create Invoice (as different Tenant)
@@ -38,12 +36,11 @@ Feature: Authorization
     Then I should be <Action>
 
     Examples:
-      | Role        | Action  |
-      | ADMIN       | denied  |
-      | SUPER_ADMIN | allowed |
-      | CUSTOMER    | denied  |
-      | PAYER       | denied  |
-      | AUTHOR      | denied  |
+      | Role                | Action  |
+      | ADMIN               | denied  |
+      | SUPER_ADMIN         | allowed |
+      | PAYER               | denied  |
+      | QUEUE_EVENT_HANDLER | allowed |
 
 
   Scenario Outline: Delete Invoice (as Tenant)
@@ -52,12 +49,11 @@ Feature: Authorization
     Then I should be <Action>
 
     Examples:
-      | Role        | Action  |
-      | ADMIN       | allowed |
-      | SUPER_ADMIN | allowed |
-      | CUSTOMER    | denied  |
-      | PAYER       | denied  |
-      | AUTHOR      | denied  |
+      | Role                | Action  |
+      | ADMIN               | denied  |
+      | SUPER_ADMIN         | allowed |
+      | PAYER               | denied  |
+      | QUEUE_EVENT_HANDLER | allowed |
 
 
   Scenario Outline: Delete Invoice (as different Tenant)
@@ -66,9 +62,8 @@ Feature: Authorization
     Then I should be <Action>
 
     Examples:
-      | Role        | Action  |
-      | ADMIN       | denied  |
-      | SUPER_ADMIN | allowed |
-      | CUSTOMER    | denied  |
-      | PAYER       | denied  |
-      | AUTHOR      | denied  |
+      | Role                | Action  |
+      | ADMIN               | denied  |
+      | SUPER_ADMIN         | allowed |
+      | PAYER               | denied  |
+      | QUEUE_EVENT_HANDLER | allowed |

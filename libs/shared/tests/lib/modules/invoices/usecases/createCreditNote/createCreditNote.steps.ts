@@ -29,7 +29,7 @@ import { CreateCreditNoteUsecase } from './../../../../../../src/lib/modules/inv
 import { Roles } from '../../../../../../src/lib/modules/users/domain/enums/Roles';
 
 const defaultContext: UsecaseAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN],
+  roles: [Roles.ADMIN],
 };
 
 let mockInvoiceRepo: MockInvoiceRepo;

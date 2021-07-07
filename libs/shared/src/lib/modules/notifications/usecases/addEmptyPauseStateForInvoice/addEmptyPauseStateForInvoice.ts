@@ -7,6 +7,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
@@ -22,17 +27,21 @@ import { AddEmptyPauseStateForInvoiceDTO as DTO } from './addEmptyPauseStateForI
 import * as Errors from './addEmptyPauseStateForInvoiceErrors';
 
 export class AddEmptyPauseStateForInvoiceUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private loggerService: LoggerContract
   ) {
+    super();
+
     this.addNewPauseInstance = this.addNewPauseInstance.bind(this);
     this.existsInvoiceWithId = this.existsInvoiceWithId.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
   }
 
+  @Authorize('reminders:add')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const execution = new AsyncEither(request)

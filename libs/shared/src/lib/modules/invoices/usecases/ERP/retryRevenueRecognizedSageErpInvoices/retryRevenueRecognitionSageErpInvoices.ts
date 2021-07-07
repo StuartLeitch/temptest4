@@ -3,6 +3,11 @@ import { right, left } from '../../../../../core/logic/Either';
 import { UseCase } from '../../../../../core/domain/UseCase';
 
 import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../../domain/authorization';
 
 import { ArticleRepoContract } from '../../../../manuscripts/repos/articleRepo';
 import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
@@ -25,6 +30,7 @@ import { RetryRevenueRecognitionSageErpInvoicesResponse as Response } from './re
 import { RetryRevenueRecognitionSageErpInvoicesDTO as DTO } from './retryRevenueRecognitionSageErpInvoicesDTO';
 
 export class RetryRevenueRecognitionSageErpInvoicesUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   private publishRevenueRecognitionToErpUsecase: PublishRevenueRecognitionToErpUsecase;
   constructor(
@@ -41,6 +47,8 @@ export class RetryRevenueRecognitionSageErpInvoicesUsecase
     private sageService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {
+    super();
+
     this.publishRevenueRecognitionToErpUsecase = new PublishRevenueRecognitionToErpUsecase(
       this.invoiceRepo,
       this.invoiceItemRepo,
@@ -57,6 +65,7 @@ export class RetryRevenueRecognitionSageErpInvoicesUsecase
     );
   }
 
+  @Authorize('erp:publish')
   public async execute(request?: DTO, context?: Context): Promise<Response> {
     try {
       const maybeUnrecognizedErpInvoices = await this.invoiceRepo.getUnrecognizedSageErpInvoices();
@@ -89,7 +98,8 @@ export class RetryRevenueRecognitionSageErpInvoicesUsecase
         const updatedInvoiceResponse = await this.publishRevenueRecognitionToErpUsecase.execute(
           {
             invoiceId: unrecognizedInvoice.id.toString(),
-          }
+          },
+          context
         );
         if (updatedInvoiceResponse.isLeft()) {
           errs.push(updatedInvoiceResponse.value);

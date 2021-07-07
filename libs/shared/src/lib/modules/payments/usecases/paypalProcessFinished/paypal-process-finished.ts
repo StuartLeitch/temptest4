@@ -47,7 +47,7 @@ export class PayPalProcessFinishedUsecase
     this.attachPayment = this.attachPayment.bind(this);
   }
 
-  @Authorize('payments:update')
+  @Authorize('payment:update')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const result = await new AsyncEither(request)

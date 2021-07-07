@@ -5,6 +5,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 // * Usecase specific
 import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
@@ -14,9 +19,13 @@ import { UpdateInvoiceItemsDTO as DTO } from './updateInvoiceItemsDTO';
 import * as Errors from './updateInvoiceItemsErrors';
 
 export class UpdateInvoiceItemsUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
-  constructor(private invoiceItemRepo: InvoiceItemRepoContract) {}
+  constructor(private invoiceItemRepo: InvoiceItemRepoContract) {
+    super();
+  }
 
+  @Authorize('invoice:update')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       request.invoiceItems.forEach(async (item) => {

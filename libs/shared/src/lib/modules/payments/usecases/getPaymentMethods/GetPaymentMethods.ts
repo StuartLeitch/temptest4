@@ -7,6 +7,11 @@ import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { PaymentMethodRepoContract } from '../../repos/paymentMethodRepo';
 
@@ -17,12 +22,16 @@ import * as Errors from './GetPaymentMethodsErrors';
 type Context = UsecaseAuthorizationContext & { correlationId?: string };
 
 export class GetPaymentMethodsUseCase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private paymentMethodRepo: PaymentMethodRepoContract,
     private loggerService: LoggerContract
-  ) {}
+  ) {
+    super();
+  }
 
+  @Authorize('paymentMethods:read')
   public async execute(request?: DTO, context?: Context): Promise<Response> {
     try {
       this.loggerService.debug('GetPaymentMethodsUseCase', {

@@ -43,7 +43,7 @@ export const invoiceCreditControlHandler = (
     emailService
   );
   const usecaseContext = {
-    roles: [Roles.ADMIN],
+    roles: [Roles.SYSTEM],
   };
 
   const request: SendInvoiceCreditControlReminderDTO = {

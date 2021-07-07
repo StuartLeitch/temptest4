@@ -1,4 +1,7 @@
-import { RetryRevenueRecognitionNetsuiteErpInvoicesUsecase } from '@hindawi/shared';
+import {
+  RetryRevenueRecognitionNetsuiteErpInvoicesUsecase,
+  Roles,
+} from '@hindawi/shared';
 
 import { Context } from '../builders';
 
@@ -54,7 +57,10 @@ export class RegisterRevenueRecognitionsCron {
       loggerService
     );
 
-    const maybeResponse = await retryRevenueRecognizedInvoicesToNetsuiteErpUsecase.execute();
+    const maybeResponse = await retryRevenueRecognizedInvoicesToNetsuiteErpUsecase.execute(
+      null,
+      { roles: [Roles.SYSTEM] }
+    );
     if (maybeResponse.isLeft()) {
       loggerService.error(maybeResponse.value.message);
       throw maybeResponse.value;

@@ -16,7 +16,7 @@ import { GetManuscriptByManuscriptIdUsecase } from '../../manuscripts/usecases/g
 import { PublishInvoiceDraftDueAmountUpdatedUseCase } from '../usecases/publishEvents/publishInvoiceDraftDueAmountUpdated';
 
 const defaultContext: UsecaseAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN],
+  roles: [Roles.DOMAIN_EVENT_HANDLER],
 };
 
 export class AfterInvoiceDraftDueAmountUpdatedEvent

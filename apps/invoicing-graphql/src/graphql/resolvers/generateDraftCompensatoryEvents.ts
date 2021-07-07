@@ -17,6 +17,11 @@ export const generateDraftCompensatoryEvents: Resolvers<Context> = {
         repos: { invoiceItem, manuscript, invoice, coupon, waiver },
         services: { logger: loggerService, qq: sqsQueService },
       } = context;
+
+      const usecaseContext = {
+        roles,
+      };
+
       const usecase = new GenerateDraftCompensatoryEventsUsecase(
         invoiceItem,
         manuscript,
@@ -27,18 +32,18 @@ export const generateDraftCompensatoryEvents: Resolvers<Context> = {
         loggerService
       );
       const getIdsUsecase = new GetInvoicesIdsUsecase(invoice);
-      const maybeResult = await getIdsUsecase.execute({
-        invoiceIds,
-        journalIds,
-        omitDeleted: false,
-      });
+      const maybeResult = await getIdsUsecase.execute(
+        {
+          invoiceIds,
+          journalIds,
+          omitDeleted: false,
+        },
+        usecaseContext
+      );
 
       if (maybeResult.isLeft()) {
         throw new Error(maybeResult.value.message);
       }
-      const usecaseContext = {
-        roles,
-      };
 
       const ids = maybeResult.value;
 

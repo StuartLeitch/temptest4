@@ -5,6 +5,11 @@ import { right, left } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { InvoiceStatus, Invoice } from '../../domain/Invoice';
 import { InvoiceId } from '../../domain/InvoiceId';
@@ -16,9 +21,13 @@ import { ChangeInvoiceStatusRequestDTO as DTO } from './changeInvoiceStatusDTO';
 import * as Errors from './changeInvoiceStatusErrors';
 
 export class ChangeInvoiceStatus
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
-  constructor(private invoiceRepo: InvoiceRepoContract) {}
+  constructor(private invoiceRepo: InvoiceRepoContract) {
+    super();
+  }
 
+  @Authorize('invoice:update')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     let invoice: Invoice;
     try {

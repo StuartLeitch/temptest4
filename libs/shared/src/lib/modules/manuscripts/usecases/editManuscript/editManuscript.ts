@@ -28,7 +28,7 @@ export class EditManuscriptUsecase
     super();
   }
 
-  @Authorize('manuscript:edit')
+  @Authorize('manuscript:update')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     let manuscript: Manuscript;
 

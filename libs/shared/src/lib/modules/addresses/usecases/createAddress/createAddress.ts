@@ -3,6 +3,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 import { left } from '../../../../core/logic/Either';
 
 import { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { AddressRepoContract } from '../../repos/addressRepo';
 import { AddressMap } from '../../mappers/AddressMap';
@@ -12,9 +17,13 @@ import { CreateAddressRequestDTO as DTO } from './createAddressDTO';
 import * as Errors from './createAddressErrors';
 
 export class CreateAddressUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
-  constructor(private addressRepo: AddressRepoContract) {}
+  constructor(private addressRepo: AddressRepoContract) {
+    super();
+  }
 
+  @Authorize('address:create')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const { postalCode } = request;
     try {

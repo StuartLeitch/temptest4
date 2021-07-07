@@ -51,7 +51,6 @@ export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscri
 export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptDTO';
 export * from './modules/transactions/usecases/getTransactionDetailsByManuscriptCustomId/getTransactionDetailsByManuscriptCustomId';
 export * from './modules/transactions/usecases/getTransactionDetailsByManuscriptCustomId/getTransactionDetailsByManuscriptCustomId.dto';
-export * from './modules/transactions/usecases/setTransactionToActiveByCustomId/setTransactionToActiveByCustomId';
 export * from './modules/transactions/usecases/createTransaction/createTransaction';
 export * from './modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
 export * from './modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransactionDTO';

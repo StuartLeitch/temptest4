@@ -6,6 +6,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 // * Usecase specific
 import { VATService } from '../../../../domain/services/VATService';
@@ -22,13 +27,17 @@ import type { GetVATNoteDTO as DTO } from './getVATNoteDTO';
 import * as Errors from './getVATNoteErrors';
 
 export class GetVATNoteUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private payerRepo: PayerRepoContract,
     private addressRepo: AddressRepoContract,
     private vatService: VATService
-  ) {}
+  ) {
+    super();
+  }
 
+  @Authorize('invoice:applyVAT')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const invoiceId = InvoiceId.create(new UniqueEntityID(request.invoiceId));
 

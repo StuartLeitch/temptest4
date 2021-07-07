@@ -104,7 +104,7 @@ let response: ScheduleRemindersForExistingInvoicesResponse = null;
 let usecase: ScheduleRemindersForExistingInvoicesUsecase = null;
 
 const context: UsecaseAuthorizationContext = {
-  roles: [Roles.ADMIN],
+  roles: [Roles.SERVICE],
 };
 
 Before({ tags: '@ValidateScheduleReminders' }, () => {

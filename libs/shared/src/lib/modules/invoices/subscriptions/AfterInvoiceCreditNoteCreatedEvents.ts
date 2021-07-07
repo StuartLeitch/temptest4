@@ -31,7 +31,7 @@ import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMeth
 import { Payer } from '../../payers/domain/Payer';
 
 const defaultContext: UsecaseAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN],
+  roles: [Roles.DOMAIN_EVENT_HANDLER],
 };
 
 export class AfterInvoiceCreditNoteCreatedEvent

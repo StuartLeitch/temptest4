@@ -3,6 +3,11 @@ import { right, left } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { ErrorUtils } from '../../../../utils/ErrorUtils';
 
@@ -31,6 +36,7 @@ import { RetryPaymentsRegistrationToErpResponse as Response } from './retryPayme
 import { RetryPaymentsRegistrationToErpDTO as DTO } from './retryPaymentRegistrationDTO';
 
 export class RetryPaymentsRegistrationToErpUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   private publishPaymentToErpUsecase: PublishPaymentToErpUsecase;
   constructor(
@@ -47,6 +53,8 @@ export class RetryPaymentsRegistrationToErpUsecase
     private netsuiteService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {
+    super();
+
     this.publishPaymentToErpUsecase = new PublishPaymentToErpUsecase(
       this.invoiceRepo,
       this.invoiceItemRepo,
@@ -85,7 +93,8 @@ export class RetryPaymentsRegistrationToErpUsecase
         const publishedPaymentResponse = await this.publishPaymentToErpUsecase.execute(
           {
             paymentId: paymentId.id.toString(),
-          }
+          },
+          context
         );
         if (publishedPaymentResponse.isLeft()) {
           errs.push(publishedPaymentResponse.value);

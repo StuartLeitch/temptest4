@@ -61,7 +61,7 @@ export class PayPalPaymentApprovedUsecase
     this.captureMoney = this.captureMoney.bind(this);
   }
 
-  @Authorize('payments:update')
+  @Authorize('payment:update')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const result = new AsyncEither(request)

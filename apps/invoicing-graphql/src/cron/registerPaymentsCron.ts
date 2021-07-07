@@ -1,4 +1,4 @@
-import { RetryPaymentsRegistrationToErpUsecase } from '@hindawi/shared';
+import { RetryPaymentsRegistrationToErpUsecase, Roles } from '@hindawi/shared';
 
 import { Context } from '../builders';
 
@@ -52,7 +52,10 @@ export class RegisterPaymentsCron {
       loggerService
     );
 
-    const maybeResponse = await retryPaymentsToNetsuiteErpUsecase.execute();
+    const maybeResponse = await retryPaymentsToNetsuiteErpUsecase.execute(
+      null,
+      { roles: [Roles.SYSTEM] }
+    );
     if (maybeResponse.isLeft()) {
       loggerService.error(maybeResponse.value.message);
       throw maybeResponse.value;

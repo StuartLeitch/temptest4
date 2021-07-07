@@ -3,6 +3,11 @@ import { right, left } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { Publisher } from '../../../publishers/domain/Publisher';
 import { CatalogItem } from '../../domain/CatalogItem';
@@ -17,12 +22,16 @@ import { AddCatalogItemToCatalogUseCaseDTO as DTO } from './addCatalogItemToCata
 import * as Errors from './addCatalogItemToCatalogErrors';
 
 export class AddCatalogItemToCatalogUseCase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Response, Context> {
   constructor(
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract
-  ) {}
+  ) {
+    super();
+  }
 
+  @Authorize('journal:create')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const {
       amount,
