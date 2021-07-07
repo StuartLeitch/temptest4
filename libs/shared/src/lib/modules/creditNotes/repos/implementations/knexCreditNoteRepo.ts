@@ -7,8 +7,10 @@ import { RepoError } from '../../../../infrastructure/RepoError';
 import { CreditNote } from '../../domain/CreditNote';
 import { CreditNoteId } from '../../domain/CreditNoteId';
 import { CreditNoteRepoContract } from './../creditNoteRepo';
+import { InvoiceItemRepoContract } from '../../../invoices/repos';
 import { CreditNoteMap } from '../../mappers/CreditNoteMap';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
+import { ManuscriptId } from '../../../manuscripts/domain/ManuscriptId';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { PaginatedCreditNoteResult } from '../creditNoteRepo';
 import { applyFilters } from './utils';
@@ -17,7 +19,11 @@ import { applyFilters } from './utils';
 export class KnexCreditNoteRepo
   extends AbstractBaseDBRepo<Knex, CreditNote>
   implements CreditNoteRepoContract {
-  constructor(protected db: Knex, protected logger?: any) {
+  constructor(
+    protected db: Knex,
+    protected logger?: any,
+    private invoiceItemRepo?: InvoiceItemRepoContract
+  ) {
     super(db, logger);
   }
 
@@ -201,27 +207,36 @@ export class KnexCreditNoteRepo
   ): Promise<Either<GuardFailure | RepoError, CreditNote>> {
     const { db } = this;
 
+    const articleId = ManuscriptId.create(new UniqueEntityID(customId));
+
+    const maybeInvoiceItems = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
+      articleId
+    );
+
+    if (maybeInvoiceItems.isLeft()) {
+      return left(RepoError.createEntityNotFoundError('article', customId));
+    }
+
+    const maybeCreditNote = await this.getCreditNoteByInvoiceId(
+      maybeInvoiceItems.value[0].invoiceId
+    );
+
+    if (maybeCreditNote.isLeft()) {
+      return left(
+        RepoError.createEntityNotFoundError(
+          'invoiceItem',
+          maybeInvoiceItems.value[0].invoiceId.id.toString()
+        )
+      );
+    }
+    const creditNoteInvoiceId = maybeCreditNote.value.invoiceId;
+    const invoiceItemInvoiceId = maybeInvoiceItems.value[0].invoiceId;
+
     const result = await db
-      .select(
-        'credit_notes.invoiceId AS invoiceId',
-        'credit_notes.dateCreated AS creditNoteDateCreated',
-        'articles.customId AS customId',
-        'articles.datePublished AS datePublished'
-      )
-      .from('articles')
-      .leftJoin(
-        'invoice_items',
-        'invoice_items.manuscriptId',
-        '=',
-        'articles.id'
-      )
-      .leftJoin(
-        'credit_notes',
-        'invoice_items.invoiceId',
-        '=',
-        'credit_notes.invoiceId'
-      )
-      .where({ 'articles.customId': customId })
+      .select()
+      .from('credit_notes')
+      .where('invoiceId', creditNoteInvoiceId.id.toString())
+      .where('invoiceId', '=', invoiceItemInvoiceId.id.toString())
       .first();
 
     if (result.length === 0) {
