@@ -65,8 +65,8 @@ export class PublishCreditNoteCreatedUsecase
       manuscriptAcceptedDate: invoice?.dateAccepted?.toISOString(),
       invoiceCreatedDate: invoice?.dateCreated.toISOString(),
       invoiceIssuedDate: invoice?.dateIssued?.toISOString(),
-
-      reason: creditNote.creationReason,
+      // * Temporary commented until CN events decision
+      // reason: creditNote.creationReason,
 
       costs: formatCosts(invoiceItems, payments, invoice, creditNote),
 
