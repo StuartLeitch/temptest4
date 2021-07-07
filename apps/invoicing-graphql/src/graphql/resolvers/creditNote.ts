@@ -53,6 +53,7 @@ export const creditNote: Resolvers<Context> = {
         invoice: {
           ...InvoiceMap.toPersistence(invoiceResult.value),
           invoiceId: invoiceResult.value.id.toString(),
+          referenceNumber: invoiceResult.value.persistentReferenceNumber,
         },
       };
     },

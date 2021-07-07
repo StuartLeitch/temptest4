@@ -66,6 +66,20 @@ const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
               />
             </Col>
           </FormGroup>
+          <FormGroup row>
+              <Label for='staticText' sm={12}>
+                Cancelled Invoice
+                <Link
+                  to={`/invoices/details/${invoice.id}`}
+                >
+                  {
+                    <span className='ml-1 font-weight-bold text-warning'>
+                     {invoice.referenceNumber}
+                    </span>
+                  }
+                </Link>
+              </Label>
+            </FormGroup>
         </div>
       </Form>
     </>
