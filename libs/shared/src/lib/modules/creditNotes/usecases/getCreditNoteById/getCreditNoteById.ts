@@ -18,7 +18,7 @@ import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
 
 // * Usecase specific
 import { GetCreditNoteByIdResponse as Response } from './getCreditNoteByIdResponse';
-import { GetCreditNoteByIdErrors as Errors } from './getCreditNoteByIdErrors';
+import * as Errors from './getCreditNoteByIdErrors';
 import type { GetCreditNoteByIdDTO as DTO } from './getCreditNoteByIdDTO';
 
 export class GetCreditNoteByIdUsecase
@@ -31,7 +31,7 @@ export class GetCreditNoteByIdUsecase
     return {};
   }
 
-  @Authorize('read:credit_note')
+  @Authorize('creditNote:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const { creditNoteId } = request;
 

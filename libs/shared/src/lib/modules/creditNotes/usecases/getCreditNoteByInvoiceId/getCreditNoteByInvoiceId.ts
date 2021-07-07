@@ -20,7 +20,7 @@ import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
 
 // * Usecase specific
 import { GetCreditNoteByInvoiceIdResponse as Response } from './getCreditNoteByInvoiceIdResponse';
-import { GetCreditNoteByInvoiceIdErrors as Errors } from './getCreditNoteByInvoiceIdErrors';
+import * as Errors from './getCreditNoteByInvoiceIdErrors';
 import type { GetCreditNoteByInvoiceIdDTO as DTO } from './getCreditNoteByInvoiceIdDTO';
 
 // to be modified with Guard/Either
@@ -37,7 +37,7 @@ export class GetCreditNoteByInvoiceIdUsecase
     return {};
   }
 
-  @Authorize('read:credit_note')
+  @Authorize('creditNote:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const { invoiceId } = request;
 

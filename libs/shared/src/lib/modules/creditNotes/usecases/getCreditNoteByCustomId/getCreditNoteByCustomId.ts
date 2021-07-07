@@ -18,7 +18,7 @@ import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
 
 import type { GetCreditNoteByCustomIdDTO as DTO } from './getCreditNoteByCustomIdDTO';
 import { GetCreditNoteByCustomIdResponse as Response } from './getCreditNoteByCustomIdResponse';
-import { GetCreditNoteByCustomIdErrors as Errors } from './getCreditNoteByCustomIdErrors';
+import * as Errors from './getCreditNoteByCustomIdErrors';
 
 export class GetCreditNoteByCustomIdUsecase
   implements
@@ -30,7 +30,7 @@ export class GetCreditNoteByCustomIdUsecase
     return {};
   }
 
-  @Authorize('read:credit_note')
+  @Authorize('creditNote:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const { customId } = request;
 

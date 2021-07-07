@@ -36,7 +36,7 @@ import { WaiverRepoContract } from '../../../waivers/repos';
 
 import type { CreateCreditNoteRequestDTO as DTO } from './createCreditNoteDTO';
 import { CreateCreditNoteResponse as Response } from './createCreditNoteResponse';
-import { CreateCreditNoteErrors as Errors } from './createCreditNoteErrors';
+import * as Errors from './createCreditNoteErrors';
 
 export class CreateCreditNoteUsecase
   implements
@@ -63,7 +63,7 @@ export class CreateCreditNoteUsecase
     return {};
   }
 
-  @Authorize('create:credit_note')
+  @Authorize('creditNote:create')
   public async execute(
     request: DTO,
     context?: UsecaseAuthorizationContext

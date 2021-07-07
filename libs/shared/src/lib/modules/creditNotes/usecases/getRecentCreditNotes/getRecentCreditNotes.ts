@@ -7,7 +7,7 @@ import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
 // * Usecase specifics
 import { GetRecentCreditNotesResponse as Response } from './getRecentCreditNotesResponse';
 import type { GetRecentCreditNotesDTO as DTO } from './getRecentCreditNotesDTO';
-import { GetRecentCreditNotesErrors as Errors } from './getRecentCreditNotesErrors';
+import * as Errors from './getRecentCreditNotesErrors';
 
 // * Authorization logic
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
@@ -32,7 +32,7 @@ export class GetRecentCreditNotesUesecase
     return {};
   }
 
-  @Authorize('read:credit_note')
+  @Authorize('creditNote:read')
   public async execute(
     request: DTO,
     context?: UsecaseAuthorizationContext
