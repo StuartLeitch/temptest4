@@ -27,7 +27,7 @@ import { WaiverRepoContract } from '../../../../waivers/repos';
 import { PublishCreditNoteToErpUsecase } from '../publishCreditNoteToErp/publishCreditNoteToErp';
 
 import { RetryCreditNotesResponse as Response } from './retryCreditNotesResponse';
-import { RetryCreditNotesDTO as DTO } from './retryCreditNotesDTO';
+import type { RetryCreditNotesDTO as DTO } from './retryCreditNotesDTO';
 
 export class RetryCreditNotesUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>

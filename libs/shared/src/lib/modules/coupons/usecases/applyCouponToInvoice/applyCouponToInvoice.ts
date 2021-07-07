@@ -50,7 +50,7 @@ import {
 } from '../../../invoices/usecases/confirmInvoice';
 
 import { ApplyCouponToInvoiceResponse as Response } from './applyCouponToInvoiceResponse';
-import { ApplyCouponToInvoiceDTO as DTO } from './applyCouponToInvoiceDTO';
+import type { ApplyCouponToInvoiceDTO as DTO } from './applyCouponToInvoiceDTO';
 import * as Errors from './applyCouponToInvoiceErrors';
 
 export class ApplyCouponToInvoiceUsecase

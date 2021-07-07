@@ -19,7 +19,7 @@ import { PublisherRepoContract } from '../../../publishers/repos';
 import { CatalogRepoContract } from '../../repos/catalogRepo';
 
 import { UpdateCatalogItemToCatalogResponse as Response } from './updateCatalogItemToCatalogResponse';
-import { UpdateCatalogItemToCatalogDTO as DTO } from './updateCatalogItemToCatalogDTO';
+import type { UpdateCatalogItemToCatalogDTO as DTO } from './updateCatalogItemToCatalogDTO';
 import * as Errors from './updateCatalogItemToCatalogErrors';
 
 export class UpdateCatalogItemToCatalogUseCase

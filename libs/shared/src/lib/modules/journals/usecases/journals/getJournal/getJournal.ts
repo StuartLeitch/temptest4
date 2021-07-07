@@ -17,7 +17,7 @@ import { CatalogItem } from '../../../domain/CatalogItem';
 import { JournalId } from '../../../domain/JournalId';
 
 import { GetJournalResponse as Response } from './getJournalResponse';
-import { GetJournalDTO as DTO } from './getJournalDTO';
+import type { GetJournalDTO as DTO } from './getJournalDTO';
 import * as Errors from './getJournalErrors';
 
 export class GetJournalUsecase

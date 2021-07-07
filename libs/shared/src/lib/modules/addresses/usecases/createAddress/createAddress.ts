@@ -2,7 +2,7 @@ import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 import { left } from '../../../../core/logic/Either';
 
-import { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
   AccessControlledUsecase,
   AccessControlContext,
@@ -13,7 +13,7 @@ import { AddressRepoContract } from '../../repos/addressRepo';
 import { AddressMap } from '../../mappers/AddressMap';
 
 import { CreateAddressResponse as Response } from './createAddressResponse';
-import { CreateAddressRequestDTO as DTO } from './createAddressDTO';
+import type { CreateAddressRequestDTO as DTO } from './createAddressDTO';
 import * as Errors from './createAddressErrors';
 
 export class CreateAddressUsecase

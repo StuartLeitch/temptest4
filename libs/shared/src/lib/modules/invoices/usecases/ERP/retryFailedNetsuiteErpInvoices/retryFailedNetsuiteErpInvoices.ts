@@ -33,7 +33,7 @@ import { PublishInvoiceToErpUsecase } from '../publishInvoiceToErp/publishInvoic
 import { ErpInvoiceResponse } from '../../../../../domain/services/ErpService';
 
 import { RetryFailedNetsuiteErpInvoicesResponse as Response } from './retryFailedNetsuiteErpInvoicesResponse';
-import { RetryFailedNetsuiteErpInvoicesDTO as DTO } from './retryFailedNetsuiteErpInvoicesDTO';
+import type { RetryFailedNetsuiteErpInvoicesDTO as DTO } from './retryFailedNetsuiteErpInvoicesDTO';
 
 export class RetryFailedNetsuiteErpInvoicesUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>

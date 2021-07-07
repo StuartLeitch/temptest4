@@ -28,7 +28,7 @@ import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 import { GetItemsForInvoiceUsecase } from '../../getItemsForInvoice/getItemsForInvoice';
 
 import { PublishCreditNoteToErpResponse as Response } from './publishCreditNoteToErpResponse';
-import { PublishCreditNoteToErpRequestDTO as DTO } from './publishCreditNoteToErpDTO';
+import type { PublishCreditNoteToErpRequestDTO as DTO } from './publishCreditNoteToErpDTO';
 
 export class PublishCreditNoteToErpUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>

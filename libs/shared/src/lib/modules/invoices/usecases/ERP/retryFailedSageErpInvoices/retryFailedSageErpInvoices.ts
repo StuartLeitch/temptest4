@@ -31,7 +31,7 @@ import { PublishInvoiceToErpUsecase } from '../publishInvoiceToErp/publishInvoic
 import { ErpInvoiceResponse } from '../../../../../domain/services/ErpService';
 
 import { RetryFailedSageErpInvoicesResponse as Response } from './retryFailedSageErpInvoicesResponse';
-import { RetryFailedSageErpInvoicesDTO as DTO } from './retryFailedSageErpInvoicesDTO';
+import type { RetryFailedSageErpInvoicesDTO as DTO } from './retryFailedSageErpInvoicesDTO';
 
 export class RetryFailedSageErpInvoicesUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>

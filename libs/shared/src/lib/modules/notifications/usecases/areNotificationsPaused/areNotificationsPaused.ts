@@ -23,7 +23,7 @@ import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
 // * Usecase specific
 import { AreNotificationsPausedResponse as Response } from './areNotificationsPausedResponse';
-import { AreNotificationsPausedDTO as DTO } from './areNotificationsPausedDTO';
+import type { AreNotificationsPausedDTO as DTO } from './areNotificationsPausedDTO';
 import * as Errors from './areNotificationsPausedErrors';
 
 type TypeToPauseMap = {

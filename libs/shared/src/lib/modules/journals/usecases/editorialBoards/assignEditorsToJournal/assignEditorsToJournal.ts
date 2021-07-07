@@ -19,7 +19,7 @@ import { CatalogRepoContract } from '../../../repos';
 import { CreateEditor } from '../createEditor/createEditor';
 
 import { AssignEditorsToJournalResponse as Response } from './assignEditorsToJournalResponse';
-import { AssignEditorsToJournalDTO as DTO } from './assignEditorsToJournalDTO';
+import type { AssignEditorsToJournalDTO as DTO } from './assignEditorsToJournalDTO';
 
 export class AssignEditorsToJournalUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>

@@ -6,7 +6,7 @@ import { right, left } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
   AccessControlledUsecase,
   AccessControlContext,
@@ -19,7 +19,7 @@ import { ArticleRepoContract } from '../../repos/articleRepo';
 
 // * Usecase specific
 import { ExistsManuscriptByIdResponse as Response } from './existsManuscriptByIdResponse';
-import { ExistsManuscriptByIdDTO as DTO } from './existsManuscriptByIdDTO';
+import type { ExistsManuscriptByIdDTO as DTO } from './existsManuscriptByIdDTO';
 import * as Errors from './existsManuscriptByIdErrors';
 
 export class ExistsManuscriptByIdUsecase

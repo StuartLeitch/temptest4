@@ -39,7 +39,7 @@ import { Invoice } from '../../../domain/Invoice';
 
 import { GetItemsForInvoiceUsecase } from '../../getItemsForInvoice/getItemsForInvoice';
 import { PublishInvoiceToErpResponse as Response } from './publishInvoiceToErpResponse';
-import { PublishInvoiceToErpRequestDTO as DTO } from './publishInvoiceToErpDTO';
+import type { PublishInvoiceToErpRequestDTO as DTO } from './publishInvoiceToErpDTO';
 
 export class PublishInvoiceToErpUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>

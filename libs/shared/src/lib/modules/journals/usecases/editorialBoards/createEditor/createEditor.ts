@@ -24,7 +24,7 @@ import { JournalId } from '../../../domain/JournalId';
 import { EditorRepoContract } from '../../../repos/editorRepo';
 
 import { CreateEditorResponse as Response } from './createEditorResponse';
-import { CreateEditorDTO as DTO } from './createEditorDTO';
+import type { CreateEditorDTO as DTO } from './createEditorDTO';
 
 export class CreateEditor
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>

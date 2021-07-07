@@ -42,7 +42,7 @@ import {
 } from '../../../invoices/usecases/confirmInvoice';
 
 import { EpicOnArticlePublishedResponse as Response } from './epicOnArticlePublishedResponse';
-import { EpicOnArticlePublishedDTO as DTO } from './epicOnArticlePublishedDTO';
+import type { EpicOnArticlePublishedDTO as DTO } from './epicOnArticlePublishedDTO';
 import * as Errors from './epicOnArticlePublishedErrors';
 
 interface CorrelationContext {

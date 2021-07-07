@@ -15,7 +15,7 @@ import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
 // * Usecase specific
 import { GetInvoicesIdsResponse as Response } from './getInvoicesIdsResponse';
-import { GetInvoicesIdsDTO as DTO } from './getInvoicesIdsDTO';
+import type { GetInvoicesIdsDTO as DTO } from './getInvoicesIdsDTO';
 import * as Errors from './getInvoicesIdsErrors';
 
 export class GetInvoicesIdsUsecase

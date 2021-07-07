@@ -19,7 +19,7 @@ import { Article } from '../../domain/Article';
 
 // * Usecase specific
 import { GetArticleDetailsResponse as Response } from './getArticleDetailsResponse';
-import { GetArticleDetailsDTO as DTO } from './getArticleDetailsDTO';
+import type { GetArticleDetailsDTO as DTO } from './getArticleDetailsDTO';
 import * as Errors from './getArticleDetailsErrors';
 
 export class GetArticleDetailsUsecase

@@ -23,7 +23,7 @@ import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 
 // * Usecase specific
 import { AddEmptyPauseStateForInvoiceResponse as Response } from './addEmptyPauseStateForInvoiceResponse';
-import { AddEmptyPauseStateForInvoiceDTO as DTO } from './addEmptyPauseStateForInvoiceDTO';
+import type { AddEmptyPauseStateForInvoiceDTO as DTO } from './addEmptyPauseStateForInvoiceDTO';
 import * as Errors from './addEmptyPauseStateForInvoiceErrors';
 
 export class AddEmptyPauseStateForInvoiceUsecase

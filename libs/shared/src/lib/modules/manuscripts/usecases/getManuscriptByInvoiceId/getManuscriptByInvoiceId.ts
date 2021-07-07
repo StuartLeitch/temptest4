@@ -6,7 +6,7 @@ import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
   AccessControlledUsecase,
   AccessControlContext,
@@ -22,7 +22,7 @@ import { ArticleRepoContract } from '../../repos/articleRepo';
 
 // * Usecase specific
 import { GetManuscriptByInvoiceIdResponse as Response } from './getManuscriptByInvoiceIdResponse';
-import { GetManuscriptByInvoiceIdDTO as DTO } from './getManuscriptByInvoiceIdDTO';
+import type { GetManuscriptByInvoiceIdDTO as DTO } from './getManuscriptByInvoiceIdDTO';
 import * as Errors from './getManuscriptByInvoiceIdErrors';
 
 export class GetManuscriptByInvoiceIdUsecase

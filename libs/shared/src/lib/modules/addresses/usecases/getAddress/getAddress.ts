@@ -5,7 +5,7 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
 
-import { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
   AccessControlledUsecase,
   AccessControlContext,
@@ -17,7 +17,7 @@ import { AddressId } from '../../domain/AddressId';
 import { AddressRepoContract } from '../../repos/addressRepo';
 
 import { GetAddressResponse as Response } from './getAddressResponse';
-import { GetAddressRequestDTO as DTO } from './getAddressDTO';
+import type { GetAddressRequestDTO as DTO } from './getAddressDTO';
 import * as Errors from './getAddressErrors';
 
 export class GetAddressUsecase

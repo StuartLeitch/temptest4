@@ -21,7 +21,7 @@ import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 
 import { GetItemsForInvoiceResponse as Response } from './getItemsForInvoiceResponse';
-import { GetItemsForInvoiceDTO as DTO } from './getItemsForInvoiceDTO';
+import type { GetItemsForInvoiceDTO as DTO } from './getItemsForInvoiceDTO';
 import * as Errors from './getItemsForInvoiceErrors';
 
 export class GetItemsForInvoiceUsecase

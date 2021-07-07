@@ -27,7 +27,7 @@ import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 import { PublishRevenueRecognitionToErpUsecase } from '../publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
 
 import { RetryRevenueRecognitionSageErpInvoicesResponse as Response } from './retryRevenueRecognitionSageErpInvoicesResponse';
-import { RetryRevenueRecognitionSageErpInvoicesDTO as DTO } from './retryRevenueRecognitionSageErpInvoicesDTO';
+import type { RetryRevenueRecognitionSageErpInvoicesDTO as DTO } from './retryRevenueRecognitionSageErpInvoicesDTO';
 
 export class RetryRevenueRecognitionSageErpInvoicesUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>

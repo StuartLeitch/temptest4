@@ -41,7 +41,7 @@ import { GetItemsForInvoiceUsecase } from './../../../invoices/usecases/getItems
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 
 import { PublishPaymentToErpResponse as Response } from './publishPaymentToErpResponse';
-import { PublishPaymentToErpDTO as DTO } from './publishPaymentToErpDTO';
+import type { PublishPaymentToErpDTO as DTO } from './publishPaymentToErpDTO';
 
 export class PublishPaymentToErpUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>

@@ -40,7 +40,7 @@ export const invoiceConfirmHandler = (
     emailService
   );
   const usecaseContext = {
-    roles: [Roles.SYSTEM],
+    roles: [Roles.CHRON_JOB],
   };
 
   const request: SendInvoiceConfirmationReminderDTO = {

@@ -17,7 +17,7 @@ import { InvoiceId } from '../../domain/InvoiceId';
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
 import { ChangeInvoiceStatusResponse as Response } from './changeInvoiceStatusResponse';
-import { ChangeInvoiceStatusRequestDTO as DTO } from './changeInvoiceStatusDTO';
+import type { ChangeInvoiceStatusRequestDTO as DTO } from './changeInvoiceStatusDTO';
 import * as Errors from './changeInvoiceStatusErrors';
 
 export class ChangeInvoiceStatus

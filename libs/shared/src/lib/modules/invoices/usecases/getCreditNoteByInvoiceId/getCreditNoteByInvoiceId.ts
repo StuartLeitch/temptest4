@@ -19,7 +19,7 @@ import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
 // * Usecase specific
 import { GetCreditNoteByInvoiceIdResponse as Response } from './getCreditNoteByInvoiceIdResponse';
-import { GetCreditNoteByInvoiceIdDTO as DTO } from './getCreditNoteByInvoiceIdDTO';
+import type { GetCreditNoteByInvoiceIdDTO as DTO } from './getCreditNoteByInvoiceIdDTO';
 import * as Errors from './getCreditNoteByInvoiceIdErrors';
 
 export class GetCreditNoteByInvoiceIdUsecase

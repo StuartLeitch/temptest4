@@ -16,7 +16,7 @@ import {
 import { PaymentMethodRepoContract } from '../../repos/paymentMethodRepo';
 
 import { GetPaymentMethodsResponse as Response } from './GetPaymentMethodsResponse';
-import { GetPaymentMethodsDTO as DTO } from './GetPaymentMethodsDTO';
+import type { GetPaymentMethodsDTO as DTO } from './GetPaymentMethodsDTO';
 import * as Errors from './GetPaymentMethodsErrors';
 
 type Context = UsecaseAuthorizationContext & { correlationId?: string };

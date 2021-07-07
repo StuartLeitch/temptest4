@@ -22,7 +22,7 @@ import { Payer } from '../../domain/Payer';
 
 // * Usecase specific
 import { GetPayerDetailsByInvoiceIdResponse as Response } from './getPayerDetailsByInvoiceIdResponse';
-import { GetPayerDetailsByInvoiceIdDTO as DTO } from './getPayerDetailsByInvoiceIdDTO';
+import type { GetPayerDetailsByInvoiceIdDTO as DTO } from './getPayerDetailsByInvoiceIdDTO';
 import * as Errors from './getPayerDetailsByInvoiceIdErrors';
 
 export class GetPayerDetailsByInvoiceIdUsecase

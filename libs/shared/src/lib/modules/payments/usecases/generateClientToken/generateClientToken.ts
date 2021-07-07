@@ -18,7 +18,7 @@ import {
 } from '../../domain/strategies/payment-strategy-factory';
 
 import { GenerateClientTokenResponse as Response } from './generateClientToken.response';
-import { GenerateClientTokenDTO as DTO } from './generateClientToken.dto';
+import type { GenerateClientTokenDTO as DTO } from './generateClientToken.dto';
 
 export class GenerateClientTokenUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>

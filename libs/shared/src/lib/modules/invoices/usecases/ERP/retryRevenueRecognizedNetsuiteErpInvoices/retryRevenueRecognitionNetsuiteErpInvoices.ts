@@ -29,7 +29,7 @@ import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 import { PublishRevenueRecognitionToErpUsecase } from '../publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
 
 import { RetryRevenueRecognitionNetsuiteErpInvoicesResponse as Response } from './retryRevenueRecognitionNetsuiteErpInvoicesResponse';
-import { RetryRevenueRecognitionNetsuiteErpInvoicesDTO as DTO } from './retryRevenueRecognitionNetsuiteErpInvoicesDTO';
+import type { RetryRevenueRecognitionNetsuiteErpInvoicesDTO as DTO } from './retryRevenueRecognitionNetsuiteErpInvoicesDTO';
 
 export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>

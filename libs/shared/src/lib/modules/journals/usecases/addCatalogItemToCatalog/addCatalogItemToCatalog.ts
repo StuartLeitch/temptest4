@@ -18,7 +18,7 @@ import { PublisherRepoContract } from '../../../publishers/repos/publisherRepo';
 import { CatalogRepoContract } from '../../repos/catalogRepo';
 
 import { AddCatalogItemToCatalogUseCaseResponse as Response } from './addCatalogToItemCatalogResponse';
-import { AddCatalogItemToCatalogUseCaseDTO as DTO } from './addCatalogItemToCatalogDTO';
+import type { AddCatalogItemToCatalogUseCaseDTO as DTO } from './addCatalogItemToCatalogDTO';
 import * as Errors from './addCatalogItemToCatalogErrors';
 
 export class AddCatalogItemToCatalogUseCase

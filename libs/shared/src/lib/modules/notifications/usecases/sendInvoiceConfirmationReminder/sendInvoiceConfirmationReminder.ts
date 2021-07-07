@@ -49,7 +49,7 @@ import { notificationsSentInLastDelay } from '../usecase-utils';
 
 // * Usecase specific
 import { SendInvoiceConfirmationReminderResponse as Response } from './sendInvoiceConfirmationReminderResponse';
-import { SendInvoiceConfirmationReminderDTO as DTO } from './sendInvoiceConfirmationReminderDTO';
+import type { SendInvoiceConfirmationReminderDTO as DTO } from './sendInvoiceConfirmationReminderDTO';
 import * as Errors from './sendInvoiceConfirmationReminderErrors';
 
 interface CompoundDTO extends DTO {

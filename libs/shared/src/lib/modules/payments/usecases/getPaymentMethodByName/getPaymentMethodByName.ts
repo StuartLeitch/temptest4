@@ -15,7 +15,7 @@ import { PaymentMethodRepoContract } from '../../repos/paymentMethodRepo';
 
 // * Usecase specific
 import { GetPaymentMethodByNameResponse as Response } from './getPaymentMethodByNameResponse';
-import { GetPaymentMethodByNameDTO as DTO } from './getPaymentMethodByNameDTO';
+import type { GetPaymentMethodByNameDTO as DTO } from './getPaymentMethodByNameDTO';
 import * as Errors from './getPaymentMethodByNameErrors';
 
 export class GetPaymentMethodByNameUsecase

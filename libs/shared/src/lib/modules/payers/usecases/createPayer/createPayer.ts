@@ -16,7 +16,7 @@ import { PayerMap } from '../../mapper/Payer';
 import { PayerRepoContract } from '../../repos/payerRepo';
 
 import { CreatePayerResponse as Response } from './createPayerResponse';
-import { CreatePayerRequestDTO as DTO } from './createPayerDTO';
+import type { CreatePayerRequestDTO as DTO } from './createPayerDTO';
 import * as Errors from './createPayerErrors';
 
 export class CreatePayerUsecase

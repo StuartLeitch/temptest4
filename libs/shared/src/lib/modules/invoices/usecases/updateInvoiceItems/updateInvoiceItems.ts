@@ -15,7 +15,7 @@ import {
 import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
 
 import { UpdateInvoiceItemsResponse as Response } from './updateInvoiceItemsResponse';
-import { UpdateInvoiceItemsDTO as DTO } from './updateInvoiceItemsDTO';
+import type { UpdateInvoiceItemsDTO as DTO } from './updateInvoiceItemsDTO';
 import * as Errors from './updateInvoiceItemsErrors';
 
 export class UpdateInvoiceItemsUsecase

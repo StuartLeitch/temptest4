@@ -37,7 +37,7 @@ import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 import { GetItemsForInvoiceUsecase } from './../../getItemsForInvoice/getItemsForInvoice';
 
 import { PublishRevenueRecognitionToErpResponse as Response } from './publishRevenueRecognitionToErpResponse';
-import { PublishRevenueRecognitionToErpRequestDTO as DTO } from './publishRevenueRecognitionToErpDTO';
+import type { PublishRevenueRecognitionToErpRequestDTO as DTO } from './publishRevenueRecognitionToErpDTO';
 
 export class PublishRevenueRecognitionToErpUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>

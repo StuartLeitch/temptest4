@@ -17,7 +17,7 @@ import { EditorRepoContract } from '../../../repos/editorRepo';
 import { CatalogRepoContract } from '../../../repos';
 
 import { GetEditorsByJournalResponse as Response } from './getEditorsByJournalResponse';
-import { GetEditorsByJournalDTO as DTO } from './getEditorsByJournalDTO';
+import type { GetEditorsByJournalDTO as DTO } from './getEditorsByJournalDTO';
 
 export class GetEditorsByJournalUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>

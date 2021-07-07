@@ -22,7 +22,7 @@ import { EditorRepoContract } from '../../../repos/editorRepo';
 import { CatalogRepoContract } from '../../../repos';
 
 import { RemoveEditorsFromJournalResponse as Response } from './removeEditorsFromJournalResponse';
-import { RemoveEditorsFromJournalDTO as DTO } from './removeEditorsFromJournalDTO';
+import type { RemoveEditorsFromJournalDTO as DTO } from './removeEditorsFromJournalDTO';
 
 export class RemoveEditorsFromJournalUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>

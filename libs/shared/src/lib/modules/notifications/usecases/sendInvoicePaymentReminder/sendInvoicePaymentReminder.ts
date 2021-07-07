@@ -52,7 +52,7 @@ import { notificationsSentInLastDelay } from '../usecase-utils';
 
 // * Usecase specific
 import { SendInvoicePaymentReminderResponse as Response } from './sendInvoicePaymentReminderResponse';
-import { SendInvoicePaymentReminderDTO as DTO } from './sendInvoicePaymentReminderDTO';
+import type { SendInvoicePaymentReminderDTO as DTO } from './sendInvoicePaymentReminderDTO';
 import * as Errors from './sendInvoicePaymentReminderErrors';
 
 import {

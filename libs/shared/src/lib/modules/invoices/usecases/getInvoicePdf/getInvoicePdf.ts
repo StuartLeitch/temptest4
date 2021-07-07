@@ -36,7 +36,7 @@ import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails
 
 import { GetInvoicePdfResponse as Response } from './getInvoicePdfResponse';
 import { GetInvoicePdfErrors as Errors } from './getInvoicePdfErrors';
-import { GetInvoicePdfDTO as DTO } from './getInvoicePdfDTO';
+import type { GetInvoicePdfDTO as DTO } from './getInvoicePdfDTO';
 
 import {
   PdfGeneratorService,

@@ -18,7 +18,7 @@ import { Payer } from '../../domain/Payer';
 
 // * Usecase specific
 import { GetPayerDetailsResponse as Response } from './getPayerDetailsResponse';
-import { GetPayerDetailsDTO as DTO } from './getPayerDetailsDTO';
+import type { GetPayerDetailsDTO as DTO } from './getPayerDetailsDTO';
 import * as Errors from './getPayerDetailsErrors';
 
 export class GetPayerDetailsUsecase

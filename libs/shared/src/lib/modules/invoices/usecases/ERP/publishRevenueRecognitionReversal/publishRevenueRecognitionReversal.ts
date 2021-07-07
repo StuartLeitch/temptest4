@@ -36,7 +36,7 @@ import { GetItemsForInvoiceUsecase } from '../../getItemsForInvoice/getItemsForI
 import { GetInvoiceDetailsUsecase } from '../../getInvoiceDetails/getInvoiceDetails';
 
 import { PublishRevenueRecognitionReversalResponse as Response } from './publishRevenueRecognitionReversal.response';
-import { PublishRevenueRecognitionReversalDTO as DTO } from './publishRevenueRecognitionReversal.dto';
+import type { PublishRevenueRecognitionReversalDTO as DTO } from './publishRevenueRecognitionReversal.dto';
 import * as Errors from './publishRevenueRecognitionReversal.errors';
 
 export class PublishRevenueRecognitionReversalUsecase

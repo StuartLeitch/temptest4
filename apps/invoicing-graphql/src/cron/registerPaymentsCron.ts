@@ -54,7 +54,7 @@ export class RegisterPaymentsCron {
 
     const maybeResponse = await retryPaymentsToNetsuiteErpUsecase.execute(
       null,
-      { roles: [Roles.SYSTEM] }
+      { roles: [Roles.CHRON_JOB] }
     );
     if (maybeResponse.isLeft()) {
       loggerService.error(maybeResponse.value.message);
