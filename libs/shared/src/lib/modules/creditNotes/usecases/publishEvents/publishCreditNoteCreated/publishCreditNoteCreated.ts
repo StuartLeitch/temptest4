@@ -48,7 +48,7 @@ export class PublishCreditNoteCreatedUsecase
       messageTimestamp,
     } = request;
 
-    const erpReference = creditNote.getErpReference();
+    const erpReference = creditNote.erpReference;
     const data: CreditNoteCreatedEvent = {
       ...EventUtils.createEventObject(),
 

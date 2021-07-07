@@ -213,7 +213,7 @@ export class CreateCreditNoteUsecase
 
       return right(creditNote);
     } catch (err) {
-      throw new UnexpectedError(err);
+      return left(new UnexpectedError(err));
     }
   }
 }

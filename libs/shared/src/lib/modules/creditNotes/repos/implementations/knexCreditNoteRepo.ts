@@ -55,9 +55,11 @@ export class KnexCreditNoteRepo
       .first();
 
     if (!creditNote) {
-      throw RepoError.createEntityNotFoundError(
-        'creditNote',
-        invoiceId.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError(
+          'creditNote',
+          invoiceId.id.toString()
+        )
       );
     }
 
@@ -74,7 +76,9 @@ export class KnexCreditNoteRepo
       .first();
 
     if (!creditNote) {
-      throw RepoError.createEntityNotFoundError('creditNote', referenceNumber);
+      return left(
+        RepoError.createEntityNotFoundError('creditNote', referenceNumber)
+      );
     }
 
     return CreditNoteMap.toDomain(creditNote);
@@ -144,9 +148,11 @@ export class KnexCreditNoteRepo
       .update(updateObject);
 
     if (!updated) {
-      throw RepoError.createEntityNotFoundError(
-        'creditNote',
-        creditNote.creditNoteId.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError(
+          'creditNote',
+          creditNote.creditNoteId.id.toString()
+        )
       );
     }
 
@@ -171,7 +177,7 @@ export class KnexCreditNoteRepo
     try {
       await db(TABLES.CREDIT_NOTES).insert(rawCreditNote);
     } catch (error) {
-      throw RepoError.fromDBError(error);
+      return left(RepoError.fromDBError(error));
     }
 
     return this.getCreditNoteById(creditNote.creditNoteId);
@@ -217,10 +223,10 @@ export class KnexCreditNoteRepo
       .first();
 
     if (result.length === 0) {
-      throw RepoError.createEntityNotFoundError('article', customId);
+      return left(RepoError.createEntityNotFoundError('article', customId));
     }
 
-    return result;
+    return right(result);
   }
 
   async getRecentCreditNotes(

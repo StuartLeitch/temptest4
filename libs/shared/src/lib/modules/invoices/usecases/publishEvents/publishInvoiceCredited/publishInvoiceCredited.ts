@@ -46,7 +46,7 @@ export class PublishInvoiceCreditedUsecase
       messageTimestamp,
     } = request;
 
-    const erpReference = creditNote.getErpReference();
+    const erpReference = creditNote.erpReference;
 
     const data: InvoiceCreditNoteCreatedEvent = {
       ...EventUtils.createEventObject(),
@@ -65,7 +65,8 @@ export class PublishInvoiceCreditedUsecase
       invoiceCreatedDate: invoice?.dateCreated?.toISOString(),
       invoiceIssuedDate: invoice?.dateIssued?.toISOString(),
 
-      reason: creditNote.creationReason,
+      // * Temporary disable until decision with CN events
+      // reason: creditNote.creationReason,
 
       costs: formatCosts(invoiceItems, payments, invoice, creditNote),
 
