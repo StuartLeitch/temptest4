@@ -40,7 +40,7 @@ const TrTableCreditNotesList = ({creditNotes}) => (
             >
               <span className={ 'text-secondary'}>
                 <strong>
-                    CN-{persistentReferenceNumber}
+                    {persistentReferenceNumber}
                 </strong>
               </span>
             </Link>

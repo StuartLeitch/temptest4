@@ -62,7 +62,7 @@ const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
               <Input
                 plaintext
                 readOnly
-                value={`CN-${creditNote.persistentReferenceNumber}`}
+                value={creditNote.persistentReferenceNumber}
               />
             </Col>
           </FormGroup>

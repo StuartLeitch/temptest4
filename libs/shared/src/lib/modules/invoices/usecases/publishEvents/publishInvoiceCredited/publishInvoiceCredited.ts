@@ -47,12 +47,11 @@ export class PublishInvoiceCreditedUsecase
     } = request;
 
     const erpReference = creditNote.erpReference;
-
     const data: InvoiceCreditNoteCreatedEvent = {
       ...EventUtils.createEventObject(),
 
       creditNoteForInvoice: creditNote.invoiceId.id.toString(),
-      referenceNumber: `CN-${creditNote.persistentReferenceNumber}` ?? null,
+      referenceNumber: creditNote.persistentReferenceNumber,
       transactionId: invoice.transactionId.toString(),
       erpReference: erpReference?.value ?? null,
       invoiceId: creditNote.id.toString(),

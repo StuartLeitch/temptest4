@@ -53,7 +53,7 @@ export class PublishCreditNoteCreatedUsecase
       ...EventUtils.createEventObject(),
 
       creditNoteForInvoice: creditNote.invoiceId.id.toString(),
-      referenceNumber: `CN-${creditNote.persistentReferenceNumber}` ?? null,
+      referenceNumber: creditNote.persistentReferenceNumber,
       transactionId: invoice.transactionId.toString(),
       erpReference: erpReference?.value ?? null,
       invoiceId: creditNote.invoiceId.id.toString(),
