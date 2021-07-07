@@ -19,7 +19,7 @@ import InvoicingDashboard from './Dashboards/Invoicing';
 import Financial from './Dashboards/Financial';
 import NavbarOnly from './Layouts/NavbarOnly';
 import SidebarWithNavbar from './Layouts/SidebarWithNavbar';
-import PendingLogging from './components/PendingLogging';
+// import PendingLogging from './components/PendingLogging';
 
 // ----------- Layout Imports ---------------
 import { DefaultNavbar } from '../layout/components/DefaultNavbar';
@@ -46,7 +46,7 @@ export const RoutedContent = () => {
       </PrivateRoute>
       {/* Credit Notes Routes */}
       <PrivateRoute path='/credit-notes/list' exact>
-      <CreditNotesList />
+        <CreditNotesList />
       </PrivateRoute>
 
       <PrivateRoute path='/credit-notes/details/:id' exact>

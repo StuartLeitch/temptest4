@@ -1,3 +1,4 @@
-import CreditNoteList from './CreditNoteList';
+import CreditNotesContainer from './Container';
 
-export default CreditNoteList;
+export default CreditNotesContainer;
+
