@@ -95,9 +95,11 @@ export class KnexCreditNoteRepo
       .first();
 
     if (!creditNote) {
-      throw RepoError.createEntityNotFoundError(
-        'creditNote',
-        creditNoteId.id.toString()
+      return left(
+        RepoError.createEntityNotFoundError(
+          'creditNote',
+          creditNoteId.id.toString()
+        )
       );
     }
 
