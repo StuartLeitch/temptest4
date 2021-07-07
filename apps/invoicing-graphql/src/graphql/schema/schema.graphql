@@ -17,6 +17,15 @@ enum InvoiceStatus {
   FINAL
 }
 
+enum CreditNoteReason {
+  WITHDRAWN_MANUSCRIPT
+  REDUCTION_APPLIED
+  WAIVED_MANUSCRIPT
+  CHANGED_PAYER_DETAILS
+  BAD_DEBT
+  OTHER_REASON
+}
+
 type Article @model(id: "articles") {
   id: String
   journalId: ID @filter
@@ -283,11 +292,13 @@ input InvoiceItemFilters {
   article: ArticleFilters
 }
 input InvoiceFilters {
+  reason: [CreditNoteReason]
   invoiceStatus: [InvoiceStatus]
   transactionStatus: [TransactionStatus]
   referenceNumber: [ReferenceNumber]
   invoiceItem: InvoiceItemFilters
 }
+
 
 input Pagination {
   page: Int

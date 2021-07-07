@@ -7,7 +7,6 @@ export class Filters {
     return {
       invoiceStatus: src.invoiceStatus && [...src.invoiceStatus],
       transactionStatus: src.transactionStatus && [...src.transactionStatus],
-      referenceNumber: wrap(src.referenceNumber),
       invoiceItem: {
         article: {
           // journalId: src.journalId,
@@ -15,5 +14,11 @@ export class Filters {
         },
       },
     };
+  }
+
+  static collectCreditNotes(src) {
+    return {
+      reason: src.reason && [...src.reason],
+    }
   }
 }

@@ -244,6 +244,7 @@ export class KnexCreditNoteRepo
     .select([`${TABLES.CREDIT_NOTES}.*`]);
 
     console.info(sql.toString());
+
     const creditNotes: Array<any> = await sql;
 
     const maybeInvoices = flatten(creditNotes.map(CreditNoteMap.toDomain));

@@ -87,6 +87,19 @@ export function applyFilters(src: QueryBuilder, filters: Filters) {
         const invoiceRef = filter[0];
         here = here.where({ persistentReferenceNumber: invoiceRef });
         break;
+
+      case '/reason':
+        const lookup = {
+          'WITHDRAWN_MANUSCRIPT': 'withdrawn-manuscript',
+          'REDUCTION_APPLIED': 'reduction-applied',
+          'WAIVED_MANUSCRIPT': 'waived-manuscript',
+          'CHANGED_PAYER_DETAILS': 'changed-payer-details',
+          'BAD_DEBT': 'bad-debt',
+          'OTHER_REASON': 'other-reason'
+        }
+        const filtr = filter.map((filter) => lookup[filter]);
+        here = here.whereIn(`${TABLES.CREDIT_NOTES}.creationReason`, filtr);
+        break;
     }
   }
 

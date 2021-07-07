@@ -84,9 +84,9 @@ const CreditNotesLeftNav = (props) => {
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
-            name='reason.CHANGE_PAYER_DETAILS'
+            name='reason.CHANGED_PAYER_DETAILS'
             onChange={(evt: any) => onFilterHandler.callback(evt.target)}
-            checked={reason.includes('CHANGE_PAYER_DETAILS')}
+            checked={reason.includes('CHANGED_PAYER_DETAILS')}
             className='text-info'
             type='checkbox'
             id='creditnote-reason-change-payer-details'
@@ -108,13 +108,13 @@ const CreditNotesLeftNav = (props) => {
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
-            name='reason.OTHER'
+            name='reason.OTHER_REASON'
             onChange={(evt: any) => onFilterHandler.callback(evt.target)}
-            checked={reason.includes('OTHER')}
+            checked={reason.includes('OTHER_REASON')}
             className='text-info'
             type='checkbox'
             id='creditnote-reason-other'
-            label='Other'
+            label='Other Reason'
             inline
           />
         </NavItem>

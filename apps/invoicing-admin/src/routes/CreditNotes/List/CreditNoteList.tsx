@@ -40,9 +40,10 @@ const RecentCreditNotesList: React.FC<RecentCreditNotesListProps> = (props) => {
   useEffect(() => {
     async function fetchData() {
       const { filters, pagination } = props.state;
+
       await fetchCreditNotes({
         variables: {
-          filters: Filters.collect(filters),
+          filters: Filters.collectCreditNotes(filters),
           pagination,
         },
       });
