@@ -171,10 +171,18 @@ const ProjectsDashboard: React.FC = () => {
               let searchResultsToRender = null;
               switch (category) {
                 case 'invoices':
-                  searchResultsToRender = <InvoicesSearchResults title={'invoices'} searchResults={searchResults['invoices']} />;
+                  searchResultsToRender = (
+                    <InvoicesSearchResults
+                      title={'invoices'}
+                      data={searchResults['invoices']}
+                    />);
                   break;
                 case 'getRecentCreditNotes':
-                  searchResultsToRender = <CreditNotesSearchResults title={'credit notes'} searchResults={searchResults['getRecentCreditNotes']} />
+                  searchResultsToRender = (
+                    <CreditNotesSearchResults
+                      title={'credit notes'}
+                      data={searchResults['getRecentCreditNotes']}
+                    />);
                   break;
               }
 

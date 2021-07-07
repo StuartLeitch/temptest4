@@ -11,7 +11,8 @@ import {
   Table,
 } from '../../../components';
 
-import { TrTableInvoicesList } from './components/TrTableList';
+// import { TrTableInvoicesList } from './components/TrTableList';
+import { InvoicesTableBody } from './components/TableBody';
 import { Loading } from '../../components';
 
 import { INVOICES_QUERY } from './graphql';
@@ -51,27 +52,7 @@ const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
 
   return (
     <Card className='mb-0'>
-      {/* START Table */}
-      <div className='table-responsive-xl'>
-        <Table className='mb-0 table-striped' hover>
-          <thead>
-            <tr>
-              <th className='align-middle bt-0'>Status</th>
-              <th className='align-middle bt-0'>Reference</th>
-              <th className='align-middle bt-0'>Manuscript Custom ID</th>
-              <th className='align-middle bt-0'>Issue Date</th>
-              <th className='align-middle bt-0'>APC</th>
-              <th className='align-middle bt-0'>Journal Title</th>
-              <th className='align-middle bt-0'>Manuscript Title</th>
-              <th className='align-middle bt-0'>Manuscript Acceptance Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            <TrTableInvoicesList invoices={data?.invoices?.invoices || []} />
-          </tbody>
-        </Table>
-      </div>
-      {/* END Table */}
+      <InvoicesTableBody data={data?.invoices} />
       <CardFooter className='d-flex justify-content-center pb-0'>
         <ListPagination
           totalRecords={data?.invoices?.totalCount}
@@ -99,7 +80,7 @@ interface RecentInvoicesListProps {
       referenceNumber: string;
       customId: string;
     }
-};
+  };
   setPage(key: string, value: string | boolean | any[]): void;
 }
 

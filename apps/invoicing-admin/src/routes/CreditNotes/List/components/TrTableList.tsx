@@ -29,10 +29,7 @@ const TrTableCreditNotesList = ({creditNotes}) => (
         dateCreated
       }) => (
         <tr key={id}>
-          <td className='align-middle'>
-            <div>{CREATION_REASON[creationReason]}</div>
-          </td>
-
+          <td className='align-middle'>&lt;Manuscript Custom ID&gt;</td>
           <td className='align-middle'>
             <Link
               to={`/credit-notes/details/${id}`}
@@ -47,31 +44,17 @@ const TrTableCreditNotesList = ({creditNotes}) => (
           </td>
 
           <td className='align-middle'>
+            <div>{CREATION_REASON[creationReason]}</div>
+          </td>
+
+
+          <td className='align-middle'>
             <strong
               className={price < 0 ? 'text-danger' : 'text-success'}
             >
               {numeral(price).format('$0.00')}
             </strong>
           </td>
-
-          <td className='align-middle'>
-            <Link to={`/credit-notes/details/${id}`}
-              className='text-decoration-none'
-            >
-              <span className='text-secondary'>
-              {vat}%
-              </span>
-            </Link>
-          </td>
-
-          <td className='align-middle text-nowrap'>
-            {dateIssued && format(new Date(dateIssued), 'dd MMM yyyy')}
-          </td>
-
-          <td className='align-middle text-nowrap'>
-            {dateCreated && format(new Date(dateCreated), 'dd MMM yyyy')}
-          </td>
-
         </tr>
       )
     )}
