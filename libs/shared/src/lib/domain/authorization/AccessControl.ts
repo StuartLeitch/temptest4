@@ -184,6 +184,8 @@ accessControl
   .action('publish')
   .resource('reminder')
   .action('send')
+  .action('read')
+  .action('add')
   .resource('invoice')
   .action('read')
   .resource('payment')
