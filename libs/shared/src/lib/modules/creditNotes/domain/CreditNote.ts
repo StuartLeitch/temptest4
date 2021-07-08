@@ -45,7 +45,9 @@ export class CreditNote extends AggregateRoot<CreditNoteProps> {
     this.props.invoiceId = invoiceId;
 
     if (invoiceId) {
-      this.addDomainEvent(new CreditNoteCreated(this.invoiceId, new Date()));
+      this.addDomainEvent(
+        new CreditNoteCreated(this.invoiceId, this.creditNoteId, new Date())
+      );
     }
   }
 
@@ -105,6 +107,10 @@ export class CreditNote extends AggregateRoot<CreditNoteProps> {
     this.props.dateUpdated = dateUpdated;
   }
 
+  get erpReference(): ErpReference {
+    return this.props.erpReference;
+  }
+
   private constructor(props: CreditNoteProps, id?: UniqueEntityID) {
     super(props, id);
   }
@@ -113,17 +119,13 @@ export class CreditNote extends AggregateRoot<CreditNoteProps> {
     props: CreditNoteProps,
     id?: UniqueEntityID
   ): Either<GuardFailure, CreditNote> {
-    const defaultValues = {
+    const defaultProps = {
       ...props,
-      dateCreated: props.dateCreated ? props.dateCreated : new Date(),
+      dateCreated: props.dateCreated ?? new Date(),
     };
 
-    const creditNote = new CreditNote(defaultValues, id);
+    const creditNote = new CreditNote(defaultProps, id);
 
     return right(creditNote);
-  }
-
-  public getErpReference(): ErpReference {
-    return this.props.erpReference;
   }
 }

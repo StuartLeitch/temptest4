@@ -30,6 +30,7 @@ import {
   GetPaymentsByInvoiceIdUsecase,
   GetVATNoteUsecase,
   CreditNoteMap,
+  GetCreditNoteByInvoiceIdDTO,
   // Payer
 } from '@hindawi/shared';
 
@@ -44,6 +45,7 @@ import {
 import { Context } from '../../builders';
 
 import { env } from '../../env';
+import { creditNote } from './creditNote';
 
 export const invoice: Resolvers<Context> = {
   Query: {
@@ -443,7 +445,30 @@ export const invoice: Resolvers<Context> = {
     },
 
     // * to look forward
+    async creditNote(parent: Invoice, args, context) {
+      const { repos } = context;
 
+      const usecase = new GetCreditNoteByInvoiceIdUsecase(repos.creditNote);
+
+      const usecaseContext = { roles: [Roles.ADMIN] };
+
+      const creditNoteRequest: GetCreditNoteByInvoiceIdDTO = {
+        invoiceId: parent.invoiceId,
+      };
+
+      const creditNote = await usecase.execute(
+        creditNoteRequest,
+        usecaseContext
+      );
+
+      if (creditNote.isLeft()) {
+        return null;
+      }
+
+      return {
+        ...CreditNoteMap.toPersistence(creditNote.value),
+      };
+    },
     async transaction(parent: Invoice, args, context) {
       const {
         repos: { transaction: transactionRepo },

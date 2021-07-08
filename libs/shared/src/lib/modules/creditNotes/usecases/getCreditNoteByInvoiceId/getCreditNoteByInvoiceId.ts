@@ -7,9 +7,9 @@ import { left, right } from '../../../../core/logic/Either';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 
 // * Authorization Logic
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
   AccessControlledUsecase,
-  UsecaseAuthorizationContext,
   AccessControlContext,
   Authorize,
 } from '../../../../domain/authorization';
@@ -20,18 +20,14 @@ import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
 
 // * Usecase specific
 import { GetCreditNoteByInvoiceIdResponse as Response } from './getCreditNoteByInvoiceIdResponse';
-import { GetCreditNoteByInvoiceIdErrors as Errors } from './getCreditNoteByInvoiceIdErrors';
+import * as Errors from './getCreditNoteByInvoiceIdErrors';
 import type { GetCreditNoteByInvoiceIdDTO as DTO } from './getCreditNoteByInvoiceIdDTO';
 
 // to be modified with Guard/Either
 export class GetCreditNoteByInvoiceIdUsecase
   implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(
     // private articleRepo: ArticleRepoContract,
     private creditNoteRepo: CreditNoteRepoContract
@@ -41,11 +37,8 @@ export class GetCreditNoteByInvoiceIdUsecase
     return {};
   }
 
-  @Authorize('read:credit_note')
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  @Authorize('creditNote:read')
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const { invoiceId } = request;
 
     let creditNote: CreditNote;

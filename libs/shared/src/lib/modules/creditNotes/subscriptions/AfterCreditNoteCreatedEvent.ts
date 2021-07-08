@@ -67,8 +67,8 @@ export class AfterCreditNoteCreatedEvent
   ): Promise<any> {
     const getInvoiceDetails = new GetInvoiceDetailsUsecase(this.invoiceRepo);
     try {
-      const maybeCreditNote = await this.creditNoteRepo.getCreditNoteByInvoiceId(
-        event.invoiceId
+      const maybeCreditNote = await this.creditNoteRepo.getCreditNoteById(
+        event.creditNoteId
       );
       if (maybeCreditNote.isLeft()) {
         return left(
@@ -78,16 +78,21 @@ export class AfterCreditNoteCreatedEvent
 
       const creditNote = maybeCreditNote.value;
       // * Get Invoice Id
-      const invoiceId = creditNote.invoiceId;
+      const invoiceId = event.invoiceId;
 
-      // * Get Invoice Items
+      // * Get Invoice Details
 
-      const maybeInvoice = await this.invoiceRepo.getInvoiceById(invoiceId);
+      const maybeInvoice = await getInvoiceDetails.execute(
+        { invoiceId: invoiceId.id.toString() },
+        defaultContext
+      );
       if (maybeInvoice.isLeft()) {
         return left(new UnexpectedError(new Error(maybeInvoice.value.message)));
       }
 
       const invoice = maybeInvoice.value;
+
+      // * Get Invoice Items
       let invoiceItems = invoice.invoiceItems.currentItems;
 
       if (invoiceItems.length === 0) {
@@ -112,7 +117,6 @@ export class AfterCreditNoteCreatedEvent
       }
 
       // * Get Manuscript details
-
       const maybeManuscript = await this.manuscriptRepo.findById(
         invoiceItems[0].manuscriptId
       );
@@ -167,7 +171,7 @@ export class AfterCreditNoteCreatedEvent
 
       // * Get Payments
       const maybePayments = await this.paymentRepo.getPaymentsByInvoiceId(
-        creditNote.invoiceId
+        event.invoiceId
       );
       if (maybePayments.isLeft()) {
         return left(
@@ -186,28 +190,10 @@ export class AfterCreditNoteCreatedEvent
       }
       const billingAddress = maybeBillingAddress.value;
 
-      // * Get Invoice details
-      const maybeInvoiceDetails = await getInvoiceDetails.execute(
-        {
-          invoiceId: invoiceId.id.toString(),
-        },
-        defaultContext
-      );
-
-      if (maybeInvoiceDetails.isLeft()) {
-        return left(
-          new Error(
-            `Couldn't find Invoice Values for ID: ${invoiceId.id.toString()}`
-          )
-        );
-      }
-
-      const invoiceDetails = maybeInvoiceDetails.value;
-
       //* Run publish Credit Note created usecase
       const publishResult = await this.publishCreditNoteCreated.execute({
         payer,
-        invoice: invoiceDetails,
+        invoice,
         payments,
         manuscript,
         creditNote,

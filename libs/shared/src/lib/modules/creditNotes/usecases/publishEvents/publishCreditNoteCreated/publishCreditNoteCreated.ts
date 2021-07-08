@@ -48,12 +48,12 @@ export class PublishCreditNoteCreatedUsecase
       messageTimestamp,
     } = request;
 
-    const erpReference = creditNote.getErpReference();
+    const erpReference = creditNote.erpReference;
     const data: CreditNoteCreatedEvent = {
       ...EventUtils.createEventObject(),
 
       creditNoteForInvoice: creditNote.invoiceId.id.toString(),
-      referenceNumber: `CN-${creditNote.persistentReferenceNumber}` ?? null,
+      referenceNumber: creditNote.persistentReferenceNumber,
       transactionId: invoice.transactionId.toString(),
       erpReference: erpReference?.value ?? null,
       invoiceId: creditNote.invoiceId.id.toString(),
@@ -65,8 +65,8 @@ export class PublishCreditNoteCreatedUsecase
       manuscriptAcceptedDate: invoice?.dateAccepted?.toISOString(),
       invoiceCreatedDate: invoice?.dateCreated.toISOString(),
       invoiceIssuedDate: invoice?.dateIssued?.toISOString(),
-
-      reason: creditNote.creationReason,
+      // * Temporary commented until CN events decision
+      // reason: creditNote.creationReason,
 
       costs: formatCosts(invoiceItems, payments, invoice, creditNote),
 

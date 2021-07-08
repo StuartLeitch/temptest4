@@ -1,4 +1,4 @@
-import { TABLES } from '@hindawi/infrastructure';
+import { TABLES } from '../../../../infrastructure';
 import { LeanTraversal, ParseUtils, toPath, Categories, Cached } from '@utils';
 import { QueryBuilder } from 'knex';
 
@@ -77,10 +77,6 @@ export function applyFilters(src: QueryBuilder, filters: Filters) {
 
       case '/transactionStatus':
         here = here.whereIn(`${TABLES.TRANSACTIONS}.status`, filter);
-        break;
-
-      case '/invoiceStatus':
-        here = here.whereIn(`${TABLES.INVOICES}.status`, filter);
         break;
 
       case '/referenceNumber':

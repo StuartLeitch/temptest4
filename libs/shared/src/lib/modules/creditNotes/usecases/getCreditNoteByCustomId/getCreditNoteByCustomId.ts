@@ -4,10 +4,8 @@ import { left, right } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 
 // * Authorization Logic
-import {
-  Authorize,
-  UsecaseAuthorizationContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import { Authorize } from '../../../../domain/authorization';
 import {
   AccessControlledUsecase,
   AccessControlContext,
@@ -20,27 +18,20 @@ import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
 
 import type { GetCreditNoteByCustomIdDTO as DTO } from './getCreditNoteByCustomIdDTO';
 import { GetCreditNoteByCustomIdResponse as Response } from './getCreditNoteByCustomIdResponse';
-import { GetCreditNoteByCustomIdErrors as Errors } from './getCreditNoteByCustomIdErrors';
+import * as Errors from './getCreditNoteByCustomIdErrors';
 
 export class GetCreditNoteByCustomIdUsecase
   implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+    UseCase<DTO, Promise<Response>, Context>,
+    AccessControlledUsecase<DTO, Context, AccessControlContext> {
   constructor(private creditNoteRepo: CreditNoteRepoContract) {}
 
   private async getAccessControlContext(request, context?) {
     return {};
   }
 
-  @Authorize('read:credit_note')
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  @Authorize('creditNote:read')
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const { customId } = request;
 
     let creditNote: CreditNote;

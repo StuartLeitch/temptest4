@@ -2,7 +2,7 @@ import { Either } from '../../../../core/logic/Either';
 import { GuardFailure } from '../../../../core/logic/GuardFailure';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 
-import { GetRecentCreditNotesErrors } from './getRecentCreditNotesErrors';
+import * as Errors from './getRecentCreditNotesErrors';
 import { CreditNote } from '../../domain/CreditNote';
 
 export interface GetRecentCreditNotesSuccessResponse {
@@ -11,8 +11,6 @@ export interface GetRecentCreditNotesSuccessResponse {
 }
 
 export type GetRecentCreditNotesResponse = Either<
-  | GetRecentCreditNotesErrors.CreditNotesListFailure
-  | UnexpectedError
-  | GuardFailure,
+  Errors.CreditNotesListFailure | UnexpectedError | GuardFailure,
   GetRecentCreditNotesSuccessResponse
 >;
