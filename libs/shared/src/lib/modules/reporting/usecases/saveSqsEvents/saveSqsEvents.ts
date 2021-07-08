@@ -3,11 +3,7 @@ import { UseCase } from '../../../../core/domain/UseCase';
 import { right } from '../../../../core/logic/Either';
 
 // * Authorization Logic
-import {
-  UsecaseAuthorizationContext as Context,
-  AccessControlledUsecase,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
@@ -18,10 +14,7 @@ import { SaveEventsUsecase } from '../saveEvents/saveEvents';
 import { SaveSqsEventsResponse as Response } from './saveSqsEventsResponse';
 import { SaveSqsEventsDTO as DTO } from './saveSqsEventsDTO';
 
-export class SaveSqsEventsUsecase
-  implements
-    UseCase<DTO, Response, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+export class SaveSqsEventsUsecase implements UseCase<DTO, Response, Context> {
   authorizationContext: Context;
 
   constructor(
