@@ -422,13 +422,11 @@ export type Mutation = {
   updateCoupon?: Maybe<Coupon>;
   createCoupon?: Maybe<Coupon>;
   createInvoice?: Maybe<Invoice>;
-  deleteInvoice?: Maybe<Scalars['Boolean']>;
   creditCardPayment: Payment;
   bankTransferPayment: Payment;
   createCreditNote: CreditNote;
   createPayPalOrder: PayPalOrderId;
   recordPayPalPayment: Scalars['ID'];
-  migrateEntireInvoice?: Maybe<Scalars['String']>;
   generateCompensatoryEvents?: Maybe<Scalars['String']>;
   generateDraftCompensatoryEvents?: Maybe<Scalars['String']>;
   togglePauseConfirmationReminders?: Maybe<RemindersStatus>;
@@ -460,11 +458,6 @@ export type MutationCreateCouponArgs = {
 
 export type MutationCreateInvoiceArgs = {
   totalAmount?: Maybe<Scalars['Float']>;
-};
-
-
-export type MutationDeleteInvoiceArgs = {
-  id: Scalars['ID'];
 };
 
 
@@ -508,21 +501,6 @@ export type MutationCreatePayPalOrderArgs = {
 export type MutationRecordPayPalPaymentArgs = {
   invoiceId: Scalars['ID'];
   orderId: Scalars['ID'];
-};
-
-
-export type MutationMigrateEntireInvoiceArgs = {
-  acceptanceDate?: Maybe<Scalars['String']>;
-  submissionDate: Scalars['String'];
-  paymentDate?: Maybe<Scalars['String']>;
-  issueDate?: Maybe<Scalars['String']>;
-  revenueRecognitionReference?: Maybe<Scalars['String']>;
-  erpReference?: Maybe<Scalars['String']>;
-  payer?: Maybe<MigratePayer>;
-  invoiceId: Scalars['String'];
-  apc: MigrateApc;
-  token: Scalars['String'];
-  status: Scalars['String'];
 };
 
 
@@ -977,13 +955,11 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   updateCoupon?: Resolver<Maybe<ResolversTypes['Coupon']>, ParentType, ContextType, RequireFields<MutationUpdateCouponArgs, never>>;
   createCoupon?: Resolver<Maybe<ResolversTypes['Coupon']>, ParentType, ContextType, RequireFields<MutationCreateCouponArgs, never>>;
   createInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<MutationCreateInvoiceArgs, never>>;
-  deleteInvoice?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationDeleteInvoiceArgs, 'id'>>;
   creditCardPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationCreditCardPaymentArgs, 'invoiceId' | 'payerId' | 'paymentMethodId' | 'paymentMethodNonce' | 'amount'>>;
   bankTransferPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationBankTransferPaymentArgs, 'invoiceId' | 'payerId' | 'paymentMethodId' | 'paymentReference' | 'amount' | 'datePaid'>>;
   createCreditNote?: Resolver<ResolversTypes['CreditNote'], ParentType, ContextType, RequireFields<MutationCreateCreditNoteArgs, 'invoiceId'>>;
   createPayPalOrder?: Resolver<ResolversTypes['PayPalOrderId'], ParentType, ContextType, RequireFields<MutationCreatePayPalOrderArgs, 'invoiceId'>>;
   recordPayPalPayment?: Resolver<ResolversTypes['ID'], ParentType, ContextType, RequireFields<MutationRecordPayPalPaymentArgs, 'invoiceId' | 'orderId'>>;
-  migrateEntireInvoice?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationMigrateEntireInvoiceArgs, 'submissionDate' | 'invoiceId' | 'apc' | 'token' | 'status'>>;
   generateCompensatoryEvents?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationGenerateCompensatoryEventsArgs, never>>;
   generateDraftCompensatoryEvents?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationGenerateDraftCompensatoryEventsArgs, never>>;
   togglePauseConfirmationReminders?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, RequireFields<MutationTogglePauseConfirmationRemindersArgs, 'invoiceId' | 'state'>>;

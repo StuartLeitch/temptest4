@@ -81,7 +81,6 @@ export * from './modules/invoices/usecases/confirmInvoice/confirmInvoiceDTO';
 export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdf';
 export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdfDTO';
 export * from './modules/invoices/usecases/getItemsForInvoice/getItemsForInvoice';
-export * from './modules/invoices/usecases/migrateEntireInvoice/';
 export * from './modules/invoices/usecases/generateCompensatoryEvents';
 export * from './modules/invoices/usecases/generateDraftCompensatoryEvents';
 export * from './modules/invoices/usecases/getInvoicesIds';

@@ -8,7 +8,6 @@ import { invoice } from './invoice';
 import { coupon } from './coupon';
 import { payments } from './payments';
 import { journals } from './journals';
-import { migrateEntireInvoice } from './migrateEntireInvoice';
 import { generateCompensatoryEvents } from './generateCompensatoryEvents';
 import { reminders } from './reminders';
 import { generateMissingReminderJobs } from './generateMissingReminderJobs';
@@ -21,7 +20,6 @@ export const resolvers: Resolvers<Context> = merge(
   coupon,
   payments,
   journals,
-  migrateEntireInvoice,
   generateCompensatoryEvents,
   reminders,
   generateMissingReminderJobs,
