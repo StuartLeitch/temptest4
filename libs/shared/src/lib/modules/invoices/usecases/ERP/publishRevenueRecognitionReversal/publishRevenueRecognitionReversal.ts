@@ -114,7 +114,7 @@ export class PublishRevenueRecognitionReversalUsecase
 
       invoice.addItems(invoiceItems);
 
-      //Get Payer details
+      // * Get Payer details
       const maybePayer = await getPayerDetails.execute({ invoiceId }, context);
       if (maybePayer.isLeft()) {
         return left(new Errors.InvoicePayersNotFoundError(invoiceId));
@@ -122,7 +122,7 @@ export class PublishRevenueRecognitionReversalUsecase
       const payer = maybePayer.value;
       const addressId = payer.billingAddressId.id.toString();
 
-      //Get Billing address
+      // * Get Billing address
       const maybeAddress = await getAddress.execute(
         {
           billingAddressId: addressId,
