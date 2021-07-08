@@ -120,7 +120,6 @@ export const creditNote: Resolvers<Context> = {
   },
   CreditNote: {
     async invoice(parent: Invoice, args, context) {
-      console.info('In CreditNote/invoice');
       const {
         repos: {
           invoice: invoiceRepo,
