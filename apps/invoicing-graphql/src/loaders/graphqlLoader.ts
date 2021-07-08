@@ -1,6 +1,3 @@
-import path from 'path';
-import fs from 'fs';
-
 import { ApolloServer } from 'apollo-server-express';
 import Keycloak from 'keycloak-connect';
 import session from 'express-session';
@@ -27,8 +24,6 @@ export const graphqlLoader: MicroframeworkLoader = (
     const expressApp = settings.getData('express_app');
     const { keycloak } = configureKeycloak(expressApp, env.graphql.route);
 
-    // expressApp.use(env.graphql.route, keycloak.protect());
-
     const graphqlServer = new ApolloServer({
       typeDefs: [KeycloakTypeDefs, typeDefs], // 1. Add the Keycloak Type Defs
       schemaDirectives: KeycloakSchemaDirectives, // 2. Add the KeycloakSchemaDirectives
@@ -51,9 +46,6 @@ export const graphqlLoader: MicroframeworkLoader = (
 };
 
 function configureKeycloak(app, graphqlPath) {
-  // const keycloakConfig = JSON.parse(
-  //   fs.readFileSync(path.resolve(__dirname, './keycloak.json')).toString()
-  // );
   const keycloakConfig = env.app.keycloakConfig;
   const memoryStore = new session.MemoryStore();
 

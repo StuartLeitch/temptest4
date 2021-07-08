@@ -431,7 +431,6 @@ export type Mutation = {
   generateDraftCompensatoryEvents?: Maybe<Scalars['String']>;
   togglePauseConfirmationReminders?: Maybe<RemindersStatus>;
   togglePausePaymentReminders?: Maybe<RemindersStatus>;
-  generateMissingReminderJobs: Scalars['String'];
 };
 
 
@@ -964,7 +963,6 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   generateDraftCompensatoryEvents?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationGenerateDraftCompensatoryEventsArgs, never>>;
   togglePauseConfirmationReminders?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, RequireFields<MutationTogglePauseConfirmationRemindersArgs, 'invoiceId' | 'state'>>;
   togglePausePaymentReminders?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, RequireFields<MutationTogglePausePaymentRemindersArgs, 'invoiceId' | 'state'>>;
-  generateMissingReminderJobs?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = any> = {

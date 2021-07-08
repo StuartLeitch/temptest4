@@ -10,7 +10,6 @@ import { payments } from './payments';
 import { journals } from './journals';
 import { generateCompensatoryEvents } from './generateCompensatoryEvents';
 import { reminders } from './reminders';
-import { generateMissingReminderJobs } from './generateMissingReminderJobs';
 import { generateDraftCompensatoryEvents } from './generateDraftCompensatoryEvents';
 
 export const resolvers: Resolvers<Context> = merge(
@@ -22,6 +21,5 @@ export const resolvers: Resolvers<Context> = merge(
   journals,
   generateCompensatoryEvents,
   reminders,
-  generateMissingReminderJobs,
   generateDraftCompensatoryEvents
 );
