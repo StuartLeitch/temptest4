@@ -37,4 +37,5 @@ export interface InvoiceRepoContract extends Repo<Invoice> {
   getInvoicesByCustomId?(customId: string): Promise<Either<GuardFailure | RepoError,Invoice[]>>;
   getUnregisteredErpCreditNotes(): Promise<Either<GuardFailure | RepoError,InvoiceId[]>>;
   isInvoiceDeleted(id: InvoiceId): Promise<Either<GuardFailure | RepoError,boolean>>;
+  getUnrecognizedReversalsNetsuiteErp(): Promise<Either<GuardFailure | RepoError, any[]>>;
 }

@@ -12,6 +12,7 @@ import { RegisterRevenueRecognitionsCron } from './../cron/registerRevenueRecogn
 import { RegisterCreditNotesCron } from './../cron/registerCreditNotesCron';
 import { RegisterInvoicesCron } from './../cron/registerInvoicesCron';
 import { RegisterPaymentsCron } from './../cron/registerPaymentsCron';
+import { RegisterRevenueRecognitionReversalsCron } from './../cron/registerRevenueRecognitionsReversalCron';
 
 import { env } from '../env';
 import { Context } from '../builders';
@@ -35,6 +36,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
       RegisterRevenueRecognitionsCron,
       RegisterCreditNotesCron,
       RegisterPaymentsCron,
+      RegisterRevenueRecognitionReversalsCron
     ];
 
     const jobsQueue = [].concat(
