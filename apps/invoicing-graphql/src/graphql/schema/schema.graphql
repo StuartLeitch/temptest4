@@ -337,7 +337,6 @@ type Mutation {
   updateCoupon(coupon: CouponInput): Coupon
   createCoupon(coupon: CouponInput): Coupon
   createInvoice(totalAmount: Float): Invoice
-  deleteInvoice(id: ID!): Boolean
   creditCardPayment(
     invoiceId: ID!
     payerId: String!
