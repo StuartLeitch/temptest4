@@ -9,21 +9,13 @@ import { ParseUtils, Filters } from '@utils';
 import {
   Container,
   Row,
-  Card,
-  CardBody,
-  CardTitle,
   CustomInput,
-  Badge,
-  Table,
   Button,
-  ListGroup,
-  ListGroupItem,
   Input,
   InputGroup,
   InputGroupAddon,
   FormGroup,
   Label,
-  Media,
   Col,
 } from './../../../components';
 import { setupPage } from './../../../components/Layout/setupPage';
@@ -34,11 +26,6 @@ import SearchList from './SearchList';
 import { INVOICES_AND_CREDIT_NOTES_QUERY } from '../../Invoices/List/graphql';
 import InvoicesSearchResults from '../Invoicing/InvoicesSearchResults';
 import CreditNotesSearchResults from '../Invoicing/CreditNotesSearchResults';
-
-// import { TrTableInvoices } from '../../components/Financial/TrTableInvoices';
-// import { TinyDonutChart } from '../../components/ProjectsDashboards/TinyDonutChart';
-// import { TinyDonutChartAllProjects } from '../../components/ProjectsDashboards/TinyDonutChartAllProjects';
-// import { StackedAreaChart } from '../../components/Financial/StackedAreaChart';
 
 const ProjectsDashboard: React.FC = () => {
   const [searchResults, setSearchResults] = useState(null);
@@ -60,7 +47,6 @@ const ProjectsDashboard: React.FC = () => {
     'customId',
     (defaultFilters as any).customId
   );
-
 
   const [listState] = useLocalStorage('searchList', { filters:defaultFilters, pagination: defaultPagination});
   let { filters, pagination } = listState;
@@ -96,6 +82,8 @@ const ProjectsDashboard: React.FC = () => {
     const searchValue = (document.getElementById('search') as any).value;
     const isSearchByRefNumberChecked = (document.getElementById('searchByReferenceNumber') as any).checked;
     const isSearchByManuscriptIdChecked = (document.getElementById('searchByManuscriptId') as any).checked;
+
+    if (_.isEmpty(searchValue)) return;
 
     if (isSearchByRefNumberChecked) {
       filters['referenceNumber'] = searchValue;

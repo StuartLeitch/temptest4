@@ -26,16 +26,17 @@ const TrTableCreditNotesList = ({creditNotes}) => (
         price,
         vat,
         dateIssued,
-        dateCreated
+        dateCreated,
+        invoice
       }) => (
         <tr key={id}>
-          <td className='align-middle'>&lt;Manuscript Custom ID&gt;</td>
+          <td className='align-middle'><strong>{invoice?.invoiceItem?.article?.customId}</strong></td>
           <td className='align-middle'>
             <Link
               to={`/credit-notes/details/${id}`}
               className='text-decoration-none'
             >
-              <span className={ 'text-secondary'}>
+              <span className={'text-secondary'}>
                 <strong>
                     CN-{persistentReferenceNumber}
                 </strong>

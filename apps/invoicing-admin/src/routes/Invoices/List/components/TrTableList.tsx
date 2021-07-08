@@ -33,8 +33,6 @@ const TrTableInvoicesList = ({ invoices }) => {
           id,
           status,
           referenceNumber,
-          cancelledInvoiceReference,
-          customId,
           invoiceItem,
           dateIssued,
           dateAccepted,

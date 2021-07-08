@@ -1,4 +1,4 @@
-import { Resolvers, CreditNote } from '../schema';
+import { Resolvers, Invoice, CreditNote } from '../schema';
 
 import { Context } from '../../builders';
 import {
@@ -15,6 +15,8 @@ import {
   GetInvoiceDetailsDTO,
   GetCreditNoteByInvoiceIdUsecase,
   GetCreditNoteByInvoiceIdDTO,
+  GetArticleDetailsUsecase,
+  ArticleMap,
 } from '@hindawi/shared';
 
 import { CreateCreditNoteUsecase } from '../../../../../libs/shared/src/lib/modules/creditNotes/usecases/createCreditNote/createCreditNote';
@@ -115,6 +117,50 @@ export const creditNote: Resolvers<Context> = {
 
       return CreditNoteMap.toPersistence(result.value);
     },
+  },
+  CreditNote: {
+    async invoice(parent: Invoice, args, context) {
+      console.info('In CreditNote/invoice');
+      const {
+        repos: {
+          invoice: invoiceRepo,
+        }
+      } = context;
+
+      const usecaseContext = {
+        roles: [Roles.ADMIN],
+      };
+      const associatedInvoiceUsecase = new GetInvoiceDetailsUsecase(invoiceRepo);
+
+      const request: any = { invoiceId: parent.invoiceId };
+
+      const result = await associatedInvoiceUsecase.execute(request, usecaseContext);
+
+      if (result.isLeft()) {
+        throw new Error(result.value.message);
+      }
+
+      if (result.isLeft()) {
+        throw new Error(result.value.message);
+      }
+
+      const invoiceDetails = result.value;
+
+      return {
+        invoiceId: invoiceDetails.id.toString(),
+        status: invoiceDetails.status,
+        dateCreated: invoiceDetails?.dateCreated?.toISOString(),
+        dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
+        dateMovedToFinal: invoiceDetails?.dateMovedToFinal?.toISOString(),
+        // erpReferences: invoiceDetails
+        //   .getErpReferences()
+        //   .getItems()
+        //   .concat(erpPaymentReferences),
+        cancelledInvoiceReference: invoiceDetails.cancelledInvoiceReference,
+        dateIssued: invoiceDetails?.dateIssued?.toISOString(),
+        referenceNumber: invoiceDetails.persistentReferenceNumber,
+      };
+    }
   },
   Mutation: {
     async createCreditNote(parent, args, context) {

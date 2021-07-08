@@ -308,6 +308,7 @@ export const invoice: Resolvers<Context> = {
       return PayerMap.toPersistence(maybePayer.value);
     },
     async invoiceItem(parent: Invoice, args, context) {
+      // console.info('In Invoice/InvoiceItem...')
       const {
         repos: {
           invoiceItem: invoiceItemRepo,
@@ -475,6 +476,7 @@ export const invoice: Resolvers<Context> = {
   },
   InvoiceItem: {
     async article(parent, args, context) {
+      // console.info('In Invoice Item/article...')
       if (!parent) return null;
 
       const getArticleUseCase = new GetArticleDetailsUsecase(

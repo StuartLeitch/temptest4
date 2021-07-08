@@ -5,6 +5,7 @@ function wrap(value) {
 export class Filters {
   static collect(src) {
     return {
+      referenceNumber: src.referenceNumber,
       invoiceStatus: src.invoiceStatus && [...src.invoiceStatus],
       transactionStatus: src.transactionStatus && [...src.transactionStatus],
       invoiceItem: {

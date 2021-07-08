@@ -184,5 +184,12 @@ fragment creditNoteFragment on CreditNote {
   dateUpdated
   persistentReferenceNumber
   creationReason
+  invoice {
+  	invoiceItem {
+      article {
+        customId
+      }
+    }
+  }
 }
 `;
