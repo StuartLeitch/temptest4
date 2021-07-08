@@ -92,6 +92,7 @@ export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getI
 export * from './modules/invoices/usecases/createCreditNote/createCreditNote';
 export * from './modules/invoices/usecases/getCreditNoteByInvoiceId/getCreditNoteByInvoiceId';
 export * from './modules/invoices/usecases/ERP/retryRevenueRecognizedNetsuiteErpInvoices/retryRevenueRecognitionNetsuiteErpInvoices';
+export * from './modules/invoices/usecases/ERP/retryRevenueRecognizedReversalsNetsuiteErp/retryRevenueRecognitionReversalsNetsuiteErp';
 
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceConfirmed/publishInvoiceConfirmed';
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
