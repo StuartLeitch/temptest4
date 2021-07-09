@@ -31,7 +31,7 @@ export const graphqlLoader: MicroframeworkLoader = (
       context: ({ req }) => {
         return {
           ...context,
-          keycloakAuth: new KeycloakContext({ req } as any), // 3. add the KeycloakContext to `kAuth`
+          keycloakAuth: new KeycloakContext({ req } as any, keycloak), // 3. add the KeycloakContext to `kAuth`
         };
       },
       playground: env.graphql.editor,
@@ -48,17 +48,6 @@ export const graphqlLoader: MicroframeworkLoader = (
 function configureKeycloak(app, graphqlPath) {
   const keycloakConfig = env.app.keycloakConfig;
   const memoryStore = new session.MemoryStore();
-
-  app.use(
-    session({
-      secret:
-        process.env.SESSION_SECRET_STRING ||
-        'th1s 5h0u1d b3 a we11-h1dden s3cr3t',
-      resave: false,
-      saveUninitialized: true,
-      store: memoryStore,
-    })
-  );
 
   const keycloak = new Keycloak(
     {

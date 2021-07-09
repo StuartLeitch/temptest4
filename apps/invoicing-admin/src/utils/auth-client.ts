@@ -60,7 +60,7 @@ class _AuthClient {
     return await this.kc.init(kcOptions as any);
   }
 
-  private handleAuthSuccess() {
+  private async handleAuthSuccess() {
     const { kc } = this;
     const data = kc.tokenParsed as any;
 

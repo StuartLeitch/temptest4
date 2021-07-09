@@ -21,3 +21,11 @@ export function getAuthRoles(context: Context): Array<Roles> {
 
   return contextRoles;
 }
+
+export function getOptionalAuthRoles(context: Context): Array<Roles> {
+  if (!context.keycloakAuth.accessToken) {
+    return [Roles.PAYER];
+  } else {
+    return getAuthRoles(context);
+  }
+}

@@ -33,7 +33,11 @@ import { InvoiceStatus, PayerType, Resolvers, Invoice } from '../schema';
 import { Context } from '../../builders';
 import { env } from '../../env';
 
-import { handleForbiddenUsecase, getAuthRoles } from './utils';
+import {
+  handleForbiddenUsecase,
+  getOptionalAuthRoles,
+  getAuthRoles,
+} from './utils';
 
 export const invoice: Resolvers<Context> = {
   Query: {
@@ -219,6 +223,9 @@ export const invoice: Resolvers<Context> = {
           `The postalCode {${args.postalCode}} is invalid, it needs to have 5 numbers.`
         );
       }
+
+      const roles = getOptionalAuthRoles(context);
+
       const {
         repos,
         services: { exchangeRateService, vatService },
@@ -229,7 +236,7 @@ export const invoice: Resolvers<Context> = {
         invoiceId: args.invoiceId,
       };
       const usecaseContext = {
-        roles: [Roles.PAYER],
+        roles,
       };
 
       const result = await usecase.execute(request, usecaseContext);
@@ -311,6 +318,8 @@ export const invoice: Resolvers<Context> = {
       return PayerMap.toPersistence(maybePayer.value);
     },
     async invoiceItem(parent: Invoice, args, context) {
+      const roles = getOptionalAuthRoles(context);
+
       const {
         repos: {
           invoiceItem: invoiceItemRepo,
@@ -323,7 +332,7 @@ export const invoice: Resolvers<Context> = {
       } = context;
 
       const usecaseContext = {
-        roles: [Roles.PAYER],
+        roles,
       };
 
       const getItemsUseCase = new GetItemsForInvoiceUsecase(
@@ -332,9 +341,12 @@ export const invoice: Resolvers<Context> = {
         waiverRepo
       );
 
-      const result = await getItemsUseCase.execute({
-        invoiceId: parent.invoiceId,
-      });
+      const result = await getItemsUseCase.execute(
+        {
+          invoiceId: parent.invoiceId,
+        },
+        usecaseContext
+      );
 
       let rawItem;
       if (result.isLeft()) {
@@ -380,12 +392,14 @@ export const invoice: Resolvers<Context> = {
       return { ...rawItem, rate: Math.round(rate * 10000) / 10000, vatnote };
     },
     async payment(parent: Invoice, args, context) {
+      const roles = getOptionalAuthRoles(context);
+
       const {
         repos: { payment: paymentRepo, invoice: invoiceRepo },
       } = context;
 
       const usecaseContext = {
-        roles: [Roles.PAYER],
+        roles,
       };
 
       const usecase = new GetPaymentsByInvoiceIdUsecase(
@@ -412,12 +426,14 @@ export const invoice: Resolvers<Context> = {
       return PaymentMap.toPersistence(payment);
     },
     async payments(parent: Invoice, args, context) {
+      const roles = getOptionalAuthRoles(context);
+
       const {
         repos: { invoice: invoiceRepo, payment: paymentRepo },
       } = context;
 
       const usecaseContext = {
-        roles: [Roles.PAYER],
+        roles,
       };
 
       const usecase = new GetPaymentsByInvoiceIdUsecase(
@@ -505,12 +521,14 @@ export const invoice: Resolvers<Context> = {
       };
     },
     async transaction(parent: Invoice, args, context) {
+      const roles = getOptionalAuthRoles(context);
+
       const {
         repos: { transaction: transactionRepo },
       } = context;
 
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles,
       };
 
       const usecase = new GetTransactionByInvoiceIdUsecase(transactionRepo);
@@ -538,13 +556,22 @@ export const invoice: Resolvers<Context> = {
     async article(parent, args, context) {
       if (!parent) return null;
 
+      const roles = getOptionalAuthRoles(context);
+
       const getArticleUseCase = new GetArticleDetailsUsecase(
         context.repos.manuscript
       );
 
-      const article = await getArticleUseCase.execute({
-        articleId: parent.manuscriptId,
-      });
+      const usecaseContext = {
+        roles,
+      };
+
+      const article = await getArticleUseCase.execute(
+        {
+          articleId: parent.manuscriptId,
+        },
+        usecaseContext
+      );
 
       if (article.isLeft()) {
         throw article.value;
@@ -598,13 +625,22 @@ export const invoice: Resolvers<Context> = {
   },
   Payment: {
     async paymentMethod(parent, args, context) {
+      const roles = getOptionalAuthRoles(context);
+
       const getPaymentMethodUseCase = new GetPaymentMethodByIdUsecase(
         context.repos.paymentMethod
       );
 
-      const paymentMethod = await getPaymentMethodUseCase.execute({
-        paymentMethodId: parent.paymentMethodId,
-      });
+      const usecaseContext = {
+        roles,
+      };
+
+      const paymentMethod = await getPaymentMethodUseCase.execute(
+        {
+          paymentMethodId: parent.paymentMethodId,
+        },
+        usecaseContext
+      );
 
       if (paymentMethod.isLeft()) {
         throw paymentMethod.value;
@@ -615,6 +651,8 @@ export const invoice: Resolvers<Context> = {
   },
   Mutation: {
     async applyCoupon(parent, args, context) {
+      const roles = getOptionalAuthRoles(context);
+
       const {
         repos: {
           invoice: invoiceRepo,
@@ -634,7 +672,7 @@ export const invoice: Resolvers<Context> = {
       } = env.app;
 
       const usecaseContext = {
-        roles: [Roles.PAYER],
+        roles,
       };
 
       const applyCouponUsecase = new ApplyCouponToInvoiceUsecase(

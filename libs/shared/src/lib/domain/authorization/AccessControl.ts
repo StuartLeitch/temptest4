@@ -62,10 +62,14 @@ accessControl
   .action('read')
   .resource('paymentMethods')
   .action('read')
+  .resource('paymentMethod')
+  .action('read')
   .resource('transaction')
   .action('read')
   .resource('coupon')
   .action('apply')
+  .resource('waiver')
+  .action('read')
   .resource('VAT')
   .action('validate');
 accessControl

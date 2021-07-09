@@ -17393,10 +17393,10 @@ keycloak-connect-graphql@^0.7.0:
   dependencies:
     "@graphql-tools/utils" "7.2.3"
 
-keycloak-connect@^13.0.0:
-  version "13.0.0"
-  resolved "https://registry.yarnpkg.com/keycloak-connect/-/keycloak-connect-13.0.0.tgz#95bcb96627b04abc282b563a0b897aa79002fa44"
-  integrity sha512-OdCy9KQ7v+c46Q2JlZWHBvvL58XkFanF7w+Expmt9TfDAWIe1ZMdmoSzxvU8Orz+GQO3BaBSRNv0WCwI+1sXTg==
+keycloak-connect@^10.0.0:
+  version "10.0.2"
+  resolved "https://registry.yarnpkg.com/keycloak-connect/-/keycloak-connect-10.0.2.tgz#a21003f0a683516b921546fc3d0bdd85d9263a95"
+  integrity sha512-uzWCpUPYqIakV5flPsf86ihxO+aQlwIsouOw+aljak71e3oIGSvx2WrujccY3h9D3qHLFsAoosk9Ow9MsoLMjA==
   dependencies:
     jwk-to-pem "^2.0.0"
   optionalDependencies:
