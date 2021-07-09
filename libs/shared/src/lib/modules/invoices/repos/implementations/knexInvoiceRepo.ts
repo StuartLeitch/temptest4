@@ -811,8 +811,38 @@ export class KnexInvoiceRepo
     // * SQL for retrieving results needed only for ERP registration
     const filterRevenueRecognitionReadyForERP = this.filterRevenueRecognitionReadyForErpRegistration();
 
-    const prepareIdsSQL = filterRevenueRecognitionReadyForERP(
-      withRevenueRecognitionReversalErpReference(withInvoiceItems(erpReferencesQuery))
+    const withCreditNoteErpReference = this.withErpReferenceQuery(
+      'creditnoteref',
+      'invoices.id',
+      'invoice',
+      'netsuite',
+      'creditNote'
+    );
+    // * SQL for retrieving already registerd credit notes
+    const filterRegisteredCreditNotesForERP = this.filterRegisteredCreditNotesForErpRegistration();
+
+    const withRevenueRecognitionErpReference = this.withErpReferenceQuery(
+      'revenuerecognitionref',
+      'invoices.id',
+      'invoice',
+      'netsuite',
+      'revenueRecognition'
+    );
+    // * SQL for retrieving already registerd credit notes
+    const filterRegisteredRevenueRecognitionForERP = this.filterRegisteredRevenueRecognitionForErpRegistration();
+
+    const prepareIdsSQL = filterRegisteredRevenueRecognitionForERP(
+      withRevenueRecognitionErpReference(
+        filterRegisteredCreditNotesForERP(
+          withCreditNoteErpReference(
+            filterRevenueRecognitionReadyForERP(
+              withRevenueRecognitionReversalErpReference(
+                withInvoiceItems(erpReferencesQuery)
+              )
+            )
+          )
+        )
+      )
     );
 
     logger.debug('select', {
@@ -826,5 +856,15 @@ export class KnexInvoiceRepo
     return right(
       revenueRecognitions.map((i) => InvoiceId.create(new UniqueEntityID(i.invoiceId)))
     );
+  }
+
+  private filterRegisteredCreditNotesForErpRegistration(): any {
+    return (query) =>
+      query.whereNotNull('creditnoteref.value');
+  }
+
+  private filterRegisteredRevenueRecognitionForErpRegistration(): any {
+    return (query) =>
+      query.whereNotNull('revenuerecognitionref.value');
   }
 }
