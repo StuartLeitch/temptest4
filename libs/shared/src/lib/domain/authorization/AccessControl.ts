@@ -71,7 +71,9 @@ accessControl
   .resource('waiver')
   .action('read')
   .resource('VAT')
-  .action('validate');
+  .action('validate')
+  .resource('journal')
+  .action('read');
 accessControl
   .grant(Roles.ADMIN)
   .resource('payment')
@@ -116,6 +118,8 @@ accessControl
   .action('create')
   .action('read')
   .resource('transaction')
+  .action('read')
+  .resource('journal')
   .action('read');
 accessControl.grant(Roles.SUPER_ADMIN).resource('*').action('*');
 accessControl
