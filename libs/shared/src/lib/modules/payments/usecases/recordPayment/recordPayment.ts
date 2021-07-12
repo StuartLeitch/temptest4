@@ -90,7 +90,7 @@ export class RecordPaymentUsecase
   async getAccessControlContext(r: DTO, c: Context, a?: AccessControlContext) {
     return {
       paymentType: c.paymentType,
-    };
+    } as any;
   }
 
   @Authorize('payment:register')

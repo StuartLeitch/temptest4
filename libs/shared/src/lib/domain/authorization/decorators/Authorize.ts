@@ -13,7 +13,11 @@ interface AccessControlledUsecaseContract<R, C, ACC> {
 }
 
 abstract class AccessControlledUsecase<R, C, ACC>
-  implements AccessControlledUsecaseContract<R, C, ACC> {}
+  implements AccessControlledUsecaseContract<R, C, ACC> {
+    getAccessControlContext(r: any, context: any): any {
+      return {} as any;
+    }
+  }
 
 const Authorize = <R, C extends AuthorizationContext>(action: string) => (
   _target: AccessControlledUsecase<R, C, AccessControlContext>, // Class of the decorated method
