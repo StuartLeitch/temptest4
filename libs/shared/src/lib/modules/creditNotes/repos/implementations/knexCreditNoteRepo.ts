@@ -219,7 +219,7 @@ export class KnexCreditNoteRepo
     if (creditNote.length === 0) {
       return left(RepoError.createEntityNotFoundError('article', customId));
     }
-    return creditNote;
+    return right(creditNote);
   }
 
   async getRecentCreditNotes(
