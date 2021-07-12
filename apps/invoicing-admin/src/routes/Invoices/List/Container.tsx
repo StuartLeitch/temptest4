@@ -189,7 +189,6 @@ const InvoicesContainer: React.FC = () => {
     const [name, status] = ParseUtils.parseEvent(key);
     let newStatus = [];
     let newTransactionStatus = [];
-    let newJournalId = [];
 
     switch (name) {
 
@@ -252,42 +251,6 @@ const InvoicesContainer: React.FC = () => {
           page: 1,
         }});
         break;
-
-      // case 'journalTitle':
-      //   newJournalId = (value as any[]).map((j) => j.journalId);
-      //   setJournalId(newJournalId);
-      //   setPage(1);
-      //   writeStorage('invoicesList', { filters: {
-      //     ...filters,
-      //     journalId: newJournalId,
-      //   }, pagination: {
-      //     ...pagination,
-      //     page: 1,
-      //   }});
-      //   break;
-
-      // case 'referenceNumber':
-      //   setPage(1);
-      //   setReferenceNumber(value as string);
-      //   writeStorage('invoicesList',{ filters: {
-      //     ...filters,
-      //     referenceNumber: value,
-      //   }, pagination: {
-      //     ...pagination,
-      //     page: 1,
-      //   }});
-      //   break;
-
-      // default:
-      //   setCustomId(value as string);
-      //   setPage(1);
-      //   writeStorage('invoicesList', {
-      //     filters: { ...filters, customId: value },
-      //     pagination: {
-      //       ...pagination,
-      //       page: 1,
-      //     }
-      //   });
     }
   }
 };
