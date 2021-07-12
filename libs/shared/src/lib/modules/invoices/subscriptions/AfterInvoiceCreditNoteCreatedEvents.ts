@@ -47,7 +47,7 @@ export class AfterInvoiceCreditNoteCreatedEvent
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
     private publishInvoiceCredited: PublishInvoiceCreditedUsecase | NoOpUseCase,
-    private publishRevenueRecognitionReversal: PublishRevenueRecognitionReversalUsecase,
+    // private publishRevenueRecognitionReversal: PublishRevenueRecognitionReversalUsecase,
     private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
@@ -202,30 +202,30 @@ export class AfterInvoiceCreditNoteCreatedEvent
         `[AfterInvoiceCreditNoteCreated]: Successfully executed onInvoiceCreditNoteCreatedEvent use case InvoiceCreditedEvent`
       );
 
-      const nsRevRecReference = invoice
-        .getErpReferences()
-        .getItems()
-        .filter(
-          (er) =>
-            er.vendor === 'netsuite' && er.attribute === 'revenueRecognition'
-        )
-        .find(Boolean);
+      // const nsRevRecReference = invoice
+      //   .getErpReferences()
+      //   .getItems()
+      //   .filter(
+      //     (er) =>
+      //       er.vendor === 'netsuite' && er.attribute === 'revenueRecognition'
+      //   )
+      //   .find(Boolean);
 
-      if (manuscript.datePublished && nsRevRecReference) {
-        const publishRevenueRecognitionReversal = await this.publishRevenueRecognitionReversal.execute(
-          { invoiceId },
-          defaultContext
-        );
+      // if (manuscript.datePublished && nsRevRecReference) {
+      //   const publishRevenueRecognitionReversal = await this.publishRevenueRecognitionReversal.execute(
+      //     { invoiceId },
+      //     defaultContext
+      //   );
 
-        if (publishRevenueRecognitionReversal.isLeft()) {
-          throw publishRevenueRecognitionReversal.value.message;
-        }
-        this.loggerService.info(
-          `[PublishRevenueRecognitionReversal]: ${JSON.stringify(
-            publishRevenueRecognitionReversal
-          )}`
-        );
-      }
+      //   if (publishRevenueRecognitionReversal.isLeft()) {
+      //     throw publishRevenueRecognitionReversal.value.message;
+      //   }
+      //   this.loggerService.info(
+      //     `[PublishRevenueRecognitionReversal]: ${JSON.stringify(
+      //       publishRevenueRecognitionReversal
+      //     )}`
+      //   );
+      // }
     } catch (err) {
       console.error(err);
       console.log(
