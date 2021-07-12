@@ -31,4 +31,5 @@ export interface InvoiceItemRepoContract extends Repo<InvoiceItem> {
   update(
     invoiceItem: InvoiceItem
   ): Promise<Either<GuardFailure | RepoError, InvoiceItem>>;
+  invoiceItemCreditNoteJoinQuery?(): any;
 }

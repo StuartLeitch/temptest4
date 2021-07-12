@@ -8,6 +8,7 @@ import { CreditNote } from '../../domain/CreditNote';
 import { CreditNoteId } from '../../domain/CreditNoteId';
 import { CreditNoteRepoContract } from './../creditNoteRepo';
 import { InvoiceItemRepoContract } from '../../../invoices/repos';
+import { ArticleRepoContract } from '../../../manuscripts/repos';
 import { CreditNoteMap } from '../../mappers/CreditNoteMap';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { ManuscriptId } from '../../../manuscripts/domain/ManuscriptId';
@@ -21,8 +22,9 @@ export class KnexCreditNoteRepo
   implements CreditNoteRepoContract {
   constructor(
     protected db: Knex,
-    protected logger?: any,
-    private invoiceItemRepo?: InvoiceItemRepoContract
+    private invoiceItemRepo: InvoiceItemRepoContract,
+    private articleRepo: ArticleRepoContract,
+    protected logger?: any
   ) {
     super(db, logger);
   }
@@ -205,45 +207,19 @@ export class KnexCreditNoteRepo
   async getCreditNoteByCustomId(
     customId: string
   ): Promise<Either<GuardFailure | RepoError, CreditNote>> {
-    const { db } = this;
-
-    const articleId = ManuscriptId.create(new UniqueEntityID(customId));
-
-    const maybeInvoiceItems = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
-      articleId
-    );
-
-    if (maybeInvoiceItems.isLeft()) {
-      return left(RepoError.createEntityNotFoundError('article', customId));
-    }
-
-    const maybeCreditNote = await this.getCreditNoteByInvoiceId(
-      maybeInvoiceItems.value[0].invoiceId
-    );
-
-    if (maybeCreditNote.isLeft()) {
-      return left(
-        RepoError.createEntityNotFoundError(
-          'invoiceItem',
-          maybeInvoiceItems.value[0].invoiceId.id.toString()
-        )
-      );
-    }
-    const creditNoteInvoiceId = maybeCreditNote.value.invoiceId;
-    const invoiceItemInvoiceId = maybeInvoiceItems.value[0].invoiceId;
-
-    const result = await db
-      .select()
-      .from('credit_notes')
-      .where('invoiceId', creditNoteInvoiceId.id.toString())
-      .where('invoiceId', '=', invoiceItemInvoiceId.id.toString())
+    const selectQuery = this.creditNoteAndArticleSelector();
+    const withArticleQuery = this.articleRepo.articleInvoiceItemJoinQuery();
+    const withInvoiceItems = this.invoiceItemRepo.invoiceItemCreditNoteJoinQuery();
+    const creditNoteResult = selectQuery(withArticleQuery(withInvoiceItems))
+      .where({ 'articles.customId': customId })
       .first();
 
-    if (result.length === 0) {
+    const creditNote = await creditNoteResult;
+
+    if (creditNote.length === 0) {
       return left(RepoError.createEntityNotFoundError('article', customId));
     }
-
-    return right(result);
+    return creditNote;
   }
 
   async getRecentCreditNotes(
@@ -275,5 +251,15 @@ export class KnexCreditNoteRepo
       totalCount: totalCount[0]['count'],
       creditNotes: maybeInvoices.value,
     });
+  }
+
+  private creditNoteAndArticleSelector(): any {
+    return () =>
+      this.db.select(
+        'credit_notes.invoiceId AS invoiceId',
+        'credit_notes.dateCreated AS creditNoteDateCreated',
+        'articles.customId AS customId',
+        'articles.datePublished AS datePublished'
+      );
   }
 }

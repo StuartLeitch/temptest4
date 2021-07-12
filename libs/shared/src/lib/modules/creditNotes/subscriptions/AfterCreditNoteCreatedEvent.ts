@@ -135,16 +135,8 @@ export class AfterCreditNoteCreatedEvent
       );
 
       if (maybePayer.isLeft()) {
-        if (creditNote.invoiceId.id.toString() === invoice.id.toString()) {
-          maybePayer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
-          if (maybePayer.isLeft()) {
-            return left(
-              new Error(
-                `Credit Note ${creditNote.id.toString()} has no payers.`
-              )
-            );
-          }
-        } else {
+        maybePayer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
+        if (maybePayer.isLeft()) {
           return left(
             new Error(`Credit Note ${creditNote.id.toString()} has no payers.`)
           );

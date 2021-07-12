@@ -10,11 +10,24 @@ import { Manuscript } from '../domain/Manuscript';
 import { Article } from '../domain/Article';
 
 export interface ArticleRepoContract extends Repo<Article | Manuscript> {
-  findById(manuscriptId: ManuscriptId): Promise<Either<GuardFailure | RepoError,Article | Manuscript>>;
-  findByCustomId(customId: ManuscriptId | string): Promise<Either<GuardFailure | RepoError,Article | Manuscript>>;
-  delete(manuscript: Manuscript): Promise<Either<GuardFailure | RepoError,void>>;
-  restore(manuscript: Manuscript): Promise<Either<GuardFailure | RepoError,void>>;
-  update(manuscript: Manuscript): Promise<Either<GuardFailure | RepoError,Manuscript>>;
+  findById(
+    manuscriptId: ManuscriptId
+  ): Promise<Either<GuardFailure | RepoError, Article | Manuscript>>;
+  findByCustomId(
+    customId: ManuscriptId | string
+  ): Promise<Either<GuardFailure | RepoError, Article | Manuscript>>;
+  delete(
+    manuscript: Manuscript
+  ): Promise<Either<GuardFailure | RepoError, void>>;
+  restore(
+    manuscript: Manuscript
+  ): Promise<Either<GuardFailure | RepoError, void>>;
+  update(
+    manuscript: Manuscript
+  ): Promise<Either<GuardFailure | RepoError, Manuscript>>;
   filterBy(criteria: any): any;
-  findByInvoiceId?(invoiceId: InvoiceId): Promise<Either<GuardFailure | RepoError,Manuscript>>;
+  findByInvoiceId?(
+    invoiceId: InvoiceId
+  ): Promise<Either<GuardFailure | RepoError, Manuscript>>;
+  articleInvoiceItemJoinQuery?(): any;
 }
