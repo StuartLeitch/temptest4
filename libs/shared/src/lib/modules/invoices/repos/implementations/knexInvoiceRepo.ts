@@ -849,12 +849,10 @@ export class KnexInvoiceRepo
       unregisteredRevenueRecognitionReversal: prepareIdsSQL.toString(),
     });
 
-    process.exit(0);
-
-    const revenueRecognitions: Array<any> = await prepareIdsSQL;
+    const revenueRecognitionReversals: Array<any> = await prepareIdsSQL;
 
     return right(
-      revenueRecognitions.map((i) => InvoiceId.create(new UniqueEntityID(i.invoiceId)))
+      revenueRecognitionReversals.map((i) => InvoiceId.create(new UniqueEntityID(i.invoiceId)))
     );
   }
 
