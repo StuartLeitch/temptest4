@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import numeral from 'numeral';
 import format from 'date-fns/format';
+import addMinutes from 'date-fns/addMinutes';
 import DatePicker from 'react-datepicker';
 import { ButtonInput } from '../../../Forms/DatePicker/components/ButtonInput';
 import { Invoice } from '../types';
@@ -310,7 +311,7 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
 
                 <dt className='col-sm-4'>Paid Date</dt>
                 <dd className='col-sm-8 text-inverse'>
-                  {format(new Date(payment?.datePaid), 'dd MMMM yyyy')}
+                  {formatDate(new Date(payment?.datePaid))}
                 </dd>
                 <dt className='col-sm-4'>Amount</dt>
                 <dd className='col-sm-8 text-inverse'>
@@ -338,6 +339,10 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
     </Card>
   );
 };
+
+function formatDate(date) {
+  return format(addMinutes(date, date.getTimezoneOffset()), 'dd MMM yyyy');
+}
 
 interface InvoiceDetailsTabProps {
   invoiceId: string;

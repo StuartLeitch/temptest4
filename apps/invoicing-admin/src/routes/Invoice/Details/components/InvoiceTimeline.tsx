@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardBody, CardTitle } from '../../../../components';
 import { TimelineMini } from '../../../components/Timeline/TimelineMini';
 import format from 'date-fns/format';
+import addMinutes from 'date-fns/addMinutes';
 import compareDesc from 'date-fns/compareDesc';
 import { Invoice } from '../types';
 
@@ -32,7 +33,7 @@ const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ({ invoice }) => (
           icon='circle'
           badgeTitle='Draft'
           badgeColor='secondary'
-          date={format(new Date(invoice?.dateCreated), 'dd MMMM yyyy')}
+          date={formatDate(new Date(invoice?.dateCreated))}
           phrase={'Invoice enters DRAFT state.'}
         />
       )}
@@ -43,7 +44,7 @@ const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ({ invoice }) => (
           iconClassName='text-primary'
           badgeTitle='Active'
           badgeColor='primary'
-          date={format(new Date(invoice?.dateIssued), 'dd MMMM yyyy')}
+          date={formatDate(new Date(invoice?.dateIssued))}
           phrase={'Invoice enters ACTIVE state.'}
         />
       )}
@@ -74,7 +75,7 @@ const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ({ invoice }) => (
           iconClassName='text-success'
           badgeTitle='Finalized'
           badgeColor='success'
-          date={format(new Date(invoice?.dateMovedToFinal), 'dd MMMM yyyy')}
+          date={formatDate(new Date(invoice?.dateMovedToFinal))}
           phrase={'Invoice enters FINAL state.'}
         />
       )}
@@ -85,9 +86,8 @@ const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ({ invoice }) => (
           iconClassName='text-warning'
           badgeTitle='Credit Note'
           badgeColor='warning'
-          date={format(
-            new Date(invoice?.creditNote?.dateCreated),
-            'dd MMMM yyyy'
+          date={formatDate(
+            new Date(invoice?.creditNote?.dateCreated)
           )}
           phrase={`
           Credit Note issued.
@@ -102,9 +102,8 @@ const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ({ invoice }) => (
           iconClassName='text-blue'
           badgeTitle='Published'
           badgeColor='blue'
-          date={format(
-            new Date(invoice?.invoiceItem?.article?.datePublished),
-            'dd MMMM yyyy'
+          date={formatDate(
+            new Date(invoice?.invoiceItem?.article?.datePublished)
           )}
           phrase={'Article enters PUBLISHED state.'}
         />
@@ -115,6 +114,10 @@ const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ({ invoice }) => (
 
 interface InvoiceTimelineProps {
   invoice: Invoice;
+}
+
+function formatDate(date) {
+  return format(addMinutes(date, date.getTimezoneOffset()), 'dd MMM yyyy');
 }
 
 export default InvoiceTimeline;
