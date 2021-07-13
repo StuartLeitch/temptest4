@@ -7,14 +7,14 @@ import { RepoError } from '../../../../infrastructure/RepoError';
 import { CreditNote } from '../../domain/CreditNote';
 import { CreditNoteId } from '../../domain/CreditNoteId';
 import { CreditNoteRepoContract } from './../creditNoteRepo';
-import { InvoiceItemRepoContract } from '../../../invoices/repos';
-import { ArticleRepoContract } from '../../../manuscripts/repos';
+import { KnexInvoiceItemRepo } from '../../../invoices/repos';
 import { CreditNoteMap } from '../../mappers/CreditNoteMap';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { ManuscriptId } from '../../../manuscripts/domain/ManuscriptId';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { PaginatedCreditNoteResult } from '../creditNoteRepo';
 import { applyFilters } from './utils';
+import { KnexArticleRepo } from '../../../manuscripts/repos';
 
 // to be updated with GuardFailure
 export class KnexCreditNoteRepo
@@ -22,8 +22,8 @@ export class KnexCreditNoteRepo
   implements CreditNoteRepoContract {
   constructor(
     protected db: Knex,
-    private invoiceItemRepo: InvoiceItemRepoContract,
-    private articleRepo: ArticleRepoContract,
+    private invoiceItemRepo: KnexInvoiceItemRepo,
+    private articleRepo: KnexArticleRepo,
     protected logger?: any
   ) {
     super(db, logger);

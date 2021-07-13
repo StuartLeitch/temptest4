@@ -209,7 +209,7 @@ export class KnexArticleRepo
     };
   }
 
-  articleInvoiceItemJoinQuery(): any {
+  public articleInvoiceItemJoinQuery(): any {
     return (query) =>
       query
         .from('articles')
