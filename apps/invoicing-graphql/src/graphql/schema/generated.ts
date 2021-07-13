@@ -421,7 +421,6 @@ export type Mutation = {
   applyCoupon?: Maybe<Coupon>;
   updateCoupon?: Maybe<Coupon>;
   createCoupon?: Maybe<Coupon>;
-  createInvoice?: Maybe<Invoice>;
   creditCardPayment: Payment;
   bankTransferPayment: Payment;
   createCreditNote: CreditNote;
@@ -452,11 +451,6 @@ export type MutationUpdateCouponArgs = {
 
 export type MutationCreateCouponArgs = {
   coupon?: Maybe<CouponInput>;
-};
-
-
-export type MutationCreateInvoiceArgs = {
-  totalAmount?: Maybe<Scalars['Float']>;
 };
 
 
@@ -953,7 +947,6 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   applyCoupon?: Resolver<Maybe<ResolversTypes['Coupon']>, ParentType, ContextType, RequireFields<MutationApplyCouponArgs, never>>;
   updateCoupon?: Resolver<Maybe<ResolversTypes['Coupon']>, ParentType, ContextType, RequireFields<MutationUpdateCouponArgs, never>>;
   createCoupon?: Resolver<Maybe<ResolversTypes['Coupon']>, ParentType, ContextType, RequireFields<MutationCreateCouponArgs, never>>;
-  createInvoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<MutationCreateInvoiceArgs, never>>;
   creditCardPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationCreditCardPaymentArgs, 'invoiceId' | 'payerId' | 'paymentMethodId' | 'paymentMethodNonce' | 'amount'>>;
   bankTransferPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationBankTransferPaymentArgs, 'invoiceId' | 'payerId' | 'paymentMethodId' | 'paymentReference' | 'amount' | 'datePaid'>>;
   createCreditNote?: Resolver<ResolversTypes['CreditNote'], ParentType, ContextType, RequireFields<MutationCreateCreditNoteArgs, 'invoiceId'>>;
