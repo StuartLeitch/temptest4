@@ -245,9 +245,12 @@ export class GetInvoicePdfUsecase
   private async getPayloadWithAddress(payload: InvoicePayload) {
     const { billingAddressId } = payload.payer;
     const usecase = new GetAddressUsecase(this.addressRepo);
-    const addressEither = await usecase.execute({
-      billingAddressId: billingAddressId.id.toString(),
-    });
+    const addressEither = await usecase.execute(
+      {
+        billingAddressId: billingAddressId.id.toString(),
+      },
+      this.authorizationContext
+    );
 
     return addressEither.map((address) => ({
       ...payload,
@@ -261,7 +264,10 @@ export class GetInvoicePdfUsecase
       this.couponRepo,
       this.waiverRepo
     );
-    const itemsEither = await usecase.execute({ invoiceId });
+    const itemsEither = await usecase.execute(
+      { invoiceId },
+      this.authorizationContext
+    );
     return itemsEither;
   }
 
