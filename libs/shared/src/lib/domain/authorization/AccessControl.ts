@@ -211,6 +211,8 @@ accessControl
   .resource('paymentMethod')
   .action('read')
   .resource('paymentMethods')
+  .action('read')
+  .resource('journal')
   .action('read');
 
 export { accessControl };
