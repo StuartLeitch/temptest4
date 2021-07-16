@@ -85,7 +85,7 @@ export class AssignEditorsToJournalUsecase
 
       const createEditorUsecase = new CreateEditor(this.editorRepo);
       const createEditorsResponse = await Promise.all(
-        editorsToCreate.map((e) => createEditorUsecase.execute(e))
+        editorsToCreate.map((e) => createEditorUsecase.execute(e, context))
       );
 
       const errs = [];
