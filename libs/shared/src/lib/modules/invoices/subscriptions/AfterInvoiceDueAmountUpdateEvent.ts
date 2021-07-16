@@ -1,23 +1,19 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
-import {
-  Roles,
-  UsecaseAuthorizationContext,
-} from '../../../domain/authorization';
+import { Roles } from '../../../domain/authorization';
+
 import { InvoiceDraftDueAmountUpdated } from '../domain/events/invoiceDraftDueAmountUpdated';
-import { InvoiceRepoContract } from '../repos/invoiceRepo';
+
 import { InvoiceItemRepoContract } from '../repos/invoiceItemRepo';
 import { ArticleRepoContract } from '../../manuscripts/repos';
+import { InvoiceRepoContract } from '../repos/invoiceRepo';
 import { WaiverRepoContract } from '../../waivers/repos';
 import { CouponRepoContract } from '../../coupons/repos';
-import { GetInvoiceDetailsUsecase } from '../usecases/getInvoiceDetails';
-import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
-import { GetManuscriptByManuscriptIdUsecase } from '../../manuscripts/usecases/getManuscriptByManuscriptId/getManuscriptByManuscriptId';
-import { PublishInvoiceDraftDueAmountUpdatedUseCase } from '../usecases/publishEvents/publishInvoiceDraftDueAmountUpdated';
 
-const defaultContext: UsecaseAuthorizationContext = {
-  roles: [Roles.DOMAIN_EVENT_HANDLER],
-};
+import { PublishInvoiceDraftDueAmountUpdatedUseCase } from '../usecases/publishEvents/publishInvoiceDraftDueAmountUpdated';
+import { GetManuscriptByManuscriptIdUsecase } from '../../manuscripts/usecases/getManuscriptByManuscriptId';
+import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
+import { GetInvoiceDetailsUsecase } from '../usecases/getInvoiceDetails';
 
 export class AfterInvoiceDraftDueAmountUpdatedEvent
   implements HandleContract<InvoiceDraftDueAmountUpdated> {
@@ -42,6 +38,9 @@ export class AfterInvoiceDraftDueAmountUpdatedEvent
   private async onInvoiceDraftDueAmountUpdatedEvent(
     event: InvoiceDraftDueAmountUpdated
   ): Promise<any> {
+    const defaultContext = {
+      roles: [Roles.DOMAIN_EVENT_HANDLER],
+    };
     //Get invoice data
     const invoiceId = event.invoiceId.id.toString();
     const getInvoice = new GetInvoiceDetailsUsecase(this.invoiceRepo);

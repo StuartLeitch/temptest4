@@ -1,17 +1,14 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
+import { LoggerContract } from '../../../infrastructure/logging/Logger';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 import { NoOpUseCase } from './../../../core/domain/NoOpUseCase';
-
-import {
-  Roles,
-  UsecaseAuthorizationContext,
-} from '../../../domain/authorization';
-import { LoggerContract } from '../../../infrastructure/logging/Logger';
+import { Roles } from '../../../domain/authorization';
 
 import { InvoiceCreditNoteCreated as InvoiceCreditNoteCreatedEvent } from '../domain/events/invoiceCreditNoteCreated';
 
 import { InvoiceId } from './../domain/InvoiceId';
+import { Payer } from '../../payers/domain/Payer';
 
 import { PaymentMethodRepoContract } from '../../payments/repos/paymentMethodRepo';
 import { ArticleRepoContract } from '../../manuscripts/repos/articleRepo';
@@ -23,16 +20,11 @@ import { InvoiceRepoContract } from '../repos/invoiceRepo';
 import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
 
+import { PublishRevenueRecognitionReversalUsecase } from '../usecases/ERP/publishRevenueRecognitionReversal';
 import { PublishInvoiceCreditedUsecase } from '../usecases/publishEvents/publishInvoiceCredited';
-import { PublishRevenueRecognitionReversalUsecase } from '../usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
-import { GetInvoiceDetailsUsecase } from '../../invoices/usecases/getInvoiceDetails';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
+import { GetInvoiceDetailsUsecase } from '../../invoices/usecases/getInvoiceDetails';
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
-import { Payer } from '../../payers/domain/Payer';
-
-const defaultContext: UsecaseAuthorizationContext = {
-  roles: [Roles.DOMAIN_EVENT_HANDLER],
-};
 
 export class AfterInvoiceCreditNoteCreatedEvent
   implements HandleContract<InvoiceCreditNoteCreatedEvent> {
@@ -63,6 +55,10 @@ export class AfterInvoiceCreditNoteCreatedEvent
   private async onInvoiceCreditNoteCreatedEvent(
     event: InvoiceCreditNoteCreatedEvent
   ): Promise<any> {
+    const defaultContext = {
+      roles: [Roles.DOMAIN_EVENT_HANDLER],
+    };
+
     const getInvoiceDetails = new GetInvoiceDetailsUsecase(this.invoiceRepo);
     try {
       const maybeCreditNote = await this.invoiceRepo.getInvoiceById(
