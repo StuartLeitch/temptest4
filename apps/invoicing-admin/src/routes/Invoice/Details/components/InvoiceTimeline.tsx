@@ -59,11 +59,8 @@ const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ({ invoice }) => (
             iconClassName='text-success'
             badgeTitle='Paid'
             badgeColor='success'
-            date={format(
-              invoice?.payments
-                ?.map((i) => new Date(i.datePaid))
-                .sort(compareDesc)[0],
-              'dd MMMM yyyy'
+            date={formatDate(
+              invoice?.payments?.map((i) => new Date(i.datePaid)).sort(compareDesc)[0]
             )}
             phrase={'Invoice Payment received.'}
           />
