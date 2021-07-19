@@ -33,6 +33,7 @@
     "reporting-pull-historic-events": { "tags": [] },
     "sisif": { "tags": [] },
     "sisif-test": { "tags": [] },
-    "invoicing-infrastructure": { "tags": [] }
+    "invoicing-infrastructure": { "tags": [] },
+    "erp-integration": { "tags": [] }
   }
 }

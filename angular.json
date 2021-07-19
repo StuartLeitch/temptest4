@@ -656,6 +656,57 @@
           }
         }
       }
+    },
+    "erp-integration": {
+      "root": "apps/erp-integration",
+      "sourceRoot": "apps/erp-integration/src",
+      "projectType": "application",
+      "prefix": "erp-integration",
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/erp-integration",
+            "main": "apps/erp-integration/src/main.ts",
+            "tsConfig": "apps/erp-integration/tsconfig.app.json",
+            "assets": ["apps/erp-integration/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/erp-integration/src/environments/environment.ts",
+                  "with": "apps/erp-integration/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "erp-integration:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/erp-integration/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/erp-integration"],
+          "options": {
+            "jestConfig": "apps/erp-integration/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
     }
   },
   "cli": {

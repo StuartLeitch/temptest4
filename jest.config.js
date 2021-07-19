@@ -6,5 +6,6 @@ module.exports = {
   resolver: '@nrwl/jest/plugins/resolver',
   moduleFileExtensions: ['ts', 'js', 'html'],
   passWithNoTests: true,
-  coverageReporters: ['lcov', 'json']
+  coverageReporters: ['lcov', 'json'],
+  projects: '<rootDir>/apps/erp-integration',
 };

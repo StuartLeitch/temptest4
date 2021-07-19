@@ -17,6 +17,7 @@
   "include": [
     "**/src/**/*.ts",
     "lib/shared/src/lib/**/*.ts",
+    "../config/**/*.js",
     "src/lib/infrastructure/database/knex/migrations/20191105154102_create_journals_table.js",
     "src/lib/infrastructure/database/knex/migrations/20191105154722_create_editors_table.js",
     "src/lib/infrastructure/database/knex/seeds/payment_methods.js",
