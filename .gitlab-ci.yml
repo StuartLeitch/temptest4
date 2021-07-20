@@ -43,6 +43,8 @@ variables:
   AFFECTED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend'
 
 Install Dependencies:
+  tags:
+    - 'cluster:hindawi-dev'
   interruptible: true
   allow_failure: false
   stage: setup
@@ -60,6 +62,8 @@ Install Dependencies:
     - ./tools/scripts/dockerize-builder.sh
 
 Test:
+  tags:
+    - 'cluster:hindawi-dev'
   interruptible: true
   allow_failure: false
   stage: test
@@ -85,6 +89,8 @@ Test:
       - reports
 
 Build:
+  tags:
+    - 'cluster:hindawi-dev'
   interruptible: true
   stage: build
   script:
@@ -114,6 +120,8 @@ Build:
       - dist
 
 Package Images:dev:
+  tags:
+    - 'cluster:hindawi-dev'
   interruptible: true
   stage: package
   image: docker:19.03.12
