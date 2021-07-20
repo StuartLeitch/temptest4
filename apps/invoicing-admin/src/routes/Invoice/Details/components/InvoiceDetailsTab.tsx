@@ -1,9 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import numeral from 'numeral';
-import parseISO from 'date-fns/parseISO';
-import format from 'date-fns/format';
-import addMinutes from 'date-fns/addMinutes';
 import DatePicker from 'react-datepicker';
 import { ButtonInput } from '../../../Forms/DatePicker/components/ButtonInput';
 import { Invoice } from '../types';
@@ -20,6 +17,7 @@ import {
   Row,
   Table,
 } from '../../../../components';
+import  { formatDate } from '../../../../utils/date';
 
 import Config from '../../../../config';
 
@@ -340,10 +338,6 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
     </Card>
   );
 };
-
-function formatDate(date) {
-  return format(addMinutes(date, date.getTimezoneOffset()), 'dd MMM yyyy');
-}
 
 interface InvoiceDetailsTabProps {
   invoiceId: string;

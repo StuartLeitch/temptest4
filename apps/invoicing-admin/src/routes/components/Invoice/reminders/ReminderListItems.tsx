@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { format } from 'date-fns';
+import  { formatDateWithMinutes } from '../../../../utils/date';
 
 import { ListGroupItem } from '../../../../components';
 
@@ -32,7 +32,7 @@ const ReminderListItem: FunctionComponent<ReminderListItemProps> = ({
         <span style={{ textAlign: 'center', flex: '1' }}>{type}</span>
         <span style={{ textAlign: 'center', flex: '1' }}>{toEmail}</span>
         <span style={{ textAlign: 'center', flex: '1' }}>
-          {format(new Date(new Date(when).toISOString()), 'dd MMMM yyyy HH:mm')}
+          {formatDateWithMinutes(new Date(when))}
         </span>
       </div>
     </ListGroupItem>

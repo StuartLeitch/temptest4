@@ -1,8 +1,9 @@
 import React from 'react';
 import { Card, CardBody, CardTitle } from '../../../../components';
 import { TimelineMini } from '../../../components/Timeline/TimelineMini';
-import format from 'date-fns/format';
-import addMinutes from 'date-fns/addMinutes';
+
+import  { formatDate } from '../../../../utils/date';
+
 import compareDesc from 'date-fns/compareDesc';
 import { Invoice } from '../types';
 
@@ -111,10 +112,6 @@ const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ({ invoice }) => (
 
 interface InvoiceTimelineProps {
   invoice: Invoice;
-}
-
-function formatDate(date) {
-  return format(addMinutes(date, date.getTimezoneOffset()), 'dd MMM yyyy');
 }
 
 export default InvoiceTimeline;
