@@ -163,9 +163,12 @@ export class EpicOnArticlePublishedUsecase
       manuscriptId: manuscript.id.toString(),
     });
 
-    const maybeInvoiceIds = await getInvoiceIds.execute({
-      customId: manuscript.customId,
-    });
+    const maybeInvoiceIds = await getInvoiceIds.execute(
+      {
+        customId: manuscript.customId,
+      },
+      context
+    );
 
     if (maybeInvoiceIds.isLeft()) {
       return left(
