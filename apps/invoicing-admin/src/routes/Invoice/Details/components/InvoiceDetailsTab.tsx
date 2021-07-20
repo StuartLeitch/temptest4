@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import numeral from 'numeral';
+import parseISO from 'date-fns/parseISO';
 import format from 'date-fns/format';
 import addMinutes from 'date-fns/addMinutes';
 import DatePicker from 'react-datepicker';
@@ -62,7 +63,7 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
                 <DatePicker
                   disabled
                   customInput={<ButtonInput />}
-                  selected={formatDate(new Date(invoice.dateIssued))}
+                  selected={new Date(Date.parse(formatDate(new Date(invoice?.dateIssued))))}
                   onChange={() => ({})}
                 />
               ) : (

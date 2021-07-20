@@ -71,7 +71,7 @@
     "country-list": "2.2.0",
     "cron": "1.8.2",
     "dataloader": "2.0.0",
-    "date-fns": "2.16.1",
+    "date-fns": "2.22.1",
     "document-register-element": "1.14.5",
     "dotenv": "8.2.0",
     "downshift": "6.0.5",
