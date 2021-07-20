@@ -3,7 +3,6 @@ import {
   WithAwsSecretsServiceProps,
 } from '@hindawi/phenom-charts';
 import { App as Cdk8sApp } from 'cdk8s';
-import url from 'url';
 
 import { Command } from '../../contracts';
 import { getOsEnv } from '../../env';
@@ -16,6 +15,7 @@ function makeAppEnum(app: string): App | null {
     case App.graphql:
     case App.web:
     case App.reporting:
+    case App.erpIntegration:
       return app as App;
 
     default:
@@ -73,7 +73,7 @@ export class BuildManifestsCommand implements Command {
         // todo delete contiune, this should exit with error
         continue;
       }
-      console.log('building ' + app)
+      console.log('building ' + app);
       await HindawiServiceChart.withAwsSecrets(rootConstruct, app, appProps);
     }
     rootConstruct.synth();

@@ -670,7 +670,10 @@
             "outputPath": "dist/apps/erp-integration",
             "main": "apps/erp-integration/src/main.ts",
             "tsConfig": "apps/erp-integration/tsconfig.app.json",
-            "assets": ["apps/erp-integration/src/assets"]
+            "assets": [
+              "apps/erp-integration/src/assets",
+              "apps/invoicing-graphql/src/Dockerfile"
+            ]
           },
           "configurations": {
             "production": {

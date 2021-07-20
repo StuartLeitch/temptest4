@@ -7,11 +7,13 @@ import { values as devInvoicingAdminValues } from 'apps/invoicing-admin/chart/hi
 import { values as devInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/hindawi/dev';
 import { values as devInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/dev';
 import { values as devReportingBackendValues } from 'apps/reporting-backend/chart/hindawi/dev';
+import { values as devErpIntegrationValues } from 'apps/erp-integration/chart/hindawi/dev';
 
 import { values as qaInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/hindawi/qa';
 import { values as qaInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/qa';
 import { values as qaInvoicingAdminValues } from 'apps/invoicing-admin/chart/hindawi/qa';
 import { values as qaReportingBackendValues } from 'apps/reporting-backend/chart/hindawi/qa';
+import { values as qaErpIntegrationValues } from 'apps/erp-integration/chart/hindawi/qa';
 
 import { values as demoInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/hindawi/demo';
 import { values as demoInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/demo';
@@ -62,12 +64,14 @@ const masterConfig: {
       [App.admin]: qaInvoicingAdminValues,
       [App.web]: qaInvoicingWebValues,
       [App.reporting]: qaReportingBackendValues,
+      [App.erpIntegration]: qaErpIntegrationValues,
     },
     dev: {
       [App.admin]: devInvoicingAdminValues,
       [App.graphql]: devInvoicingGraphqlValues,
       [App.web]: devInvoicingWebValues,
       [App.reporting]: devReportingBackendValues,
+      [App.erpIntegration]: devErpIntegrationValues,
     },
   },
   [Tenant.gsw]: {
