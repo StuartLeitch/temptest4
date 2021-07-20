@@ -62,7 +62,7 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
                 <DatePicker
                   disabled
                   customInput={<ButtonInput />}
-                  selected={new Date(invoice.dateIssued)}
+                  selected={formatDate(new Date(invoice.dateIssued))}
                   onChange={() => ({})}
                 />
               ) : (
