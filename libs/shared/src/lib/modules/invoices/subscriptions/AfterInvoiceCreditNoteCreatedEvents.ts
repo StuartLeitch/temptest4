@@ -79,9 +79,12 @@ export class AfterInvoiceCreditNoteCreatedEvent
           this.waiverRepo
         );
 
-        const invoiceItemsResult = await getItemsUsecase.execute({
-          invoiceId: creditNote.invoiceId.id.toString(),
-        });
+        const invoiceItemsResult = await getItemsUsecase.execute(
+          {
+            invoiceId: creditNote.invoiceId.id.toString(),
+          },
+          defaultContext
+        );
         if (invoiceItemsResult.isLeft()) {
           throw new Error(
             `CreditNote ${creditNote.id.toString()} has no invoice items.`
@@ -135,7 +138,10 @@ export class AfterInvoiceCreditNoteCreatedEvent
         this.loggerService
       );
 
-      const paymentMethods = await paymentMethodsUsecase.execute();
+      const paymentMethods = await paymentMethodsUsecase.execute(
+        null,
+        defaultContext
+      );
 
       if (paymentMethods.isLeft()) {
         throw new Error(
@@ -179,16 +185,19 @@ export class AfterInvoiceCreditNoteCreatedEvent
       }
       const invoice = maybeInvoice.value;
 
-      const publishResult = await this.publishInvoiceCredited.execute({
-        paymentMethods: paymentMethods.value,
-        billingAddress: billingAddress.value,
-        payments: payments.value,
-        invoiceItems,
-        creditNote,
-        manuscript,
-        invoice,
-        payer,
-      });
+      const publishResult = await this.publishInvoiceCredited.execute(
+        {
+          paymentMethods: paymentMethods.value,
+          billingAddress: billingAddress.value,
+          payments: payments.value,
+          invoiceItems,
+          creditNote,
+          manuscript,
+          invoice,
+          payer,
+        },
+        defaultContext
+      );
 
       if (publishResult.isLeft()) {
         throw publishResult.value;
