@@ -70,16 +70,6 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
             </Col>
           </FormGroup>
           <FormGroup row>
-            <Label sm={5}>Date of Supply</Label>
-            <Col sm={7}>
-              <DatePicker
-                readOnly
-                customInput={<ButtonInput />}
-                selected={Date.now()}
-              />
-            </Col>
-          </FormGroup>
-          <FormGroup row>
             <Label for='staticText' sm={5}>
               Terms
             </Label>

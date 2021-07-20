@@ -68,7 +68,7 @@ const CouponViewEdit: React.FC<CouponViewEditProps> = ({ coupon, mode }) => {
       <Redeems value={redeemCount} />
 
       <DateField
-        stringValue={formatDate(Date.parse(dateCreated))}
+        stringValue={formatDate(new Date(dateCreated))}
         disabled
         label='Created Date'
         id='createdDate'
@@ -76,7 +76,7 @@ const CouponViewEdit: React.FC<CouponViewEditProps> = ({ coupon, mode }) => {
       />
 
       <DateField
-        stringValue={formatDate(Date.parse(dateUpdated))}
+        stringValue={formatDate(new Date(dateUpdated))}
         disabled
         label='Updated Date'
         id='updatedDate'
@@ -84,7 +84,7 @@ const CouponViewEdit: React.FC<CouponViewEditProps> = ({ coupon, mode }) => {
       />
 
       <DateField
-        stringValue={formatDate(Date.parse(expirationDate))}
+        stringValue={formatDate(new Date(expirationDate))}
         disabled={areInputsDisabled}
         label='Expiration Date'
         id='expirationDate'
