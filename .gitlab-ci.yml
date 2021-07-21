@@ -15,11 +15,15 @@ include:
   - template: Dependency-Scanning.gitlab-ci.yml
 
 license_scanning:
+  tags:
+    - 'cluster:hindawi-dev'
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop"
       when: always
 
 gemnasium-dependency_scanning:
+  tags:
+    - 'cluster:hindawi-dev'
   rules:
     - if: $CI_COMMIT_REF_NAME == "develop"
       when: always
@@ -271,6 +275,8 @@ Deploy:hindawi-prod:
     COMMAND: build-manifests
 
 pages:
+  tags:
+    - 'cluster:hindawi-dev'
   interruptible: true
   stage: reports
   script:
