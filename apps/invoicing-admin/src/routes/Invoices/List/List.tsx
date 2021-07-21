@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { useManualQuery } from 'graphql-hooks';
 import { Filters } from '@utils';
 import { useLocalStorage } from '@rehooks/local-storage';
+// import { Parser } from 'json2csv'
+// import { CSVLink } from 'react-csv'
 
 import {
   Card,
@@ -15,6 +17,7 @@ import { TrTableInvoicesList } from './components/TrTableList';
 import { Loading } from '../../components';
 
 import { INVOICES_QUERY } from './graphql';
+
 
 const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
   const { pagination: defaultPaginator, filters } = props.state;
@@ -31,6 +34,7 @@ const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
   const onPageChanged = ({ currentPage }: any) => {
     props.setPage('page', currentPage);
   };
+  
 
   useEffect(() => {
     async function fetchData() {
@@ -49,7 +53,7 @@ const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
 
   if (error) return <Error data={error as any} />;
 
-  return (
+  return (    
     <Card className='mb-0'>
       {/* START Table */}
       <div className='table-responsive-xl'>

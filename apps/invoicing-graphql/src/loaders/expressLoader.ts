@@ -7,10 +7,17 @@ import {
   MicroframeworkLoader,
 } from 'microframework-w3tec';
 
+import { Parser } from 'json2csv';
+import fs from 'fs';
+import http from 'http';
+
 import {
   PayPalProcessFinishedUsecase,
   GetInvoicePdfUsecase,
   Roles,
+  GetRecentInvoicesUsecase,
+  InvoiceMap,
+  left,
 } from '@hindawi/shared';
 
 import { Context } from '../builders';
@@ -41,6 +48,77 @@ export const expressLoader: MicroframeworkLoader = (
 
     app.use(express.json());
     app.use(corsMiddleware());
+
+    app.get('/api/invoices/invoices-list', async (req, res) => {
+      const {
+        repos,
+        services: { logger },
+      } = context;
+      const authContext = { roles: [Roles.ADMIN] };
+
+      const usecase = new GetRecentInvoicesUsecase(repos.invoice);
+
+      const fields = [
+        'id',
+        'status',
+        'dateCreated',
+        'dateIssued',
+        'dateAccepted',
+        'persistentReferenceNumber',
+        'cancelledInvoiceReference',
+      ];
+      const opts = { fields };
+      const csvConverter = new Parser(opts);
+
+      const listResponse = await usecase.execute(
+        {
+          pagination: { offset: 10 },
+          filters: {
+            invoiceStatus: req.query.invoiceStatus
+              ? [req.query.invoiceStatus]
+              : [],
+            transactionStatus: req.query.transactionStatus
+              ? [req.query.transactionStatus]
+              : [],
+            referenceNumber: req.query.reference
+              ? [req.query.referenceNumber]
+              : [],
+          },
+        },
+        authContext
+      );
+
+      if (listResponse.isLeft()) {
+        return left(listResponse.value);
+      }
+
+      const invoices = listResponse.value;
+      const getInvoices = async () =>
+        Promise.all(
+          invoices.invoices.map(async (invoiceDetails: any) => {
+            return {
+              ...InvoiceMap.toPersistence(invoiceDetails),
+              invoiceId: invoiceDetails.id.toString(),
+              dateCreated: invoiceDetails?.dateCreated?.toISOString(),
+              dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
+              dateIssued: invoiceDetails?.dateIssued?.toISOString(),
+              referenceNumber: invoiceDetails?.persistentReferenceNumber,
+            };
+          })
+        );
+
+      const invoicesList = await getInvoices();
+
+      const jsonData = JSON.parse(JSON.stringify(invoicesList));
+      const csv = csvConverter.parse(jsonData);
+
+      res.setHeader(
+        'Content-disposition',
+        'attachment; filename=test_invoices_list.csv'
+      );
+      res.set('Content-Type', 'text/csv');
+      res.status(200).send(csv);
+    });
 
     app.get('/api/invoice/:payerId', async (req, res) => {
       const {

@@ -4,6 +4,7 @@ import React from 'react';
 import { useQueryState } from 'react-router-use-location-state';
 import { useLocalStorage, writeStorage } from '@rehooks/local-storage';
 import { toast } from 'react-toastify';
+import { config } from '../../../../../invoicing-web/src/config'
 
 import { ParseUtils } from '@utils';
 import {
@@ -139,6 +140,36 @@ const InvoicesContainer: React.FC = () => {
     }
   };
 
+  const exportUrlFilters = (_filters) => {
+    const {
+      invoiceStatus: _invoiceStatus,
+      transactionStatus: _transactionStatus,
+      journalId: _journalId,
+      referenceNUmber: _referenceNumber,
+      customId: _customId,
+    } = _filters;
+
+    // * build the query string out of query state
+    let queryString = '';
+    if (Object.keys(Object.assign({}, _filters)).length) {
+      queryString += '?';
+      queryString += _invoiceStatus.reduce(
+        (qs, is) => (qs += `invoiceStatus=${is}&`),
+        ''
+      );
+      queryString += _transactionStatus.reduce(
+        (qs, ts) => (qs += `transactionStatus=${ts}&`),
+        ''
+      );
+      queryString += _journalId.reduce(
+        (qs, ji) => (qs += `journalId=${ji}&`),
+        ''
+      );
+
+      return `${config.apiRoot}/invoices/invoices-list${queryString}`;
+    }
+  };
+
   return (
     <React.Fragment>
       <Container fluid={true}>
@@ -169,6 +200,7 @@ const InvoicesContainer: React.FC = () => {
                 </UncontrolledTooltip>
               </ButtonGroup>
             </ButtonToolbar>
+            <a href={exportUrlFilters(filters)} download>Export Link</a>
             <InvoicesList
               state={listState}
               setPage={setFilter}

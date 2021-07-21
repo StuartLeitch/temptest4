@@ -63,8 +63,8 @@ function applyJoins(src: QueryBuilder, filterEntries) {
 export function applyFilters(src: QueryBuilder, filters: Filters) {
   const cachedEntries = new Cached(LeanTraversal.deepTraverse(filters));
   let here: QueryBuilder = applyJoins(src, cachedEntries);
-
   let invoiceNumber: string, creationYear: string;
+
   for (const [keyList, filter] of cachedEntries) {
     switch (toPath(keyList)) {
       case '/invoiceItem/article/journalId':
@@ -78,19 +78,21 @@ export function applyFilters(src: QueryBuilder, filters: Filters) {
 
       case '/transactionStatus':
         here = here.whereIn(`${TABLES.TRANSACTIONS}.status`, filter);
+
         break;
 
       case '/invoiceStatus':
         here = here.whereIn(`${TABLES.INVOICES}.status`, filter);
+
         break;
 
       case '/referenceNumber':
         // [invoiceNumber, creationYear] = ParseUtils.parseRefNumber(filter[0]);
         const invoiceRef = filter[0];
         here = here.where({ persistentReferenceNumber: invoiceRef });
+
         break;
     }
   }
-
   return here;
 }

@@ -207,16 +207,14 @@ export class KnexInvoiceRepo
   ): Promise<Either<GuardFailure | RepoError, InvoicePaginated>> {
     const { pagination, filters } = args;
     const { db } = this;
-
     const getModel = () =>
       db(TABLES.INVOICES).whereNot(`${TABLES.INVOICES}.deleted`, 1);
 
     const totalCount = await applyFilters(getModel(), filters).count(
       `${TABLES.INVOICES}.id`
     );
-
+    console.log(filters);
     const offset = pagination.offset * pagination.limit;
-
     const invoices: Array<any> = await applyFilters(getModel(), filters)
       .orderBy(`${TABLES.INVOICES}.dateCreated`, 'desc')
       .offset(offset < totalCount[0].count ? offset : 0)
@@ -224,7 +222,6 @@ export class KnexInvoiceRepo
       .select([`${TABLES.INVOICES}.*`]);
 
     const maybeInvoices = flatten(invoices.map(InvoiceMap.toDomain));
-
     if (maybeInvoices.isLeft()) {
       return left(maybeInvoices.value);
     }
