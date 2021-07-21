@@ -28,6 +28,18 @@ gemnasium-dependency_scanning:
     - if: $CI_COMMIT_REF_NAME == "develop"
       when: always
 
+retire-js-dependency_scanning:
+  tags:
+    - 'cluster:hindawi-dev'
+
+gemnasium-maven-dependency_scanning:
+  tags:
+    - 'cluster:hindawi-dev'
+
+gemnasium-python-dependency_scanning:
+  tags:
+    - 'cluster:hindawi-dev'
+
 variables:
   DOCKER_HOST: tcp://docker:2375
   DOCKER_TLS_CERTDIR: ''
