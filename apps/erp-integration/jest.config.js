@@ -1,14 +1,19 @@
 module.exports = {
   displayName: 'erp-integration',
-  preset: '../../jest.preset.js',
-  globals: {
-    'ts-jest': {
-      tsConfig: '<rootDir>/tsconfig.spec.json',
-    },
-  },
+  preset: '../../jest.config.js',
   transform: {
-    '^.+\\.[tj]s$': 'ts-jest',
+    '^.+\\.graphql$': 'graphql-import-node/jest'
   },
+  reporters: [
+    'default',
+    [
+      'jest-junit',
+      {
+        outputDirectory: 'coverage/apps/invoicing-graphql',
+        outputName: 'junit.xml'
+      }
+    ]
+  ],
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: '../../coverage/apps/erp-integration',
 };
