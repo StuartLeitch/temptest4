@@ -1,7 +1,8 @@
 import React from 'react';
 
 import { Form } from '../../../components';
-import { TypeSelection, Code, Reduction, Name, Date, Redeems } from './Fields';
+import  { formatDate } from '../../../utils/date';
+import { TypeSelection, Code, Reduction, Name, DateField, Redeems } from './Fields';
 
 import { CouponType, CouponMode } from '../types';
 
@@ -66,24 +67,24 @@ const CouponViewEdit: React.FC<CouponViewEditProps> = ({ coupon, mode }) => {
 
       <Redeems value={redeemCount} />
 
-      <Date
-        stringValue={dateCreated}
+      <DateField
+        stringValue={formatDate(new Date(dateCreated))}
         disabled
         label='Created Date'
         id='createdDate'
         mode={mode}
       />
 
-      <Date
-        stringValue={dateUpdated}
+      <DateField
+        stringValue={formatDate(new Date(dateUpdated))}
         disabled
         label='Updated Date'
         id='updatedDate'
         mode={mode}
       />
 
-      <Date
-        stringValue={expirationDate}
+      <DateField
+        stringValue={formatDate(new Date(expirationDate))}
         disabled={areInputsDisabled}
         label='Expiration Date'
         id='expirationDate'

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Form } from '../../../components';
-import { TypeSelection, CreateCode, Reduction, Name, Date } from './Fields';
+import { TypeSelection, CreateCode, Reduction, Name, DateField } from './Fields';
 
 import { couponTypeOptions, couponStatusOptions } from '../config';
 
@@ -34,7 +34,7 @@ const CouponCreate: React.FC = () => {
         value='ACTIVE'
       />
 
-      <Date
+      <DateField
         label='Expiration Date'
         id='expirationDate'
         filter={(date) => date > window.Date.now()}

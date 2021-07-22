@@ -26,7 +26,6 @@ const InvoiceDetails: React.FC<Props> = ({ invoice }) => {
     <Expander title="Invoice Details" expanded>
       <Root>
         <DetailItem label="Invoice Issue Date" text={issuedDate} />
-        <DetailItem label="Date of Supply" text={issuedDate} />
         <DetailItem label="Reference Number" text={invoice.referenceNumber} />
         <DetailItem label="Terms" text="Payable upon Receipt" />
       </Root>

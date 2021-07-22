@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import numeral from 'numeral';
-import format from 'date-fns/format';
 import DatePicker from 'react-datepicker';
 import { ButtonInput } from '../../../Forms/DatePicker/components/ButtonInput';
 import { Invoice, CreditNote } from '../types';
@@ -18,6 +17,7 @@ import {
   Row,
   Table,
 } from '../../../../components';
+import  { formatDate } from '../../../../utils/date';
 
 import Config from '../../../../config';
 
@@ -62,22 +62,12 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
                 <DatePicker
                   disabled
                   customInput={<ButtonInput />}
-                  selected={new Date(invoice.dateIssued)}
+                  selected={new Date(Date.parse(formatDate(new Date(invoice?.dateIssued))))}
                   onChange={() => ({})}
                 />
               ) : (
                 <Input readOnly plaintext value='---' />
               )}
-            </Col>
-          </FormGroup>
-          <FormGroup row>
-            <Label sm={5}>Date of Supply</Label>
-            <Col sm={7}>
-              <DatePicker
-                readOnly
-                customInput={<ButtonInput />}
-                selected={Date.now()}
-              />
             </Col>
           </FormGroup>
           <FormGroup row>
@@ -311,7 +301,7 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
 
                 <dt className='col-sm-4'>Paid Date</dt>
                 <dd className='col-sm-8 text-inverse'>
-                  {format(new Date(payment?.datePaid), 'dd MMMM yyyy')}
+                  {formatDate(new Date(payment?.datePaid))}
                 </dd>
                 <dt className='col-sm-4'>Amount</dt>
                 <dd className='col-sm-8 text-inverse'>
