@@ -120,6 +120,8 @@ accessControl
   .resource('transaction')
   .action('read')
   .resource('journal')
+  .action('read')
+  .resource('journals')
   .action('read');
 accessControl.grant(Roles.SUPER_ADMIN).resource('*').action('*');
 accessControl

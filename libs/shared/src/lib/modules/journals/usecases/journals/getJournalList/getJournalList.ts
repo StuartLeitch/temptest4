@@ -24,7 +24,7 @@ export class GetJournalListUsecase
     super();
   }
 
-  @Authorize('journal:read')
+  @Authorize('journals:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const result = await this.journalRepo.getCatalogCollection();

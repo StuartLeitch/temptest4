@@ -87,7 +87,7 @@ export class RecordPaymentUsecase
     this.pay = this.pay.bind(this);
   }
 
-  async getAccessControlContext(r: DTO, c: Context, a?: AccessControlContext) {
+  async getAccessControlContext(r: DTO, c: Context) {
     return {
       paymentType: c.paymentType,
     } as any;

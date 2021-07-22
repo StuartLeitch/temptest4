@@ -25,14 +25,20 @@ export const graphqlLoader: MicroframeworkLoader = (
 
     const memoryStore = new session.MemoryStore();
 
-    expressApp.use(session({
-      secret: 's0m3 s3cr3t',
-      resave: false,
-      saveUninitialized: true,
-      store: memoryStore
-    }));
+    expressApp.use(
+      session({
+        secret: env.app.sessionSecret,
+        resave: false,
+        saveUninitialized: true,
+        store: memoryStore,
+      })
+    );
 
-    const { keycloak } = configureKeycloak(expressApp, memoryStore, env.graphql.route);
+    const { keycloak } = configureKeycloak(
+      expressApp,
+      memoryStore,
+      env.graphql.route
+    );
 
     const graphqlServer = new ApolloServer({
       typeDefs: [KeycloakTypeDefs, typeDefs], // 1. Add the Keycloak Type Defs
