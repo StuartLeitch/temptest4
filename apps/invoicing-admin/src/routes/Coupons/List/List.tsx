@@ -3,6 +3,7 @@ import format from 'date-fns/format';
 import { Link } from 'react-router-dom';
 import { CouponType } from '../../Coupon/types';
 
+import  { formatDate } from '../../../utils/date';
 import { Table, Badge } from '../../../components';
 
 const COUPON_STATUS = {
@@ -69,14 +70,14 @@ const CouponsList: React.FC<CouponsListProps> = ({ coupons }) => {
                 <td className='align-middle bt-0'>{COUPON_STATUS[status]}</td>
                 <td className='align-middle bt-0'>{redeemCount}</td>
                 <td className='align-middle bt-0'>
-                  {dateCreated && format(new Date(dateCreated), 'dd MMMM yyyy')}
+                  {dateCreated && formatDate(new Date(dateCreated))}
                 </td>
                 <td className='align-middle bt-0'>
-                  {dateUpdated && format(new Date(dateUpdated), 'dd MMMM yyyy')}
+                  {dateUpdated && formatDate(new Date(dateUpdated))}
                 </td>
                 <td className='align-middle bt-0'>
                   {expirationDate &&
-                    format(new Date(expirationDate), 'dd MMMM yyyy')}
+                    formatDate(new Date(expirationDate))}
                 </td>
               </tr>
             );

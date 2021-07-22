@@ -2,6 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import { Link } from 'react-router-dom';
 import format from 'date-fns/format';
+import addMinutes from 'date-fns/addMinutes';
 import numeral from 'numeral';
 
 import { Badge } from '../../../../components';
@@ -33,8 +34,8 @@ const TrTableInvoicesList = ({ invoices }) => (
         status,
         referenceNumber,
         cancelledInvoiceReference,
-        customId,
-        manuscriptTitle,
+        // customId,
+        // manuscriptTitle,
         invoiceItem,
         dateIssued,
         dateAccepted,
@@ -85,7 +86,7 @@ const TrTableInvoicesList = ({ invoices }) => (
             </Link>
           </td>
           <td className='align-middle text-nowrap'>
-            {dateIssued && format(new Date(dateIssued), 'dd MMM yyyy')}
+            {dateIssued && formatDate(new Date(dateIssued))}
           </td>
           <td className='align-middle'>
             <strong
@@ -101,12 +102,16 @@ const TrTableInvoicesList = ({ invoices }) => (
           </td>
           <td className='align-left text-truncate' style={{maxWidth: 200}}>{invoiceItem?.article?.title}</td>
           <td className='align-middle text-nowrap'>
-            {dateAccepted && format(new Date(dateAccepted), 'dd MMM yyyy')}
+            {dateAccepted && formatDate(new Date(dateAccepted))}
           </td>
         </tr>
       )
     )}
   </React.Fragment>
 );
+
+function formatDate(date) {
+  return format(addMinutes(date, date.getTimezoneOffset()), 'dd MMM yyyy');
+}
 
 export { TrTableInvoicesList };
