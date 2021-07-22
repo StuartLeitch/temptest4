@@ -252,15 +252,6 @@ export class PublishInvoiceToErpUsecase
       }
       this.loggerService.info('PublishInvoiceToERP rate', finalExchangeRate);
 
-      // * Calculate Tax Rate code
-      // * id=20 E-GB = EXOutput_GB, i.e. Sales made outside of UK and EU
-      let taxRateId = '20';
-
-      if (address.country === 'UK' || address.country === 'GB') {
-        // * id=7 S-GB = StandardGB in Sage, i.e. Sales made in UK or in EU where there is no EU VAT registration number
-        taxRateId = '7';
-      }
-
       try {
         await this.invoiceRepo.update(invoice);
         this.loggerService.info('PublishInvoiceToERP full invoice', invoice);
@@ -276,7 +267,6 @@ export class PublishInvoiceToErpUsecase
           exchangeRate: finalExchangeRate,
           customSegmentId: publisherCustomValues.customSegmentId,
           itemId: publisherCustomValues.itemId,
-          taxRateId,
         };
 
         const erpResponse = await this.erpService.registerInvoice(erpData);

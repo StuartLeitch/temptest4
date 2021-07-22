@@ -60,6 +60,10 @@ export function toArray(value: string, delimiter = ','): string[] {
   return (value && value.split(delimiter)) || [];
 }
 
+export function toObject(value: string): any {
+  return JSON.parse(value);
+}
+
 export function normalizePort(port: string): number | string | boolean {
   const parsedPort = parseInt(port, 10);
   if (isNaN(parsedPort)) {

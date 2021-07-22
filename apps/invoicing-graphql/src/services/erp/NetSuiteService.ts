@@ -11,6 +11,7 @@ import {
   PaymentMethod,
   InvoiceItem,
   Manuscript,
+  Address,
   Invoice,
   Payment,
   Payer,
@@ -23,6 +24,7 @@ import {
   ErpInvoiceRequest,
   ErpRevRecResponse,
   ErpRevRecRequest,
+  ErpTaxDetails,
 } from './../../../../../libs/shared/src/lib/domain/services/ErpService';
 
 import { ConnectionConfig } from './netsuite/ConnectionConfig';
@@ -36,6 +38,8 @@ export class NetSuiteService implements ErpServiceContract {
     private customSegmentFieldName: string,
     private customExternalPaymentReference: string,
     private customUniquePaymentReference: string,
+    private taxDetailsUkStandard: ErpTaxDetails,
+    private taxDetailsUkZero: ErpTaxDetails,
     readonly referenceMappings?: Record<string, any>
   ) {}
 
@@ -48,7 +52,9 @@ export class NetSuiteService implements ErpServiceContract {
     loggerBuilder: LoggerBuilderContract,
     customSegmentFieldName: string,
     customExternalPaymentReference: string,
-    customUniquePaymentReference: string
+    customUniquePaymentReference: string,
+    taxDetailsUkStandard: ErpTaxDetails,
+    taxDetailsUkZero: ErpTaxDetails
   ): NetSuiteService {
     const { connection: configConnection, referenceMappings } = config;
     const connection = new Connection({
@@ -64,6 +70,8 @@ export class NetSuiteService implements ErpServiceContract {
       customSegmentFieldName,
       customExternalPaymentReference,
       customUniquePaymentReference,
+      taxDetailsUkStandard,
+      taxDetailsUkZero,
       referenceMappings
     );
 
@@ -88,7 +96,7 @@ export class NetSuiteService implements ErpServiceContract {
       items: data.items,
       journalName: data.journalName,
       manuscript: data.manuscript,
-      taxRateId: data.taxRateId,
+      billingAddress: data.billingAddress,
     });
     return {
       tradeDocumentId: String(response),
@@ -312,9 +320,9 @@ export class NetSuiteService implements ErpServiceContract {
     manuscript: Manuscript;
     journalName: string;
     customSegmentId: string;
-    taxRateId: string;
     itemId: string;
     customerId: string;
+    billingAddress: Address;
   }) {
     const {
       connection: { config, oauth, token },
@@ -327,13 +335,21 @@ export class NetSuiteService implements ErpServiceContract {
       customerId,
       customSegmentId,
       itemId,
-      taxRateId,
+      billingAddress,
     } = data;
 
     const invoiceRequestOpts = {
       url: `${config.endpoint}record/v1/invoice`,
       method: 'POST',
     };
+
+    let taxDetails: ErpTaxDetails = null;
+
+    if (billingAddress.country === 'GB' || billingAddress.country === 'UK') {
+      taxDetails = this.taxDetailsUkStandard;
+    } else {
+      taxDetails = this.taxDetailsUkZero;
+    }
 
     const createInvoicePayload: Record<string, any> = {
       tranDate: format(
@@ -363,9 +379,19 @@ export class NetSuiteService implements ErpServiceContract {
             item: {
               id: itemId,
             },
-            taxCode: {
-              id: taxRateId,
-            },
+          },
+        ],
+      },
+      taxDetailsOverride: true,
+      taxDetails: {
+        items: [
+          {
+            taxDetailsReference: taxDetails.taxDetailsReference,
+            taxCode: taxDetails.taxCode,
+            taxType: taxDetails.taxType,
+            taxBasis: item.calculateNetPrice(),
+            taxAmount: item.calculateVat(),
+            taxRate: item.vat,
           },
         ],
       },
@@ -631,76 +657,6 @@ export class NetSuiteService implements ErpServiceContract {
     } catch (err) {
       console.error(err);
       return { err } as unknown;
-    }
-  }
-
-  private async patchInvoice(data: { invoice: Invoice; journalId: string }) {
-    const {
-      connection: { config, oauth, token },
-    } = this;
-    const { invoice, journalId } = data;
-
-    const nsErpReference = invoice
-      .getErpReferences()
-      .getItems()
-      .filter(
-        (er) => er.vendor === 'netsuite' && er.attribute === 'confirmation'
-      )
-      .find(Boolean);
-
-    if (nsErpReference.value === 'NON_INVOICEABLE') {
-      this.logger.warn({
-        message: `Invoice patch in NetSuite cancelled for "NON_INVOICEABLE" Invoice ${invoice.id.toString()}.`,
-      });
-      return;
-    }
-
-    const invoiceExistsRequestOpts = {
-      url: `${config.endpoint}record/v1/invoice/${nsErpReference.value}`,
-      method: 'GET',
-    };
-
-    try {
-      await axios({
-        ...invoiceExistsRequestOpts,
-        headers: oauth.toHeader(
-          oauth.authorize(invoiceExistsRequestOpts, token)
-        ),
-        data: {},
-      } as AxiosRequestConfig);
-    } catch (err) {
-      this.logger.error({
-        message: 'No invoice found.',
-        response: err?.response?.data,
-      });
-      return; // no business to be done
-    }
-
-    const invoiceRequestOpts = {
-      url: `${config.endpoint}record/v1/invoice/${nsErpReference.value}`,
-      method: 'PATCH',
-    };
-
-    const patchInvoicePayload: Record<string, unknown> = {
-      custbody_bbs_revenue_journal: {
-        id: journalId,
-        refName: `Journal #${journalId}`,
-      },
-    };
-
-    try {
-      await axios({
-        ...invoiceRequestOpts,
-        headers: oauth.toHeader(oauth.authorize(invoiceRequestOpts, token)),
-        data: patchInvoicePayload,
-      } as AxiosRequestConfig);
-    } catch (err) {
-      this.logger.error({
-        message: 'Failed to update invoice',
-        response: err?.response?.data,
-        request: patchInvoicePayload,
-      });
-      throw err;
     }
   }
 
