@@ -802,7 +802,7 @@ export class KnexInvoiceRepo
 
     const withRevenueRecognitionReversalErpReference = this.withErpReferenceQuery(
       'revenuerecognitionreversalref',
-      'invoices.id',
+      'invoices.cancelledInvoiceReference',
       'invoice',
       'netsuite',
       'revenueRecognitionReversal'
@@ -823,7 +823,7 @@ export class KnexInvoiceRepo
 
     const withRevenueRecognitionErpReference = this.withErpReferenceQuery(
       'revenuerecognitionref',
-      'invoices.id',
+      'invoices.cancelledInvoiceReference',
       'invoice',
       'netsuite',
       'revenueRecognition'
