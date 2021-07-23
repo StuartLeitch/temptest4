@@ -665,7 +665,6 @@
       "architect": {
         "build": {
           "builder": "@nrwl/node:build",
-          "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/apps/erp-integration",
             "main": "apps/erp-integration/src/main.ts",
@@ -679,13 +678,7 @@
             "production": {
               "optimization": true,
               "extractLicenses": true,
-              "inspect": false,
-              "fileReplacements": [
-                {
-                  "replace": "apps/erp-integration/src/environments/environment.ts",
-                  "with": "apps/erp-integration/src/environments/environment.prod.ts"
-                }
-              ]
+              "inspect": false
             }
           }
         },
@@ -696,17 +689,33 @@
           }
         },
         "lint": {
-          "builder": "@nrwl/linter:eslint",
+          "builder": "@nrwl/linter:lint",
           "options": {
-            "lintFilePatterns": ["apps/erp-integration/**/*.ts"]
+            "linter": "eslint",
+            "config": "apps/erp-integration/.eslintrc",
+            "tsConfig": [
+              "apps/erp-integration/tsconfig.app.json",
+              "apps/erp-integration/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!apps/erp-integration/**"]
           }
         },
         "test": {
+          "builder": "./tools/builders:cucumber",
+          "options": {
+            "tsConfig": "apps/erp-integration/tsconfig.spec.json",
+            "features": "apps/erp-integration/tests/**/*.feature",
+            "steps": "apps/erp-integration/tests/**/*.steps.ts",
+            "path": "apps/erp-integration",
+            "format": "json",
+            "coverage": true
+          }
+        },
+        "jest": {
           "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/erp-integration"],
           "options": {
             "jestConfig": "apps/erp-integration/jest.config.js",
-            "passWithNoTests": true
+            "tsConfig": "apps/erp-integration/tsconfig.spec.json"
           }
         }
       }
