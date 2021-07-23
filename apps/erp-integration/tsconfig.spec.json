@@ -1,9 +1,19 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "allowJs": true,
     "outDir": "../../dist/out-tsc",
     "module": "commonjs",
-    "types": ["jest", "node"]
+    "types": ["jest", "node"],
+    "baseUrl": ".",
+    "paths": {
+      "@env/*": ["src/environments/*"],
+      "@hindawi/shared": ["../../libs/shared/src/lib/shared.ts"],
+      "@hindawi/infrastructure": [
+        "../../libs/shared/src/lib/infrastructure/index.ts"
+      ],
+      "@utils": ["../../libs/shared/src/lib/utils/index.ts"]
+    }
   },
   "include": ["**/*.spec.ts", "**/*.d.ts"]
 }

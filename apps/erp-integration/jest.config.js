@@ -9,11 +9,10 @@ module.exports = {
     [
       'jest-junit',
       {
-        outputDirectory: 'coverage/apps/invoicing-graphql',
+        outputDirectory: 'coverage/apps/erp-integration',
         outputName: 'junit.xml'
       }
     ]
   ],
-  moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: '../../coverage/apps/erp-integration',
 };
