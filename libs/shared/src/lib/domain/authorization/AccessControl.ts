@@ -133,6 +133,7 @@ accessControl
   .action('delete')
   .action('restore')
   .action('readByCustomId')
+  .action('confirm')
   .resource('transaction')
   .action('create')
   .action('read')
@@ -158,7 +159,16 @@ accessControl
   .action('update')
   .action('delete')
   .action('read')
-  .action('assign');
+  .action('assign')
+  .resource('address')
+  .action('read')
+  .action('create')
+  .resource('coupon')
+  .action('read')
+  .resource('waiver')
+  .action('read')
+  .resource('VAT')
+  .action('validate');
 accessControl.grant(Roles.DOMAIN_EVENT_HANDLER).resource('*').action('*');
 accessControl
   .grant(Roles.SERVICE)

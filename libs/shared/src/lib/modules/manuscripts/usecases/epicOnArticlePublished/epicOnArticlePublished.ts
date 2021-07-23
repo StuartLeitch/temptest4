@@ -282,7 +282,7 @@ export class EpicOnArticlePublishedUsecase
               new UnexpectedError(
                 new Error(
                   `While auto-confirming on article published an error ocurred: ${JSON.stringify(
-                    resp.value
+                    resp.value.message
                   )}`
                 )
               )
