@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useParams, Route } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useQuery } from 'graphql-hooks';
 
 import {

@@ -20,19 +20,16 @@ import { CouponRepoContract } from '../../repos/couponRepo';
 // * Usecase specific
 import { GetCouponDetailsByCodeResponse as Response } from './getCouponDetailsByCodeResponse';
 import type { GetCouponDetailsByCodeDTO as DTO } from './getCouponDetailsByCodeDTO';
-import { CouponNotFoundError } from './getCouponDetailsByCodeErrors';
+import * as Errors from './getCouponDetailsByCodeErrors';
 
 export class GetCouponDetailsByCodeUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
-  constructor(private couponRepo: CouponRepoContract) {}
-
-  private async getAccessControlContext(request, context?) {
-    return {};
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
+  constructor(private couponRepo: CouponRepoContract) {
+    super();
   }
 
-  @Authorize('invoice:read')
+  @Authorize('coupon:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const maybeCouponCode = CouponCode.create(request.couponCode);
 
@@ -47,14 +44,14 @@ export class GetCouponDetailsByCodeUsecase
         const coupon = await this.couponRepo.getCouponByCode(couponCode);
         if (coupon.isLeft()) {
           if (coupon.value instanceof RepoError) {
-            return left(new CouponNotFoundError(couponCode.toString()));
+            return left(new Errors.CouponNotFoundError(couponCode.toString()));
           } else {
             return left(new UnexpectedError(new Error(coupon.value.message)));
           }
         }
         return right(coupon.value);
       } catch (err) {
-        return left(new CouponNotFoundError(couponCode.toString()));
+        return left(new Errors.CouponNotFoundError(couponCode.toString()));
       }
     } catch (err) {
       return left(new UnexpectedError(err));

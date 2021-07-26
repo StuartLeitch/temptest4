@@ -25,16 +25,13 @@ interface WithForeignId {
 }
 
 export class GetPaymentByForeignPaymentIdUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private paymentRepo: PaymentRepoContract) {
+    super();
+
     this.validateRequest = this.validateRequest.bind(this);
     this.attachPayment = this.attachPayment.bind(this);
-  }
-
-  private async getAccessControlContext(request, context?) {
-    return {};
   }
 
   @Authorize('payments:read')

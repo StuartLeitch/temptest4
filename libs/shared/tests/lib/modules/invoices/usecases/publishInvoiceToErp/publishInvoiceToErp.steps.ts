@@ -56,7 +56,7 @@ let response: PublishInvoiceToErpResponse;
 let invoice: Invoice;
 
 const context: UsecaseAuthorizationContext = {
-  roles: [Roles.ADMIN],
+  roles: [Roles.CHRON_JOB],
 };
 
 Before({ tags: '@ValidatePublishInvoiceToErp' }, function () {

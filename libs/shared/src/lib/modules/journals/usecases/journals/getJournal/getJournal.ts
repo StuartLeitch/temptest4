@@ -6,19 +6,28 @@ import { UseCase } from '../../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../../domain/authorization';
 
 import { CatalogRepoContract } from '../../../repos/catalogRepo';
 import { CatalogItem } from '../../../domain/CatalogItem';
 import { JournalId } from '../../../domain/JournalId';
 
 import { GetJournalResponse as Response } from './getJournalResponse';
-import { GetJournalDTO as DTO } from './getJournalDTO';
+import type { GetJournalDTO as DTO } from './getJournalDTO';
 import * as Errors from './getJournalErrors';
 
 export class GetJournalUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
-  constructor(private journalRepo: CatalogRepoContract) {}
+  constructor(private journalRepo: CatalogRepoContract) {
+    super();
+  }
 
+  @Authorize('journal:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     let journal: CatalogItem;
 

@@ -3,7 +3,12 @@ import { right, left } from '../../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
 
 // * Authorization Logic
-import { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../../domain/authorization';
 
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
@@ -24,6 +29,7 @@ import { PublishCreditNoteToErpResponse as Response } from './publishCreditNoteT
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 
 export class PublishCreditNoteToErpUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private creditNoteRepo: CreditNoteRepoContract,
@@ -34,12 +40,11 @@ export class PublishCreditNoteToErpUsecase
     private erpReferenceRepo: ErpReferenceRepoContract,
     private erpService: ErpServiceContract,
     private loggerService: LoggerContract
-  ) {}
-
-  private async getAccessControlContext(request: any, context?: any) {
-    return {};
+  ) {
+    super();
   }
 
+  @Authorize('erp:publish')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     this.loggerService.info('PublishCreditNoteToERP Request', request);
     let creditNote: CreditNote;
@@ -83,9 +88,12 @@ export class PublishCreditNoteToErpUsecase
           this.waiverRepo
         );
 
-        const response = await getItemsUsecase.execute({
-          invoiceId: creditNote.invoiceId.id.toString(),
-        });
+        const response = await getItemsUsecase.execute(
+          {
+            invoiceId: request.creditNoteId,
+          },
+          context
+        );
         this.loggerService.debug(
           'PublishCreditNoteToERP getItemsUsecase Response'
         );

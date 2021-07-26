@@ -2,6 +2,7 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import { JournalUpdated } from '@hindawi/phenom-events';
+import { Roles } from '@hindawi/shared';
 
 import { UpdateCatalogItemToCatalogUseCase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/updateCatalogItemToCatalog';
 
@@ -15,6 +16,8 @@ export const JournalUpdatedHandler: EventHandler<JournalUpdated> = {
   event: JOURNAL_UPDATED,
   handler(context: Context) {
     return async (data: JournalUpdated) => {
+      const usecaseContext = { roles: [Roles.QUEUE_EVENT_HANDLER] };
+
       const {
         repos: { catalog: catalogRepo, publisher: publisherRepo },
         services: { logger },
@@ -28,17 +31,20 @@ export const JournalUpdatedHandler: EventHandler<JournalUpdated> = {
         publisherRepo
       );
 
-      const result = await updateJournalUsecase.execute({
-        isActive: data.isActive,
-        journalTitle: data.name,
-        created: data.created,
-        updated: data.updated,
-        journalId: data.id,
-        amount: data.apc,
-        currency: 'USD',
-        issn: data.issn,
-        type: null,
-      });
+      const result = await updateJournalUsecase.execute(
+        {
+          isActive: data.isActive,
+          journalTitle: data.name,
+          created: data.created,
+          updated: data.updated,
+          journalId: data.id,
+          amount: data.apc,
+          currency: 'USD',
+          issn: data.issn,
+          type: null,
+        },
+        usecaseContext
+      );
 
       if (result.isLeft()) {
         logger.error(result.value.message);

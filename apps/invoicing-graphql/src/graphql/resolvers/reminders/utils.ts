@@ -3,23 +3,23 @@ import {
   ResumeInvoiceConfirmationReminderUsecase,
   PauseInvoicePaymentRemindersUsecase,
   ResumeInvoicePaymentReminderUsecase,
-  Roles,
+  UsecaseAuthorizationContext,
 } from '@hindawi/shared';
+
+import { Context } from '../../../builders';
 
 import { env } from '../../../env';
 
 export async function pauseOrResumeConfirmation(
   invoiceId: string,
   state: boolean,
-  context
+  context: Context,
+  usecaseContext: UsecaseAuthorizationContext
 ) {
   const {
     repos: { pausedReminder, invoiceItem, transaction, manuscript, invoice },
     services: { logger: loggerService, schedulingService },
   } = context;
-  const usecaseContext = {
-    roles: [Roles.ADMIN],
-  };
 
   if (state == true) {
     const pauseUsecase = new PauseInvoiceConfirmationRemindersUsecase(
@@ -57,15 +57,13 @@ export async function pauseOrResumeConfirmation(
 export async function pauseOrResumePayment(
   invoiceId: string,
   state: boolean,
-  context
+  context: Context,
+  usecaseContext: UsecaseAuthorizationContext
 ) {
   const {
     repos: { pausedReminder, transaction, invoice, payer },
     services: { logger: loggerService, schedulingService },
   } = context;
-  const usecaseContext = {
-    roles: [Roles.ADMIN],
-  };
 
   if (state == true) {
     const pauseUsecase = new PauseInvoicePaymentRemindersUsecase(

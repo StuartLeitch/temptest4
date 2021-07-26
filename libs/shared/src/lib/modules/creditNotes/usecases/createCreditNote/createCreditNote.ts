@@ -6,7 +6,7 @@ import { UnexpectedError } from '../../../../core/logic/AppError';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
   AccessControlledUsecase,
   AccessControlContext,
@@ -39,13 +39,8 @@ import { CreateCreditNoteResponse as Response } from './createCreditNoteResponse
 import * as Errors from './createCreditNoteErrors';
 
 export class CreateCreditNoteUsecase
-  implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private creditNoteRepo: CreditNoteRepoContract,
     private invoiceRepo: InvoiceRepoContract,
@@ -54,20 +49,12 @@ export class CreateCreditNoteUsecase
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private pausedReminderRepo: PausedReminderRepoContract
-  ) {}
-
-  private async getAccessControlContext(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<AccessControlContext> {
-    return {};
+  ) {
+    super();
   }
 
   @Authorize('creditNote:create')
-  public async execute(
-    request: DTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<Response> {
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     let transaction: Transaction;
     let invoice: Invoice;
     let items: InvoiceItem[];

@@ -4,9 +4,13 @@ import { right, left } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { Publisher } from '../../../publishers/domain/Publisher';
-import { CatalogItem } from '../../domain/CatalogItem';
 import { JournalId } from '../../domain/JournalId';
 
 import { CatalogMap } from '../../mappers/CatalogMap';
@@ -15,10 +19,11 @@ import { PublisherRepoContract } from '../../../publishers/repos';
 import { CatalogRepoContract } from '../../repos/catalogRepo';
 
 import { UpdateCatalogItemToCatalogResponse as Response } from './updateCatalogItemToCatalogResponse';
-import { UpdateCatalogItemToCatalogDTO as DTO } from './updateCatalogItemToCatalogDTO';
+import type { UpdateCatalogItemToCatalogDTO as DTO } from './updateCatalogItemToCatalogDTO';
 import * as Errors from './updateCatalogItemToCatalogErrors';
 
 export class UpdateCatalogItemToCatalogUseCase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Response, Context> {
   private catalogRepo: CatalogRepoContract;
   private publisherRepo: PublisherRepoContract;
@@ -27,10 +32,13 @@ export class UpdateCatalogItemToCatalogUseCase
     catalogRepo: CatalogRepoContract,
     publisherRepo: PublisherRepoContract
   ) {
+    super();
+
     this.catalogRepo = catalogRepo;
     this.publisherRepo = publisherRepo;
   }
 
+  @Authorize('journal:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const {
       amount,

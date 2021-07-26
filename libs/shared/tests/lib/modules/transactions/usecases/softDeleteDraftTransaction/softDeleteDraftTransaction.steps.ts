@@ -27,7 +27,7 @@ import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/r
 import { ArticleMap } from '../../../../../../src/lib/modules/manuscripts/mappers/ArticleMap';
 
 const defaultContext: UsecaseAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN],
+  roles: [Roles.QUEUE_EVENT_HANDLER],
 };
 
 const mockTransactionRepo: MockTransactionRepo = new MockTransactionRepo();

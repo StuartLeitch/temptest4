@@ -8,6 +8,11 @@ import { ErrorUtils } from './../../../../../utils/ErrorUtils';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../../domain/authorization';
 
 import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
 import { ArticleRepoContract } from '../../../../manuscripts/repos/articleRepo';
@@ -28,9 +33,10 @@ import { PublishInvoiceToErpUsecase } from '../publishInvoiceToErp/publishInvoic
 import { ErpInvoiceResponse } from '../../../../../domain/services/ErpService';
 
 import { RetryFailedNetsuiteErpInvoicesResponse as Response } from './retryFailedNetsuiteErpInvoicesResponse';
-import { RetryFailedNetsuiteErpInvoicesDTO as DTO } from './retryFailedNetsuiteErpInvoicesDTO';
+import type { RetryFailedNetsuiteErpInvoicesDTO as DTO } from './retryFailedNetsuiteErpInvoicesDTO';
 
 export class RetryFailedNetsuiteErpInvoicesUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   private publishToErpUsecase: PublishInvoiceToErpUsecase;
   constructor(
@@ -48,6 +54,8 @@ export class RetryFailedNetsuiteErpInvoicesUsecase
     private loggerService: LoggerContract,
     private vatService: VATService
   ) {
+    super();
+
     this.publishToErpUsecase = new PublishInvoiceToErpUsecase(
       this.invoiceRepo,
       this.invoiceItemRepo,
@@ -65,6 +73,7 @@ export class RetryFailedNetsuiteErpInvoicesUsecase
     );
   }
 
+  @Authorize('erp:publish')
   public async execute(request?: DTO, context?: Context): Promise<Response> {
     try {
       const maybeFailedErpInvoicesIds = await this.invoiceRepo.getFailedNetsuiteErpInvoices();
@@ -98,18 +107,19 @@ export class RetryFailedNetsuiteErpInvoicesUsecase
         const maybeUpdatedInvoiceResponse = await this.publishToErpUsecase.execute(
           {
             invoiceId: failedInvoice.id.toString(),
-          }
+          },
+          context
         );
-
-        const updatedInvoiceResponse = maybeUpdatedInvoiceResponse.value;
 
         if (
           typeof maybeUpdatedInvoiceResponse.isLeft === 'function' &&
           maybeUpdatedInvoiceResponse.isLeft()
         ) {
-          errs.push(updatedInvoiceResponse);
-          return left(updatedInvoiceResponse);
+          errs.push(maybeUpdatedInvoiceResponse.value);
+          return left(maybeUpdatedInvoiceResponse.value);
         }
+
+        const updatedInvoiceResponse = maybeUpdatedInvoiceResponse.value;
         const assignedErpReference = updatedInvoiceResponse as ErpInvoiceResponse;
 
         if (assignedErpReference) {

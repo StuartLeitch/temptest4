@@ -1,14 +1,12 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import {
-  Roles,
-  GetCouponDetailsByCodeDTO,
-  UpdateCouponUsecase,
-  CreateCouponUsecase,
-  GenerateCouponCodeUsecase,
-  GetRecentCouponsUsecase,
-  GetRecentCouponsDTO,
   GetCouponDetailsByCodeUsecase,
+  GenerateCouponCodeUsecase,
+  GetCouponDetailsByCodeDTO,
+  GetRecentCouponsUsecase,
+  CreateCouponUsecase,
+  GetRecentCouponsDTO,
+  UpdateCouponUsecase,
+  CreateCouponDTO,
   CouponMap,
 } from '@hindawi/shared';
 
@@ -16,9 +14,12 @@ import { Context } from '../../builders';
 
 import { Resolvers } from '../schema';
 
+import { handleForbiddenUsecase, getAuthRoles } from './utils';
+
 export const coupon: Resolvers<Context> = {
   Query: {
     async coupon(parent, args, context) {
+      const roles = getAuthRoles(context);
       const { repos } = context;
       const usecase = new GetCouponDetailsByCodeUsecase(repos.coupon);
 
@@ -27,10 +28,12 @@ export const coupon: Resolvers<Context> = {
       };
 
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles,
       };
 
       const result = await usecase.execute(request, usecaseContext);
+
+      handleForbiddenUsecase(result);
 
       if (result.isLeft()) {
         throw new Error(result.value.message);
@@ -39,14 +42,18 @@ export const coupon: Resolvers<Context> = {
       return CouponMap.toPersistence(result.value);
     },
     async coupons(parent, args: GetRecentCouponsDTO, context) {
+      const roles = getAuthRoles(context);
       const { repos } = context;
       const usecase = new GetRecentCouponsUsecase(repos.coupon);
 
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles,
       };
 
       const result = await usecase.execute(args, usecaseContext);
+
+      handleForbiddenUsecase(result);
+
       if (result.isLeft()) {
         throw new Error(result.value.message);
       }
@@ -59,13 +66,19 @@ export const coupon: Resolvers<Context> = {
       };
     },
     async generateCouponCode(parent, args, context) {
+      const roles = getAuthRoles(context);
+
       const { repos } = context;
       const usecase = new GenerateCouponCodeUsecase(repos.coupon);
 
-      const result = await usecase.execute();
+      const usecaseContext = { roles };
+
+      const result = await usecase.execute(null, usecaseContext);
       if (result.isLeft()) {
         throw new Error(result.value.message);
       }
+
+      handleForbiddenUsecase(result);
 
       const code = result.value.value;
       return { code };
@@ -73,13 +86,36 @@ export const coupon: Resolvers<Context> = {
   },
   Mutation: {
     async createCoupon(parent, args, context) {
+      const roles = getAuthRoles(context);
+
       const {
         repos: { coupon: couponRepo },
       } = context;
 
       const createCouponUsecase = new CreateCouponUsecase(couponRepo);
 
-      const result = await createCouponUsecase.execute(args.coupon as any);
+      const usecaseContext = {
+        roles,
+      };
+
+      const rawCoupon = args.coupon;
+
+      const usecaseArgs: CreateCouponDTO = {
+        invoiceItemType: rawCoupon.invoiceItemType,
+        expirationDate: rawCoupon.expirationDate,
+        reduction: rawCoupon.reduction,
+        status: rawCoupon.status,
+        code: rawCoupon.code,
+        name: rawCoupon.name,
+        type: rawCoupon.type,
+      };
+
+      const result = await createCouponUsecase.execute(
+        usecaseArgs,
+        usecaseContext
+      );
+
+      handleForbiddenUsecase(result);
 
       if (result.isLeft()) {
         throw new Error(result?.value?.message);
@@ -88,13 +124,24 @@ export const coupon: Resolvers<Context> = {
       return CouponMap.toPersistence(result.value);
     },
     async updateCoupon(parent, args, context) {
+      const roles = getAuthRoles(context);
+
       const {
         repos: { coupon: couponRepo },
       } = context;
 
       const updateCouponUsecase = new UpdateCouponUsecase(couponRepo);
 
-      const result = await updateCouponUsecase.execute(args.coupon);
+      const usecaseContext = {
+        roles,
+      };
+
+      const result = await updateCouponUsecase.execute(
+        args.coupon,
+        usecaseContext
+      );
+
+      handleForbiddenUsecase(result);
 
       if (result.isLeft()) {
         throw new Error(result.value.message);

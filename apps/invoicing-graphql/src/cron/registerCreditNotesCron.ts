@@ -1,4 +1,4 @@
-import { RetryCreditNotesUsecase } from '@hindawi/shared';
+import { RetryCreditNotesUsecase, Roles } from '@hindawi/shared';
 
 import { Context } from '../builders';
 
@@ -37,7 +37,10 @@ export class RegisterCreditNotesCron {
       loggerService
     );
 
-    const maybeResponse = await retryRevenueRecognizedInvoicesToNetsuiteErpUsecase.execute();
+    const maybeResponse = await retryRevenueRecognizedInvoicesToNetsuiteErpUsecase.execute(
+      null,
+      { roles: [Roles.CHRON_JOB] }
+    );
     if (maybeResponse.isLeft()) {
       loggerService.error(maybeResponse.value.message);
       throw maybeResponse.value;

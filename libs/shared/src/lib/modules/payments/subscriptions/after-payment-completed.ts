@@ -25,7 +25,7 @@ export class AfterPaymentCompleted implements HandleContract<PaymentCompleted> {
   }
 
   private async onPaymentCompleted(event: PaymentCompleted): Promise<void> {
-    const usecaseContext = { roles: [Roles.EVENT_HANDLER] };
+    const usecaseContext = { roles: [Roles.DOMAIN_EVENT_HANDLER] };
     const invoiceId = event.payment.invoiceId.toString();
     const paymentId = event.payment.paymentId;
 

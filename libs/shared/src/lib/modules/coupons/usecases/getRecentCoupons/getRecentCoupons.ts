@@ -3,40 +3,27 @@ import { right, left } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
   AccessControlledUsecase,
   AccessControlContext,
   Authorize,
 } from '../../../../domain/authorization';
 
-import { GetRecentCouponsResponse } from './getRecentCouponsResponse';
-import type { GetRecentCouponsDTO } from './getRecentCouponsDTO';
 import { CouponRepoContract } from '../../repos/couponRepo';
 
-export class GetRecentCouponsUsecase
-  implements
-    UseCase<
-      Record<string, unknown>,
-      Promise<GetRecentCouponsResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      GetRecentCouponsDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
-  constructor(private couponRepo: CouponRepoContract) {}
+import { GetRecentCouponsResponse as Response } from './getRecentCouponsResponse';
+import type { GetRecentCouponsDTO as DTO } from './getRecentCouponsDTO';
 
-  private async getAccessControlContext() {
-    return {};
+export class GetRecentCouponsUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<Record<string, unknown>, Promise<Response>, Context> {
+  constructor(private couponRepo: CouponRepoContract) {
+    super();
   }
 
-  @Authorize('coupon:read')
-  public async execute(
-    request: GetRecentCouponsDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<GetRecentCouponsResponse> {
+  @Authorize('coupons:read')
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const paginatedResult = await this.couponRepo.getRecentCoupons(request);
 

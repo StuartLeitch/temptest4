@@ -6,6 +6,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 // * Usecase specific
 import { InvoiceItem } from '../../domain/InvoiceItem';
@@ -16,17 +21,21 @@ import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 
 import { GetItemsForInvoiceResponse as Response } from './getItemsForInvoiceResponse';
-import { GetItemsForInvoiceDTO as DTO } from './getItemsForInvoiceDTO';
+import type { GetItemsForInvoiceDTO as DTO } from './getItemsForInvoiceDTO';
 import * as Errors from './getItemsForInvoiceErrors';
 
 export class GetItemsForInvoiceUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract
-  ) {}
+  ) {
+    super();
+  }
 
+  @Authorize('invoice:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     let items: InvoiceItem[];
 

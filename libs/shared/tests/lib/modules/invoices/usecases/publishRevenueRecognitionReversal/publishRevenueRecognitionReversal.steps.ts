@@ -53,7 +53,7 @@ let response: PublishRevenueRecognitionReversalResponse;
 let invoice: Invoice;
 
 const context: UsecaseAuthorizationContext = {
-  roles: [Roles.ADMIN],
+  roles: [Roles.CHRON_JOB],
 };
 
 const testInvoiceId = 'testing-invoice';
