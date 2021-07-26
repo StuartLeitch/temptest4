@@ -6,7 +6,6 @@ import {
   getOsPath,
   getOsEnv,
   toNumber,
-  toObject,
   toArray,
   toFloat,
   toBool,
