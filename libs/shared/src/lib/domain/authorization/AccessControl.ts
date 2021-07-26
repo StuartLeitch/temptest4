@@ -134,6 +134,7 @@ accessControl
   .action('restore')
   .action('readByCustomId')
   .action('confirm')
+  .action('applyVAT')
   .resource('transaction')
   .action('create')
   .action('read')
