@@ -23,13 +23,10 @@ import type { GetCreditNoteByReferenceNumberDTO as DTO } from './getCreditNoteBy
 
 // to be modified with Guard/Either
 export class GetCreditNoteByReferenceNumberUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
-  constructor(private creditNoteRepo: CreditNoteRepoContract) {}
-
-  private async getAccessControlContext(request, context?) {
-    return {};
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
+  constructor(private creditNoteRepo: CreditNoteRepoContract) {
+    super();
   }
 
   @Authorize('creditNote:read')

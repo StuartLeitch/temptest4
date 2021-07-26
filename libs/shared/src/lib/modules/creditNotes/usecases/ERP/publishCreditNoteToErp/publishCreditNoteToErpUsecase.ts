@@ -24,7 +24,7 @@ import { ErpReferenceMap } from './../../../../vendors/mapper/ErpReference';
 import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
 
 import { GetItemsForInvoiceUsecase } from '../../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
-import { PublishCreditNoteToErpRequestDTO as DTO } from './publishCreditNoteToErpDTO';
+import type { PublishCreditNoteToErpRequestDTO as DTO } from './publishCreditNoteToErpDTO';
 import { PublishCreditNoteToErpResponse as Response } from './publishCreditNoteToErpResponse';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 
