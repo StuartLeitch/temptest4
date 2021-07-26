@@ -31,7 +31,7 @@ After({ tags: '@ValidateGenerateCouponCode' }, () => {
 Given(
   /^I call the execution of the usecase generateCouponCodeUsecase/,
   async () => {
-    response = await usecase.execute(context);
+    response = await usecase.execute(null, context);
   }
 );
 

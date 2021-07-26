@@ -22,15 +22,10 @@ import type { GetTransactionByInvoiceIdRequestDTO as DTO } from './getTransactio
 import * as Errors from './getTransactionByInvoiceIdErrors';
 
 export class GetTransactionByInvoiceIdUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private transactionRepo: TransactionRepoContract) {
-    this.transactionRepo = transactionRepo;
-  }
-
-  private async getAccessControlContext(request, context?) {
-    return {};
+    super();
   }
 
   @Authorize('transaction:read')

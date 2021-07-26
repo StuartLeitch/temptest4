@@ -5,6 +5,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import {
@@ -36,9 +41,10 @@ import { GetItemsForInvoiceUsecase } from './../../../invoices/usecases/getItems
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 
 import { PublishPaymentToErpResponse as Response } from './publishPaymentToErpResponse';
-import { PublishPaymentToErpDTO as DTO } from './publishPaymentToErpDTO';
+import type { PublishPaymentToErpDTO as DTO } from './publishPaymentToErpDTO';
 
 export class PublishPaymentToErpUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
@@ -53,8 +59,11 @@ export class PublishPaymentToErpUsecase
     private erpReferenceRepo: ErpReferenceRepoContract,
     private erpService: ErpServiceContract,
     private loggerService: LoggerContract
-  ) {}
+  ) {
+    super();
+  }
 
+  @Authorize('erp:publish')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     let invoice: Invoice;
     try {

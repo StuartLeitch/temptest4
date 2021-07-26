@@ -23,13 +23,10 @@ import type { GetInvoiceDetailsDTO as DTO } from './getInvoiceDetailsDTO';
 import * as Errors from './getInvoiceDetailsErrors';
 
 export class GetInvoiceDetailsUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
-  constructor(private invoiceRepo: InvoiceRepoContract) {}
-
-  private async getAccessControlContext(request, context?) {
-    return {};
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
+  constructor(private invoiceRepo: InvoiceRepoContract) {
+    super();
   }
 
   @Authorize('invoice:read')

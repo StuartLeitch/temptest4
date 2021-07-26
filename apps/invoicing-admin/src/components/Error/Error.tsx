@@ -15,7 +15,11 @@ const Error: React.FC<ErrorProps> = props => {
     const len = graphQLErrors.length;
     title = `${len} GraphQL ${len > 0 ? 'errors have' : 'error'} occurred`;
     // eslint-disable-next-line no-debugger
-    // message = graphQLErrors.map(error => {  });
+    message = graphQLErrors.map(error => {
+      return (
+        <div>{(error && (error as any).message) || ''}</div>
+      )
+    });
 
     return (
       <Alert color="danger" {...alert}>

@@ -8,6 +8,7 @@ import {
 import {
   AssignEditorsToJournalUsecase,
   JournalEventMap,
+  Roles,
 } from '@hindawi/shared';
 
 import { Context } from '../../builders';
@@ -38,10 +39,13 @@ function addEditorEventHandlerFactory<T extends EnvType>(eventName: string) {
       try {
         const journalId = data.id;
         const editors = JournalEventMap.extractEditors(data);
-        const assignEditorResponse = await assignEditorToJournal.execute({
-          journalId,
-          allEditors: editors,
-        });
+        const assignEditorResponse = await assignEditorToJournal.execute(
+          {
+            journalId,
+            allEditors: editors,
+          },
+          { roles: [Roles.QUEUE_EVENT_HANDLER] }
+        );
 
         if (assignEditorResponse.isLeft()) {
           logger.error(assignEditorResponse.value.message);

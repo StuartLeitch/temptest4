@@ -25,7 +25,7 @@ import {
 import { Context } from '../../../builders';
 
 const defaultContext: UsecaseAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN],
+  roles: [Roles.QUEUE_EVENT_HANDLER],
 };
 
 function getExistingManuscript(context: Context) {

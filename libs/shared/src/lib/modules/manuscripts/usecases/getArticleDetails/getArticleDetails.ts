@@ -6,6 +6,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { ManuscriptId } from '../../../manuscripts/domain/ManuscriptId';
 
@@ -14,13 +19,17 @@ import { Article } from '../../domain/Article';
 
 // * Usecase specific
 import { GetArticleDetailsResponse as Response } from './getArticleDetailsResponse';
-import { GetArticleDetailsDTO as DTO } from './getArticleDetailsDTO';
+import type { GetArticleDetailsDTO as DTO } from './getArticleDetailsDTO';
 import * as Errors from './getArticleDetailsErrors';
 
 export class GetArticleDetailsUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
-  constructor(private articleRepo: ArticleRepoContract) {}
+  constructor(private articleRepo: ArticleRepoContract) {
+    super();
+  }
 
+  @Authorize('manuscript:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     let article: Article;
 

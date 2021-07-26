@@ -26,7 +26,7 @@ import { MockErpReferenceRepo } from './../../../../../../src/lib/modules/vendor
 import { GenerateDraftCompensatoryEventsUsecase } from '../../../../../../src/lib/modules/invoices/usecases/generateDraftCompensatoryEvents';
 
 const defaultUsecaseContext: UsecaseAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN],
+  roles: [Roles.SERVICE],
 };
 
 interface Context {

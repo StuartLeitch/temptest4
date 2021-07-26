@@ -7,6 +7,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { NotificationPause } from '../../../notifications/domain/NotificationPause';
 import { Transaction } from '../../../transactions/domain/Transaction';
@@ -29,6 +34,7 @@ import type { CreateCreditNoteRequestDTO as DTO } from './createCreditNoteDTO';
 import * as Errors from './createCreditNoteErrors';
 
 export class CreateCreditNoteUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
@@ -37,8 +43,11 @@ export class CreateCreditNoteUsecase
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private pausedReminderRepo: PausedReminderRepoContract
-  ) {}
+  ) {
+    super();
+  }
 
+  @Authorize('creditNote:create')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     let transaction: Transaction;
     let invoice: Invoice;

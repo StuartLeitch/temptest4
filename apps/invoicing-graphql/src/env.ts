@@ -6,6 +6,7 @@ import {
   getOsPath,
   getOsEnv,
   toNumber,
+  toObject,
   toArray,
   toFloat,
   toBool,
@@ -71,6 +72,8 @@ export const env = {
     ),
     assistanceEmail: getOsEnv('ASSISTANCE_EMAIL'),
     doiNumber: getOsEnv('DOI_NUMBER'),
+    keycloakConfig: toObject(getOsEnv('KEYCLOAK_CONFIG')),
+    sessionSecret: getOsEnv('SESSION_SECRET'),
   },
   loaders: {
     knexEnabled: toBool(getOsEnvOptional('KNEX_LOADER_ENABLED')),

@@ -6,10 +6,11 @@ import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
 
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
@@ -22,21 +23,25 @@ import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
 // * Usecase specific
 import { GetSentNotificationForInvoiceResponse as Response } from './getSentNotificationForInvoiceResponse';
-import { GetSentNotificationForInvoiceDTO as DTO } from './getSentNotificationForInvoiceDTO';
+import type { GetSentNotificationForInvoiceDTO as DTO } from './getSentNotificationForInvoiceDTO';
 import * as Errors from './getSentNotificationForInvoiceErrors';
 
 export class GetSentNotificationForInvoiceUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private sentNotificationRepo: SentNotificationRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private loggerService: LoggerContract
   ) {
+    super();
+
     this.existsInvoiceWithId = this.existsInvoiceWithId.bind(this);
     this.fetchNotifications = this.fetchNotifications.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
   }
 
+  @Authorize('reminder:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const execution = await new AsyncEither<null, DTO>(request)

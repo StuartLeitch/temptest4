@@ -5,8 +5,8 @@ import { right, left } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
+import { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
   AccessControlContext,
   Authorize,
@@ -22,19 +22,13 @@ import { MarkManuscriptAsPublishedDTO as DTO } from './markManuscriptAsPublished
 import * as Errors from './markManuscriptAsPublishedErrors';
 
 export class MarkManuscriptAsPublishedUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
-  constructor(private manuscriptRepo: ManuscriptRepoContract) {}
-
-  private async getAccessControlContext(
-    request: DTO,
-    context?: Context
-  ): Promise<AccessControlContext> {
-    return {};
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
+  constructor(private manuscriptRepo: ManuscriptRepoContract) {
+    super();
   }
 
-  @Authorize('write:manuscript')
+  @Authorize('manuscript:update')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     let manuscript: Manuscript;
 

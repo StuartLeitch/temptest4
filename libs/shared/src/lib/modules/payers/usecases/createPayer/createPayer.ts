@@ -5,19 +5,28 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { PayerMap } from '../../mapper/Payer';
 
 import { PayerRepoContract } from '../../repos/payerRepo';
 
 import { CreatePayerResponse as Response } from './createPayerResponse';
-import { CreatePayerRequestDTO as DTO } from './createPayerDTO';
+import type { CreatePayerRequestDTO as DTO } from './createPayerDTO';
 import * as Errors from './createPayerErrors';
 
 export class CreatePayerUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
-  constructor(private payerRepo: PayerRepoContract) {}
+  constructor(private payerRepo: PayerRepoContract) {
+    super();
+  }
 
+  @Authorize('payer:create')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const {
       name,

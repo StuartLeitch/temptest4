@@ -35,10 +35,11 @@ interface WithPayment {
 }
 
 export class PayPalProcessFinishedUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private paymentRepo: PaymentRepoContract) {
+    super();
+
     this.dispatchEvents = this.dispatchEvents.bind(this);
     this.updatePaymentStatus = this.updatePaymentStatus.bind(this);
     this.savePaymentChanges = this.savePaymentChanges.bind(this);
@@ -46,11 +47,7 @@ export class PayPalProcessFinishedUsecase
     this.attachPayment = this.attachPayment.bind(this);
   }
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  @Authorize('payments:update')
+  @Authorize('payment:update')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const result = await new AsyncEither(request)

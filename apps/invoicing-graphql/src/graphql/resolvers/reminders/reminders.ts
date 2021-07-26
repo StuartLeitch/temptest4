@@ -1,23 +1,26 @@
 import {
   GetRemindersPauseStateForInvoiceUsecase,
   GetSentNotificationForInvoiceUsecase,
-  Roles,
 } from '@hindawi/shared';
 
 import { Resolvers, ReminderType } from '../../schema';
+import { Context } from '../../../builders';
 
 import { pauseOrResumeConfirmation, pauseOrResumePayment } from './utils';
 
-export const reminders: Resolvers<any> = {
+import { handleForbiddenUsecase, getAuthRoles } from '../utils';
+
+export const reminders: Resolvers<Context> = {
   Query: {
     async remindersStatus(parent, args, context) {
+      const roles = getAuthRoles(context);
       const { invoiceId } = args;
       const {
         repos: { invoice, pausedReminder },
         services: { logger: loggerService },
       } = context;
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles,
       };
 
       const usecase = new GetRemindersPauseStateForInvoiceUsecase(
@@ -30,6 +33,8 @@ export const reminders: Resolvers<any> = {
         usecaseContext
       );
 
+      handleForbiddenUsecase(maybePauseState);
+
       if (maybePauseState.isLeft()) {
         throw new Error(maybePauseState.value.message);
       }
@@ -38,13 +43,14 @@ export const reminders: Resolvers<any> = {
     },
 
     async remindersSent(parent, args, context) {
+      const roles = getAuthRoles(context);
       const { invoiceId } = args;
       const {
         repos: { invoice, sentNotifications },
         services: { logger: loggerService },
       } = context;
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles,
       };
 
       const usecase = new GetSentNotificationForInvoiceUsecase(
@@ -58,6 +64,8 @@ export const reminders: Resolvers<any> = {
         },
         usecaseContext
       );
+
+      handleForbiddenUsecase(maybeSentNotifications);
 
       if (maybeSentNotifications.isLeft()) {
         throw new Error(maybeSentNotifications.value.message);
@@ -73,6 +81,7 @@ export const reminders: Resolvers<any> = {
   },
   Mutation: {
     async togglePauseConfirmationReminders(parent, args, context) {
+      const roles = getAuthRoles(context);
       const { invoiceId, state } = args;
       const {
         repos: { invoice, pausedReminder },
@@ -80,7 +89,7 @@ export const reminders: Resolvers<any> = {
       } = context;
 
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles,
       };
 
       const getPauseStatusUsecase = new GetRemindersPauseStateForInvoiceUsecase(
@@ -92,13 +101,16 @@ export const reminders: Resolvers<any> = {
       const maybeUpdate = await pauseOrResumeConfirmation(
         invoiceId,
         state,
-        context
+        context,
+        usecaseContext
       );
       const maybeNewPauseState = await getPauseStatusUsecase.execute(
         { invoiceId },
         usecaseContext
       );
       const result = maybeUpdate.chain(() => maybeNewPauseState);
+
+      handleForbiddenUsecase(result);
 
       if (result.isLeft()) {
         throw new Error(result.value.message);
@@ -108,6 +120,7 @@ export const reminders: Resolvers<any> = {
     },
 
     async togglePausePaymentReminders(parent, args, context) {
+      const roles = getAuthRoles(context);
       const { invoiceId, state } = args;
       const {
         repos: { invoice, pausedReminder },
@@ -115,7 +128,7 @@ export const reminders: Resolvers<any> = {
       } = context;
 
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles,
       };
 
       const getPauseStatusUsecase = new GetRemindersPauseStateForInvoiceUsecase(
@@ -124,12 +137,19 @@ export const reminders: Resolvers<any> = {
         loggerService
       );
 
-      const maybeUpdate = await pauseOrResumePayment(invoiceId, state, context);
+      const maybeUpdate = await pauseOrResumePayment(
+        invoiceId,
+        state,
+        context,
+        usecaseContext
+      );
       const maybeNewPauseState = await getPauseStatusUsecase.execute(
         { invoiceId },
         usecaseContext
       );
       const result = maybeUpdate.chain(() => maybeNewPauseState);
+
+      handleForbiddenUsecase(result);
 
       if (result.isLeft()) {
         throw new Error(result.value.message);

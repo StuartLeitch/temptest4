@@ -5,6 +5,11 @@ import { UseCase } from '../../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../../domain/authorization';
 
 import { Manuscript } from '../../../../manuscripts/domain/Manuscript';
 import { JournalId } from '../../../../journals/domain/JournalId';
@@ -32,9 +37,10 @@ import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 import { GetItemsForInvoiceUsecase } from './../../getItemsForInvoice/getItemsForInvoice';
 
 import { PublishRevenueRecognitionToErpResponse as Response } from './publishRevenueRecognitionToErpResponse';
-import { PublishRevenueRecognitionToErpRequestDTO as DTO } from './publishRevenueRecognitionToErpDTO';
+import type { PublishRevenueRecognitionToErpRequestDTO as DTO } from './publishRevenueRecognitionToErpDTO';
 
 export class PublishRevenueRecognitionToErpUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
@@ -49,8 +55,11 @@ export class PublishRevenueRecognitionToErpUsecase
     private erpReferenceRepo: ErpReferenceRepoContract,
     private erpService: ErpServiceContract,
     private loggerService: LoggerContract
-  ) {}
+  ) {
+    super();
+  }
 
+  @Authorize('erp:publish')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     let invoice: Invoice;
     let payer: Payer;
@@ -75,9 +84,12 @@ export class PublishRevenueRecognitionToErpUsecase
 
       invoice = maybeInvoice.value;
 
-      const itemsResult = await getItemsUsecase.execute({
-        invoiceId: request.invoiceId,
-      });
+      const itemsResult = await getItemsUsecase.execute(
+        {
+          invoiceId: request.invoiceId,
+        },
+        context
+      );
 
       if (itemsResult.isLeft()) {
         throw new Error(

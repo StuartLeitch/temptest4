@@ -26,6 +26,7 @@ export const contextLoader: MicroframeworkLoader = async (
       services,
       repos,
       loggerBuilder,
+      keycloakAuth: null,
     };
 
     settings.setData('context', context);

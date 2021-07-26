@@ -11,8 +11,8 @@ import { UseCase } from '../../../../core/domain/UseCase';
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 
 // * Authorization Logic
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 import {
-  UsecaseAuthorizationContext,
   AccessControlledUsecase,
   AccessControlContext,
   Authorize,
@@ -44,8 +44,6 @@ import { GenerateDraftCompensatoryEventsResponse as Response } from './generate-
 import type { GenerateDraftCompensatoryEventsDTO as DTO } from './generate-draft-compensatory-events.dto';
 import * as Errors from './generate-draft-compensatory-events.errors';
 
-type Context = UsecaseAuthorizationContext;
-
 interface WithInvoiceId {
   invoiceId: string;
 }
@@ -72,9 +70,8 @@ function roundToHour(dateToRound: Date): Date {
 }
 
 export class GenerateDraftCompensatoryEventsUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
     private manuscriptRepo: ArticleRepoContract,
@@ -84,6 +81,8 @@ export class GenerateDraftCompensatoryEventsUsecase
     private queueService: SQSPublishServiceContract,
     private logger: LoggerContract
   ) {
+    super();
+
     this.sendDueAmountUpdated = this.sendDueAmountUpdated.bind(this);
     this.sendCreated = this.sendCreated.bind(this);
     this.sendDeleted = this.sendDeleted.bind(this);
@@ -95,11 +94,7 @@ export class GenerateDraftCompensatoryEventsUsecase
     this.attachInvoice = this.attachInvoice.bind(this);
   }
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  @Authorize('invoice:regenerateEvents')
+  @Authorize('invoice:generateCompensatoryEvents')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const execution = await new AsyncEither(request)

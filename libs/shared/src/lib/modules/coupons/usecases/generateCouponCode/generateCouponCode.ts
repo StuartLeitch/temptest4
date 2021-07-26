@@ -4,26 +4,30 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { CouponCode } from '../../domain/CouponCode';
 
 import { CouponRepoContract } from '../../repos/couponRepo';
 
-import { GenerateCouponCodeResponse } from './generateCouponCodeResponse';
+import { GenerateCouponCodeResponse as Response } from './generateCouponCodeResponse';
 
 export class GenerateCouponCodeUsecase
-  implements
-    UseCase<
-      Record<string, unknown>,
-      Promise<GenerateCouponCodeResponse>,
-      Context
-    > {
-  constructor(private couponRepo: CouponRepoContract) {}
+  extends AccessControlledUsecase<unknown, Context, AccessControlContext>
+  implements UseCase<unknown, Promise<Response>, Context> {
+  constructor(private couponRepo: CouponRepoContract) {
+    super();
+  }
 
+  @Authorize('coupon:generateCode')
   public async execute(
     request?: unknown,
     context?: Context
-  ): Promise<GenerateCouponCodeResponse> {
+  ): Promise<Response> {
     try {
       const found = false;
       while (!found) {

@@ -20,19 +20,13 @@ import { CreateManuscriptResponse as Response } from './createManuscriptResponse
 import type { CreateManuscriptDTO as DTO } from './createManuscriptDTO';
 
 export class CreateManuscriptUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
-  constructor(private manuscriptRepo: ManuscriptRepoContract) {}
-
-  private async getAccessControlContext(
-    request: DTO,
-    context?: Context
-  ): Promise<AccessControlContext> {
-    return {};
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
+  constructor(private manuscriptRepo: ManuscriptRepoContract) {
+    super();
   }
 
-  @Authorize('create:manuscript')
+  @Authorize('manuscript:create')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     let manuscript: Manuscript;
 

@@ -6,6 +6,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { InvoiceId } from '../../domain/InvoiceId';
 import { Invoice } from '../../domain/Invoice';
@@ -14,13 +19,17 @@ import { InvoiceRepoContract } from '../../repos/invoiceRepo';
 
 // * Usecase specific
 import { GetCreditNoteByInvoiceIdResponse as Response } from './getCreditNoteByInvoiceIdResponse';
-import { GetCreditNoteByInvoiceIdDTO as DTO } from './getCreditNoteByInvoiceIdDTO';
+import type { GetCreditNoteByInvoiceIdDTO as DTO } from './getCreditNoteByInvoiceIdDTO';
 import * as Errors from './getCreditNoteByInvoiceIdErrors';
 
 export class GetCreditNoteByInvoiceIdUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
-  constructor(private invoiceRepo: InvoiceRepoContract) {}
+  constructor(private invoiceRepo: InvoiceRepoContract) {
+    super();
+  }
 
+  @Authorize('creditNote:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const { invoiceId } = request;
 

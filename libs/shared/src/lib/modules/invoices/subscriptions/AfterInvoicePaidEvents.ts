@@ -1,7 +1,8 @@
-import { NoOpUseCase } from './../../../core/domain/NoOpUseCase';
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
+import { NoOpUseCase } from './../../../core/domain/NoOpUseCase';
+import { Roles } from '../../../domain/authorization';
 
 import { InvoicePaymentAddedEvent } from '../domain/events/invoicePaymentAdded';
 
@@ -48,6 +49,8 @@ export class AfterInvoicePaidEvent
   private async onInvoicePaidEvent(
     event: InvoicePaymentAddedEvent
   ): Promise<any> {
+    const usecaseContext = { roles: [Roles.DOMAIN_EVENT_HANDLER] };
+
     try {
       const maybeInvoice = await this.invoiceRepo.getInvoiceById(
         event.invoiceId
@@ -68,9 +71,12 @@ export class AfterInvoicePaidEvent
           this.waiverRepo
         );
 
-        const resp = await getItemsUsecase.execute({
-          invoiceId: invoice.invoiceId.id.toString(),
-        });
+        const resp = await getItemsUsecase.execute(
+          {
+            invoiceId: invoice.invoiceId.id.toString(),
+          },
+          usecaseContext
+        );
         if (resp.isLeft()) {
           throw new Error(
             `Invoice ${invoice.id.toString()} has no invoice items.`
@@ -94,9 +100,12 @@ export class AfterInvoicePaidEvent
         this.payerRepo,
         this.loggerService
       );
-      const maybePayerResponse = await payerUsecase.execute({
-        invoiceId: invoice.id.toString(),
-      });
+      const maybePayerResponse = await payerUsecase.execute(
+        {
+          invoiceId: invoice.id.toString(),
+        },
+        usecaseContext
+      );
       if (maybePayerResponse.isLeft()) {
         throw new Error(`No payer for invoice ${invoice.id.toString()} found`);
       }
@@ -105,7 +114,10 @@ export class AfterInvoicePaidEvent
         this.paymentMethodRepo,
         this.loggerService
       );
-      const paymentMethods = await paymentMethodsUsecase.execute();
+      const paymentMethods = await paymentMethodsUsecase.execute(
+        null,
+        usecaseContext
+      );
 
       if (paymentMethods.isLeft()) {
         throw new Error(
@@ -137,15 +149,18 @@ export class AfterInvoicePaidEvent
 
       invoice.addItems(invoiceItems);
 
-      const publishResult = await this.publishInvoicePaid.execute({
-        paymentMethods: paymentMethods.value,
-        billingAddress: billingAddress.value,
-        manuscript: manuscript.value,
-        payments: payments.value,
-        invoiceItems,
-        invoice,
-        payer,
-      });
+      const publishResult = await this.publishInvoicePaid.execute(
+        {
+          paymentMethods: paymentMethods.value,
+          billingAddress: billingAddress.value,
+          manuscript: manuscript.value,
+          payments: payments.value,
+          invoiceItems,
+          invoice,
+          payer,
+        },
+        usecaseContext
+      );
 
       if (publishResult.isLeft()) {
         throw publishResult.value;
