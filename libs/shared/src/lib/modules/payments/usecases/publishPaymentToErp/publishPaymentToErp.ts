@@ -116,9 +116,12 @@ export class PublishPaymentToErpUsecase
           this.waiverRepo
         );
 
-        const resp = await getItemsUsecase.execute({
-          invoiceId: invoice.invoiceId.id.toString(),
-        });
+        const resp = await getItemsUsecase.execute(
+          {
+            invoiceId: invoice.invoiceId.id.toString(),
+          },
+          context
+        );
         this.loggerService.info(
           'PublishInvoiceToERP getItemsUsecase response',
           resp
