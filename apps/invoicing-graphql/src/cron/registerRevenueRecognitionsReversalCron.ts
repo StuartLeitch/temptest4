@@ -1,4 +1,4 @@
-import { RetryRevenueRecognitionReversalsNetsuiteErpUsecase } from '@hindawi/shared';
+import { RetryRevenueRecognitionReversalsNetsuiteErpUsecase, Roles } from '@hindawi/shared';
 
 import { Context } from '../builders';
 
@@ -54,7 +54,10 @@ export class RegisterRevenueRecognitionReversalsCron {
       loggerService
     );
 
-    const maybeResponse = await retryRevenueRecognizedReversalsToNetsuiteErpUsecase.execute();
+    const maybeResponse = await retryRevenueRecognizedReversalsToNetsuiteErpUsecase.execute(
+      null,
+      { roles: [Roles.CHRON_JOB] }
+    );
     if (maybeResponse.isLeft()) {
       loggerService.error(maybeResponse.value.message);
       throw maybeResponse.value;
