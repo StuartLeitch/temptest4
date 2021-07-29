@@ -91,7 +91,8 @@ export class RetryRevenueRecognitionReversalsNetsuiteErpUsecase
         const updatedReversalResponse = await this.publishRevenueRecognitionReversalUsecase.execute(
           {
             invoiceId: unrecognizedReversal.id.toString(),
-          }
+          },
+          context
         );
         if (updatedReversalResponse.isLeft()) {
           errs.push(updatedReversalResponse.value);
