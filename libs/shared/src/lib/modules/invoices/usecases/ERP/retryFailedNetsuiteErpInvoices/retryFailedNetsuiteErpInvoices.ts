@@ -116,19 +116,19 @@ export class RetryFailedNetsuiteErpInvoicesUsecase
           maybeUpdatedInvoiceResponse.isLeft()
         ) {
           errs.push(maybeUpdatedInvoiceResponse.value);
-          return left(maybeUpdatedInvoiceResponse.value);
-        }
+          // return left(maybeUpdatedInvoiceResponse.value);
+        } else {
+          const updatedInvoiceResponse = maybeUpdatedInvoiceResponse.value;
+          const assignedErpReference = updatedInvoiceResponse as ErpInvoiceResponse;
 
-        const updatedInvoiceResponse = maybeUpdatedInvoiceResponse.value;
-        const assignedErpReference = updatedInvoiceResponse as ErpInvoiceResponse;
-
-        if (assignedErpReference) {
-          this.loggerService.info(
-            `Assigned successfully ${
-              assignedErpReference?.tradeDocumentId
-            } to invoice ${failedInvoice.id.toString()}`
-          );
-          updatedInvoices.push(assignedErpReference);
+          if (assignedErpReference) {
+            this.loggerService.info(
+              `Assigned successfully ${
+                assignedErpReference?.tradeDocumentId
+              } to invoice ${failedInvoice.id.toString()}`
+            );
+            updatedInvoices.push(assignedErpReference);
+          }
         }
       }
 
