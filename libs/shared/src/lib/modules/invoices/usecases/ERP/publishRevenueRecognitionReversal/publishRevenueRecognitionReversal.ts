@@ -94,7 +94,7 @@ export class PublishRevenueRecognitionReversalUsecase
       }
       const invoice = maybeInvoice.value;
 
-      //Get Invoice Items
+      // * Get Invoice Items
       const maybeItems = await getItemsUsecase.execute(
         {
           invoiceId,

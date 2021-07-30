@@ -795,7 +795,7 @@ export class KnexInvoiceRepo
     const { db, logger } = this;
 
     const erpReferencesQuery = db(TABLES.INVOICES)
-      .column({ invoiceId: 'invoices.id' })
+      .column({ invoiceId: 'invoices.cancelledInvoiceReference' })
       .select();
 
     const withInvoiceItems = this.withInvoicesItemsDetailsQuery();
@@ -848,6 +848,8 @@ export class KnexInvoiceRepo
     logger.debug('select', {
       unregisteredRevenueRecognitionReversal: prepareIdsSQL.toString(),
     });
+
+    process.exit(0)
 
     const revenueRecognitionReversals: Array<any> = await prepareIdsSQL;
 
