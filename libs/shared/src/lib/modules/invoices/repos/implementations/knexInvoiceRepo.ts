@@ -849,8 +849,6 @@ export class KnexInvoiceRepo
       unregisteredRevenueRecognitionReversal: prepareIdsSQL.toString(),
     });
 
-    process.exit(0)
-
     const revenueRecognitionReversals: Array<any> = await prepareIdsSQL;
 
     return right(
