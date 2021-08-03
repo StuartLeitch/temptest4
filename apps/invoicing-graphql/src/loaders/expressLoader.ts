@@ -6,6 +6,7 @@ import {
   MicroframeworkSettings,
   MicroframeworkLoader,
 } from 'microframework-w3tec';
+import { SNS } from 'aws-sdk';
 
 import { createQueueService } from '@hindawi/queue-service';
 
@@ -165,7 +166,7 @@ export const expressLoader: MicroframeworkLoader = (
           eventNamespace: env.app.eventNamespace,
           publisherName: 'invoicing',
           serviceName: env.app.name,
-          defaultMessageAttributes: env.app.defaultMessageAttributes,
+          defaultMessageAttributes: {},
         };
 
         let queue: PhenomSqsServiceContract;
@@ -180,13 +181,41 @@ export const expressLoader: MicroframeworkLoader = (
           console.log('--------------------------------------------------');
         }
 
+        const sns = new SNS({
+          endpoint: env.erpIntegration.awsSNSEndpoint,
+          accessKeyId: env.erpIntegration.awsSNSAccessKey,
+          secretAccessKey: env.erpIntegration.awsSNSSecretKey,
+          region: env.erpIntegration.awsSNSRegion,
+        });
+
+        const { TopicArn } = await sns
+          .createTopic({ Name: env.erpIntegration.awsSNSTopic })
+          .promise();
+
         try {
           await queue.publishMessage({
             data: {
               invoiceId: invoiceId,
             },
             event: 'PublishInvoice',
+            messageAttributes: {
+              step: 'PublishInvoice',
+            },
           });
+
+          // const aa: SNS.MessageAttributeMap = {
+          //   step: {
+          //     DataType: 'String',
+          //     StringValue: 'PublishInvoice',
+          //   },
+          // };
+          // await sns
+          //   .publish({
+          //     Message: JSON.stringify({ data: { invoiceId } }),
+          //     MessageAttributes: aa,
+          //     TopicArn,
+          //   })
+          //   .promise();
         } catch (err) {
           console.log('--------------- erp queue send error ---------------');
           console.error(err);

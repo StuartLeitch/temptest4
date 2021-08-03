@@ -60,5 +60,8 @@ export const env = {
     awsSQSRegion: getOsEnv('ERP_AWS_SQS_REGION'),
     awsSQSEndpoint: getOsEnv('ERP_AWS_SQS_ENDPOINT'),
     awsSQSQueueName: getOsEnv('ERP_AWS_SQS_QUEUE_NAME'),
+    awsSQSAccessKey: getOsEnv('ERP_AWS_SQS_ACCESS_KEY'),
+    awsSecretKey: getOsEnv('ERP_AWS_SQS_SECRET_KEY'),
+    awsRegion: getOsEnv('AWS_REGION'),
   },
 };

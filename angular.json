@@ -671,7 +671,7 @@
             "tsConfig": "apps/erp-integration/tsconfig.app.json",
             "assets": [
               "apps/erp-integration/src/assets",
-              "apps/invoicing-graphql/src/Dockerfile"
+              "apps/erp-integration/src/Dockerfile"
             ]
           },
           "configurations": {

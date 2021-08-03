@@ -2,12 +2,14 @@ import {
   MicroframeworkSettings,
   MicroframeworkLoader,
 } from 'microframework-w3tec';
+import { SQS } from 'aws-sdk';
+import { Consumer } from 'sqs-consumer';
 
 import { createQueueService } from '@hindawi/queue-service';
 
 import { env } from '../env';
 
-export const netsuiteLoader: MicroframeworkLoader = async (
+export const queueLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ) => {
   if (settings) {
@@ -28,30 +30,62 @@ export const netsuiteLoader: MicroframeworkLoader = async (
       // defaultMessageAttributes: env.app.defaultMessageAttributes,
     };
 
-    let queue;
-    try {
-      queue = await createQueueService(config);
+    // let queue;
+    // try {
+    //   queue = await createQueueService(config);
 
-      queue.registerEventHandler({
-        event: 'PublishInvoice',
-        handler: (data) => {
-          console.log('*********************************************');
-          console.info(data);
-          console.log('*********************************************');
+    //   queue.registerEventHandler({
+    //     event: 'PublishInvoice',
+    //     handler: (data) => {
+    //       console.log('*********************************************');
+    //       console.info(data);
+    //       console.log('*********************************************');
+    //     },
+    //   });
+    // } catch (err) {
+    //   console.log(
+    //     '--------------------- erp queue error ---------------------'
+    //   );
+    //   console.error(err);
+    //   console.log(
+    //     '-----------------------------------------------------------'
+    //   );
+    // }
+
+    // queue.start();
+
+    // settings.setData('queue', queue);
+
+    try {
+      const sqs: any = new SQS({
+        region: env.erpIntegration.awsRegion,
+        accessKeyId: env.erpIntegration.awsSQSAccessKey,
+        secretAccessKey: env.erpIntegration.awsSecretKey,
+        endpoint: env.erpIntegration.awsSQSEndpoint,
+      });
+
+      let { QueueUrl } = await sqs
+        .getQueueUrl({ QueueName: env.erpIntegration.awsSQSQueueName })
+        .promise();
+
+      const sqsConsumer = Consumer.create({
+        sqs,
+        queueUrl: QueueUrl,
+        handleMessage: async (message) => {
+          console.log(message);
         },
       });
+
+      sqsConsumer.on('error', console.error);
+
+      sqsConsumer.on('processing_error', console.error);
+
+      sqsConsumer.start();
+      console.log('loaded sqs');
     } catch (err) {
-      console.log(
-        '--------------------- erp queue error ---------------------'
-      );
+      console.log('-------------------- erp queue error --------------------');
       console.error(err);
-      console.log(
-        '-----------------------------------------------------------'
-      );
+      console.log('---------------------------------------------------------');
     }
-
-    queue.start();
-
-    settings.setData('queue', queue);
   }
 };

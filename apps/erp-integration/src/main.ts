@@ -18,6 +18,12 @@ async function main() {
     loaders.push(netsuiteLoader);
   }
 
+  if (env.loaders.netsuiteLoader) {
+    const { queueLoader } = await import('./loaders/QueueLoader');
+    log.info('NetSuite initiated ✔️');
+    loaders.push(queueLoader);
+  }
+
   await bootstrapMicroframework(loaders).catch((error) => {
     log.error('Application crashed', error);
     process.exit(1);
