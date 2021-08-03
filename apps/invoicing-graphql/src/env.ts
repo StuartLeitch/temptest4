@@ -29,7 +29,7 @@ export const env = {
     FERoot: getOsEnv('FE_ROOT'),
     eventNamespace: getOsEnv('EVENT_NAMESPACE'),
     publisherName: getOsEnv('PUBLISHER_NAME'),
-    defaultMessageAttributes: getOsEnv('DEFAULT_MESSAGE_ATTRIBUTES'),
+    defaultMessageAttributes: toObject(getOsEnv('DEFAULT_MESSAGE_ATTRIBUTES')),
     vatValidationServiceEndpoint: getOsEnv('VAT_VALIDATION_SERVICE_ENDPOINT'),
     failedErpCronRetryTimeMinutes: toFloat(
       getOsEnv('FAILED_ERP_CRON_RETRY_TIME_MINUTES')
@@ -187,6 +187,13 @@ export const env = {
     netsuiteTaxDetailsUkZero: toObject(
       nonEmptyOsEnv('NETSUITE_TAX_DETAILS_UK_ZERO')
     ),
+  },
+  erpIntegration: {
+    awsSNSRegion: getOsEnv('ERP_AWS_SNS_REGION'),
+    awsSNSEndpoint: getOsEnv('ERP_AWS_SNS_ENDPOINT'),
+    awsSNSTopic: getOsEnv('ERP_AWS_SNS_TOPIC'),
+    awsSNSAccessKey: getOsEnv('ERP_AWS_SNS_ACCESS_KEY'),
+    awsSNSSecretKey: getOsEnv('ERP_AWS_SNS_SECRET_KEY'),
   },
   migration: {
     token: getOsEnv('MIGRATION_TOKEN'),

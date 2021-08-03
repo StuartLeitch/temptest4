@@ -7,6 +7,8 @@ import {
   MicroframeworkLoader,
 } from 'microframework-w3tec';
 
+import { createQueueService } from '@hindawi/queue-service';
+
 import {
   PayPalProcessFinishedUsecase,
   GetInvoicePdfUsecase,
@@ -20,6 +22,7 @@ import {
 } from '../services/paypal/types/webhooks';
 
 import { env } from '../env';
+import { PhenomSqsServiceContract } from '../queue_service/phenom-queue-service';
 
 function extractCaptureId(data: PayPalPaymentCapture): string {
   const orderLink = data.links.find(
@@ -142,6 +145,58 @@ export const expressLoader: MicroframeworkLoader = (
 
       res.send();
     });
+
+    if (env.isTest || env.isDevelopment) {
+      app.post('/api/register-invoice-erp', async (req, res) => {
+        const data = req.body;
+        const invoiceId: string = data.invoiceId;
+
+        const config = {
+          region: env.erpIntegration.awsSNSRegion,
+          accessKeyId: env.erpIntegration.awsSNSAccessKey,
+          secretAccessKey: env.erpIntegration.awsSNSSecretKey,
+          snsEndpoint: env.erpIntegration.awsSNSEndpoint,
+          sqsEndpoint: env.aws.sqs.endpoint,
+          s3Endpoint: env.aws.s3.endpoint,
+          topicName: env.erpIntegration.awsSNSTopic,
+          queueName: env.aws.sqs.queueName,
+          bucketName: env.aws.s3.largeEventBucket,
+          bucketPrefix: env.aws.s3.bucketPrefix,
+          eventNamespace: env.app.eventNamespace,
+          publisherName: 'invoicing',
+          serviceName: env.app.name,
+          defaultMessageAttributes: env.app.defaultMessageAttributes,
+        };
+
+        let queue: PhenomSqsServiceContract;
+
+        try {
+          queue = await createQueueService(config);
+
+          queue.start();
+        } catch (err) {
+          console.log('--------- queue creation error -------------------');
+          console.log(err);
+          console.log('--------------------------------------------------');
+        }
+
+        try {
+          await queue.publishMessage({
+            data: {
+              invoiceId: invoiceId,
+            },
+            event: 'PublishInvoice',
+          });
+        } catch (err) {
+          console.log('--------------- erp queue send error ---------------');
+          console.error(err);
+          console.log('----------------------------------------------------');
+        }
+
+        res.status(200);
+        res.send();
+      });
+    }
 
     // Run application to listen on given port
     if (!env.isTest) {
