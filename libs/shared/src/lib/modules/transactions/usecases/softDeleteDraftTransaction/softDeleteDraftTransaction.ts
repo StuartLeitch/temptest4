@@ -29,18 +29,15 @@ import { SoftDeleteDraftTransactionResponse as Response } from './softDeleteDraf
 import * as Errors from './softDeleteDraftTransactionErrors';
 
 export class SoftDeleteDraftTransactionUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private transactionRepo: TransactionRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private manuscriptRepo: ManuscriptRepoContract
-  ) {}
-
-  private async getAccessControlContext(request, context?) {
-    return {};
+  ) {
+    super();
   }
 
   @Authorize('transaction:delete')

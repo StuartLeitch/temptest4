@@ -37,7 +37,7 @@ let mockWaiverRepo: MockWaiverRepo;
 let usecase: RestoreSoftDeleteDraftTransactionUsecase;
 
 const defaultContext: UsecaseAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN],
+  roles: [Roles.QUEUE_EVENT_HANDLER],
 };
 
 Before({ tags: '@ValidateRestoreSoftDeleteTransaction' }, function () {

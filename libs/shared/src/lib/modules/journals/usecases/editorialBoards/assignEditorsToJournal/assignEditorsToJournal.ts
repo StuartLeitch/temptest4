@@ -5,6 +5,11 @@ import { UseCase } from '../../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../../domain/authorization';
 
 import { JournalId } from '../../../domain/JournalId';
 
@@ -14,15 +19,19 @@ import { CatalogRepoContract } from '../../../repos';
 import { CreateEditor } from '../createEditor/createEditor';
 
 import { AssignEditorsToJournalResponse as Response } from './assignEditorsToJournalResponse';
-import { AssignEditorsToJournalDTO as DTO } from './assignEditorsToJournalDTO';
+import type { AssignEditorsToJournalDTO as DTO } from './assignEditorsToJournalDTO';
 
 export class AssignEditorsToJournalUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private editorRepo: EditorRepoContract,
     private catalogRepo: CatalogRepoContract
-  ) {}
+  ) {
+    super();
+  }
 
+  @Authorize('editor:assign')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const { journalId: journalIdString, allEditors: editors } = request;
     const allEditors = editors.map((e) => ({
@@ -76,7 +85,7 @@ export class AssignEditorsToJournalUsecase
 
       const createEditorUsecase = new CreateEditor(this.editorRepo);
       const createEditorsResponse = await Promise.all(
-        editorsToCreate.map((e) => createEditorUsecase.execute(e))
+        editorsToCreate.map((e) => createEditorUsecase.execute(e, context))
       );
 
       const errs = [];

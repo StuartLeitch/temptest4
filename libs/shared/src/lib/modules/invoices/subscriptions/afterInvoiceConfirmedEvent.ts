@@ -1,3 +1,7 @@
+import { HandleContract } from '../../../core/domain/events/contracts/Handle';
+import { DomainEvents } from '../../../core/domain/events/DomainEvents';
+import { Roles } from '../../../domain/authorization';
+
 import { PayloadBuilder } from '../../../infrastructure/message-queues/payloadBuilder';
 import { SchedulerContract } from '../../../infrastructure/scheduler/Scheduler';
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
@@ -9,9 +13,6 @@ import {
   SchedulingTime,
   TimerBuilder,
 } from '../../../infrastructure/message-queues/contracts/Time';
-
-import { HandleContract } from '../../../core/domain/events/contracts/Handle';
-import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 
 import { InvoiceConfirmed } from '../domain/events/invoiceConfirmed';
 
@@ -26,7 +27,7 @@ import { WaiverRepoContract } from '../../waivers/repos';
 import { InvoiceItemRepoContract } from '../repos';
 
 import { PublishInvoiceConfirmedUsecase } from '../usecases/publishEvents/publishInvoiceConfirmed';
-import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
+import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice';
 
 export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
   constructor(
@@ -57,6 +58,10 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
   private async onPublishInvoiceConfirmed(
     event: InvoiceConfirmed
   ): Promise<void> {
+    const defaultContext = {
+      roles: [Roles.DOMAIN_EVENT_HANDLER],
+    };
+
     const { invoice } = event;
 
     try {
@@ -70,9 +75,12 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
           this.waiverRepo
         );
 
-        const resp = await getItemsUsecase.execute({
-          invoiceId: invoice.invoiceId.id.toString(),
-        });
+        const resp = await getItemsUsecase.execute(
+          {
+            invoiceId: invoice.invoiceId.id.toString(),
+          },
+          defaultContext
+        );
         if (resp.isLeft()) {
           throw new Error(
             `Invoice ${invoice.id.toString()} has no invoice items.`
@@ -115,13 +123,16 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
 
       const manuscript = maybeManuscript.value;
 
-      const publishResult = await this.publishInvoiceConfirmed.execute({
-        billingAddress,
-        invoiceItems,
-        manuscript,
-        invoice,
-        payer,
-      });
+      const publishResult = await this.publishInvoiceConfirmed.execute(
+        {
+          billingAddress,
+          invoiceItems,
+          manuscript,
+          invoice,
+          payer,
+        },
+        defaultContext
+      );
 
       if (publishResult.isLeft()) {
         throw publishResult.value;

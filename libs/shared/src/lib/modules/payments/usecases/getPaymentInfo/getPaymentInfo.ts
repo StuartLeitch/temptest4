@@ -23,19 +23,16 @@ import type { GetPaymentInfoDTO as DTO } from './getPaymentInfoDTO';
 import * as Errors from './getPaymentInfoErrors';
 
 export class GetPaymentInfoUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private paymentRepo: PaymentRepoContract
-  ) {}
-
-  private async getAccessControlContext(request, context?) {
-    return {};
+  ) {
+    super();
   }
 
-  @Authorize('invoice:read')
+  @Authorize('payment:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     if (!request.invoiceId) {
       return left(new Errors.InvoiceIdRequiredError());

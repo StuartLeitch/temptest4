@@ -1,5 +1,7 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import { Route, Switch, Redirect } from 'react-router';
+
+import { ClientContext } from 'graphql-hooks';
 
 import { useAuth } from '../contexts/Auth';
 
@@ -30,6 +32,17 @@ import { SidebarASidebar } from '../layout/components/SidebarASidebar';
 
 //------ Route Definitions --------
 export const RoutedContent = () => {
+  const auth = useAuth();
+  if (!auth) {
+    return null;
+  }
+  const { token } = auth.data;
+
+  const client = useContext(ClientContext);
+  if(client.headers['Authorization']== null) {
+    client.setHeader('Authorization', `Bearer ${token}`)
+  }
+
   return (
     <Switch>
       <Redirect from='/' to='/dashboards/invoicing' exact />

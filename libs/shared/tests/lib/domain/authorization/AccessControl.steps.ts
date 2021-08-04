@@ -42,15 +42,15 @@ Given('An Invoice from another Tenant', async function () {
   context.userTenantId = 'tenant-1';
 });
 
-When(/I try to ([\w-]+) an Invoice as (.+)/, async function (
-  action: string,
-  role: string
-) {
-  actionResource = 'invoice:' + action;
-  roles = [Roles[role]];
-});
+When(
+  /I try to ([\w-]+) an Invoice as (.+)/,
+  async function (action: string, role: string) {
+    actionResource = 'invoice:' + action;
+    roles = [Roles[role]];
+  }
+);
 
 Then(/^I should be (.+)/, async (actionOutcome: string) => {
-  const permission = await accessControl.can(roles, actionResource, context);
+  const permission = await accessControl.can(roles, actionResource);
   expect(!!permission.granted).to.equal(actionOutcome === 'allowed');
 });

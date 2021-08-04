@@ -11,6 +11,8 @@ import { Context } from '../../builders';
 import { Resolvers } from '../schema';
 import { env } from '../../env';
 
+import { handleForbiddenUsecase } from './utils';
+
 export const payer: Resolvers<Context> = {
   Mutation: {
     async confirmInvoice(parent, args, context) {
@@ -48,6 +50,8 @@ export const payer: Resolvers<Context> = {
         usecaseContext
       );
 
+      handleForbiddenUsecase(updatedPayer);
+
       if (updatedPayer.isLeft()) {
         throw new Error(`Error: ${updatedPayer.value.message}`);
       }
@@ -59,9 +63,18 @@ export const payer: Resolvers<Context> = {
     async address(payer: any, args: any, context) {
       const getAddressUseCase = new GetAddressUsecase(context.repos.address);
 
-      const address = await getAddressUseCase.execute({
-        billingAddressId: payer.billingAddressId,
-      });
+      const usecaseContext = {
+        roles: [Roles.PAYER],
+      };
+
+      const address = await getAddressUseCase.execute(
+        {
+          billingAddressId: payer.billingAddressId,
+        },
+        usecaseContext
+      );
+
+      handleForbiddenUsecase(address);
 
       if (address.isLeft()) {
         throw new Error(`Can't get address for payer ${payer.id}`);

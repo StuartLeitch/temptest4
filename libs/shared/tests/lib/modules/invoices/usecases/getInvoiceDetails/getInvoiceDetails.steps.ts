@@ -28,7 +28,7 @@ let result: Either<UseCaseError, Invoice>;
 let invoiceCollection: InvoiceCollection;
 
 const defaultContext: UsecaseAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN],
+  roles: [Roles.PAYER],
 };
 
 Given(/^A invoice with the id "([\w-]+)"$/, (invoiceId: string) => {

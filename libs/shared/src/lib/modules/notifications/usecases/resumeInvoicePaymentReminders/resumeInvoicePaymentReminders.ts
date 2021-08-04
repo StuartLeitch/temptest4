@@ -7,6 +7,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { PayloadBuilder } from '../../../../infrastructure/message-queues/payloadBuilder';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
@@ -41,7 +46,7 @@ import { AreNotificationsPausedUsecase } from '../areNotificationsPaused';
 
 // * Usecase specific
 import { ResumeInvoicePaymentRemindersResponse as Response } from './resumeInvoicePaymentRemindersResponse';
-import { ResumeInvoicePaymentRemindersDTO as DTO } from './resumeInvoicePaymentRemindersDTO';
+import type { ResumeInvoicePaymentRemindersDTO as DTO } from './resumeInvoicePaymentRemindersDTO';
 import * as Errors from './resumeInvoicePaymentRemindersErrors';
 
 interface CompoundDTO extends DTO {
@@ -51,6 +56,7 @@ interface CompoundDTO extends DTO {
 }
 
 export class ResumeInvoicePaymentReminderUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
@@ -60,6 +66,8 @@ export class ResumeInvoicePaymentReminderUsecase
     private loggerService: LoggerContract,
     private scheduler: SchedulerContract
   ) {
+    super();
+
     this.calculateRemainingDelay = this.calculateRemainingDelay.bind(this);
     this.existsInvoiceWithId = this.existsInvoiceWithId.bind(this);
     this.validatePauseState = this.validatePauseState.bind(this);
@@ -72,6 +80,7 @@ export class ResumeInvoicePaymentReminderUsecase
     this.resume = this.resume.bind(this);
   }
 
+  @Authorize('reminder:toggle')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const execution = new AsyncEither(request)

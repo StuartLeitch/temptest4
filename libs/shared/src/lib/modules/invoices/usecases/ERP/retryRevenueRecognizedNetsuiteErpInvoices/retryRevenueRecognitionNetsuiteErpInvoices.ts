@@ -5,6 +5,11 @@ import { UseCase } from '../../../../../core/domain/UseCase';
 import { ErrorUtils } from './../../../../../utils/ErrorUtils';
 
 import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../../domain/authorization';
 
 import { ArticleRepoContract } from '../../../../manuscripts/repos/articleRepo';
 import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
@@ -24,9 +29,10 @@ import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 import { PublishRevenueRecognitionToErpUsecase } from '../publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
 
 import { RetryRevenueRecognitionNetsuiteErpInvoicesResponse as Response } from './retryRevenueRecognitionNetsuiteErpInvoicesResponse';
-import { RetryRevenueRecognitionNetsuiteErpInvoicesDTO as DTO } from './retryRevenueRecognitionNetsuiteErpInvoicesDTO';
+import type { RetryRevenueRecognitionNetsuiteErpInvoicesDTO as DTO } from './retryRevenueRecognitionNetsuiteErpInvoicesDTO';
 
 export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   private publishRevenueRecognitionToErpUsecase: PublishRevenueRecognitionToErpUsecase;
   constructor(
@@ -43,6 +49,8 @@ export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
     private netsuiteService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {
+    super();
+
     this.publishRevenueRecognitionToErpUsecase = new PublishRevenueRecognitionToErpUsecase(
       this.invoiceRepo,
       this.invoiceItemRepo,
@@ -59,6 +67,7 @@ export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
     );
   }
 
+  @Authorize('erp:publish')
   public async execute(request?: DTO, context?: Context): Promise<Response> {
     try {
       const maybeUnrecognizedErpInvoicesIds = await this.invoiceRepo.getUnrecognizedNetsuiteErpInvoices();
@@ -91,7 +100,8 @@ export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
         const updatedInvoiceResponse = await this.publishRevenueRecognitionToErpUsecase.execute(
           {
             invoiceId: unrecognizedInvoice.id.toString(),
-          }
+          },
+          context
         );
         if (updatedInvoiceResponse.isLeft()) {
           errs.push(updatedInvoiceResponse.value);

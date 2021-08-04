@@ -12,8 +12,8 @@ const values: WithAwsSecretsServiceProps = {
     envVars: {
       ...defaultValues.serviceProps.envVars,
       AUTH_SERVER_CLIENT_ID: 'invoicing',
-      AUTH_SERVER_REALM: 'Hindawi',
-      APP_NAME: 'Invoicing Admin',
+      AUTH_SERVER_REALM: 'Phenom',
+      APP_NAME: 'Invoicing',
     },
     ingressOptions: {
       rules: [

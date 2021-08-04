@@ -75,7 +75,7 @@ export const ArticlePublishedHandler: EventHandler<ArticlePublished> = {
 
       const result = await epicOnArticlePublishedUsecase.execute(args, {
         correlationId,
-        roles: [Roles.SUPER_ADMIN],
+        roles: [Roles.QUEUE_EVENT_HANDLER],
       });
 
       if (result.isLeft()) {

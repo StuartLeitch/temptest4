@@ -23,13 +23,33 @@ import type { DeleteInvoiceRequestDTO as DTO } from './deleteInvoiceDTO';
 import * as Errors from './deleteInvoiceErrors';
 
 export class DeleteInvoiceUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
-  private invoiceRepo: InvoiceRepoContract;
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
+  constructor(private invoiceRepo: InvoiceRepoContract) {
+    super();
+  }
 
-  constructor(invoiceRepo: InvoiceRepoContract) {
-    this.invoiceRepo = invoiceRepo;
+  @Authorize('invoice:delete')
+  public async execute(request: DTO, context?: Context): Promise<Response> {
+    try {
+      // * System looks-up the invoice
+      const maybeInvoice = await this.getInvoice(request);
+
+      if (maybeInvoice.isLeft()) {
+        return maybeInvoice.map(() => null);
+      }
+
+      const invoice = maybeInvoice.value;
+      // * This is where all the magic happens
+      await this.invoiceRepo.delete(invoice);
+      invoice.generateInvoiceDraftDeletedEvent();
+      DomainEvents.dispatchEventsForAggregate(invoice.id);
+
+      return right(null);
+    } catch (err) {
+      console.log(err);
+      return left(new UnexpectedError(err));
+    }
   }
 
   private async getInvoice(
@@ -55,33 +75,6 @@ export class DeleteInvoiceUsecase
     }
     {
       return right(invoice.value);
-    }
-  }
-
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  @Authorize('invoice:delete')
-  public async execute(request: DTO, context?: Context): Promise<Response> {
-    try {
-      // * System looks-up the invoice
-      const maybeInvoice = await this.getInvoice(request);
-
-      if (maybeInvoice.isLeft()) {
-        return maybeInvoice.map(() => null);
-      }
-
-      const invoice = maybeInvoice.value;
-      // * This is where all the magic happens
-      await this.invoiceRepo.delete(invoice);
-      invoice.generateInvoiceDraftDeletedEvent();
-      DomainEvents.dispatchEventsForAggregate(invoice.id);
-
-      return right(null);
-    } catch (err) {
-      console.log(err);
-      return left(new UnexpectedError(err));
     }
   }
 }

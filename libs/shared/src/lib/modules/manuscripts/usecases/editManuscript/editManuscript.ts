@@ -22,19 +22,13 @@ import type { EditManuscriptDTO as DTO } from './editManuscriptDTO';
 import * as Errors from './editManuscriptErrors';
 
 export class EditManuscriptUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
-  constructor(private manuscriptRepo: ArticleRepoContract) {}
-
-  private async getAccessControlContext(
-    request: DTO,
-    context?: Context
-  ): Promise<AccessControlContext> {
-    return {};
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
+  constructor(private manuscriptRepo: ArticleRepoContract) {
+    super();
   }
 
-  @Authorize('edit:manuscript')
+  @Authorize('manuscript:update')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     let manuscript: Manuscript;
 

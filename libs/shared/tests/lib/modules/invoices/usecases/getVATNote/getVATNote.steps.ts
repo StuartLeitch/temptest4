@@ -1,37 +1,19 @@
 import { expect } from 'chai';
 import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
-// import { ValidateVATErrors } from './../../../../../../src/lib/modules/invoices/usecases/validateVAT/validateVATErrors';
 import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
-import { InvoiceItem } from '../../../../../../src/lib/modules/invoices/domain/InvoiceItem';
-import { UsecaseAuthorizationContext } from '../../../../../../src/lib/domain/authorization';
 
-import { ValidateVATUsecase } from '../../../../../../src/lib/modules/invoices/usecases/validateVAT/validateVAT';
-import { VATService } from '../../../../../../src/lib/domain/services/VATService';
 import { setupVatService } from '../../../../../../src/lib/domain/services/mocks/VatSoapClient';
 
-import { Roles } from '../../../../../../src/lib/modules/users/domain/enums/Roles';
-import {
-  Invoice,
-  InvoiceStatus,
-} from '../../../../../../src/lib/modules/invoices/domain/Invoice';
+import { InvoiceStatus } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
 
-import {
-  Payer,
-  PayerType,
-} from '../../../../../../src/lib/modules/payers/domain/Payer';
+import { PayerType } from '../../../../../../src/lib/modules/payers/domain/Payer';
 import { PayerMap } from '../../../../../../src/lib/modules/payers/mapper/Payer';
 import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 
 import { PoliciesRegister } from '../../../../../../src/lib/modules/invoices/domain/policies/PoliciesRegister';
 import { UKVATTreatmentArticleProcessingChargesPolicy } from '../../../../../../src/lib/modules/invoices/domain/policies/UKVATTreatmentArticleProcessingChargesPolicy';
 
-const vatService: VATService = new VATService();
-
-const validateVATUsecase = new ValidateVATUsecase(vatService);
-const defaultContext: UsecaseAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN],
-};
 let payer; //: Payer;
 let invoice; //: Invoice;
 let invoiceItem; //: InvoiceItem;
@@ -41,8 +23,6 @@ let calculateVAT: any;
 let invoiceId: string;
 let payerId: string;
 let countryCode: string;
-let vatResponse: any;
-let receivedTotalAmount: number;
 let VATNote: any;
 
 function setPayerType(payerType: string) {
@@ -139,35 +119,28 @@ Before(() => {
   setupVatService();
 });
 
-Given(
-  /^The Payer is from (\w+)$/,
-  (country: string) => {
-    APCPolicy = new UKVATTreatmentArticleProcessingChargesPolicy();
-    policiesRegister.registerPolicy(APCPolicy);
+Given(/^The Payer is from (\w+)$/, (country: string) => {
+  APCPolicy = new UKVATTreatmentArticleProcessingChargesPolicy();
+  policiesRegister.registerPolicy(APCPolicy);
 
-    countryCode = country;
-    //  //  const { asBusiness, VATRegistered } = setPayerType(payerType);
+  countryCode = country;
+  //  //  const { asBusiness, VATRegistered } = setPayerType(payerType);
 
-    calculateVAT = policiesRegister.applyPolicy(APCPolicy.getType(), [
-      { countryCode },
-      false,
-      false,
-    ]);
-  }
-);
+  calculateVAT = policiesRegister.applyPolicy(APCPolicy.getType(), [
+    { countryCode },
+    false,
+    false,
+  ]);
+});
 
 When('The VAT note is calculated', () => {
   VATNote = calculateVAT.getVATNote();
 });
 
-Then(
-  /^The final VAT note should be (.*)$/,
-  (expectedVATNote) => {
-
-    if (typeof expectedVATNote === 'undefined') {
-      expect(Boolean(VATNote.template)).to.equal(!!(expectedVATNote));
-    } else {
-      expect(VATNote.template).to.equal(expectedVATNote);
-    }
+Then(/^The final VAT note should be (.*)$/, (expectedVATNote) => {
+  if (typeof expectedVATNote === 'undefined') {
+    expect(Boolean(VATNote.template)).to.equal(!!expectedVATNote);
+  } else {
+    expect(VATNote.template).to.equal(expectedVATNote);
   }
-);
+});

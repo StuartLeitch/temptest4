@@ -4,10 +4,11 @@ import { right, left } from '../../../../../core/logic/Either';
 import { UseCase } from '../../../../../core/domain/UseCase';
 
 // * Authorization Logic
+import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
 import {
-  UsecaseAuthorizationContext as Context,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../../domain/authorization';
 
 import { JournalId } from '../../../../journals/domain/JournalId';
@@ -35,13 +36,12 @@ import { GetItemsForInvoiceUsecase } from '../../getItemsForInvoice/getItemsForI
 import { GetInvoiceDetailsUsecase } from '../../getInvoiceDetails/getInvoiceDetails';
 
 import { PublishRevenueRecognitionReversalResponse as Response } from './publishRevenueRecognitionReversal.response';
-import { PublishRevenueRecognitionReversalDTO as DTO } from './publishRevenueRecognitionReversal.dto';
+import type { PublishRevenueRecognitionReversalDTO as DTO } from './publishRevenueRecognitionReversal.dto';
 import * as Errors from './publishRevenueRecognitionReversal.errors';
 
 export class PublishRevenueRecognitionReversalUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -55,12 +55,11 @@ export class PublishRevenueRecognitionReversalUsecase
     private erpReferenceRepo: ErpReferenceRepoContract,
     private erpService: ErpServiceContract,
     private loggerService: LoggerContract
-  ) {}
-
-  private async getAccessControlContext(request: any, context?: any) {
-    return {};
+  ) {
+    super();
   }
 
+  @Authorize('erp:publish')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const invoiceId = request.invoiceId;
     const getItemsUsecase = new GetItemsForInvoiceUsecase(

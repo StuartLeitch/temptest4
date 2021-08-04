@@ -5,6 +5,11 @@ import { UseCase } from '../../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../../domain/authorization';
 
 import { JournalId } from '../../../domain/JournalId';
 
@@ -12,15 +17,19 @@ import { EditorRepoContract } from '../../../repos/editorRepo';
 import { CatalogRepoContract } from '../../../repos';
 
 import { GetEditorsByJournalResponse as Response } from './getEditorsByJournalResponse';
-import { GetEditorsByJournalDTO as DTO } from './getEditorsByJournalDTO';
+import type { GetEditorsByJournalDTO as DTO } from './getEditorsByJournalDTO';
 
 export class GetEditorsByJournalUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private editorRepo: EditorRepoContract,
     private catalogRepo: CatalogRepoContract
-  ) {}
+  ) {
+    super();
+  }
 
+  @Authorize('editor:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const { journalId: journalIdString } = request;
 

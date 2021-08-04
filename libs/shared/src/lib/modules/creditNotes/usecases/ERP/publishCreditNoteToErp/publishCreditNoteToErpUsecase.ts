@@ -3,7 +3,12 @@ import { right, left } from '../../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
 
 // * Authorization Logic
-import { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../../domain/authorization';
 
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
@@ -19,11 +24,14 @@ import { ErpReferenceMap } from './../../../../vendors/mapper/ErpReference';
 import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
 
 import { GetItemsForInvoiceUsecase } from '../../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
-import { PublishCreditNoteToErpRequestDTO as DTO } from './publishCreditNoteToErpDTO';
-import { PublishCreditNoteToErpResponse as Response } from './publishCreditNoteToErpResponse';
+// import { PublishCreditNoteToErpRequestDTO as DTO } from './publishCreditNoteToErpDTO';
+// import { PublishCreditNoteToErpResponse as Response } from './publishCreditNoteToErpResponse';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
+import { PublishCreditNoteToErpResponse as Response } from './publishCreditNoteToErpResponse';
+import type { PublishCreditNoteToErpRequestDTO as DTO } from './publishCreditNoteToErpDTO';
 
 export class PublishCreditNoteToErpUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private creditNoteRepo: CreditNoteRepoContract,
@@ -34,12 +42,11 @@ export class PublishCreditNoteToErpUsecase
     private erpReferenceRepo: ErpReferenceRepoContract,
     private erpService: ErpServiceContract,
     private loggerService: LoggerContract
-  ) {}
-
-  private async getAccessControlContext(request: any, context?: any) {
-    return {};
+  ) {
+    super();
   }
 
+  @Authorize('erp:publish')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     this.loggerService.info('PublishCreditNoteToERP Request', request);
     let creditNote: CreditNote;
@@ -83,19 +90,22 @@ export class PublishCreditNoteToErpUsecase
           this.waiverRepo
         );
 
-        const response = await getItemsUsecase.execute({
-          invoiceId: creditNote.invoiceId.id.toString(),
-        });
+        const resp = await getItemsUsecase.execute(
+          {
+            invoiceId: request.creditNoteId,
+          },
+          context
+        );
         this.loggerService.debug(
           'PublishCreditNoteToERP getItemsUsecase Response'
         );
-        if (response.isLeft()) {
+        if (resp.isLeft()) {
           throw new Error(
             `The Invoice ${creditNote.invoiceId.id.toString()} has no invoice items`
           );
         }
 
-        invoiceItems = response.value;
+        invoiceItems = resp.value;
         this.loggerService.debug(
           'PublishCreditNoteToERP Invoice Items',
           invoiceItems

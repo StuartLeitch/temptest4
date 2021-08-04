@@ -28,18 +28,15 @@ interface WithInvoiceId {
 }
 
 export class IsInvoiceDeletedUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private logger: LoggerContract
   ) {
-    this.attachDeleteStatus = this.attachDeleteStatus.bind(this);
-  }
+    super();
 
-  private async getAccessControlContext(request, context?) {
-    return {};
+    this.attachDeleteStatus = this.attachDeleteStatus.bind(this);
   }
 
   @Authorize('invoice:read')

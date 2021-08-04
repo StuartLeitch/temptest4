@@ -21,15 +21,10 @@ import type { GetTransactionDTO as DTO } from './getTransactionDTO';
 // * Authorization Logic
 
 export class GetTransactionUsecase
-  implements
-    UseCase<DTO, Response, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Response, Context> {
   constructor(private transactionRepo: TransactionRepoContract) {
-    this.transactionRepo = transactionRepo;
-  }
-
-  private async getAccessControlContext(request, context?) {
-    return {};
+    super();
   }
 
   @Authorize('transaction:read')

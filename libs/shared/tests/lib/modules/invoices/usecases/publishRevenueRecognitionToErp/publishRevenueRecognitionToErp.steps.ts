@@ -54,7 +54,7 @@ let response: PublishRevenueRecognitionToErpResponse;
 let invoice: Invoice;
 
 const context: UsecaseAuthorizationContext = {
-  roles: [Roles.ADMIN],
+  roles: [Roles.CHRON_JOB],
 };
 
 Before({ tags: '@ValidatePublishRevRecToErp' }, function () {

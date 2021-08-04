@@ -6,6 +6,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { InvoiceReminderPayload } from '../../../../infrastructure/message-queues/payloads';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
@@ -47,7 +52,7 @@ import { notificationsSentInLastDelay } from '../usecase-utils';
 
 // * Usecase specific
 import { SendInvoicePaymentReminderResponse as Response } from './sendInvoicePaymentReminderResponse';
-import { SendInvoicePaymentReminderDTO as DTO } from './sendInvoicePaymentReminderDTO';
+import type { SendInvoicePaymentReminderDTO as DTO } from './sendInvoicePaymentReminderDTO';
 import * as Errors from './sendInvoicePaymentReminderErrors';
 
 import {
@@ -57,6 +62,7 @@ import {
 } from './utils';
 
 export class SendInvoicePaymentReminderUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private sentNotificationRepo: SentNotificationRepoContract,
@@ -71,6 +77,8 @@ export class SendInvoicePaymentReminderUsecase
     private scheduler: SchedulerContract,
     private emailService: EmailService
   ) {
+    super();
+
     this.getPaymentNotificationsSent = this.getPaymentNotificationsSent.bind(
       this
     );
@@ -90,6 +98,7 @@ export class SendInvoicePaymentReminderUsecase
     this.sendEmail = this.sendEmail.bind(this);
   }
 
+  @Authorize('reminder:send')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const execution = new AsyncEither(request)

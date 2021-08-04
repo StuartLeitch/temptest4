@@ -31,9 +31,8 @@ import type { RestoreSoftDeleteDraftTransactionDTO as DTO } from './restoreSoftD
 import * as Errors from './restoreSoftDeleteDraftTransaction.errors';
 
 export class RestoreSoftDeleteDraftTransactionUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private transactionRepo: TransactionRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -41,10 +40,8 @@ export class RestoreSoftDeleteDraftTransactionUsecase
     private invoiceRepo: InvoiceRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract
-  ) {}
-
-  private async getAccessControlContext(request, context?) {
-    return {};
+  ) {
+    super();
   }
 
   @Authorize('transaction:restore')

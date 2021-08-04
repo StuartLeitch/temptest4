@@ -21,7 +21,7 @@ import { SubmissionSubmittedHelpers } from './submission-submitted/helpers';
 import { env } from '../../env';
 
 const defaultContext: UsecaseAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN],
+  roles: [Roles.QUEUE_EVENT_HANDLER],
 };
 
 const SUBMISSION_PEER_REVIEW_CYCLE_CHECK_PASSED =
