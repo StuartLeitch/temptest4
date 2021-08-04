@@ -101,7 +101,6 @@ export class AfterCreditNoteCreatedEvent
           this.waiverRepo
         );
 
-<<<<<<< HEAD
         const invoiceItemsResult = await getItemsUsecase.execute(
           {
             invoiceId: creditNote.invoiceId.id.toString(),
@@ -111,17 +110,6 @@ export class AfterCreditNoteCreatedEvent
         if (invoiceItemsResult.isLeft()) {
           throw new Error(
             `CreditNote ${creditNote.id.toString()} has no invoice items.`
-=======
-        const maybeInvoiceItemResult = await getItemsUsecase.execute({
-          invoiceId: creditNote.invoiceId.id.toString(),
-        });
-
-        if (maybeInvoiceItemResult.isLeft()) {
-          return left(
-            new Error(
-              `CreditNote ${creditNote.id.toString()} has no related invoice items.`
-            )
->>>>>>> dc2bbbd8cae91f6ebb849a6dfe9cb0b1caed4d28
           );
         }
         invoiceItems = invoiceItemsResult.value;
@@ -161,14 +149,10 @@ export class AfterCreditNoteCreatedEvent
         this.loggerService
       );
 
-<<<<<<< HEAD
       const maybePaymentMethods = await paymentMethodsUsecase.execute(
         null,
         defaultContext
       );
-=======
-      const maybePaymentMethods = await paymentMethodsUsecase.execute();
->>>>>>> dc2bbbd8cae91f6ebb849a6dfe9cb0b1caed4d28
 
       if (maybePaymentMethods.isLeft()) {
         return left(
@@ -210,11 +194,7 @@ export class AfterCreditNoteCreatedEvent
         invoiceItems,
         paymentMethods,
         billingAddress,
-<<<<<<< HEAD
       }, defaultContext);
-=======
-      });
->>>>>>> dc2bbbd8cae91f6ebb849a6dfe9cb0b1caed4d28
 
       if (publishResult.isLeft()) {
         return left(publishResult.value.message);
