@@ -64,10 +64,6 @@ export class AfterCreditNoteCreatedEvent
   private async onCreditNoteCreatedEvent(
     event: CreditNoteCreatedEvent
   ): Promise<any> {
-    const defaultContext = {
-      roles: [Roles.DOMAIN_EVENT_HANDLER],
-    };
-
     const getInvoiceDetails = new GetInvoiceDetailsUsecase(this.invoiceRepo);
     try {
       const maybeCreditNote = await this.creditNoteRepo.getCreditNoteById(
@@ -105,6 +101,7 @@ export class AfterCreditNoteCreatedEvent
           this.waiverRepo
         );
 
+<<<<<<< HEAD
         const invoiceItemsResult = await getItemsUsecase.execute(
           {
             invoiceId: creditNote.invoiceId.id.toString(),
@@ -114,6 +111,17 @@ export class AfterCreditNoteCreatedEvent
         if (invoiceItemsResult.isLeft()) {
           throw new Error(
             `CreditNote ${creditNote.id.toString()} has no invoice items.`
+=======
+        const maybeInvoiceItemResult = await getItemsUsecase.execute({
+          invoiceId: creditNote.invoiceId.id.toString(),
+        });
+
+        if (maybeInvoiceItemResult.isLeft()) {
+          return left(
+            new Error(
+              `CreditNote ${creditNote.id.toString()} has no related invoice items.`
+            )
+>>>>>>> dc2bbbd8cae91f6ebb849a6dfe9cb0b1caed4d28
           );
         }
         invoiceItems = invoiceItemsResult.value;
@@ -138,16 +146,8 @@ export class AfterCreditNoteCreatedEvent
       );
 
       if (maybePayer.isLeft()) {
-        if (creditNote.invoiceId.id.toString() === invoice.id.toString()) {
-          maybePayer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
-          if (maybePayer.isLeft()) {
-            return left(
-              new Error(
-                `Credit Note ${creditNote.id.toString()} has no payers.`
-              )
-            );
-          }
-        } else {
+        maybePayer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
+        if (maybePayer.isLeft()) {
           return left(
             new Error(`Credit Note ${creditNote.id.toString()} has no payers.`)
           );
@@ -161,10 +161,14 @@ export class AfterCreditNoteCreatedEvent
         this.loggerService
       );
 
+<<<<<<< HEAD
       const maybePaymentMethods = await paymentMethodsUsecase.execute(
         null,
         defaultContext
       );
+=======
+      const maybePaymentMethods = await paymentMethodsUsecase.execute();
+>>>>>>> dc2bbbd8cae91f6ebb849a6dfe9cb0b1caed4d28
 
       if (maybePaymentMethods.isLeft()) {
         return left(
@@ -206,7 +210,11 @@ export class AfterCreditNoteCreatedEvent
         invoiceItems,
         paymentMethods,
         billingAddress,
+<<<<<<< HEAD
       }, defaultContext);
+=======
+      });
+>>>>>>> dc2bbbd8cae91f6ebb849a6dfe9cb0b1caed4d28
 
       if (publishResult.isLeft()) {
         return left(publishResult.value.message);

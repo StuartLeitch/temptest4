@@ -10,7 +10,6 @@ import {
   GetArticleDetailsUsecase,
   GetInvoiceDetailsUsecase,
   GetRecentInvoicesUsecase,
-  CreateCreditNoteUsecase,
   GetInvoiceDetailsDTO,
   GetVATNoteUsecase,
   PaymentMethodMap,
@@ -42,7 +41,6 @@ import {
 
 import { Context } from '../../builders';
 import { env } from '../../env';
-import { creditNote } from './creditNote';
 
 import {
   handleForbiddenUsecase,

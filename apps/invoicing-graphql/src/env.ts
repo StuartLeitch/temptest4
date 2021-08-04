@@ -6,10 +6,10 @@ import {
   getOsPath,
   getOsEnv,
   toNumber,
-  toObject,
   toArray,
   toFloat,
   toBool,
+  toObject,
 } from './lib/env';
 
 export const env = {
