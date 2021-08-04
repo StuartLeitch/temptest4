@@ -289,25 +289,6 @@ export class KnexInvoiceRepo
   async getCurrentInvoiceNumber(): Promise<number> {
     const { db, logger } = this;
 
-    // const currentYear = new Date().getFullYear();
-
-    // const getLastInvoiceNumber = await db.raw(
-    //   `SELECT
-    //     COALESCE((
-    //       SELECT
-    //         max("invoiceNumber") AS max FROM (
-    //           SELECT
-    //             max("invoiceNumber") AS "invoiceNumber" FROM invoices
-    //           WHERE
-    //             "dateIssued" BETWEEN ?
-    //             AND ?
-    //           UNION
-    //           SELECT
-    //             "invoiceReferenceNumber" AS "invoiceNumber" FROM configurations) referenceNumbers), 1)
-    //   `,
-    //   [`${currentYear}-01-01`, `${currentYear + 1}-01-01`]
-    // );
-
     const today = new Date();
     const currentYear = today.getFullYear();
     const currentMonth = today.getMonth();
@@ -454,6 +435,15 @@ export class KnexInvoiceRepo
           )
         )
         .whereNull('creditnoteref.value');
+  }
+
+  private filterRevenueRecognitionReadyForErpRegistration(): any {
+    return (query) =>
+      query
+        .whereNot('invoices.deleted', 1)
+        .whereIn('invoices.status', ['FINAL'])
+        .whereNotNull('invoices.cancelledInvoiceReference')
+        .whereNull('revenuerecognitionreversalref.value');
   }
 
   private async getUnrecognizedInvoices(vendor: string) {
@@ -787,5 +777,80 @@ export class KnexInvoiceRepo
     const { CNT } = await countInvoicesSQL;
 
     return Number(CNT);
+  }
+
+  public async getUnrecognizedReversalsNetsuiteErp(): Promise<Either<GuardFailure | RepoError, any[]>> {
+    const { db, logger } = this;
+
+    const erpReferencesQuery = db(TABLES.INVOICES)
+      .column({ invoiceId: 'invoices.cancelledInvoiceReference' })
+      .select();
+
+    const withInvoiceItems = this.withInvoicesItemsDetailsQuery();
+
+    const withRevenueRecognitionReversalErpReference = this.withErpReferenceQuery(
+      'revenuerecognitionreversalref',
+      'invoices.cancelledInvoiceReference',
+      'invoice',
+      'netsuite',
+      'revenueRecognitionReversal'
+    );
+
+    // * SQL for retrieving results needed only for ERP registration
+    const filterRevenueRecognitionReadyForERP = this.filterRevenueRecognitionReadyForErpRegistration();
+
+    const withCreditNoteErpReference = this.withErpReferenceQuery(
+      'creditnoteref',
+      'invoices.id',
+      'invoice',
+      'netsuite',
+      'creditNote'
+    );
+    // * SQL for retrieving already registerd credit notes
+    const filterRegisteredCreditNotesForERP = this.filterRegisteredCreditNotesForErpRegistration();
+
+    const withRevenueRecognitionErpReference = this.withErpReferenceQuery(
+      'revenuerecognitionref',
+      'invoices.cancelledInvoiceReference',
+      'invoice',
+      'netsuite',
+      'revenueRecognition'
+    );
+    // * SQL for retrieving already registerd credit notes
+    const filterRegisteredRevenueRecognitionForERP = this.filterRegisteredRevenueRecognitionForErpRegistration();
+
+    const prepareIdsSQL = filterRegisteredRevenueRecognitionForERP(
+      withRevenueRecognitionErpReference(
+        filterRegisteredCreditNotesForERP(
+          withCreditNoteErpReference(
+            filterRevenueRecognitionReadyForERP(
+              withRevenueRecognitionReversalErpReference(
+                withInvoiceItems(erpReferencesQuery)
+              )
+            )
+          )
+        )
+      )
+    );
+
+    logger.debug('select', {
+      unregisteredRevenueRecognitionReversal: prepareIdsSQL.toString(),
+    });
+
+    const revenueRecognitionReversals: Array<any> = await prepareIdsSQL;
+
+    return right(
+      revenueRecognitionReversals.map((i) => InvoiceId.create(new UniqueEntityID(i.invoiceId)))
+    );
+  }
+
+  private filterRegisteredCreditNotesForErpRegistration(): any {
+    return (query) =>
+      query.whereNotNull('creditnoteref.value');
+  }
+
+  private filterRegisteredRevenueRecognitionForErpRegistration(): any {
+    return (query) =>
+      query.whereNotNull('revenuerecognitionref.value');
   }
 }

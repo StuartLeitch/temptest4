@@ -45,10 +45,10 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         payment,
         coupon,
         waiver,
-        payer,
-        erpReference,
-        catalog,
         publisher,
+        erpReference,
+        payer,
+        catalog
       },
       services: { logger: loggerService, schedulingService, qq: queue, erp },
     } = context;
