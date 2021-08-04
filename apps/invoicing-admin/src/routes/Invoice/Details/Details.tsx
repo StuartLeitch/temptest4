@@ -49,7 +49,7 @@ const Details: React.FC = (props) => {
       },
     }
   );
-
+  
   if (loading) return <Loading />;
 
   if (error || typeof data === undefined)
@@ -57,8 +57,7 @@ const Details: React.FC = (props) => {
 
   const { invoice, getPaymentMethods } = data;
   const { status, id: invoiceId, transaction } = invoice;
-
-  // console.info(invoice);
+  
 
   // * -> Net and total charges computing
   const { vat, coupons, waivers, price } = invoice?.invoiceItem;
@@ -241,6 +240,7 @@ const Details: React.FC = (props) => {
                   <InvoiceDetailsTab
                     invoiceId={invoiceId}
                     invoice={invoice}
+                    creditNote={invoice.creditNote}
                     netCharges={netCharges}
                     vatAmount={vatAmount}
                     totalCharges={totalCharges}
@@ -262,7 +262,7 @@ const Details: React.FC = (props) => {
             </UncontrolledTabs>
           </Col>
           <Col lg={4}>
-            <InvoiceTimeline invoice={invoice} />
+            <InvoiceTimeline creditNote={invoice.creditNote} invoice={invoice} />
           </Col>
         </Row>
       </Container>

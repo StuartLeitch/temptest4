@@ -208,4 +208,16 @@ export class KnexArticleRepo
       return join[condition](field);
     };
   }
+
+  public articleInvoiceItemJoinQuery(): any {
+    return (query) =>
+      query
+        .from('articles')
+        .leftJoin(
+          'invoice_items',
+          'invoice_items.manuscriptId',
+          '=',
+          'articles.id'
+        );
+  }
 }

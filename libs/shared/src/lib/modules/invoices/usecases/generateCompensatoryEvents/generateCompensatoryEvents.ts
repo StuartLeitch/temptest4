@@ -30,6 +30,7 @@ import { WaiverRepoContract } from '../../../waivers/repos/waiverRepo';
 import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
+import { CreditNoteRepoContract } from '../../../creditNotes/repos/creditNoteRepo';
 
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 import { GetPayerDetailsByInvoiceIdUsecase } from '../../../payers/usecases/getPayerDetailsByInvoiceId';
@@ -38,6 +39,7 @@ import { GetPaymentMethodsUseCase } from '../../../payments/usecases/getPaymentM
 import { GetAddressUsecase } from '../../../addresses/usecases/getAddress/getAddress';
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
+import { GetCreditNoteByInvoiceIdUsecase } from '../../../creditNotes/usecases/getCreditNoteByInvoiceId/getCreditNoteByInvoiceId';
 
 import {
   PublishInvoiceConfirmedUsecase,
@@ -97,6 +99,7 @@ export class GenerateCompensatoryEventsUsecase
     private manuscriptRepo: ArticleRepoContract,
     private addressRepo: AddressRepoContract,
     private invoiceRepo: InvoiceRepoContract,
+    private creditNoteRepo: CreditNoteRepoContract,
     private paymentRepo: PaymentRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
@@ -121,6 +124,7 @@ export class GenerateCompensatoryEventsUsecase
     this.shouldSendFinalize = this.shouldSendFinalize.bind(this);
     this.attachPaymentDate = this.attachPaymentDate.bind(this);
     this.shouldSendCreated = this.shouldSendCreated.bind(this);
+    this.attachCreditNote = this.attachCreditNote.bind(this);
     this.attachManuscript = this.attachManuscript.bind(this);
     this.sendCreatedEvent = this.sendCreatedEvent.bind(this);
     this.shouldSendPayed = this.shouldSendPayed.bind(this);
@@ -174,6 +178,19 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
+  private attachCreditNote(context: Context) {
+    return async <T extends WithInvoiceId>(request: T) => {
+      const usecase = new GetCreditNoteByInvoiceIdUsecase(this.creditNoteRepo);
+
+      return new AsyncEither(request.invoiceId)
+        .then((invoiceId) => usecase.execute({ invoiceId }, context))
+        .map((creditNote) => ({
+          ...request,
+          creditNote,
+        }))
+        .execute();
+    };
+  }
   private attachInvoiceItems(context: Context) {
     return async <T extends WithInvoiceId>(request: T) => {
       const usecase = new GetItemsForInvoiceUsecase(
@@ -456,7 +473,7 @@ export class GenerateCompensatoryEventsUsecase
       const data: PublishInvoiceCreditedDTO = {
         ...request,
         messageTimestamp: request.invoice.dateIssued,
-        creditNote: request.invoice,
+        creditNote: request.creditNote,
       };
       return publishUsecase.execute(data, context);
     };
@@ -557,6 +574,7 @@ export class GenerateCompensatoryEventsUsecase
         .then(this.attachAddress(context))
         .then(this.attachPayments(context))
         .then(this.attachPaymentMethods(context))
+        .then(this.attachCreditNote(context))
         .map(this.updateInvoiceStatus('DRAFT', 'dateCreated'))
         .then(this.sendCreditedEvent(context))
         .map(() => request)

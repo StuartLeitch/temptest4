@@ -98,8 +98,22 @@ type Invoice @model(id: "invoices") {
   type: String
   payment: Payment
   payments: [Payment]
-  creditNote: Invoice
   transaction: Transaction
+  creditNote: CreditNote
+}
+
+type CreditNote @model(id: "credit_notes") {
+  id: String
+  invoiceId: ID
+  creationReason: String
+  vat: Float
+  price: Float
+  persistentReferenceNumber: ReferenceNumber @filter
+  dateCreated: Date
+  dateIssued: Date
+  dateUpdated: Date
+  erpReference: ErpReference
+  invoice: Invoice
 }
 
 type InvoiceVat {
@@ -185,11 +199,6 @@ type PayPalOrderId {
   id: String!
 }
 
-type CreditNote {
-  id: String!
-  cancelledInvoiceReference: ID!
-}
-
 type PaymentMethod {
   id: String!
   name: String!
@@ -244,6 +253,10 @@ type PaginatedCoupons {
   coupons: [Coupon]
 }
 
+type PaginatedCreditNotes {
+  totalCount: Int
+  creditNotes: [CreditNote]
+}
 type RemindersStatus {
   confirmation: Boolean
   payment: Boolean
@@ -310,6 +323,13 @@ input MigrateAPC {
 }
 
 type Query {
+  getCreditNoteByInvoiceId(invoiceId: ID): CreditNote
+  getCreditNoteById(creditNoteId: ID): CreditNote
+  getRecentCreditNotes(
+    filters: InvoiceFilters
+    pagination: Pagination
+  ): PaginatedCreditNotes
+  getCreditNoteByReferenceNumber(referenceNumber: String): CreditNote
   getPaymentMethods: [PaymentMethod]
   getClientToken: ClientToken
   generateCouponCode: CouponCode

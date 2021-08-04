@@ -6,9 +6,10 @@ import { ClientContext } from 'graphql-hooks';
 import { useAuth } from '../contexts/Auth';
 
 // Invoicing Admin App
+import CreditNotesList from './CreditNotes/List'
 import InvoicesList from './Invoices/List';
 import InvoiceDetails from './Invoice/Details';
-import CreditNoteDetails from './Invoice/Details/CreditNote';
+import CreditNoteDetails from './CreditNote/CreditNote';
 import CouponsList from './Coupons';
 import { CouponDetails, CouponCreate } from './Coupon';
 
@@ -57,6 +58,10 @@ export const RoutedContent = () => {
         <SplitInvoice />
       </PrivateRoute>
       {/* Credit Notes Routes */}
+      <PrivateRoute path='/credit-notes/list' exact>
+      <CreditNotesList />
+      </PrivateRoute>
+
       <PrivateRoute path='/credit-notes/details/:id' exact>
         <CreditNoteDetails />
       </PrivateRoute>

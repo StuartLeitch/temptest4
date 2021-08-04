@@ -142,7 +142,6 @@ export class KnexInvoiceRepo
     });
 
     const invoice = await sql;
-
     if (!invoice) {
       return left(
         RepoError.createEntityNotFoundError('invoice', invoiceId.id.toString())
@@ -265,7 +264,6 @@ export class KnexInvoiceRepo
     const result = await db
       .select(
         'invoices.id AS invoiceId',
-        'invoices.cancelledInvoiceReference AS cancelledInvoiceReference',
         'invoices.status AS invoiceStatus',
         'invoices.dateCreated as invoiceDateCreated',
         'articles.customId as customId',
@@ -286,26 +284,6 @@ export class KnexInvoiceRepo
     }
 
     return flatten(result.map(InvoiceMap.toDomain));
-  }
-
-  async findByCancelledInvoiceReference(
-    invoiceId: InvoiceId
-  ): Promise<Either<GuardFailure | RepoError, Invoice>> {
-    const { db } = this;
-
-    const invoice = await db(TABLES.INVOICES)
-      .select()
-      .where('cancelledInvoiceReference', invoiceId.id.toString())
-      .first();
-
-    if (!invoice) {
-      throw RepoError.createEntityNotFoundError(
-        'creditNote',
-        invoiceId.id.toString()
-      );
-    }
-
-    return InvoiceMap.toDomain(invoice);
   }
 
   async getCurrentInvoiceNumber(): Promise<number> {
@@ -430,7 +408,6 @@ export class KnexInvoiceRepo
       query
         .whereNot('invoices.deleted', 1)
         .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
-        .whereNull('invoices.cancelledInvoiceReference')
         .whereNotNull('erprefs.value')
         .where('erprefs.value', '<>', 'ERP_NOT_FOUND')
         .where('erprefs.value', '<>', 'NON_INVOICEABLE')
@@ -440,17 +417,23 @@ export class KnexInvoiceRepo
         .whereNotIn(
           'invoices.id',
           db.raw(
-            `SELECT invoices."cancelledInvoiceReference" from invoices where invoices."cancelledInvoiceReference" is not NULL`
+            `SELECT invoices."id" FROM invoices LEFT JOIN credit_notes ON invoices."id" = credit_notes."invoiceId" WHERE credit_notes."invoiceId" is NOT NULL`
           )
         );
   }
 
   private filterCreditNotesReadyForErpRegistration(): any {
+    const { db } = this;
     return (query) =>
       query
         .whereNot('invoices.deleted', 1)
         .whereIn('invoices.status', ['FINAL'])
-        .whereNotNull('invoices.cancelledInvoiceReference')
+        .whereIn(
+          'invoices.id',
+          db.raw(
+            `SELECT invoices."id" FROM invoices LEFT JOIN credit_notes ON invoices."id" = credit_notes."invoiceId" WHERE credit_notes."invoiceId" is NOT NULL`
+          )
+        )
         .whereNull('creditnoteref.value');
   }
 
@@ -528,11 +511,17 @@ export class KnexInvoiceRepo
   }
 
   private filterReadyForRegistration(): any {
+    const { db } = this;
     return (query) =>
       query
         .whereNot('invoices.deleted', 1)
         .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
-        .whereNull('invoices.cancelledInvoiceReference')
+        .whereIn(
+          'invoices.id',
+          db.raw(
+            `SELECT invoices."id" FROM invoices LEFT JOIN credit_notes ON invoices."id" = credit_notes."invoiceId" WHERE credit_notes."invoiceId" is NULL`
+          )
+        )
         .whereNull('erprefs.value');
   }
 
@@ -776,7 +765,6 @@ export class KnexInvoiceRepo
 
     const countInvoicesSQL = db(TABLES.INVOICES)
       .count('id as CNT')
-      .whereNull('cancelledInvoiceReference')
       .where('status', criteria.status)
       .where('dateCreated', '>=', criteria.range.from.toString())
       .where('dateCreated', '<=', criteria.range.to.toString())

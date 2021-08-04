@@ -41,9 +41,6 @@ fragment invoiceFragment on Invoice {
       ...articleFragment
     }
   }
-  creditNote {
-    ...creditNoteFragment
-  }
 }
 fragment payerFragment on Payer {
   id
@@ -83,11 +80,5 @@ fragment articleFragment on Article {
   authorSurname
   authorFirstName
   journalTitle
-}
-fragment creditNoteFragment on Invoice {
-  invoiceId
-  dateCreated
-  cancelledInvoiceReference
-  referenceNumber
 }
 `;
