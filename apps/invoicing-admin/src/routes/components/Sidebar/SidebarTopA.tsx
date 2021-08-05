@@ -61,7 +61,8 @@ const SidebarTopA = () => {
               <DropdownItem divider />
               <DropdownItem
                 onClick={(evt) => {
-                  // logout();
+                  evt.preventDefault();
+                  auth.logout();
                 }}
               >
                 <i className='fas fa-sign-out-alt mr-2'></i>
