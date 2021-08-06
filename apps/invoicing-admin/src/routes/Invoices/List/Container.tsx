@@ -15,10 +15,12 @@ import {
   ButtonToolbar,
   UncontrolledTooltip,
 } from './../../../components';
+import Restricted from '../../../contexts/Restricted';
 import { HeaderMain } from '../../components/HeaderMain';
 import { InvoicesLeftNav } from '../../components/Invoices/InvoicesLeftNav';
 import InvoicesList from './List';
 import SuccessfulUrlCopiedToClipboardToast from './components/SuccessfulUrlCopiedToClipboardToast';
+import NotAuthorized from '../../components/NotAuthorized';
 
 const InvoicesContainer: React.FC = () => {
   const defaultFilters = {
@@ -141,41 +143,44 @@ const InvoicesContainer: React.FC = () => {
 
   return (
     <React.Fragment>
-      <Container fluid={true}>
-        <HeaderMain title='Invoices' className='mb-5 mt-4' />
-        <Row>
-          <Col lg={3}>
-            <InvoicesLeftNav filters={filters} setFilter={setFilter} />
-          </Col>
-          <Col lg={9} className='mt-n4 mb-5'>
-            <ButtonToolbar className='d-flex justify-content-end'>
-              <ButtonGroup className='mr-2'>
-                <Button
-                  color='link'
-                  className='text-decoration-none align-self-center pr-0'
-                  id='tooltipFav'
-                  onClick={() => {
-                    const urlToShare = buildURLWithFilters(filters, pagination);
-                    copyToClipboard(urlToShare);
-                    return toast.success(
-                      <SuccessfulUrlCopiedToClipboardToast />
-                    );
-                  }}
-                >
-                  <i className='text-blue fas fa-fw fa-share-square'></i>
-                </Button>
-                <UncontrolledTooltip placement='bottom' target='tooltipFav'>
-                  Share Search Filters
-                </UncontrolledTooltip>
-              </ButtonGroup>
-            </ButtonToolbar>
-            <InvoicesList
-              state={listState}
-              setPage={setFilter}
-            />
-          </Col>
-        </Row>
-      </Container>
+      <Restricted to='list.invoices' fallback={<NotAuthorized />}>
+        <Container fluid={true}>
+          <HeaderMain title='Invoices' className='mb-5 mt-4' />
+          <Row>
+            <Col lg={3}>
+              <InvoicesLeftNav filters={filters} setFilter={setFilter} />
+            </Col>
+            <Col lg={9} className='mt-n4 mb-5'>
+              <ButtonToolbar className='d-flex justify-content-end'>
+                <ButtonGroup className='mr-2'>
+                  <Button
+                    color='link'
+                    className='text-decoration-none align-self-center pr-0'
+                    id='tooltipFav'
+                    onClick={() => {
+                      const urlToShare = buildURLWithFilters(filters, pagination);
+                      copyToClipboard(urlToShare);
+                      return toast.success(
+                        <SuccessfulUrlCopiedToClipboardToast />
+                      );
+                    }}
+                  >
+                    <i className='text-blue fas fa-fw fa-share-square'></i>
+                  </Button>
+                  <UncontrolledTooltip placement='bottom' target='tooltipFav'>
+                    Share Search Filters
+                  </UncontrolledTooltip>
+                </ButtonGroup>
+              </ButtonToolbar>
+              <InvoicesList
+                state={listState}
+                setPage={setFilter}
+              />
+
+            </Col>
+          </Row>
+        </Container>
+      </Restricted>
     </React.Fragment>
   );
 

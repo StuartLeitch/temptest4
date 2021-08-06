@@ -30,7 +30,7 @@ import InvoiceDetailsTab from './components/InvoiceDetailsTab';
 import ArticleDetailsTab from './components/ArticleDetailsTab';
 import PayerDetailsTab from './components/PayerDetailsTab';
 import InvoiceTimeline from './components/InvoiceTimeline';
-import ErpReferencesTab from './components/ErpReferencesTab'
+import ErpReferencesTab from './components/ErpReferencesTab';
 
 import { INVOICE_QUERY } from '../graphql';
 import AddPaymentModal from './components/AddPaymentModal';
@@ -179,15 +179,13 @@ const Details: React.FC = (props) => {
                 {invoice.creditNote === null &&
                   (status === 'ACTIVE' || status === 'FINAL') &&
                   invoice.payments.every((p) => p.status !== 'PENDING') && (
-                    <>
                       <Button
                         id={CREATE_CREDIT_NOTE_MODAL_TARGET}
                         color='danger'
                         className='mr-2'
-                      >
+                        >
                         Create Credit Note
                       </Button>
-                    </>
                   )}
 
                 {status === 'DRAFT' && (
