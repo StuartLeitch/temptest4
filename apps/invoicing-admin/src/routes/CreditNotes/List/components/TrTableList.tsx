@@ -11,7 +11,7 @@ const CREATION_REASON = {
   'withdrawn-manuscript' : 'Withdrawn Manuscript',
   'reduction-applied' : 'Reduction Applied',
   'waived-manuscript' : 'Waived Manuscript',
-  'changed-payer-details' : 'Changed Payer Details',
+  'change-payer-details' : 'Change Payer Details',
   'bad-debt' : 'Bad Debt',
   'other' : 'Other',
 };
