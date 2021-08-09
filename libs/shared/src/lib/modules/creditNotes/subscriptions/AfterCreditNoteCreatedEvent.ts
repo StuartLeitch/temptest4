@@ -29,10 +29,6 @@ import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMeth
 import { left } from '../../../core/logic/Either';
 import { UnexpectedError } from '../../../core/logic/AppError';
 
-const defaultContext: UsecaseAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN],
-};
-
 export class AfterCreditNoteCreatedEvent
   implements HandleContract<CreditNoteCreatedEvent> {
   constructor(
@@ -65,6 +61,9 @@ export class AfterCreditNoteCreatedEvent
   private async onCreditNoteCreatedEvent(
     event: CreditNoteCreatedEvent
   ): Promise<any> {
+    const defaultContext = {
+      roles: [Roles.DOMAIN_EVENT_HANDLER],
+    };
     const getInvoiceDetails = new GetInvoiceDetailsUsecase(this.invoiceRepo);
     try {
       const maybeCreditNote = await this.creditNoteRepo.getCreditNoteById(
