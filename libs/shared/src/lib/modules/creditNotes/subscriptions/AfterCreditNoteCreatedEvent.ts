@@ -9,7 +9,6 @@ import {
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
 
 import { CreditNoteCreated as CreditNoteCreatedEvent } from '../domain/events/CreditNoteCreated';
-
 import { CreditNoteRepoContract } from '../repos/creditNoteRepo';
 import { PaymentMethodRepoContract } from '../../payments/repos/paymentMethodRepo';
 import { ArticleRepoContract } from '../../manuscripts/repos/articleRepo';
@@ -101,18 +100,18 @@ export class AfterCreditNoteCreatedEvent
           this.waiverRepo
         );
 
-        const maybeInvoiceItemResult = await getItemsUsecase.execute({
-          invoiceId: creditNote.invoiceId.id.toString(),
-        });
-
-        if (maybeInvoiceItemResult.isLeft()) {
-          return left(
-            new Error(
-              `CreditNote ${creditNote.id.toString()} has no related invoice items.`
-            )
+        const invoiceItemsResult = await getItemsUsecase.execute(
+          {
+            invoiceId: creditNote.invoiceId.id.toString(),
+          },
+          defaultContext
+        );
+        if (invoiceItemsResult.isLeft()) {
+          throw new Error(
+            `CreditNote ${creditNote.id.toString()} has no invoice items.`
           );
         }
-        invoiceItems = maybeInvoiceItemResult.value;
+        invoiceItems = invoiceItemsResult.value;
       }
 
       // * Get Manuscript details
@@ -149,7 +148,10 @@ export class AfterCreditNoteCreatedEvent
         this.loggerService
       );
 
-      const maybePaymentMethods = await paymentMethodsUsecase.execute();
+      const maybePaymentMethods = await paymentMethodsUsecase.execute(
+        null,
+        defaultContext
+      );
 
       if (maybePaymentMethods.isLeft()) {
         return left(
@@ -191,7 +193,7 @@ export class AfterCreditNoteCreatedEvent
         invoiceItems,
         paymentMethods,
         billingAddress,
-      });
+      }, defaultContext);
 
       if (publishResult.isLeft()) {
         return left(publishResult.value.message);

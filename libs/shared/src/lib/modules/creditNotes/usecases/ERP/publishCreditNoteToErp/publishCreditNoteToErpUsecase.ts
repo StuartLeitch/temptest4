@@ -24,9 +24,11 @@ import { ErpReferenceMap } from './../../../../vendors/mapper/ErpReference';
 import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
 
 import { GetItemsForInvoiceUsecase } from '../../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
-import type { PublishCreditNoteToErpRequestDTO as DTO } from './publishCreditNoteToErpDTO';
-import { PublishCreditNoteToErpResponse as Response } from './publishCreditNoteToErpResponse';
+// import { PublishCreditNoteToErpRequestDTO as DTO } from './publishCreditNoteToErpDTO';
+// import { PublishCreditNoteToErpResponse as Response } from './publishCreditNoteToErpResponse';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
+import { PublishCreditNoteToErpResponse as Response } from './publishCreditNoteToErpResponse';
+import type { PublishCreditNoteToErpRequestDTO as DTO } from './publishCreditNoteToErpDTO';
 
 export class PublishCreditNoteToErpUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
@@ -88,7 +90,7 @@ export class PublishCreditNoteToErpUsecase
           this.waiverRepo
         );
 
-        const response = await getItemsUsecase.execute(
+        const resp = await getItemsUsecase.execute(
           {
             invoiceId: request.creditNoteId,
           },
@@ -97,13 +99,13 @@ export class PublishCreditNoteToErpUsecase
         this.loggerService.debug(
           'PublishCreditNoteToERP getItemsUsecase Response'
         );
-        if (response.isLeft()) {
+        if (resp.isLeft()) {
           throw new Error(
             `The Invoice ${creditNote.invoiceId.id.toString()} has no invoice items`
           );
         }
 
-        invoiceItems = response.value;
+        invoiceItems = resp.value;
         this.loggerService.debug(
           'PublishCreditNoteToERP Invoice Items',
           invoiceItems

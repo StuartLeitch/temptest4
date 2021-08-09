@@ -24,11 +24,10 @@ import { ErpReferenceRepoContract } from '../../../../vendors/repos';
 import { PublishCreditNoteToErpUsecase } from '../publishCreditNoteToErp/publishCreditNoteToErpUsecase';
 
 import { RetryCreditNotesResponse as Response } from './retryCreditNotesResponse';
-import type { RetryCreditNotesDTO as DTO } from './retryCreditNotesDTO';
 
 export class RetryCreditNotesUsecase
-  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  extends AccessControlledUsecase<Record<string, unknown>, Context, AccessControlContext>
+  implements UseCase<Record<string, unknown>, Promise<Response>, Context> {
   private publishCreditNoteToErpUsecase: PublishCreditNoteToErpUsecase;
   constructor(
     private creditNoteRepo: CreditNoteRepoContract,
@@ -55,7 +54,7 @@ export class RetryCreditNotesUsecase
   }
 
   @Authorize('erp:publish')
-  public async execute(request?: DTO, context?: Context): Promise<Response> {
+  public async execute(request?: Record<string, unknown>, context?: Context): Promise<Response> {
     try {
       const maybeUnregisteredErpCreditNotesIds = await this.creditNoteRepo.getUnregisteredErpCreditNotes();
       const registeredCreditNotes: ErpInvoiceResponse[] = [];

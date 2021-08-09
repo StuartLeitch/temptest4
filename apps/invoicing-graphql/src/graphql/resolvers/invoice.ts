@@ -31,7 +31,13 @@ import {
   // Payer
 } from '@hindawi/shared';
 
-import { Resolvers, Invoice, PayerType, InvoiceStatus } from '../schema';
+import {
+  Resolvers,
+  Invoice,
+  CreditNote,
+  PayerType,
+  InvoiceStatus,
+} from '../schema';
 
 import { Context } from '../../builders';
 import { env } from '../../env';
