@@ -175,80 +175,11 @@ const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
     </>
   )
 
-  const creditNotePayments = () => (
-    <>
-      <CardTitle tag='h6' className='mt-5 mb-4'>
-        Credit Note: Payments
-      </CardTitle>
-      {invoice?.payments?.length === 0 && (
-        <span className='medium text-muted'>
-          No payments processed yet.
-        </span>
-      )}
-      {invoice?.payments?.length > 0 &&
-        invoice?.payments?.map((payment) => {
-          const paymentMethod = payment?.paymentMethod?.name;
-          let paymentMethodClassName = '';
-          switch (paymentMethod) {
-            case 'Credit Card':
-              paymentMethodClassName = 'fas fa-credit-card';
-              break;
-            case 'Bank Transfer':
-              paymentMethodClassName = 'fas fa-landmark';
-              break;
-            default:
-              paymentMethodClassName = 'fab fa-paypal';
-          }
-
-        return (
-          <React.Fragment key={payment.id}>
-            <h6 className='my-3'>
-              <i
-                className={`fa-fw text-primary mr-2 ${paymentMethodClassName}`}
-              ></i>
-              {` ${paymentMethod}`}
-              <span className='small ml-1 text-muted'>
-                payment method
-              </span>
-            </h6>
-            <Row tag='dl'>
-              <dt className='col-sm-4'>Payer</dt>
-              <dd className='col-sm-8 text-inverse'>
-                <samp>
-                  {invoice?.payer?.name} (
-                  <a href='#'>{invoice?.payer?.email}</a>)
-                </samp>
-              </dd>
-
-              <dt className='col-sm-4'>Paid Date</dt>
-              <dd className='col-sm-8 text-inverse'>
-                {format(
-                  new Date(payment?.datePaid),
-                  'dd MMMM yyyy'
-                )}
-              </dd>
-              <dt className='col-sm-4'>Amount</dt>
-              <dd className='col-sm-8 text-inverse'>
-                {' '}
-                $ {payment?.amount.toFixed(2)}
-              </dd>
-              <dt className='col-sm-4'>External Reference</dt>
-              <dd className='col-sm-8 text-success'>
-                {payment?.foreignPaymentId}
-              </dd>
-            </Row>
-          </React.Fragment>
-        );
-      })}
-    </>
-  )
-
   return (
     <Card body className='border-top-0'>
       <CardBody>
         {creditNoteDetails()}
         {creditNoteCharges()}
-        {creditNotePayments()}
       </CardBody>
     </Card>
   )
