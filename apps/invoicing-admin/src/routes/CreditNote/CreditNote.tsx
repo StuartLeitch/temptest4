@@ -2,13 +2,9 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from 'graphql-hooks';
 import LoadingOverlay from 'react-loading-overlay';
-import format from 'date-fns/format';
 
 import {
   ButtonToolbar,
-  Card,
-  CardBody,
-  CardTitle,
   Col,
   Container,
   DropdownMenu,
@@ -56,24 +52,11 @@ const Details: React.FC = () => {
   const creditNote = creditNoteData?.getCreditNoteById
   const { invoice } = creditNote
         
-  const { coupons, waivers } = invoice?.invoiceItem;
-  const price = creditNote.price
   let netCharges = creditNote.price;
+  let vat = creditNote.vat
   
-  if (coupons?.length) {
-    netCharges -= coupons.reduce(
-      (acc, coupon) => acc + (coupon.reduction / 100) * price,
-      0
-    );
-  }
-  if (waivers?.length) {
-    netCharges -= waivers.reduce(
-      (acc, waiver) => acc + (waiver.reduction / 100) * price,
-      0
-    );
-  }
-  const vat = (netCharges / 100) * creditNote.vat
-  const total = netCharges + vat;
+  const vatAmount = (netCharges * vat) / 100
+  const total = netCharges + vatAmount;
 
   return (
     <React.Fragment>

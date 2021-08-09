@@ -135,69 +135,6 @@ const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
                 )}
               </td>
             </tr>
-            {invoice?.invoiceItem?.coupons?.length > 0 &&
-              invoice.invoiceItem.coupons.map((coupon) => (
-                <tr>
-                  <td
-                    colSpan={2}
-                    style={{ borderTop: 'none' }}
-                  ></td>
-                  <td
-                    className='align-middle text-right'
-                    style={{ borderTop: 'none' }}
-                  >
-                    <Badge pill color='success'>
-                      coupon
-                    </Badge>
-                  </td>
-                  <td>
-                    <span className='small mt-2'>
-                      {coupon.code}
-                    </span>
-                    <span className='text-muted px-2'>
-                      (&ndash;{coupon.reduction}%)
-                    </span>
-                  </td>
-                  <td className='align-middle text-right text-dark font-weight-bold'>
-                    &ndash;
-                    {numeral(
-                      (invoice.invoiceItem.price *
-                        coupon.reduction) /
-                        100
-                    ).format('$0.00')}
-                  </td>
-                </tr>
-              ))}
-            {invoice?.invoiceItem?.waivers?.length > 0 &&
-              invoice.invoiceItem.waivers.map((waiver) => (
-                <tr>
-                  <td
-                    colSpan={2}
-                    style={{ borderTop: 'none' }}
-                  ></td>
-                  <td
-                    className='align-middle text-right'
-                    style={{ borderTop: 'none' }}
-                  >
-                    <Badge pill color='success'>
-                      waiver
-                    </Badge>
-                  </td>
-                  <td>
-                    <span className='small mt-2'>
-                      {waiver.type_id}
-                    </span>
-                    <span className='text-muted px-2'>
-                      (&ndash;{waiver.reduction}%)
-                    </span>
-                  </td>
-                  <td className='align-middle text-right text-dark font-weight-bold'>
-                    &ndash;$
-                    {(waiver.reduction / 100) *
-                      invoice.invoiceItem.price}
-                  </td>
-                </tr>
-              ))}
             <tr>
               <td colSpan={3} style={{ borderTop: 'none' }}></td>
               <td className='align-middle text-uppercase text-muted font-weight-bold'>
