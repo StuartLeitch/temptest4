@@ -143,9 +143,10 @@ export class KnexCreditNoteRepo
 
     const creditNotes = await prepareIdsSQL;
 
-    if (creditNotes.isLeft()) {
-      return left(creditNotes.value);
+    if (!creditNotes) {
+      return left(RepoError.fromDBError(creditNotes));
     }
+
     return right(
       creditNotes.map((cn) =>
         CreditNoteId.create(new UniqueEntityID(cn.creditNoteId))
