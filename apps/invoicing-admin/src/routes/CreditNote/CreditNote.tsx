@@ -55,8 +55,7 @@ const Details: React.FC = () => {
   let netCharges = creditNote.price;
   let vat = creditNote.vat
   
-  const vatAmount = (netCharges * vat) / 100
-  const total = netCharges + vatAmount;
+  const total = netCharges + vat;
 
   return (
     <React.Fragment>
