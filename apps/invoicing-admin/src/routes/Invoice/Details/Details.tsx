@@ -17,6 +17,7 @@ import {
   UncontrolledButtonDropdown,
   UncontrolledTabs,
 } from '../../../components';
+import Restricted from '../../../contexts/Restricted';
 
 import { HeaderMain } from '../../components/HeaderMain';
 import { InvoiceReminders } from '../../components/Invoice/reminders';
@@ -169,16 +170,19 @@ const Details: React.FC = (props) => {
                 </UncontrolledButtonDropdown>
 
                 {status === 'ACTIVE' && (
-                  <AddPaymentModal
+                  <Restricted to='add.payment'>
+                    <AddPaymentModal
                     invoice={invoice}
                     getPaymentMethods={getPaymentMethods}
                     onSuccessCallback={invoiceQueryRefetch}
-                  />
+                    />
+                  </Restricted>
                 )}
 
                 {invoice.creditNote === null &&
                   (status === 'ACTIVE' || status === 'FINAL') &&
                   invoice.payments.every((p) => p.status !== 'PENDING') && (
+                    <Restricted to='create.credit-note'>
                       <Button
                         id={CREATE_CREDIT_NOTE_MODAL_TARGET}
                         color='danger'
@@ -186,12 +190,15 @@ const Details: React.FC = (props) => {
                         >
                         Create Credit Note
                       </Button>
+                    </Restricted>
                   )}
 
                 {status === 'DRAFT' && (
-                  <Button id={APPLY_COUPON_MODAL_TARGET} color='twitter'>
-                    Apply Coupon
-                  </Button>
+                  <Restricted to='apply.coupon'>
+                    <Button id={APPLY_COUPON_MODAL_TARGET} color='twitter'>
+                      Apply Coupon
+                    </Button>
+                  </Restricted>
                 )}
 
                 {transaction.status === 'ACTIVE' && status === 'DRAFT' && (

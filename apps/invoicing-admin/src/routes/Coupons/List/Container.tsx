@@ -16,6 +16,7 @@ import {
   ButtonToolbar,
   Button,
 } from '../../../components';
+import Restricted from '../../../contexts/Restricted';
 
 import { HeaderMain } from '../../components/HeaderMain';
 import { Loading } from '../../components';
@@ -77,7 +78,7 @@ const CouponsContainer: React.FC = () => {
                 onPageChanged={onPageChange}
                 pageLimit={defaultPaginationSettings.limit}
                 currentPage={page}
-              />
+                />
             </CardFooter>
           </Card>
         </>
@@ -90,15 +91,17 @@ const CouponsContainer: React.FC = () => {
     <React.Fragment>
       <Container fluid={true}>
         <HeaderMain title='Coupons' className='mb-5 mt-4' />
-        <Col lg={12} className='d-flex mb-3'>
-          <ButtonToolbar className='ml-auto'>
-            <Link to={`/coupons/create`}>
-              <Button color='twitter' className='mr-2'>
-                <i className='fas fa-plus mr-2'></i>
-                Create Coupon
-              </Button>
-            </Link>
-          </ButtonToolbar>
+        <Col lg={12} className='d-flex mb-3 mr-0 pr-0'>
+          <Restricted to='create.coupon'>
+            <ButtonToolbar className='ml-auto'>
+              <Link to={`/coupons/create`}>
+                <Button color='twitter' className='mr-2'>
+                  <i className='fas fa-plus mr-2'></i>
+                  Create Coupon
+                </Button>
+              </Link>
+            </ButtonToolbar>
+          </Restricted>
         </Col>
         <Row>
           <Col lg={12} className="mb-5">

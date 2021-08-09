@@ -12,11 +12,31 @@ type PermissionCache = {
 }
 
 const PERMISSIONS = {
-  SUPER_ADMIN: ['list.credit-notes', 'create.coupon'],
-  FINANCIAL_CONTROLLER: ['list.credit-notes', 'list.payments', 'apply.coupon'],
-  FINANCIAL_ADMIN: ['list.credit-notes', 'list.payments', 'apply.coupon', 'create.coupon', 'edit.coupon', 'stop.reminders'],
-  FINANCIAL_SUPPORT: ['apply.coupon'],
-  MARKETING: ['create.coupon', 'apply.coupon', 'edit.coupon'],
+  SUPER_ADMIN: [
+    'list.invoices',
+    'list.credit-notes',
+    'create.credit-note',
+    'create.coupon',
+    'list.coupons',
+    'edit.coupon',
+    'apply.coupon',
+    'add.payment',
+    'stop.reminders'
+  ],
+  FINANCIAL_ADMIN: [
+    'list.invoices',
+    'list.credit-notes',
+    'create.credit-note',
+    'create.coupon',
+    'list.coupons',
+    'apply.coupon',
+    'edit.coupon',
+    'add.payment',
+    'stop.reminders'
+  ],
+  FINANCIAL_CONTROLLER: ['list.credit-notes', 'list.invoices', 'apply.coupon'],
+  MARKETING: ['list.invoices', 'list.credit-notes', 'create.coupon', 'apply.coupon', 'edit.coupon'],
+  FINANCIAL_SUPPORT: ['list.invoices', 'list.credit-notes', 'apply.coupon'],
 }
 
 // This provider is intended to be surrounding the whole application.
@@ -24,6 +44,7 @@ const PERMISSIONS = {
 const PermissionProvider: React.FunctionComponent<{}> = ({children}) => {
     const { data } = useAuth();
 
+    console.info(data);
     // const cache: PermissionCache = {};
 
     // * Creates a method that returns whether the requested permission is available in the list of permissions

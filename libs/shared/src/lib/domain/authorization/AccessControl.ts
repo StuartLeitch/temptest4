@@ -233,4 +233,49 @@ accessControl
   .resource('journal')
   .action('read');
 
+  accessControl
+  .grant(Roles.MARKETING)
+  .resource('coupons')
+  .action('read')
+  .resource('coupon')
+  .action('read')
+  .action('create')
+  .action('apply')
+  .action('generateCode');
+
+  accessControl
+  .grant(Roles.FINANCIAL_ADMIN)
+  .resource('invoices')
+  .action('read')
+  .resource('invoice')
+  .action('read')
+  .action('create')
+  .action('update')
+  .action('delete')
+  .action('restore')
+  .action('readByCustomId')
+  .action('confirm')
+  .action('applyVAT')
+  .resource('coupons')
+  .action('read')
+  .resource('coupon')
+  .action('read')
+  .action('create')
+  .action('apply')
+  .action('generateCode')
+  .resource('manuscript')
+  .action('create')
+  .action('read')
+  .resource('journals')
+  .action('read')
+  .resource('transaction')
+  .action('read')
+  .resource('payments')
+  .action('read')
+  .resource('reminder')
+  .action('toggle')
+  .action('send')
+  .action('read')
+  .action('add');
+
 export { accessControl };
