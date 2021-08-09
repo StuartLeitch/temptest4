@@ -12,6 +12,7 @@ import {
   RemoveEditorsFromJournalUsecase,
   EditorMap,
   JournalEventMap,
+  Roles,
 } from '@hindawi/shared';
 
 import { Context } from '../../builders';
@@ -24,6 +25,8 @@ const JOURNAL_SECTION_EDITOR_REMOVED = 'JournalSectionEditorRemoved';
 function removeEditorEventHandlerFactory(eventName: string) {
   return (context: Context): HandlerFunction<JournalEditorRemoved> => {
     return async (data: JournalEditorRemoved) => {
+      const usecaseContext = { roles: [Roles.QUEUE_EVENT_HANDLER] };
+
       const {
         repos: { catalog: catalogRepo, editor: editorRepo },
         services: { logger },
@@ -51,9 +54,12 @@ function removeEditorEventHandlerFactory(eventName: string) {
         const journalId = data.id;
         const eventEditors = JournalEventMap.extractEditors(data);
 
-        const maybeCurrentEditors = await getEditorsByJournal.execute({
-          journalId,
-        });
+        const maybeCurrentEditors = await getEditorsByJournal.execute(
+          {
+            journalId,
+          },
+          usecaseContext
+        );
 
         if (maybeCurrentEditors.isLeft()) {
           const err = maybeCurrentEditors.value;
@@ -65,10 +71,13 @@ function removeEditorEventHandlerFactory(eventName: string) {
           EditorMap.toPersistence
         );
 
-        const maybeEditorsRemoved = await removeEditorsFromJournal.execute({
-          journalId,
-          allEditors: currentEditors,
-        });
+        const maybeEditorsRemoved = await removeEditorsFromJournal.execute(
+          {
+            journalId,
+            allEditors: currentEditors,
+          },
+          usecaseContext
+        );
 
         const editorsRemovedResponse = maybeEditorsRemoved.value;
 
@@ -77,10 +86,13 @@ function removeEditorEventHandlerFactory(eventName: string) {
           throw editorsRemovedResponse;
         }
 
-        const maybeAddEditorsToJournal = await assignEditorsToJournal.execute({
-          journalId,
-          allEditors: eventEditors,
-        });
+        const maybeAddEditorsToJournal = await assignEditorsToJournal.execute(
+          {
+            journalId,
+            allEditors: eventEditors,
+          },
+          usecaseContext
+        );
 
         const addEditorsToJournalResponse = maybeAddEditorsToJournal.value;
         if (maybeAddEditorsToJournal.isLeft()) {

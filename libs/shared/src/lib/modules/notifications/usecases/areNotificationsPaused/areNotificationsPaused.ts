@@ -7,6 +7,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { NotificationPause } from '../../domain/NotificationPause';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
@@ -18,7 +23,7 @@ import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
 // * Usecase specific
 import { AreNotificationsPausedResponse as Response } from './areNotificationsPausedResponse';
-import { AreNotificationsPausedDTO as DTO } from './areNotificationsPausedDTO';
+import type { AreNotificationsPausedDTO as DTO } from './areNotificationsPausedDTO';
 import * as Errors from './areNotificationsPausedErrors';
 
 type TypeToPauseMap = {
@@ -33,16 +38,20 @@ const notificationTypeToPause: TypeToPauseMap = {
 };
 
 export class AreNotificationsPausedUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
     private loggerService: LoggerContract
   ) {
+    super();
+
     this.fetchNotificationPauses = this.fetchNotificationPauses.bind(this);
     this.validateRequest = this.validateRequest.bind(this);
     this.getPauseStatus = this.getPauseStatus.bind(this);
   }
 
+  @Authorize('reminder:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const execution = await new AsyncEither(request)

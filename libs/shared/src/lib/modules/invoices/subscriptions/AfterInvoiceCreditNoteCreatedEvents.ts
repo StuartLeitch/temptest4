@@ -1,17 +1,14 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
+import { LoggerContract } from '../../../infrastructure/logging/Logger';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 import { NoOpUseCase } from './../../../core/domain/NoOpUseCase';
-
-import {
-  Roles,
-  UsecaseAuthorizationContext,
-} from '../../../domain/authorization';
-import { LoggerContract } from '../../../infrastructure/logging/Logger';
+import { Roles } from '../../../domain/authorization';
 
 import { InvoiceCreditNoteCreated as InvoiceCreditNoteCreatedEvent } from '../domain/events/invoiceCreditNoteCreated';
 
 import { InvoiceId } from './../domain/InvoiceId';
+import { Payer } from '../../payers/domain/Payer';
 
 import { PaymentMethodRepoContract } from '../../payments/repos/paymentMethodRepo';
 import { ArticleRepoContract } from '../../manuscripts/repos/articleRepo';
@@ -23,16 +20,11 @@ import { InvoiceRepoContract } from '../repos/invoiceRepo';
 import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
 
+import { PublishRevenueRecognitionReversalUsecase } from '../usecases/ERP/publishRevenueRecognitionReversal';
 import { PublishInvoiceCreditedUsecase } from '../usecases/publishEvents/publishInvoiceCredited';
-import { PublishRevenueRecognitionReversalUsecase } from '../usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
-import { GetInvoiceDetailsUsecase } from '../../invoices/usecases/getInvoiceDetails';
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
+import { GetInvoiceDetailsUsecase } from '../../invoices/usecases/getInvoiceDetails';
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
-import { Payer } from '../../payers/domain/Payer';
-
-const defaultContext: UsecaseAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN],
-};
 
 export class AfterInvoiceCreditNoteCreatedEvent
   implements HandleContract<InvoiceCreditNoteCreatedEvent> {
@@ -47,7 +39,7 @@ export class AfterInvoiceCreditNoteCreatedEvent
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
     private publishInvoiceCredited: PublishInvoiceCreditedUsecase | NoOpUseCase,
-    private publishRevenueRecognitionReversal: PublishRevenueRecognitionReversalUsecase,
+    // private publishRevenueRecognitionReversal: PublishRevenueRecognitionReversalUsecase,
     private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
@@ -63,6 +55,10 @@ export class AfterInvoiceCreditNoteCreatedEvent
   private async onInvoiceCreditNoteCreatedEvent(
     event: InvoiceCreditNoteCreatedEvent
   ): Promise<any> {
+    const defaultContext = {
+      roles: [Roles.DOMAIN_EVENT_HANDLER],
+    };
+
     const getInvoiceDetails = new GetInvoiceDetailsUsecase(this.invoiceRepo);
     try {
       const maybeCreditNote = await this.invoiceRepo.getInvoiceById(
@@ -83,9 +79,12 @@ export class AfterInvoiceCreditNoteCreatedEvent
           this.waiverRepo
         );
 
-        const invoiceItemsResult = await getItemsUsecase.execute({
-          invoiceId: creditNote.invoiceId.id.toString(),
-        });
+        const invoiceItemsResult = await getItemsUsecase.execute(
+          {
+            invoiceId: creditNote.invoiceId.id.toString(),
+          },
+          defaultContext
+        );
         if (invoiceItemsResult.isLeft()) {
           throw new Error(
             `CreditNote ${creditNote.id.toString()} has no invoice items.`
@@ -139,7 +138,10 @@ export class AfterInvoiceCreditNoteCreatedEvent
         this.loggerService
       );
 
-      const paymentMethods = await paymentMethodsUsecase.execute();
+      const paymentMethods = await paymentMethodsUsecase.execute(
+        null,
+        defaultContext
+      );
 
       if (paymentMethods.isLeft()) {
         throw new Error(
@@ -183,16 +185,19 @@ export class AfterInvoiceCreditNoteCreatedEvent
       }
       const invoice = maybeInvoice.value;
 
-      const publishResult = await this.publishInvoiceCredited.execute({
-        paymentMethods: paymentMethods.value,
-        billingAddress: billingAddress.value,
-        payments: payments.value,
-        invoiceItems,
-        creditNote,
-        manuscript,
-        invoice,
-        payer,
-      });
+      const publishResult = await this.publishInvoiceCredited.execute(
+        {
+          paymentMethods: paymentMethods.value,
+          billingAddress: billingAddress.value,
+          payments: payments.value,
+          invoiceItems,
+          creditNote,
+          manuscript,
+          invoice,
+          payer,
+        },
+        defaultContext
+      );
 
       if (publishResult.isLeft()) {
         throw publishResult.value;
@@ -202,30 +207,30 @@ export class AfterInvoiceCreditNoteCreatedEvent
         `[AfterInvoiceCreditNoteCreated]: Successfully executed onInvoiceCreditNoteCreatedEvent use case InvoiceCreditedEvent`
       );
 
-      const nsRevRecReference = invoice
-        .getErpReferences()
-        .getItems()
-        .filter(
-          (er) =>
-            er.vendor === 'netsuite' && er.attribute === 'revenueRecognition'
-        )
-        .find(Boolean);
+      // const nsRevRecReference = invoice
+      //   .getErpReferences()
+      //   .getItems()
+      //   .filter(
+      //     (er) =>
+      //       er.vendor === 'netsuite' && er.attribute === 'revenueRecognition'
+      //   )
+      //   .find(Boolean);
 
-      if (manuscript.datePublished && nsRevRecReference) {
-        const publishRevenueRecognitionReversal = await this.publishRevenueRecognitionReversal.execute(
-          { invoiceId },
-          defaultContext
-        );
+      // if (manuscript.datePublished && nsRevRecReference) {
+      //   const publishRevenueRecognitionReversal = await this.publishRevenueRecognitionReversal.execute(
+      //     { invoiceId },
+      //     defaultContext
+      //   );
 
-        if (publishRevenueRecognitionReversal.isLeft()) {
-          throw publishRevenueRecognitionReversal.value.message;
-        }
-        this.loggerService.info(
-          `[PublishRevenueRecognitionReversal]: ${JSON.stringify(
-            publishRevenueRecognitionReversal
-          )}`
-        );
-      }
+      //   if (publishRevenueRecognitionReversal.isLeft()) {
+      //     throw publishRevenueRecognitionReversal.value.message;
+      //   }
+      //   this.loggerService.info(
+      //     `[PublishRevenueRecognitionReversal]: ${JSON.stringify(
+      //       publishRevenueRecognitionReversal
+      //     )}`
+      //   );
+      // }
     } catch (err) {
       console.error(err);
       console.log(

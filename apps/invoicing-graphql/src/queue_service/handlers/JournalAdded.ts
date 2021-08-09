@@ -2,6 +2,7 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import { JournalAdded } from '@hindawi/phenom-events';
+import { Roles } from '@hindawi/shared';
 
 import {
   AddCatalogItemToCatalogUseCaseDTO,
@@ -44,7 +45,9 @@ export const JournalAddedHandler: EventHandler<JournalAdded> = {
       };
 
       try {
-        const result = await addJournalUsecase.execute(request);
+        const result = await addJournalUsecase.execute(request, {
+          roles: [Roles.QUEUE_EVENT_HANDLER],
+        });
 
         if (result.isLeft()) {
           logger.error(result.value.message);

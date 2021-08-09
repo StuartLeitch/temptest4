@@ -10,6 +10,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 // * Usecase specific
 import { Invoice } from '../../domain/Invoice';
@@ -29,12 +34,9 @@ import { GetAddressUsecase } from '../../../addresses/usecases/getAddress/getAdd
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
 
-import {
-  GetInvoicePdfResponse as Response,
-  PdfResponse,
-} from './getInvoicePdfResponse';
+import { GetInvoicePdfResponse as Response } from './getInvoicePdfResponse';
 import { GetInvoicePdfErrors as Errors } from './getInvoicePdfErrors';
-import { GetInvoicePdfDTO as DTO } from './getInvoicePdfDTO';
+import type { GetInvoicePdfDTO as DTO } from './getInvoicePdfDTO';
 
 import {
   PdfGeneratorService,
@@ -51,6 +53,7 @@ import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 
 export class GetInvoicePdfUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   authorizationContext: Context;
 
@@ -66,6 +69,8 @@ export class GetInvoicePdfUsecase
     private pdfGenerator: PdfGeneratorService,
     private logger: LoggerContract
   ) {
+    super();
+
     this.getPayloadWithAddress = this.getPayloadWithAddress.bind(this);
     this.getPayloadWithInvoice = this.getPayloadWithInvoice.bind(this);
     this.getPayloadWithArticle = this.getPayloadWithArticle.bind(this);
@@ -76,6 +81,7 @@ export class GetInvoicePdfUsecase
     this.generateThePdf = this.generateThePdf.bind(this);
   }
 
+  @Authorize('invoice:getPDF')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const exchangeRateService = new ExchangeRateService();
     const vatService = new VATService();
@@ -239,9 +245,12 @@ export class GetInvoicePdfUsecase
   private async getPayloadWithAddress(payload: InvoicePayload) {
     const { billingAddressId } = payload.payer;
     const usecase = new GetAddressUsecase(this.addressRepo);
-    const addressEither = await usecase.execute({
-      billingAddressId: billingAddressId.id.toString(),
-    });
+    const addressEither = await usecase.execute(
+      {
+        billingAddressId: billingAddressId.id.toString(),
+      },
+      this.authorizationContext
+    );
 
     return addressEither.map((address) => ({
       ...payload,
@@ -255,7 +264,10 @@ export class GetInvoicePdfUsecase
       this.couponRepo,
       this.waiverRepo
     );
-    const itemsEither = await usecase.execute({ invoiceId });
+    const itemsEither = await usecase.execute(
+      { invoiceId },
+      this.authorizationContext
+    );
     return itemsEither;
   }
 

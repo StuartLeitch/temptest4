@@ -1,19 +1,20 @@
-// import * as path from 'path';
-// import * as express from 'express';
-// import GraphQLHTTP from 'express-graphql';
-
-import {
-  MicroframeworkLoader,
-  MicroframeworkSettings,
-} from 'microframework-w3tec';
 import { ApolloServer } from 'apollo-server-express';
+import Keycloak from 'keycloak-connect';
+import session from 'express-session';
+import {
+  KeycloakSchemaDirectives,
+  KeycloakContext,
+  KeycloakTypeDefs,
+} from 'keycloak-connect-graphql';
+import {
+  MicroframeworkSettings,
+  MicroframeworkLoader,
+} from 'microframework-w3tec';
+
+import { resolvers } from '../graphql/resolvers';
+import { typeDefs } from '../graphql/schema';
 
 import { env } from '../env';
-import { getErrorCode, getErrorMessage } from '../lib/graphql';
-
-// import {Context} from '../context';
-import { typeDefs } from '../graphql/schema';
-import { resolvers } from '../graphql/resolvers';
 
 export const graphqlLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
@@ -22,16 +23,34 @@ export const graphqlLoader: MicroframeworkLoader = (
     const context = settings.getData('context');
     const expressApp = settings.getData('express_app');
 
+    const memoryStore = new session.MemoryStore();
+
+    expressApp.use(
+      session({
+        secret: env.app.sessionSecret,
+        resave: false,
+        saveUninitialized: true,
+        store: memoryStore,
+      })
+    );
+
+    const { keycloak } = configureKeycloak(
+      expressApp,
+      memoryStore,
+      env.graphql.route
+    );
+
     const graphqlServer = new ApolloServer({
-      typeDefs,
+      typeDefs: [KeycloakTypeDefs, typeDefs], // 1. Add the Keycloak Type Defs
+      schemaDirectives: KeycloakSchemaDirectives, // 2. Add the KeycloakSchemaDirectives
       resolvers,
-      context: () => context,
+      context: ({ req }) => {
+        return {
+          ...context,
+          keycloakAuth: new KeycloakContext({ req } as any, keycloak), // 3. add the KeycloakContext to `kAuth`
+        };
+      },
       playground: env.graphql.editor,
-      formatError: (error) => ({
-        code: getErrorCode(error.message),
-        message: getErrorMessage(error.message),
-        path: error.path,
-      }),
     });
 
     // Add graphql layer to the express app
@@ -41,3 +60,20 @@ export const graphqlLoader: MicroframeworkLoader = (
     });
   }
 };
+
+function configureKeycloak(app, memoryStore, graphqlPath) {
+  const keycloakConfig = env.app.keycloakConfig;
+
+  const keycloak = new Keycloak(
+    {
+      store: memoryStore,
+    },
+    keycloakConfig
+  );
+
+  // Protect the main route for all graphql services
+  // Disable unauthenticated access
+  app.use(graphqlPath, keycloak.middleware());
+
+  return { keycloak };
+}

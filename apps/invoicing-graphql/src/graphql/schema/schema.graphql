@@ -336,9 +336,6 @@ type Mutation {
   applyCoupon(invoiceId: ID, couponCode: String): Coupon
   updateCoupon(coupon: CouponInput): Coupon
   createCoupon(coupon: CouponInput): Coupon
-  createInvoice(totalAmount: Float): Invoice
-  deleteInvoice(id: ID!): Boolean
-  setTransactionToActive(customId: ID): Transaction
   creditCardPayment(
     invoiceId: ID!
     payerId: String!
@@ -362,19 +359,6 @@ type Mutation {
   ): CreditNote!
   createPayPalOrder(invoiceId: ID!): PayPalOrderId!
   recordPayPalPayment(invoiceId: ID!, orderId: ID!): ID!
-  migrateEntireInvoice(
-    acceptanceDate: String
-    submissionDate: String!
-    paymentDate: String
-    issueDate: String
-    revenueRecognitionReference: String
-    erpReference: String
-    payer: MigratePayer
-    invoiceId: String!
-    apc: MigrateAPC!
-    token: String!
-    status: String!
-  ): String
   generateCompensatoryEvents(invoiceIds: [String], journalIds: [String]): String
   generateDraftCompensatoryEvents(
     invoiceIds: [String]
@@ -385,5 +369,4 @@ type Mutation {
     state: Boolean!
   ): RemindersStatus
   togglePausePaymentReminders(invoiceId: ID!, state: Boolean!): RemindersStatus
-  generateMissingReminderJobs: String!
 }

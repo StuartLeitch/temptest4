@@ -9,6 +9,12 @@ import {
 import { Manuscript } from '../../modules/manuscripts/domain/Manuscript';
 import { PublisherCustomValues } from '../../modules/publishers/domain/PublisherCustomValues';
 
+export interface ErpTaxDetails {
+  taxDetailsReference: string;
+  taxType: string;
+  taxCode: string;
+}
+
 export interface ErpInvoiceRequest {
   invoice: Invoice;
   originalInvoice?: Invoice;
@@ -24,7 +30,6 @@ export interface ErpInvoiceRequest {
   invoiceTotal?: number;
   exchangeRate?: number;
   customSegmentId?: string;
-  taxRateId?: string;
   itemId?: string;
 }
 

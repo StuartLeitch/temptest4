@@ -1,13 +1,12 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
 import {
   PayPalPaymentApprovedUsecase,
   GenerateClientTokenUsecase,
   GetPaymentMethodsUseCase,
   RecordPaymentUsecase,
   PaymentMethodMap,
+  ExternalOrderId,
   CorrelationID,
+  PaymentTypes,
   Roles,
 } from '@hindawi/shared';
 import {
@@ -15,9 +14,10 @@ import {
   RepoError,
 } from 'libs/shared/src/lib/infrastructure/RepoError';
 
-import { ExternalOrderId } from '../../../../../libs/shared/src/lib/modules/payments/domain/external-order-id';
 import { Context } from '../../builders';
 import { Resolvers } from '../schema';
+
+import { handleForbiddenUsecase, getAuthRoles } from './utils';
 
 export const payments: Resolvers<Context> = {
   Query: {
@@ -32,10 +32,14 @@ export const payments: Resolvers<Context> = {
         loggerService
       );
 
-      const result = await usecase.execute(null, {
+      const usecaseContext = {
+        roles: [Roles.PAYER],
         correlationId,
-        roles: null,
-      });
+      };
+
+      const result = await usecase.execute(null, usecaseContext);
+
+      handleForbiddenUsecase(result);
 
       if (result.isRight()) {
         return result.value.map(PaymentMethodMap.toPersistence);
@@ -49,7 +53,13 @@ export const payments: Resolvers<Context> = {
       } = context;
       const usecase = new GenerateClientTokenUsecase(paymentStrategyFactory);
 
-      const result = await usecase.execute();
+      const usecaseContext = {
+        roles: [Roles.PAYER],
+      };
+
+      const result = await usecase.execute(null, usecaseContext);
+
+      handleForbiddenUsecase(result);
 
       if (result.isRight()) {
         const paymentClientToken = result.value;
@@ -91,7 +101,10 @@ export const payments: Resolvers<Context> = {
         payerRepo,
         logger
       );
-      const usecaseContext = { roles: [Roles.PAYER] };
+      const usecaseContext = {
+        paymentType: PaymentTypes.CREDIT_CARD,
+        roles: [Roles.PAYER],
+      };
 
       const result = await usecase.execute(
         {
@@ -101,6 +114,8 @@ export const payments: Resolvers<Context> = {
         },
         usecaseContext
       );
+
+      handleForbiddenUsecase(result);
 
       if (result.isLeft()) {
         console.error(result.value.message);
@@ -122,7 +137,10 @@ export const payments: Resolvers<Context> = {
 
     async createPayPalOrder(parent, args, context) {
       const { invoiceId } = args;
-      const usecaseContext = { roles: [Roles.PAYER] };
+      const usecaseContext = {
+        paymentType: PaymentTypes.PAYPAL,
+        roles: [Roles.PAYER],
+      };
       const {
         repos: {
           payment: paymentRepo,
@@ -156,6 +174,8 @@ export const payments: Resolvers<Context> = {
         usecaseContext
       );
 
+      handleForbiddenUsecase(result);
+
       if (result.isLeft()) {
         console.log(result.value.message);
         throw new Error(result.value.message);
@@ -188,6 +208,8 @@ export const payments: Resolvers<Context> = {
           usecaseContext
         );
 
+        handleForbiddenUsecase(result);
+
         if (result.isLeft()) {
           throw result.value;
         }
@@ -200,6 +222,7 @@ export const payments: Resolvers<Context> = {
     },
 
     async bankTransferPayment(parent, args, context) {
+      const roles = getAuthRoles(context);
       const {
         repos: {
           invoiceItem: invoiceItemRepo,
@@ -243,7 +266,7 @@ export const payments: Resolvers<Context> = {
         throw new Error('Payment reference already used!');
       }
 
-      const usecaseContext = { roles: [Roles.PAYER] };
+      const usecaseContext = { roles, paymentType: PaymentTypes.BANK_TRANSFER };
       const usecase = new RecordPaymentUsecase(
         paymentStrategyFactory,
         invoiceItemRepo,
@@ -266,6 +289,8 @@ export const payments: Resolvers<Context> = {
         },
         usecaseContext
       );
+
+      handleForbiddenUsecase(result);
 
       if (result.isLeft()) {
         console.log(result.value);

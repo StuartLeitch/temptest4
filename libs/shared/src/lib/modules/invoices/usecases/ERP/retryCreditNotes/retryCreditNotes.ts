@@ -5,6 +5,11 @@ import { UseCase } from '../../../../../core/domain/UseCase';
 import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
 
 import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../../domain/authorization';
 
 import { ErrorUtils } from './../../../../../utils/ErrorUtils';
 
@@ -22,9 +27,10 @@ import { WaiverRepoContract } from '../../../../waivers/repos';
 import { PublishCreditNoteToErpUsecase } from '../publishCreditNoteToErp/publishCreditNoteToErp';
 
 import { RetryCreditNotesResponse as Response } from './retryCreditNotesResponse';
-import { RetryCreditNotesDTO as DTO } from './retryCreditNotesDTO';
+import type { RetryCreditNotesDTO as DTO } from './retryCreditNotesDTO';
 
 export class RetryCreditNotesUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   private publishCreditNoteToErpUsecase: PublishCreditNoteToErpUsecase;
   constructor(
@@ -36,6 +42,8 @@ export class RetryCreditNotesUsecase
     private erpService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {
+    super();
+
     this.publishCreditNoteToErpUsecase = new PublishCreditNoteToErpUsecase(
       this.invoiceRepo,
       this.invoiceItemRepo,
@@ -47,6 +55,7 @@ export class RetryCreditNotesUsecase
     );
   }
 
+  @Authorize('erp:publish')
   public async execute(request?: DTO, context?: Context): Promise<Response> {
     try {
       const maybeUnregisteredErpCreditNotesIds = await this.invoiceRepo.getUnregisteredErpCreditNotes();
@@ -79,7 +88,8 @@ export class RetryCreditNotesUsecase
         const publishedCreditNoteResponse = await this.publishCreditNoteToErpUsecase.execute(
           {
             creditNoteId: unregisteredCreditNote.id.toString(),
-          }
+          },
+          context
         );
         if (publishedCreditNoteResponse.isLeft()) {
           errs.push(publishedCreditNoteResponse.value);

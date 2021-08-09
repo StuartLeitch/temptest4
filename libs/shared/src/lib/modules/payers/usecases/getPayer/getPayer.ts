@@ -20,15 +20,10 @@ import { GetPayerResponse as Response } from './getPayerResponse';
 import type { GetPayerDTO as DTO } from './getPayerDTO';
 
 export class GetPayerUsecase
-  implements
-    UseCase<DTO, Response, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Response, Context> {
   constructor(private payerRepo: PayerRepoContract) {
-    this.payerRepo = payerRepo;
-  }
-
-  private async getAccessControlContext(request, context?) {
-    return {};
+    super();
   }
 
   @Authorize('payer:read')

@@ -1,13 +1,10 @@
-import { NoOpUseCase } from './../../../core/domain/NoOpUseCase';
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
-import { InvoiceCreated } from '../domain/events/invoiceCreated';
-import { InvoiceRepoContract } from '../repos/invoiceRepo';
-import { InvoiceItemRepoContract } from '../repos/invoiceItemRepo';
-import { ArticleRepoContract } from '../../manuscripts/repos';
-import { PublishInvoiceCreatedUsecase } from '../usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
+import { NoOpUseCase } from './../../../core/domain/NoOpUseCase';
+import { Roles } from '../../../domain/authorization';
 
 import { PayloadBuilder } from '../../../infrastructure/message-queues/payloadBuilder';
+import { SchedulerContract } from '../../../infrastructure/scheduler/Scheduler';
 import {
   SisifJobTypes,
   JobBuilder,
@@ -16,7 +13,14 @@ import {
   SchedulingTime,
   TimerBuilder,
 } from '../../../infrastructure/message-queues/contracts/Time';
-import { SchedulerContract } from '../../../infrastructure/scheduler/Scheduler';
+
+import { InvoiceCreated } from '../domain/events/invoiceCreated';
+
+import { InvoiceItemRepoContract } from '../repos/invoiceItemRepo';
+import { ArticleRepoContract } from '../../manuscripts/repos';
+import { InvoiceRepoContract } from '../repos/invoiceRepo';
+
+import { PublishInvoiceCreatedUsecase } from '../usecases/publishEvents/publishInvoiceCreated';
 
 export class AfterInvoiceCreatedEvent
   implements HandleContract<InvoiceCreated> {
@@ -40,6 +44,9 @@ export class AfterInvoiceCreatedEvent
   }
 
   private async onInvoiceCreatedEvent(event: InvoiceCreated): Promise<any> {
+    const defaultContext = {
+      roles: [Roles.DOMAIN_EVENT_HANDLER],
+    };
     // Get invoice from repo
     try {
       const maybeInvoice = await this.invoiceRepo.getInvoiceById(
@@ -83,11 +90,14 @@ export class AfterInvoiceCreatedEvent
 
       const manuscript = maybeManuscript.value;
 
-      const result = await this.publishInvoiceCreated.execute({
-        invoice,
-        invoiceItems,
-        manuscript,
-      });
+      const result = await this.publishInvoiceCreated.execute(
+        {
+          invoice,
+          invoiceItems,
+          manuscript,
+        },
+        defaultContext
+      );
 
       if (result.isLeft()) {
         throw new Error(result.value.message);

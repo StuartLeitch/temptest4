@@ -1,7 +1,8 @@
-import { NoOpUseCase } from './../../../core/domain/NoOpUseCase';
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
+import { NoOpUseCase } from './../../../core/domain/NoOpUseCase';
+import { Roles } from '../../../domain/authorization';
 
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
 
@@ -53,6 +54,8 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
   ): Promise<void> {
     const { invoice } = event;
 
+    const usecaseContext = { roles: [Roles.DOMAIN_EVENT_HANDLER] };
+
     try {
       // TODO move this to usecase
       let invoiceItems = invoice.invoiceItems.currentItems;
@@ -64,9 +67,12 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
           this.waiverRepo
         );
 
-        const resp = await getItemsUsecase.execute({
-          invoiceId: invoice.invoiceId.id.toString(),
-        });
+        const resp = await getItemsUsecase.execute(
+          {
+            invoiceId: invoice.invoiceId.id.toString(),
+          },
+          usecaseContext
+        );
         if (resp.isLeft()) {
           throw new Error(
             `Invoice ${invoice.id.toString()} has no invoice items.`
@@ -122,7 +128,10 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
         this.paymentMethodRepo,
         this.loggerService
       );
-      const paymentMethods = await paymentMethodsUsecase.execute();
+      const paymentMethods = await paymentMethodsUsecase.execute(
+        null,
+        usecaseContext
+      );
 
       if (paymentMethods.isLeft()) {
         throw new Error(
@@ -140,15 +149,18 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
         );
       }
 
-      const publishResult = await this.publishInvoiceFinalized.execute({
-        paymentMethods: paymentMethods.value,
-        billingAddress: billingAddress.value,
-        manuscript: manuscript.value,
-        payments: payments.value,
-        invoiceItems,
-        invoice,
-        payer,
-      });
+      const publishResult = await this.publishInvoiceFinalized.execute(
+        {
+          paymentMethods: paymentMethods.value,
+          billingAddress: billingAddress.value,
+          manuscript: manuscript.value,
+          payments: payments.value,
+          invoiceItems,
+          invoice,
+          payer,
+        },
+        usecaseContext
+      );
 
       if (publishResult.isLeft()) {
         throw publishResult.value;

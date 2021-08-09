@@ -1,7 +1,6 @@
 import { beforeMethod, afterMethod, Metadata } from 'aspect.js';
 
 import {
-  ScheduleRemindersForExistingInvoicesUsecase,
   UpdateTransactionOnAcceptManuscriptUsecase,
   PauseInvoiceConfirmationRemindersUsecase,
   ResumeInvoiceConfirmationReminderUsecase,
@@ -62,7 +61,6 @@ const watchList = [
   GetSentNotificationForInvoiceUsecase,
   AreNotificationsPausedUsecase,
   AddEmptyPauseStateForInvoiceUsecase,
-  ScheduleRemindersForExistingInvoicesUsecase,
   GetPayerDetailsByInvoiceIdUsecase,
   GetPaymentInfoUsecase,
   RecordPaymentUsecase,
@@ -104,7 +102,6 @@ export class LoggerAspect {
       GetSentNotificationForInvoiceUsecase.prototype.execute,
       AreNotificationsPausedUsecase.prototype.execute,
       AddEmptyPauseStateForInvoiceUsecase.prototype.execute,
-      ScheduleRemindersForExistingInvoicesUsecase.prototype.execute,
       GetPayerDetailsByInvoiceIdUsecase.prototype.execute,
       GetPaymentInfoUsecase.prototype.execute,
       RecordPaymentUsecase.prototype.execute,
@@ -147,7 +144,6 @@ export class LoggerAspect {
       GetSentNotificationForInvoiceUsecase.prototype.execute,
       AreNotificationsPausedUsecase.prototype.execute,
       AddEmptyPauseStateForInvoiceUsecase.prototype.execute,
-      ScheduleRemindersForExistingInvoicesUsecase.prototype.execute,
       GetPayerDetailsByInvoiceIdUsecase.prototype.execute,
       GetPaymentInfoUsecase.prototype.execute,
       RecordPaymentUsecase.prototype.execute,

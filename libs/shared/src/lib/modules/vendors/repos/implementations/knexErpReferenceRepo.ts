@@ -76,7 +76,8 @@ export class KnexErpReferenceRepo
 
     const sql = db(TABLES.ERP_REFERENCES)
       .select()
-      .where('entity_id', id.toString());
+      .where('entity_id', id.toString())
+      .first();
 
     logger.debug('select', {
       sql: sql.toString(),
@@ -94,7 +95,7 @@ export class KnexErpReferenceRepo
   async exists(
     erpReference: ErpReference
   ): Promise<Either<GuardFailure | RepoError, boolean>> {
-    return right(false);
+    return left(RepoError.methodNotImplemented('knexErpReferenceRepo.exists'));
   }
 
   async save(
@@ -107,6 +108,7 @@ export class KnexErpReferenceRepo
     } catch (e) {
       return left(RepoError.fromDBError(e));
     }
+
     return this.getErpReferenceById(new UniqueEntityID(erpReference.entity_id));
   }
 }

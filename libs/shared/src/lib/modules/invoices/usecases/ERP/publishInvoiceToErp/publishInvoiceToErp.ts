@@ -4,10 +4,11 @@ import { right, left } from '../../../../../core/logic/Either';
 import { UseCase } from '../../../../../core/domain/UseCase';
 
 // * Authorization Logic
+import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
 import {
-  UsecaseAuthorizationContext,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../../domain/authorization';
 
 import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
@@ -37,21 +38,12 @@ import { InvoiceId } from '../../../domain/InvoiceId';
 import { Invoice } from '../../../domain/Invoice';
 
 import { GetItemsForInvoiceUsecase } from '../../getItemsForInvoice/getItemsForInvoice';
-import { PublishInvoiceToErpResponse } from './publishInvoiceToErpResponse';
-import { PublishInvoiceToErpRequestDTO } from './publishInvoiceToErpDTO';
+import { PublishInvoiceToErpResponse as Response } from './publishInvoiceToErpResponse';
+import type { PublishInvoiceToErpRequestDTO as DTO } from './publishInvoiceToErpDTO';
 
 export class PublishInvoiceToErpUsecase
-  implements
-    UseCase<
-      PublishInvoiceToErpRequestDTO,
-      Promise<PublishInvoiceToErpResponse>,
-      UsecaseAuthorizationContext
-    >,
-    AccessControlledUsecase<
-      PublishInvoiceToErpRequestDTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -66,17 +58,12 @@ export class PublishInvoiceToErpUsecase
     private publisherRepo: PublisherRepoContract,
     private loggerService: LoggerContract,
     private vatService: VATService
-  ) {}
-
-  private async getAccessControlContext(request: any, context?: any) {
-    return {};
+  ) {
+    super();
   }
 
-  // @Authorize('zzz:zzz')
-  public async execute(
-    request: PublishInvoiceToErpRequestDTO,
-    context?: UsecaseAuthorizationContext
-  ): Promise<PublishInvoiceToErpResponse> {
+  @Authorize('erp:publish')
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     this.loggerService.setScope('PublishInvoiceToERP');
     this.loggerService.info('PublishInvoiceToERP Request', request);
 
@@ -100,9 +87,12 @@ export class PublishInvoiceToErpUsecase
         this.waiverRepo
       );
 
-      const resp = await getItemsUsecase.execute({
-        invoiceId: request.invoiceId,
-      });
+      const resp = await getItemsUsecase.execute(
+        {
+          invoiceId: request.invoiceId,
+        },
+        context
+      );
       this.loggerService.info(
         'PublishInvoiceToERP getItemsUsecase response',
         resp
@@ -252,15 +242,6 @@ export class PublishInvoiceToErpUsecase
       }
       this.loggerService.info('PublishInvoiceToERP rate', finalExchangeRate);
 
-      // * Calculate Tax Rate code
-      // * id=20 E-GB = EXOutput_GB, i.e. Sales made outside of UK and EU
-      let taxRateId = '20';
-
-      if (address.country === 'UK' || address.country === 'GB') {
-        // * id=7 S-GB = StandardGB in Sage, i.e. Sales made in UK or in EU where there is no EU VAT registration number
-        taxRateId = '7';
-      }
-
       try {
         await this.invoiceRepo.update(invoice);
         this.loggerService.info('PublishInvoiceToERP full invoice', invoice);
@@ -276,7 +257,6 @@ export class PublishInvoiceToErpUsecase
           exchangeRate: finalExchangeRate,
           customSegmentId: publisherCustomValues.customSegmentId,
           itemId: publisherCustomValues.itemId,
-          taxRateId,
         };
 
         const erpResponse = await this.erpService.registerInvoice(erpData);

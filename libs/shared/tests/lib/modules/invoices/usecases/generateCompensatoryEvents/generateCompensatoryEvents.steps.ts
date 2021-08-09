@@ -73,7 +73,7 @@ Before({ tags: '@ValidateGenerateCompensatoryEvents' }, function () {
   );
 
   context = {
-    roles: [Roles.ADMIN],
+    roles: [Roles.SERVICE],
   };
   loggerService = new MockLogger();
 

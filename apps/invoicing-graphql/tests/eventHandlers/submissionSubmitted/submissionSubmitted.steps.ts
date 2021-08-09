@@ -79,7 +79,7 @@ let context: MockContext = {
 };
 
 const defaultUsecaseContext: UsecaseAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN],
+  roles: [Roles.QUEUE_EVENT_HANDLER],
 };
 
 let submittingManuscript: Manuscript = null;

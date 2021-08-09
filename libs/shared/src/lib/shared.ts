@@ -51,7 +51,6 @@ export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscri
 export * from './modules/transactions/usecases/updateTransactionOnAcceptManuscript/updateTransactionOnAcceptManuscriptDTO';
 export * from './modules/transactions/usecases/getTransactionDetailsByManuscriptCustomId/getTransactionDetailsByManuscriptCustomId';
 export * from './modules/transactions/usecases/getTransactionDetailsByManuscriptCustomId/getTransactionDetailsByManuscriptCustomId.dto';
-export * from './modules/transactions/usecases/setTransactionToActiveByCustomId/setTransactionToActiveByCustomId';
 export * from './modules/transactions/usecases/createTransaction/createTransaction';
 export * from './modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
 export * from './modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransactionDTO';
@@ -82,7 +81,6 @@ export * from './modules/invoices/usecases/confirmInvoice/confirmInvoiceDTO';
 export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdf';
 export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdfDTO';
 export * from './modules/invoices/usecases/getItemsForInvoice/getItemsForInvoice';
-export * from './modules/invoices/usecases/migrateEntireInvoice/';
 export * from './modules/invoices/usecases/generateCompensatoryEvents';
 export * from './modules/invoices/usecases/generateDraftCompensatoryEvents';
 export * from './modules/invoices/usecases/getInvoicesIds';
@@ -92,6 +90,7 @@ export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getI
 export * from './modules/invoices/usecases/createCreditNote/createCreditNote';
 export * from './modules/invoices/usecases/getCreditNoteByInvoiceId/getCreditNoteByInvoiceId';
 export * from './modules/invoices/usecases/ERP/retryRevenueRecognizedNetsuiteErpInvoices/retryRevenueRecognitionNetsuiteErpInvoices';
+export * from './modules/invoices/usecases/ERP/retryRevenueRecognizedReversalsNetsuiteErp/retryRevenueRecognitionReversalsNetsuiteErp';
 
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceConfirmed/publishInvoiceConfirmed';
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
@@ -243,7 +242,6 @@ export * from './modules/notifications/usecases/pauseInvoicePaymentReminders';
 export * from './modules/notifications/usecases/resumeInvoicePaymentReminders';
 export * from './modules/notifications/usecases/getRemindersPauseStateForInvoice';
 export * from './modules/notifications/usecases/addEmptyPauseStateForInvoice';
-export * from './modules/notifications/usecases/scheduleRemindersForExistingInvoices';
 
 // * Export Author Subdomain
 export * from './modules/authors/domain/Author';

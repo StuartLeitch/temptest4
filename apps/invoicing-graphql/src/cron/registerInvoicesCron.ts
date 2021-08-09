@@ -1,5 +1,5 @@
 // import { env } from '../env';
-import { RetryFailedNetsuiteErpInvoicesUsecase } from '@hindawi/shared';
+import { RetryFailedNetsuiteErpInvoicesUsecase, Roles } from '@hindawi/shared';
 
 import { Context } from '../builders';
 
@@ -54,7 +54,10 @@ export class RegisterInvoicesCron {
       vatService
     );
 
-    const maybeResponse = await retryFailedNetsuiteErpInvoicesUsecase.execute();
+    const maybeResponse = await retryFailedNetsuiteErpInvoicesUsecase.execute(
+      null,
+      { roles: [Roles.CHRON_JOB] }
+    );
     if (maybeResponse.isLeft()) {
       loggerService.error(maybeResponse.value.message);
       throw maybeResponse.value;

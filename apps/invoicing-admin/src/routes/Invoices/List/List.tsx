@@ -36,8 +36,10 @@ const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
   };
   
 
+
   useEffect(() => {
     async function fetchData() {
+
       const { filters, pagination } = props.state;
       await fetchInvoices({
         variables: {
