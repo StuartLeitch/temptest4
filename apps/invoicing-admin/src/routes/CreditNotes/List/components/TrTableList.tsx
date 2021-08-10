@@ -26,7 +26,8 @@ const TrTableCreditNotesList = ({creditNotes}) => (
         price,
         vat,
         dateIssued,
-        dateCreated
+        dateCreated,
+        persistentReferenceNumber,
       }) => (
         <tr key={id}>
           <td className='align-middle'>
@@ -47,11 +48,16 @@ const TrTableCreditNotesList = ({creditNotes}) => (
           </td>
 
           <td className='align-middle'>
-            <strong
-              className={price < 0 ? 'text-danger' : 'text-success'}
+            <Link
+              to={`/credit-notes/details/${id}`}
+              className='text-decoration-none'
             >
-              {numeral(price).format('$0.00')}
-            </strong>
+              <span className={ 'text-secondary'}>
+                <strong>
+                    {persistentReferenceNumber}
+                </strong>
+              </span>
+            </Link>
           </td>
 
           <td className='align-middle text-nowrap'>

@@ -68,16 +68,18 @@ export class PublishCreditNoteToErpUsecase
       const maybeInvoice = await this.invoiceRepo.getInvoiceById(
         creditNote.invoiceId
       );
+
       if (maybeInvoice.isLeft()) {
         return left(maybeInvoice.value);
       }
+      invoice = maybeInvoice.value;
       this.loggerService.info(
         'PublishCreditNoteToERP Original Invoice',
         invoice
       );
 
       // *Get Invoice Items
-      let invoiceItems = invoice.invoiceItems.currentItems;
+      let invoiceItems = invoice?.invoiceItems?.currentItems;
       this.loggerService.debug(
         'PublishCreditNoteToERP Invoice Items',
         invoiceItems
@@ -92,7 +94,7 @@ export class PublishCreditNoteToErpUsecase
 
         const resp = await getItemsUsecase.execute(
           {
-            invoiceId: request.creditNoteId,
+            invoiceId: invoice.invoiceId.id.toString(),
           },
           context
         );

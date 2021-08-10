@@ -33,7 +33,6 @@ const Details: React.FC = () => {
       id,
     },
   });
- 
   if (loadingCreditNoteData)
     return (
       <LoadingOverlay
@@ -52,7 +51,7 @@ const Details: React.FC = () => {
   const creditNote = creditNoteData?.getCreditNoteById
   const { invoice } = creditNote
         
-  let netCharges = creditNote.price;
+  let netCharges = invoice?.invoiceItem?.price * -1;
   let vat = creditNote.vat
   
   const total = netCharges + vat;
