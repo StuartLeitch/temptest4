@@ -24,5 +24,12 @@ fragment creditNoteFragment on CreditNote {
   dateCreated
   dateIssued
   dateUpdated
+  invoice {
+  	invoiceItem {
+      article {
+        customId
+      }
+    }
+  }
 }
 `;

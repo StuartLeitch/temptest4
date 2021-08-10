@@ -22,7 +22,7 @@ const TrTableCreditNotesList = ({creditNotes}) => (
       ({
         id,
         creationReason,
-        persistentReferenceNumber,
+        invoice,
         price,
         vat,
         dateIssued,
@@ -40,7 +40,7 @@ const TrTableCreditNotesList = ({creditNotes}) => (
             >
               <span className={ 'text-secondary'}>
                 <strong>
-                    {persistentReferenceNumber}
+                    {invoice?.invoiceItem?.article?.customId}
                 </strong>
               </span>
             </Link>
@@ -54,22 +54,16 @@ const TrTableCreditNotesList = ({creditNotes}) => (
             </strong>
           </td>
 
-          <td className='align-middle'>
-            <Link to={`/credit-notes/details/${id}`}
-              className='text-decoration-none'
+          <td className='align-middle text-nowrap'>
+            {dateCreated && format(new Date(dateIssued), 'dd MMM yyyy')}
+          </td>
+
+         <td className='align-middle'>
+            <strong
+              className={price < 0 ? 'text-danger' : 'text-success'}
             >
-              <span className='text-secondary'>
-              {vat}%
-              </span>
-            </Link>
-          </td>
-
-          <td className='align-middle text-nowrap'>
-            {dateIssued && format(new Date(dateIssued), 'dd MMM yyyy')}
-          </td>
-
-          <td className='align-middle text-nowrap'>
-            {dateCreated && format(new Date(dateCreated), 'dd MMM yyyy')}
+              {numeral(price + vat).format('$0.00')}
+            </strong>
           </td>
 
         </tr>

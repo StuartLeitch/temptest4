@@ -24,7 +24,7 @@ const RecentCreditNotesList: React.FC = () => {
   const [fetchCreditNotes, { loading, error, data }] = useManualQuery(
     CREDIT_NOTES_QUERY
   );
-
+  console.log(data)
   const [page, setPageInUrl] = useQueryState(
     'page',
     defaultPaginationSettings.page
@@ -70,11 +70,10 @@ const RecentCreditNotesList: React.FC = () => {
             <thead>
               <tr>
                 <th className='align-middle bt-0'>Reason</th>
-                <th className='align-middle bt-0'>Reference</th>
+                <th className='align-middle bt-0'>Manuscript Custom ID</th>
                 <th className='align-middle bt-0'>APC</th>
-                <th className='align-middle bt-0'>Vat</th>
-                <th className='align-middle bt-0'>Date Issued</th>
-                <th className='align-middle bt-0'>Date Created</th>
+                <th className='align-middle bt-0'>Issue</th>
+                <th className='align-middle bt-0'>Total</th>
               </tr>
             </thead>
             <tbody>

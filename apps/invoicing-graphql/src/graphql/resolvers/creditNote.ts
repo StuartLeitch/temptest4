@@ -117,6 +117,52 @@ export const creditNote: Resolvers<Context> = {
       return CreditNoteMap.toPersistence(result.value);
     },
   },
+  CreditNote: {
+    async invoice(parent: any, args, context) {
+      const {
+        repos: { invoice: invoiceRepo },
+      } = context;
+
+      const usecaseContext = {
+        roles: [Roles.ADMIN],
+      };
+      const associatedInvoiceUsecase = new GetInvoiceDetailsUsecase(
+        invoiceRepo
+      );
+
+      const request: any = { invoiceId: parent.invoiceId };
+
+      const result = await associatedInvoiceUsecase.execute(
+        request,
+        usecaseContext
+      );
+
+      if (result.isLeft()) {
+        throw new Error(result.value.message);
+      }
+
+      if (result.isLeft()) {
+        throw new Error(result.value.message);
+      }
+
+      const invoiceDetails = result.value;
+
+      return {
+        invoiceId: invoiceDetails.id.toString(),
+        status: invoiceDetails.status,
+        dateCreated: invoiceDetails?.dateCreated?.toISOString(),
+        dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
+        dateMovedToFinal: invoiceDetails?.dateMovedToFinal?.toISOString(),
+        // erpReferences: invoiceDetails
+        //   .getErpReferences()
+        //   .getItems()
+        //   .concat(erpPaymentReferences),
+        cancelledInvoiceReference: invoiceDetails.cancelledInvoiceReference,
+        dateIssued: invoiceDetails?.dateIssued?.toISOString(),
+        referenceNumber: invoiceDetails.persistentReferenceNumber,
+      };
+    },
+  },
   Mutation: {
     async createCreditNote(parent, args, context) {
       const {
