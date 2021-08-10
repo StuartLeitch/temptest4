@@ -24,7 +24,6 @@ const RecentCreditNotesList: React.FC = () => {
   const [fetchCreditNotes, { loading, error, data }] = useManualQuery(
     CREDIT_NOTES_QUERY
   );
-  console.log(data)
   const [page, setPageInUrl] = useQueryState(
     'page',
     defaultPaginationSettings.page
