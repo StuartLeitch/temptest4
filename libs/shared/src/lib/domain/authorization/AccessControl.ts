@@ -34,7 +34,15 @@ function paymentIsBankTransfer(context: AccessControlContext): boolean {
 
 const accessControl = new AccessControlPlus();
 
+// * Deny everything to Roles.PUBLIC
 accessControl.deny(Roles.PUBLIC).resource('*').action('*');
+
+// * Grant full access to Roles.SUPER_ADMIN
+accessControl.grant(Roles.SUPER_ADMIN).resource('*').action('*');
+
+// * Grant full access to Roles.DOMAIN_EVENT_HANDLER
+accessControl.grant(Roles.DOMAIN_EVENT_HANDLER).resource('*').action('*');
+
 accessControl
   .grant(Roles.PAYER)
   .resource('invoice')
@@ -77,6 +85,7 @@ accessControl
   .action('validate')
   .resource('journal')
   .action('read');
+
 accessControl
   .grant(Roles.ADMIN)
   .resource('payment')
@@ -126,7 +135,7 @@ accessControl
   .action('read')
   .resource('journals')
   .action('read');
-accessControl.grant(Roles.SUPER_ADMIN).resource('*').action('*');
+
 accessControl
   .grant(Roles.QUEUE_EVENT_HANDLER)
   .resource('invoice')
@@ -173,7 +182,7 @@ accessControl
   .action('read')
   .resource('VAT')
   .action('validate');
-accessControl.grant(Roles.DOMAIN_EVENT_HANDLER).resource('*').action('*');
+
 accessControl
   .grant(Roles.SERVICE)
   .resource('payments')
@@ -199,6 +208,7 @@ accessControl
   .action('read')
   .resource('paymentMethods')
   .action('read');
+
 accessControl
   .grant(Roles.CHRON_JOB)
   .resource('erp')
@@ -233,17 +243,7 @@ accessControl
   .resource('journal')
   .action('read');
 
-  accessControl
-  .grant(Roles.MARKETING)
-  .resource('coupons')
-  .action('read')
-  .resource('coupon')
-  .action('read')
-  .action('create')
-  .action('apply')
-  .action('generateCode');
-
-  accessControl
+accessControl
   .grant(Roles.FINANCIAL_ADMIN)
   .resource('invoices')
   .action('read')
@@ -260,9 +260,26 @@ accessControl
   .action('read')
   .resource('coupon')
   .action('read')
+  // * Allow coupon creation
   .action('create')
+  // * Allow coupon apply
   .action('apply')
+  // * Allow coupon edit
+  .action('update')
   .action('generateCode')
+  // * Allow payment registration
+  .resource('payment')
+  .action('register')
+  .where(paymentIsBankTransfer)
+  // * Allow credit note creation
+  .resource('creditNote')
+  .action('create')
+  .action('read')
+  // * Allow toggle reminders
+  .resource('reminder')
+  .action('toggle')
+  .action('read')
+  .action('add')
   .resource('manuscript')
   .action('create')
   .action('read')
@@ -277,5 +294,92 @@ accessControl
   .action('send')
   .action('read')
   .action('add');
+
+accessControl
+  .grant(Roles.FINANCIAL_CONTROLLER)
+  .resource('invoices')
+  .action('read')
+  .resource('invoice')
+  .action('read')
+  .resource('coupons')
+  .action('read')
+  .resource('coupon')
+  .action('read')
+  // * Allow coupon apply
+  .action('apply')
+  // * Allow credit note creation
+  .resource('creditNote')
+  .action('create')
+  .action('read')
+  // * Allow payment registration
+  .resource('payment')
+  .action('register')
+  .where(paymentIsBankTransfer)
+  .action('generateCode')
+  .resource('manuscript')
+  .action('read')
+  .resource('journals')
+  .action('read')
+  .resource('transaction')
+  .action('read')
+  .resource('payments')
+  .action('read')
+  .resource('reminder')
+  .action('read');
+
+accessControl
+  .grant(Roles.FINANCIAL_SUPPORT)
+  .resource('invoices')
+  .action('read')
+  .resource('invoice')
+  .action('read')
+  .resource('coupons')
+  .action('read')
+  .resource('coupon')
+  .action('read')
+  // * Allow coupon apply
+  .action('apply')
+  .action('generateCode')
+  .resource('manuscript')
+  .action('read')
+  .resource('transaction')
+  .action('read')
+  .resource('journals')
+  .action('read')
+  .resource('payments')
+  .action('read')
+  .resource('reminder')
+  .action('read');
+
+
+accessControl
+  .grant(Roles.MARKETING)
+  .resource('invoices')
+  .action('read')
+  .resource('invoice')
+  .action('read')
+  .resource('coupons')
+  .action('read')
+  .resource('coupon')
+  .action('read')
+  // * Allow coupon creation
+  .action('create')
+  // * Allow coupon apply
+  .action('apply')
+  // * Allow coupon edit
+  .action('update')
+  .action('generateCode')
+  .resource('manuscript')
+  .action('read')
+  .resource('transaction')
+  .action('read')
+  .resource('journals')
+  .action('read')
+  .action('read')
+  .resource('payments')
+  .action('read')
+  .resource('reminder')
+  .action('read');
+
 
 export { accessControl };

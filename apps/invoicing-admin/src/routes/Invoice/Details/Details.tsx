@@ -125,7 +125,7 @@ const Details: React.FC = (props) => {
   }
 
   return (
-    <React.Fragment>
+    <>
       <Container fluid={true}>
         <Link
           to={`/invoices/list${queryString}`}
@@ -172,9 +172,9 @@ const Details: React.FC = (props) => {
                 {status === 'ACTIVE' && (
                   <Restricted to='add.payment'>
                     <AddPaymentModal
-                    invoice={invoice}
-                    getPaymentMethods={getPaymentMethods}
-                    onSuccessCallback={invoiceQueryRefetch}
+                      invoice={invoice}
+                      getPaymentMethods={getPaymentMethods}
+                      onSuccessCallback={invoiceQueryRefetch}
                     />
                   </Restricted>
                 )}
@@ -190,6 +190,13 @@ const Details: React.FC = (props) => {
                         >
                         Create Credit Note
                       </Button>
+                      <CreateCreditNoteModal
+                        invoiceItem={invoice?.invoiceItem}
+                        invoiceId={invoiceId}
+                        target={CREATE_CREDIT_NOTE_MODAL_TARGET}
+                        total={totalCharges}
+                        onSaveCallback={invoiceQueryRefetch}
+                      />
                     </Restricted>
                   )}
 
@@ -198,6 +205,11 @@ const Details: React.FC = (props) => {
                     <Button id={APPLY_COUPON_MODAL_TARGET} color='twitter'>
                       Apply Coupon
                     </Button>
+                    <ApplyCouponModal
+                      target={APPLY_COUPON_MODAL_TARGET}
+                      invoiceId={invoiceId}
+                      onSuccessCallback={invoiceQueryRefetch}
+                    />
                   </Restricted>
                 )}
 
@@ -274,20 +286,7 @@ const Details: React.FC = (props) => {
           </Col>
         </Row>
       </Container>
-
-      <ApplyCouponModal
-        target={APPLY_COUPON_MODAL_TARGET}
-        invoiceId={invoiceId}
-        onSuccessCallback={invoiceQueryRefetch}
-      />
-      <CreateCreditNoteModal
-        invoiceItem={invoice?.invoiceItem}
-        invoiceId={invoiceId}
-        target={CREATE_CREDIT_NOTE_MODAL_TARGET}
-        total={totalCharges}
-        onSaveCallback={invoiceQueryRefetch}
-      />
-    </React.Fragment>
+    </>
   );
 };
 
