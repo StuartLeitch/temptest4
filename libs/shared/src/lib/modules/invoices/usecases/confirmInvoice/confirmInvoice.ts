@@ -116,8 +116,8 @@ export class ConfirmInvoiceUsecase
 
       const maybePayer = await new AsyncEither(payerInput)
         .then(this.savePayerData(context))
-        .then(this.assignInvoiceNumber(context))
         .then(this.updateInvoiceStatus(context))
+        .then(this.assignInvoiceNumber(context))
         .then(this.applyVatToInvoice(context))
         .map(this.dispatchEvents)
         .map((data) => data.payer)
@@ -156,20 +156,22 @@ export class ConfirmInvoiceUsecase
       const { invoice } = payerData;
 
       try {
-        const lastInvoiceNumber = await this.invoiceRepo.getCurrentInvoiceNumber();
-        invoice.assignInvoiceNumber(lastInvoiceNumber);
-        const maybeUpdated = await this.invoiceRepo.update(invoice);
+        if (invoice.status === InvoiceStatus.ACTIVE) {
+          const lastInvoiceNumber = await this.invoiceRepo.getCurrentInvoiceNumber();
+          invoice.assignInvoiceNumber(lastInvoiceNumber);
+          const maybeUpdated = await this.invoiceRepo.update(invoice);
 
-        if (maybeUpdated.isLeft()) {
-          return left(
-            new Errors.InvoiceNumberAssignationError(
-              invoice.id.toString(),
-              new Error(maybeUpdated.value.message)
-            )
-          );
+          if (maybeUpdated.isLeft()) {
+            return left(
+              new Errors.InvoiceNumberAssignationError(
+                invoice.id.toString(),
+                new Error(maybeUpdated.value.message)
+              )
+            );
+          }
+
+          payerData.invoice = maybeUpdated.value;
         }
-
-        payerData.invoice = maybeUpdated.value;
 
         const aa = await this.getInvoiceItems(
           { invoiceId: invoice.id.toString() },
