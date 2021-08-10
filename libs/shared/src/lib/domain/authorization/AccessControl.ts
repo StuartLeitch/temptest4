@@ -389,4 +389,89 @@ accessControl
   .action('update')
   .action('generateCode');
 
+accessControl
+  .grant(Roles.FINANCIAL_CONTROLLER)
+  .resource('invoices')
+  .action('read')
+  .resource('invoice')
+  .action('read')
+  .resource('coupons')
+  .action('read')
+  .resource('coupon')
+  .action('read')
+  // * Allow coupon apply
+  .action('apply')
+  // * Allow credit note creation
+  .resource('creditNote')
+  .action('create')
+  .action('read')
+  // * Allow payment registration
+  .resource('payment')
+  .action('register')
+  .where(paymentIsBankTransfer)
+  .action('generateCode')
+  .resource('manuscript')
+  .action('read')
+  .resource('journals')
+  .action('read')
+  .resource('transaction')
+  .action('read')
+  .resource('payments')
+  .action('read')
+  .resource('reminder')
+  .action('read');
+
+accessControl
+  .grant(Roles.FINANCIAL_SUPPORT)
+  .resource('invoices')
+  .action('read')
+  .resource('invoice')
+  .action('read')
+  .resource('coupons')
+  .action('read')
+  .resource('coupon')
+  .action('read')
+  // * Allow coupon apply
+  .action('apply')
+  .action('generateCode')
+  .resource('manuscript')
+  .action('read')
+  .resource('transaction')
+  .action('read')
+  .resource('journals')
+  .action('read')
+  .resource('payments')
+  .action('read')
+  .resource('reminder')
+  .action('read');
+
+accessControl
+  .grant(Roles.MARKETING)
+  .resource('invoices')
+  .action('read')
+  .resource('invoice')
+  .action('read')
+  .resource('coupons')
+  .action('read')
+  .resource('coupon')
+  .action('read')
+  // * Allow coupon creation
+  .action('create')
+  // * Allow coupon apply
+  .action('apply')
+  // * Allow coupon edit
+  .action('update')
+  .action('generateCode')
+  .resource('manuscript')
+  .action('read')
+  .resource('transaction')
+  .action('read')
+  .resource('journals')
+  .action('read')
+  .action('read')
+  .resource('payments')
+  .action('read')
+  .resource('reminder')
+  .action('read');
+
 export { accessControl };

@@ -101,14 +101,12 @@ const ViewEditContainer: React.FC = () => {
             <CouponCreateContext.Provider value={couponProviderValue}>
               <CardHeader className='mb-3 d-flex align-items-center'>
                 <h5 className='mb-0'>Details</h5>
-                <Restricted to='edit.coupon'>
-                  <Toolbar
-                    mode={CREATE}
-                    onSave={saveCoupon}
-                    isSaveInProgress={saveInProgress}
-                    onCancel={cancelCreate}
-                  />
-                </Restricted>
+                <Toolbar
+                  mode={CREATE}
+                  onSave={saveCoupon}
+                  isSaveInProgress={saveInProgress}
+                  onCancel={cancelCreate}
+                />
               </CardHeader>
               <CardBody>
                 <CouponCreate />
