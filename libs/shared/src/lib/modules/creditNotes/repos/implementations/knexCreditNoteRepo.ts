@@ -189,13 +189,16 @@ export class KnexCreditNoteRepo
     const { db } = this;
 
     const rawCreditNote = CreditNoteMap.toPersistence(creditNote);
+    console.log(rawCreditNote);
 
+    const ceva = db(TABLES.CREDIT_NOTES).insert(rawCreditNote);
+    console.info(ceva.toString());
+    await ceva;
     try {
       await db(TABLES.CREDIT_NOTES).insert(rawCreditNote);
     } catch (error) {
       return left(RepoError.fromDBError(error));
     }
-
     return this.getCreditNoteById(creditNote.creditNoteId);
   }
 
