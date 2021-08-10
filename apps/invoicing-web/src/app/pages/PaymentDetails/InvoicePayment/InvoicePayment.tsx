@@ -217,6 +217,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
     ];
   }
 
+
   return (
     <Expander
       title="2. Invoice &amp; Payment"

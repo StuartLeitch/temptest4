@@ -54,9 +54,9 @@ class Service implements ServiceContract {
     Either<Errors.UnsuccessfulSale | Errors.UnexpectedError, ExternalOrderId>
   > {
     const a: TransactionRequest = {
+      amount: paymentTotal.toString(),
       paymentMethodNonce,
       merchantAccountId: this.merchantAccountId,
-      amount: paymentTotal.toString(),
       orderId: invoiceReferenceNumber,
       options: {
         submitForSettlement: true,
@@ -65,6 +65,9 @@ class Service implements ServiceContract {
         manuscript: manuscriptCustomId,
       },
     };
+
+    console.info(a);
+    process.exit(0);
 
     let result: ValidatedResponse<Transaction>;
 
