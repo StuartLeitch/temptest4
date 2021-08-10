@@ -5,9 +5,3 @@ export type User = {
   lastName: string;
   permissions: Permission[];
 }
-
-// export type ElementType = {
-//     name: string;
-//     price: number;
-//     currency: 'EUR' | 'USD';
-// }

@@ -50,9 +50,6 @@ const PERMISSIONS = {
 const PermissionProvider: React.FunctionComponent<{}> = ({children}) => {
     const { data } = useAuth();
 
-    console.info(data);
-    // const cache: PermissionCache = {};
-
     // * Creates a method that returns whether the requested permission is available in the list of permissions
     // * passed as parameter
     const isAllowedTo = async (permission: Permission): Promise<boolean> => {
