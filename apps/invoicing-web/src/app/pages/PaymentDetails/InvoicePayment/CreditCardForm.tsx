@@ -37,19 +37,6 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
   constructor(props: any) {
     super(props);
 
-    // this.numberField = React.createRef();
-    this.emailField = React.createRef();
-    this.billingPhoneNumberField = React.createRef();
-    this.billingGivenNameField = React.createRef();
-    this.billingSurnameField = React.createRef();
-    this.billingStreetAddressField = React.createRef();
-    this.billingExtendedAddressField = React.createRef();
-    this.billingLocalityField = React.createRef();
-    this.billingRegionField = React.createRef();
-    this.billingPostalCodeField = React.createRef();
-    this.billingCountryCodeField = React.createRef();
-    // this.braintree = React.createRef();
-
     ["start", "setupComponents", "setupForm", "enablePayNow", "onSubmit"].forEach(
       prop => (this[prop] = this[prop].bind(this)),
     );
@@ -78,33 +65,6 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
        console.log('component error:', err);
     });
   }
-
-  // getClientToken() {
-  //   var xhr = new XMLHttpRequest();
-  //   var self = this;
-
-  //   xhr.onreadystatechange = function() {
-  //     if (xhr.readyState === 4 && xhr.status === 201) {
-  //       self.onFetchClientToken(JSON.parse(xhr.responseText).client_token);
-  //     }
-  //   };
-  //   xhr.open("GET", "https://braintree-sample-merchant.herokuapp.com/client_token", true);
-
-  //   xhr.send();
-  // }
-
-  // onFetchClientToken(clientToken) {
-
-  //   var self = this;
-  //   return this.setupComponents(clientToken).then(function(instances) {
-  //     self.hf = instances[0];
-  //     self.threeDS = instances[1];
-
-  //     self.setupForm();
-  //   }).catch(function (err) {
-  //      console.log('component error:', err);
-  //   });
-  // }
 
   setupComponents (clientToken) {
     const braintree = (window as any).braintree;
@@ -206,13 +166,6 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
     }
   }
 
-  // onAuthorizationSuccess() {
-  //   this.setState({ isBraintreeReady: true });
-  //   // (this.numberField.current as any).focus();
-  //   // const { client } = this.braintree.current.api;
-  //   // console.info(this.braintree.current.three3DSecure);
-  // }
-
   onSubmit() {
     var self = this;
 
@@ -227,24 +180,21 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
       })
     }).then(function (token) {
       if (!token.liabilityShifted) {
-        // console.log('Liability did not shift', token);
         self.onError(token);
         return;
       }
 
-      // console.log('Liability did shift', token);
-
       self.setState(
         state => ({ ...state, token, error: null }),
         () => {
-          // send nonce and verification data to your server
-          // const ccPayload = {
-          //   paymentMethodNonce: token.nonce,
-          //   paymentMethodId: this.props.paymentMethodId,
-          //   payerId: this.props.payerId,
-          //   amount: this.props.total,
-          // };
-          // this.props.handleSubmit(ccPayload);
+          // * send nonce and verification data to our server
+          const ccPayload = {
+            paymentMethodNonce: token.nonce,
+            paymentMethodId: this.props.paymentMethodId,
+            payerId: this.props.payerId,
+            amount: this.props.total,
+          };
+          self.props.handleSubmit(ccPayload);
         },
       );
     }).catch(function (err) {
