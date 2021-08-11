@@ -51,7 +51,7 @@ const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
               <DatePicker
               disabled
                 customInput={<ButtonInput />}
-                selected={formatDate(new Date(creditNote.dateIssued))}
+                selected={new Date(Date.parse(formatDate(new Date(creditNote?.dateIssued))))}
               />
             </Col>
           </FormGroup>

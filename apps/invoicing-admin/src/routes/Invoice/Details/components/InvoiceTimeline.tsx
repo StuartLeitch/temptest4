@@ -85,7 +85,7 @@ const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ({ creditNote, invoice }
           badgeTitle='Credit Note'
           badgeColor='warning'
           date={formatDate(
-            new Date(creditNote?.dateIssued)
+            new Date(creditNote?.dateCreated)
           )}
           phrase={`
           Credit Note issued.

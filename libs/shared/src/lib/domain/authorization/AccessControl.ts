@@ -212,6 +212,8 @@ accessControl
   .action('add')
   .resource('invoice')
   .action('read')
+  .resource('creditNote')
+  .action('read')
   .resource('payment')
   .action('read')
   .resource('payer')
