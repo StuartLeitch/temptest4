@@ -191,9 +191,6 @@ export class KnexCreditNoteRepo
     const rawCreditNote = CreditNoteMap.toPersistence(creditNote);
     console.log(rawCreditNote);
 
-    const ceva = db(TABLES.CREDIT_NOTES).insert(rawCreditNote);
-    console.info(ceva.toString());
-    await ceva;
     try {
       await db(TABLES.CREDIT_NOTES).insert(rawCreditNote);
     } catch (error) {
