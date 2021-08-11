@@ -66,9 +66,6 @@ class Service implements ServiceContract {
       },
     };
 
-    console.info(a);
-    process.exit(0);
-
     let result: ValidatedResponse<Transaction>;
 
     try {

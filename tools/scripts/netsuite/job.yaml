@@ -9,14 +9,14 @@ spec:
     metadata:       
       name: kubejob       
       labels:         
-        jobgroup: netsuite     
+        jobgroup: netsuite
     spec:       
       containers:       
       - name: netsuite-terminator          
-        image: 916437579680.dkr.ecr.eu-west-1.amazonaws.com/belzebuth-playground:netsuite-pacifier-0.4.0         
+        image: 916437579680.dkr.ecr.eu-west-1.amazonaws.com/belzebuth-playground:netsuite-pacifier-0.7.0         
         env:
         - name: RECORD_TYPE
-          value: "customerpayment"
+          value: "creditmemo"
         - name: BATCH_SIZE
           value: "200"
         - name: DELAY
@@ -26,11 +26,11 @@ spec:
         - name: NETSUITE_REST_ENDPOINT
           value: "https://6416429-sb1.suitetalk.api.netsuite.com/services/rest"
         - name: NETSUITE_CONSUMER_KEY
-          value: "<placeholder>"
+          value: "fac6452381dc3265072a171cd166344b351ee68207ff136b62186310be3ff5b5"
         - name: NETSUITE_CONSUMER_SECRET
-          value: "<placeholder>"
+          value: "3e025fd25e68ff24e281654ca0cbf1be898ed6ee4d84181bcd896491206101d1"
         - name: NETSUITE_TOKEN_ID
-          value: "<placeholder>"
+          value: "9d83f6146d803d251b9b64d1df8f878161a2e2b2b82de0439aae6d06bc409abf"
         - name: NETSUITE_TOKEN_SECRET
-          value: "<placeholder>"
+          value: "d74447a1b4276d7f17837c40fc516af612dd11f7b7d0f33afb9f49713ba68d6a"
       restartPolicy: OnFailure
