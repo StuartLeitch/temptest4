@@ -50,8 +50,21 @@ const Details: React.FC = () => {
  
   const creditNote = creditNoteData?.getCreditNoteById
   const { invoice } = creditNote
-        
+  const { coupons, waivers } = invoice?.invoiceItem;
   let netCharges = invoice?.invoiceItem?.price * -1;
+
+  if (coupons?.length) {
+    netCharges -= coupons.reduce(
+      (acc, coupon) => acc + (coupon.reduction / 100) * invoice?.invoiceItem?.price,
+      0
+    );
+  }
+  if (waivers?.length) {
+    netCharges -= waivers.reduce(
+      (acc, waiver) => acc + (waiver.reduction / 100) * invoice?.invoiceItem?.price,
+      0
+    );
+  }
   let vat = creditNote.vat
   
   const total = netCharges + vat;
