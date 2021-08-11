@@ -155,7 +155,6 @@ export class PublishCreditNoteToErpUsecase
           creditNote,
           invoice,
         };
-
         const invoiceErpReference = invoice
           .getErpReferences()
           .getItems()
@@ -191,7 +190,6 @@ export class PublishCreditNoteToErpUsecase
             )
           );
         }
-
         const erpResponse = await this.erpService.registerCreditNote(erpData);
         this.loggerService.info(
           `Updating credit note ${creditNote.id.toString()}: creditNoteReference -> ${JSON.stringify(
