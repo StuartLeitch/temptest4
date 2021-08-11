@@ -18,19 +18,8 @@ interface Props {
 }
 
 class CreditCardForm extends React.PureComponent<Props, {}> {
-  // numberField: React.RefObject<unknown>;
-  // emailField: React.RefObject<unknown>;
   braintree: React.RefObject<unknown>;
   emailField: React.RefObject<unknown>;
-  billingPhoneNumberField: React.RefObject<unknown>;
-  billingGivenNameField: React.RefObject<unknown>;
-  billingSurnameField: React.RefObject<unknown>;
-  billingStreetAddressField: React.RefObject<unknown>;
-  billingExtendedAddressField: React.RefObject<unknown>;
-  billingLocalityField: React.RefObject<unknown>;
-  billingRegionField: React.RefObject<unknown>;
-  billingPostalCodeField: React.RefObject<unknown>;
-  billingCountryCodeField: React.RefObject<unknown>;
   hf: any;
   threeDS: any;
 
