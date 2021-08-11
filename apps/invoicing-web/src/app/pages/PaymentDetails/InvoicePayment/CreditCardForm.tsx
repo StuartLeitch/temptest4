@@ -112,13 +112,24 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
       (braintree as any).hostedFields.create({
         authorization: clientToken,
         styles: {
+          '::placeholder': {
+            'color': 'rgb(181, 181, 181)',
+            'opacity': '1' /* Firefox */
+          },
           input: {
             'font-size': '14px',
             'font-family': 'monospace',
             'letter-spacing': "2px",
             'word-spacing': "4px",
             'width': "100%",
-            'color': "rgb(161, 161, 161)",
+            'color': "rgb(91, 91, 91)",
+          },
+          '.number': {
+            'font-family': 'monospace',
+            'color': "rgb(91, 91, 91)",
+          },
+          '.valid': {
+            'color': 'green'
           }
         },
         fields: {
@@ -156,38 +167,6 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
     this.setState({ error });
   }
 
-  // getToken() {
-  //   (this as any)
-  //   .tokenize()
-  //   .then((token: any) => {
-  //       this.setState(
-  //         state => ({ ...state, token, error: null }),
-  //         () => {
-  //           const ccPayload = {
-  //             paymentMethodNonce: token.nonce,
-  //             paymentMethodId: this.props.paymentMethodId,
-  //             payerId: this.props.payerId,
-  //             amount: this.props.total,
-  //           };
-  //           this.props.handleSubmit(ccPayload);
-  //         },
-  //       );
-  //     })
-  //     .catch(error => this.setState({ token: null, error }));
-  // }
-
-  // renderResult(title: string, obj: any) {
-  //   if (!obj) {
-  //     return null;
-  //   }
-  //   return (
-  //     <div>
-  //       <b>{title}:</b>
-  //       <pre>{JSON.stringify(obj, null, 4)}</pre>
-  //     </div>
-  //   );
-  // }
-
   renderError(title: string, obj: any) {
 
     if (!obj && !this.props.serverError) {
@@ -216,7 +195,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
           if (invalidFieldKey === 'cvv') {
             txt = '\u2022 Please enter a valid CVV'
           }
-          acc.push(<Text type="warning">{txt}</Text>)
+          acc.push(<Text type="warning" key={`${invalidFieldKey}`}>{txt}</Text>)
           return acc;
         }, []);
 
