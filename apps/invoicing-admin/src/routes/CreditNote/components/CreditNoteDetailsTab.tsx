@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import { Invoice, CreditNote } from '../../Invoice/Details/types';
 import { ButtonInput } from '../../Forms/DatePicker/components/ButtonInput'
+import { formatDate } from '../../../utils/date;
 import {
   Badge,
   Card,
@@ -50,7 +51,7 @@ const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
               <DatePicker
               disabled
                 customInput={<ButtonInput />}
-                selected={new Date(creditNote.dateIssued)}
+                selected={formatDate(new Date(creditNote.dateIssued))}
               />
             </Col>
           </FormGroup>

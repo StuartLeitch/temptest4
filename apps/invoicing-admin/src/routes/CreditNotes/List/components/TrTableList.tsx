@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { Link } from 'react-router-dom';
 import numeral from 'numeral';
 
-import { formatDate } from 'apps/invoicing-admin/src/utils/date';
+import { formatDate } from '../../../../utils/date';
 
 /*eslint-disable */
 const CREATION_REASON = {
