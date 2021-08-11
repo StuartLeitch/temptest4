@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import { Invoice, CreditNote } from '../../Invoice/Details/types';
 import { ButtonInput } from '../../Forms/DatePicker/components/ButtonInput'
-import { formatDate } from '../../../utils/date;
+import { formatDate } from '../../../utils/date';
 import {
   Badge,
   Card,
