@@ -69,7 +69,7 @@ const RecentCreditNotesList: React.FC = () => {
             <thead>
               <tr>
                 <th className='align-middle bt-0'>Reason</th>
-                <th className='align-middle bt-0'>MS Custom Id</th>
+                <th className='align-middle bt-0'>Manuscript Custom Id</th>
                 <th className='align-middle bt-0'>Reference Number</th>
                 <th className='align-middle bt-0'>Issue Date</th>
                 <th className='align-middle bt-0'>Total</th>

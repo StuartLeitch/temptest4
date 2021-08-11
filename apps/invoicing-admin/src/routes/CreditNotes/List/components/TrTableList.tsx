@@ -1,10 +1,9 @@
 import React from 'react';
 import _ from 'lodash';
 import { Link } from 'react-router-dom';
-import format from 'date-fns/format';
 import numeral from 'numeral';
 
-import { Badge } from '../../../../components';
+import { formatDate } from 'apps/invoicing-admin/src/utils/date';
 
 /*eslint-disable */
 const CREATION_REASON = {
@@ -26,7 +25,6 @@ const TrTableCreditNotesList = ({creditNotes}) => (
         price,
         vat,
         dateIssued,
-        dateCreated,
         persistentReferenceNumber,
       }) => (
         <tr key={id}>
@@ -61,7 +59,7 @@ const TrTableCreditNotesList = ({creditNotes}) => (
           </td>
 
           <td className='align-middle text-nowrap'>
-            {dateCreated && format(new Date(dateIssued), 'dd MMM yyyy')}
+            {dateIssued && formatDate(new Date(dateIssued))}
           </td>
 
          <td className='align-middle'>
