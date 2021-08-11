@@ -60,6 +60,7 @@ const Details: React.FC = (props) => {
   
 
   // * -> Net and total charges computing
+
   const { vat, coupons, waivers, price } = invoice?.invoiceItem;
   const reductions = [...coupons, ...waivers];
   let totalDiscountFromReductions = reductions.reduce(

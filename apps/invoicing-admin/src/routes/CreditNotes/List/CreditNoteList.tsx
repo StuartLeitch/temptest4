@@ -11,7 +11,7 @@ import {
   Table,
 } from '../../../components';
 
-import { TrTableCreditNotesList } from './components/TrTableList';
+import { TrTableCreditNotesList }  from './components/TrTableList';
 import { Loading } from '../../components';
 import { HeaderMain } from '../../components/HeaderMain';
 

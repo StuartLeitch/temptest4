@@ -50,17 +50,16 @@ const Details: React.FC = () => {
  
   const creditNote = creditNoteData?.getCreditNoteById
   const { invoice } = creditNote
-  const { coupons, waivers } = invoice?.invoiceItem;
+  const { coupons, waivers, vat, price } = invoice?.invoiceItem;
   const reductions = [...coupons, ...waivers];
-  const price = invoice?.invoiceItem?.price;
-  let vat = creditNote.vat
-
+  
   let totalDiscountFromReductions = reductions.reduce((acc, curr) => acc + curr.reduction, 0);
   totalDiscountFromReductions = totalDiscountFromReductions > 100 ? 100 : totalDiscountFromReductions;
 
-  let netCharges = (price - (price * totalDiscountFromReductions) / 100) * -1
-  
-  const total = netCharges + vat;
+  const netCharges = (price - (price * totalDiscountFromReductions) / 100) * -1
+  const vatAmount = (netCharges * vat) / 100;
+
+  const total = netCharges + vatAmount;
 
   return (
     <React.Fragment>
@@ -124,7 +123,7 @@ const Details: React.FC = () => {
                     invoice={invoice}
                     creditNote={creditNote}
                     netCharges={netCharges}
-                    vat={vat}
+                    vat={vatAmount}
                     total={total}
                   />
                 </TabPane>

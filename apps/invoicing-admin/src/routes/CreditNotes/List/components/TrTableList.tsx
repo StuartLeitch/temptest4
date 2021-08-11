@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import numeral from 'numeral';
 
 import { formatDate } from '../../../../utils/date';
+import { totalAmount } from '../../../../utils/totalAmount'
 
 /*eslint-disable */
 const CREATION_REASON = {
@@ -66,7 +67,7 @@ const TrTableCreditNotesList = ({creditNotes}) => (
             <strong
               className={price < 0 ? 'text-danger' : 'text-success'}
             >
-              {numeral(price + vat).format('$0.00')}
+              {numeral(totalAmount(invoice)).format('$0.00')}
             </strong>
           </td>
 

@@ -68,7 +68,6 @@ export class PublishCreditNoteToErpUsecase
       const maybeInvoice = await this.invoiceRepo.getInvoiceById(
         creditNote.invoiceId
       );
-
       if (maybeInvoice.isLeft()) {
         return left(maybeInvoice.value);
       }

@@ -25,9 +25,19 @@ fragment creditNoteFragment on CreditNote {
   dateIssued
   dateUpdated
   invoice {
-  	invoiceItem {
+    invoiceItem {
+      id
+      type
+      vat
+      price
+      coupons {
+       reduction
+      }
+      waivers {
+       reduction
+      }
       article {
-        customId
+       customId
       }
     }
   }
