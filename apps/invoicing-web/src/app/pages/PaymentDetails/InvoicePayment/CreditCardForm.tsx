@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import PaymentIcon from "./PaymentIcon";
 import { Flex, Label, Button, Text, th } from "@hindawi/react-components";
+import { O_NONBLOCK } from "constants";
 // import { Braintree, HostedField } from "react-braintree-fields";
 
 interface Props {
@@ -147,13 +148,13 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
   }
 
   enablePayNow() {
-    console.info('enable Pay Now');
+    // console.info('enable Pay Now');
     this.setState({ isBraintreeReady: true });
   }
 
-  // onError(error: any) {
-  //   this.setState({ error });
-  // }
+  onError(error: any) {
+    this.setState({ error });
+  }
 
   // getToken() {
   //   (this as any)
@@ -187,49 +188,44 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
   //   );
   // }
 
-  // renderError(title: string, obj: any) {
-  //   if (!obj && !this.props.serverError) {
-  //     return null;
-  //   }
+  renderError(title: string, obj: any) {
 
-  //   if (obj && obj.code && obj.code === 'HOSTED_FIELDS_FIELDS_EMPTY') {
-  //     return (
-  //       <Text type="warning">{'All fields are empty'}</Text>
-  //       );
-  //   } else if (obj && obj.code && obj.code === 'HOSTED_FIELDS_FIELDS_INVALID') {
-  //     const map = []
-  //     if (obj.details && 'invalidFields' in obj.details) {
-  //       const invalids = Object.values(obj.details.invalidFieldKeys).reduce((acc: any[], invalidFieldKey) => {
-  //         let txt = '';
-  //         if (invalidFieldKey === 'number') {
-  //           txt = '\u2022 Please enter a valid credit card number'
-  //         }
-  //         if (invalidFieldKey === 'expirationDate') {
-  //           txt = '\u2022 Please enter a valid expiration date'
-  //         }
-  //         if (invalidFieldKey === 'cvv') {
-  //           txt = '\u2022 Please enter a valid CVV'
-  //         }
-  //         acc.push(<Text type="warning">{txt}</Text>)
-  //         return acc;
-  //       }, []);
+    if (!obj && !this.props.serverError) {
+      return null;
+    }
 
-  //       return ([
-  //         <Text key={'msg'} type="warning">{'Some payment input fields are invalid: '}</Text>
-  //       ] as any).concat(invalids)
-  //     }
-  //   } else if (this.props.serverError && !obj && !obj) {
-  //     let errorText = this.props.serverError;
-  //     // Eliminate duplicated text, as this is how it's being returned from Braintree
-  //     if (this.props.serverError.indexOf('Postal code can only contain letters, numbers, spaces, and hyphens') > -1) {
-  //       errorText = 'Postal code can only contain letters, numbers, spaces and hyphens.';
-  //     }
+    if (obj && ('liabilityShifted' in obj) && obj.liabilityShifted === false) {
+      return (<Text type="warning" key='3dsecure_error'>{'3D Secure authentication failed.'}</Text>)
+    }
 
-  //     return (
-  //       <Text type="warning">{errorText}</Text>
-  //     );
-  //   }
-  // }
+    if (obj && obj.code && obj.code === 'HOSTED_FIELDS_FIELDS_EMPTY') {
+       return (
+         <Text type="warning" key='all_fields_empty'>{'All fields are empty'}</Text>
+      );
+    } else if (obj && obj.code && obj.code === 'HOSTED_FIELDS_FIELDS_INVALID') {
+      const map = []
+      if (obj.details && 'invalidFields' in obj.details) {
+        const invalids = Object.values(obj.details.invalidFieldKeys).reduce((acc: any[], invalidFieldKey) => {
+          let txt = '';
+          if (invalidFieldKey === 'number') {
+            txt = '\u2022 Please enter a valid credit card number'
+          }
+          if (invalidFieldKey === 'expirationDate') {
+            txt = '\u2022 Please enter a valid expiration date'
+          }
+          if (invalidFieldKey === 'cvv') {
+            txt = '\u2022 Please enter a valid CVV'
+          }
+          acc.push(<Text type="warning">{txt}</Text>)
+          return acc;
+        }, []);
+
+        return ([
+          <Text key={'msg'} type="warning">{'Some payment input fields are invalid: '}</Text>
+        ] as any).concat(invalids)
+      }
+    }
+  }
 
   // onAuthorizationSuccess() {
   //   this.setState({ isBraintreeReady: true });
@@ -241,18 +237,6 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
   onSubmit() {
     var self = this;
 
-    // gather form data
-    // const emailValue = (this.emailField.current as any).value;
-    // const billingPhoneNumberValue = (this.billingPhoneNumberField.current  as any).value;
-    // const billingGivenNameValue = (this.billingGivenNameField.current as any).value;
-    // const billingSurnameValue = (this.billingSurnameField.current as any).value;
-    // const billingStreetAddressValue = (this.billingStreetAddressField.current as any).value;
-    // const billingExtendedAddressValue = (this.billingExtendedAddressField.current as any).value;
-    // const billingLocalityValue = (this.billingLocalityField.current as any).value;
-    // const billingRegionValue = (this.billingRegionField.current as any).value;
-    // const billingPostalCodeValue = (this.billingPostalCodeField.current as any).value;
-    // const billingCountryCodeValue = (this.billingCountryCodeField.current as any).value;
-
     this.hf.tokenize().then(function (payload) {
       return self.threeDS.verifyCard({
         onLookupComplete: function (data, next) {
@@ -260,45 +244,32 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
         },
         amount: self.props.total,
         nonce: payload.nonce,
-        bin: payload.details.bin,
-        // email: emailValue,
-        // billingAddress: {
-        //   givenName: billingGivenNameValue,
-        //   surname: billingSurnameValue,
-        //   phoneNumber: billingPhoneNumberValue.replace(/[\(\)\s\-]/g, ''), // remove (), spaces, and - from phone number
-        //   streetAddress: billingStreetAddressValue,
-        //   extendedAddress: billingExtendedAddressValue,
-        //   locality: billingLocalityValue,
-        //   region: billingRegionValue,
-        //   postalCode: billingPostalCodeValue,
-        //   countryCodeAlpha2: billingCountryCodeValue
-        // }
+        bin: payload.details.bin
       })
     }).then(function (token) {
       if (!token.liabilityShifted) {
-        console.log('Liability did not shift', token);
-        // console.info('Liability not shifted', token);
+        // console.log('Liability did not shift', token);
+        self.onError(token);
         return;
       }
 
-      console.log('Liability did shift', token);
+      // console.log('Liability did shift', token);
 
-      // self.setState(
-      //   state => ({ ...state, token, error: null }),
-      //   () => {
-      //     // send nonce and verification data to your server
-      //     const ccPayload = {
-      //       paymentMethodNonce: token.nonce,
-      //       paymentMethodId: this.props.paymentMethodId,
-      //       payerId: this.props.payerId,
-      //       amount: this.props.total,
-      //     };
-      //     this.props.handleSubmit(ccPayload);
-      //   },
-      // );
+      self.setState(
+        state => ({ ...state, token, error: null }),
+        () => {
+          // send nonce and verification data to your server
+          // const ccPayload = {
+          //   paymentMethodNonce: token.nonce,
+          //   paymentMethodId: this.props.paymentMethodId,
+          //   payerId: this.props.payerId,
+          //   amount: this.props.total,
+          // };
+          // this.props.handleSubmit(ccPayload);
+        },
+      );
     }).catch(function (err) {
-      console.log(err);
-      // enablePayNow();
+      self.onError(err);
     });
   }
 
@@ -355,7 +326,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
             </Button>
           </CardContainer>
 
-        {/*this.renderError('Error', this.state.error)*/}
+        {this.renderError('Error', this.state.error)}
       </Flex>
     );
   }
