@@ -106,6 +106,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
   // }
 
   setupComponents (clientToken) {
+    const braintree = (window as any).braintree;
     return Promise.all([
       (braintree as any).hostedFields.create({
         authorization: clientToken,
@@ -209,9 +210,6 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
   //         if (invalidFieldKey === 'cvv') {
   //           txt = '\u2022 Please enter a valid CVV'
   //         }
-  //         if (invalidFieldKey === 'postalCode') {
-  //           txt = '\u2022 Please enter a valid postal code'
-  //         }
   //         acc.push(<Text type="warning">{txt}</Text>)
   //         return acc;
   //       }, []);
@@ -244,16 +242,16 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
     var self = this;
 
     // gather form data
-    const emailValue = (this.emailField.current as any).value;
-    const billingPhoneNumberValue = (this.billingPhoneNumberField.current  as any).value;
-    const billingGivenNameValue = (this.billingGivenNameField.current as any).value;
-    const billingSurnameValue = (this.billingSurnameField.current as any).value;
-    const billingStreetAddressValue = (this.billingStreetAddressField.current as any).value;
-    const billingExtendedAddressValue = (this.billingExtendedAddressField.current as any).value;
-    const billingLocalityValue = (this.billingLocalityField.current as any).value;
-    const billingRegionValue = (this.billingRegionField.current as any).value;
-    const billingPostalCodeValue = (this.billingPostalCodeField.current as any).value;
-    const billingCountryCodeValue = (this.billingCountryCodeField.current as any).value;
+    // const emailValue = (this.emailField.current as any).value;
+    // const billingPhoneNumberValue = (this.billingPhoneNumberField.current  as any).value;
+    // const billingGivenNameValue = (this.billingGivenNameField.current as any).value;
+    // const billingSurnameValue = (this.billingSurnameField.current as any).value;
+    // const billingStreetAddressValue = (this.billingStreetAddressField.current as any).value;
+    // const billingExtendedAddressValue = (this.billingExtendedAddressField.current as any).value;
+    // const billingLocalityValue = (this.billingLocalityField.current as any).value;
+    // const billingRegionValue = (this.billingRegionField.current as any).value;
+    // const billingPostalCodeValue = (this.billingPostalCodeField.current as any).value;
+    // const billingCountryCodeValue = (this.billingCountryCodeField.current as any).value;
 
     this.hf.tokenize().then(function (payload) {
       return self.threeDS.verifyCard({
@@ -263,39 +261,41 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
         amount: self.props.total,
         nonce: payload.nonce,
         bin: payload.details.bin,
-        email: emailValue,
-        billingAddress: {
-          givenName: billingGivenNameValue,
-          surname: billingSurnameValue,
-          phoneNumber: billingPhoneNumberValue.replace(/[\(\)\s\-]/g, ''), // remove (), spaces, and - from phone number
-          streetAddress: billingStreetAddressValue,
-          extendedAddress: billingExtendedAddressValue,
-          locality: billingLocalityValue,
-          region: billingRegionValue,
-          postalCode: billingPostalCodeValue,
-          countryCodeAlpha2: billingCountryCodeValue
-        }
+        // email: emailValue,
+        // billingAddress: {
+        //   givenName: billingGivenNameValue,
+        //   surname: billingSurnameValue,
+        //   phoneNumber: billingPhoneNumberValue.replace(/[\(\)\s\-]/g, ''), // remove (), spaces, and - from phone number
+        //   streetAddress: billingStreetAddressValue,
+        //   extendedAddress: billingExtendedAddressValue,
+        //   locality: billingLocalityValue,
+        //   region: billingRegionValue,
+        //   postalCode: billingPostalCodeValue,
+        //   countryCodeAlpha2: billingCountryCodeValue
+        // }
       })
     }).then(function (token) {
       if (!token.liabilityShifted) {
         console.log('Liability did not shift', token);
-        console.info('Liability not shifted', token);
+        // console.info('Liability not shifted', token);
         return;
       }
 
-      self.setState(
-        state => ({ ...state, token, error: null }),
-        () => {
-          // send nonce and verification data to your server
-          const ccPayload = {
-            paymentMethodNonce: token.nonce,
-            paymentMethodId: this.props.paymentMethodId,
-            payerId: this.props.payerId,
-            amount: this.props.total,
-          };
-          this.props.handleSubmit(ccPayload);
-        },
-      );
+      console.log('Liability did shift', token);
+
+      // self.setState(
+      //   state => ({ ...state, token, error: null }),
+      //   () => {
+      //     // send nonce and verification data to your server
+      //     const ccPayload = {
+      //       paymentMethodNonce: token.nonce,
+      //       paymentMethodId: this.props.paymentMethodId,
+      //       payerId: this.props.payerId,
+      //       amount: this.props.total,
+      //     };
+      //     this.props.handleSubmit(ccPayload);
+      //   },
+      // );
     }).catch(function (err) {
       console.log(err);
       // enablePayNow();
@@ -313,194 +313,12 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
           <PaymentIcon id="discover" style={{ margin: 3, width: 36 }} />
         </Flex>
 
-        {/* <Braintree
-          ref={this.braintree}
-          authorization={this.props.ccToken}
-          onAuthorizationSuccess={this.onAuthorizationSuccess}
-          onError={this.onError}
-          // onCardTypeChange={this.onCardTypeChange}
-          getTokenRef={(t: any) => ((this as any).tokenize = t)}
-          styles={{
-            input: {
-              "font-size": "14px",
-              "font-family": "courier, monospace",
-              "letter-spacing": "2px",
-              "word-spacing": "4px",
-              width: "100%",
-              color: "rgb(161, 161, 161)",
-            },
-            "#credit-card-number": {
-              "text-align": "left",
-              "margin-bottom": "10px",
-            },
-            ":focus": {
-              color: "rgb(51, 51, 51)",
-            },
-          }}
-        > */}
+
           <CardContainer
             className={this.state.isBraintreeReady ? "" : "disabled"}
           >
-              <FormGroup>
-                <Label required htmlFor="emailAddress">
-                  Email address
-                </Label>
-                <input
-                  className="form-control"
-                  placeholder={
-                    "your.email@email.com"
-                  }
-                  ref={this.emailField}
-                  type="email"
-                />
-                <span id="help-email" className="help-block"></span>
-              </FormGroup>
-
-              <FormGroup>
-                <Label htmlFor="billing-phone">
-                Billing phone number
-                </Label>
-                <input
-                  id="billing-phone"
-                  ref={this.billingPhoneNumberField}
-                  className="form-control"
-                  placeholder={
-                    "123-456-7890"
-                  }
-                  type="text"
-                />
-                <span id="help-billing-phone" className="help-block"></span>
-              </FormGroup>
-
-              <FormGroup>
-                <Label htmlFor="billing-given-name">
-                Billing given name
-                </Label>
-                <input
-                  ref={this.billingGivenNameField}
-                  id="billing-given-name"
-                  className="form-control"
-                  placeholder={
-                    "First"
-                  }
-                  type="text"
-                />
-                <span id="help-billing-given-name" className="help-block"></span>
-              </FormGroup>
-
-              <FormGroup>
-                <Label htmlFor="billing-surname">
-                Billing surname
-                </Label>
-                <input
-                  ref={this.billingSurnameField}
-                  id="billing-surname"
-                  className="form-control"
-                  placeholder={
-                    "Last"
-                  }
-                  type="text"
-                />
-                <span id="help-billing-surname" className="help-block"></span>
-              </FormGroup>
-
-              <FormGroup>
-                <Label htmlFor="billing-street-address">
-                Billing street address
-                </Label>
-                <input
-                  ref={this.billingStreetAddressField}
-                  id="billing-street-address"
-                  className="form-control"
-                  placeholder={
-                    "123 Street"
-                  }
-                  type="text"
-                />
-                <span id="help-billing-street-address" className="help-block"></span>
-              </FormGroup>
-
-              <FormGroup>
-                <Label htmlFor="billing-extendend-address">
-                Billing extended address
-                </Label>
-                <input
-                  ref={this.billingExtendedAddressField}
-                  id="billing-extended-address"
-                  className="form-control"
-                  placeholder={
-                    "Unit 1"
-                  }
-                  type="text"
-                />
-                <span id="help-billing-extended-address" className="help-block"></span>
-              </FormGroup>
-
-              <FormGroup>
-                <Label htmlFor="billing-locality">
-                Billing locality
-                </Label>
-                <input
-                ref={this.billingLocalityField}
-                  id="billing-locality"
-                  className="form-control"
-                  placeholder={
-                    "City"
-                  }
-                  type="text"
-                />
-                <span id="help-billing-locality" className="help-block"></span>
-              </FormGroup>
-
-              <FormGroup>
-                <Label htmlFor="billing-region">
-                Billing region
-                </Label>
-                <input
-                  ref={this.billingRegionField}
-                  id="billing-region"
-                  className="form-control"
-                  placeholder={
-                    "State"
-                  }
-                  type="text"
-                />
-                <span id="help-billing-region" className="help-block"></span>
-              </FormGroup>
-
-              <FormGroup>
-                <Label htmlFor="billing-postal-code">
-                Billing postal code
-                </Label>
-                <input
-                  ref={this.billingPostalCodeField}
-                  id="billing-postal-code"
-                  className="form-control"
-                  placeholder={
-                    "12345"
-                  }
-                  type="text"
-                />
-                <span id="help-billing-postal-code" className="help-block"></span>
-              </FormGroup>
-
-              <FormGroup>
-                <Label htmlFor="billing-country-code">
-                Billing country code (Alpha 2)
-                </Label>
-                <input
-                  ref={this.billingCountryCodeField}
-                  id="billing-country-code"
-                  className="form-control"
-                  placeholder={
-                    "XX"
-                  }
-                  type="text"
-                />
-                <span id="help-billing-country-code" className="help-block"></span>
-              </FormGroup>
-
-              <FormGroup>
+            <Flex justifyContent="flex-start" mb={2}>
+              <FormGroup style={{ marginRight: 10 }}>
                 <Label required htmlFor="cardNumber">
                   Card Number
                 </Label>
@@ -510,24 +328,21 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
                 />
               </FormGroup>
 
-              <FormGroup>
+              <FormGroup style={{ marginRight: 10 }}>
                 <Label required htmlFor="expirationDate">
                   Expiration Date
                 </Label>
                 <div className="form-control" id="hf-date" />
               </FormGroup>
-              <FormGroup>
+
+              <FormGroup style={{ marginRight: 10 }}>
                 <Label required htmlFor="cvv">
                   CVV
                 </Label>
                 <div className="form-control" id="hf-cvv" />
               </FormGroup>
-            {/* <Flex vertical mr={4}>
-              <Label required htmlFor="postalCode">
-                Postal Code
-              </Label>
-              <input id="" type="postalCode" />
-            </Flex> */}
+            </Flex>
+
 
             <Button
               mt={6}
@@ -539,7 +354,6 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
               Pay
             </Button>
           </CardContainer>
-        {/* </Braintree> */}
 
         {/*this.renderError('Error', this.state.error)*/}
       </Flex>
