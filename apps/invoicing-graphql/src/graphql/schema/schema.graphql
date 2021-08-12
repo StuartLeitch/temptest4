@@ -345,6 +345,7 @@ type Query {
   getClientToken: ClientToken
   generateCouponCode: CouponCode
   invoice(invoiceId: ID): Invoice
+  invoiceWithAuthorization(invoiceId: ID): Invoice
   invoiceVat(
     invoiceId: ID
     country: String

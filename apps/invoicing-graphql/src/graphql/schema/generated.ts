@@ -383,6 +383,7 @@ export type Query = {
   getClientToken?: Maybe<ClientToken>;
   generateCouponCode?: Maybe<CouponCode>;
   invoice?: Maybe<Invoice>;
+  invoiceWithAuthorization?: Maybe<Invoice>;
   invoiceVat?: Maybe<InvoiceVat>;
   invoices?: Maybe<PaginatedInvoices>;
   coupon?: Maybe<Coupon>;
@@ -417,6 +418,11 @@ export type QueryGetCreditNoteByReferenceNumberArgs = {
 
 
 export type QueryInvoiceArgs = {
+  invoiceId?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryInvoiceWithAuthorizationArgs = {
   invoiceId?: Maybe<Scalars['ID']>;
 };
 
@@ -501,11 +507,6 @@ export type MutationUpdateCouponArgs = {
 
 export type MutationCreateCouponArgs = {
   coupon?: Maybe<CouponInput>;
-};
-
-
-export type MutationSetTransactionToActiveArgs = {
-  customId?: Maybe<Scalars['ID']>;
 };
 
 
@@ -1003,6 +1004,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   getClientToken?: Resolver<Maybe<ResolversTypes['ClientToken']>, ParentType, ContextType>;
   generateCouponCode?: Resolver<Maybe<ResolversTypes['CouponCode']>, ParentType, ContextType>;
   invoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<QueryInvoiceArgs, never>>;
+  invoiceWithAuthorization?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<QueryInvoiceWithAuthorizationArgs, never>>;
   invoiceVat?: Resolver<Maybe<ResolversTypes['InvoiceVat']>, ParentType, ContextType, RequireFields<QueryInvoiceVatArgs, never>>;
   invoices?: Resolver<Maybe<ResolversTypes['PaginatedInvoices']>, ParentType, ContextType, RequireFields<QueryInvoicesArgs, never>>;
   coupon?: Resolver<Maybe<ResolversTypes['Coupon']>, ParentType, ContextType, RequireFields<QueryCouponArgs, 'couponCode'>>;
