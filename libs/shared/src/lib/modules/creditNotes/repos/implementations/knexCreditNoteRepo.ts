@@ -189,7 +189,6 @@ export class KnexCreditNoteRepo
     const { db } = this;
 
     const rawCreditNote = CreditNoteMap.toPersistence(creditNote);
-    console.log(rawCreditNote);
 
     try {
       await db(TABLES.CREDIT_NOTES).insert(rawCreditNote);

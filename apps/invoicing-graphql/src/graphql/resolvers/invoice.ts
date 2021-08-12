@@ -489,9 +489,19 @@ export const invoice: Resolvers<Context> = {
       if (creditNote.isLeft()) {
         return null;
       }
+      const maybeErpCreditNoteReferences = await repos.erpReference.getErpReferenceById(
+        creditNote.value.id
+      );
+
+      if (maybeErpCreditNoteReferences.isLeft()) {
+        return maybeErpCreditNoteReferences.value;
+      }
+
+      const creditNoteErpReference = maybeErpCreditNoteReferences.value;
 
       return {
         ...CreditNoteMap.toPersistence(creditNote.value),
+        erpReference: creditNoteErpReference,
       };
     },
     async transaction(parent: Invoice, args, context) {
