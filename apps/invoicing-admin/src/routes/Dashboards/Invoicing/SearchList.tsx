@@ -18,7 +18,6 @@ const SearchList: React.FC<SearchListProps> = (props) => {
   if (props.loading) return <Loading />;
 
   return (
-    // <span className='bt-6 mt-4 ml-2' style={{ display: 'inline-block'}}><strong>{props.title.toUpperCase()}</strong></span>,
     <Card className='mb-0' style={{ marginTop: '16px'}}>
       {/* START Table */}
       <div className='table-responsive-xl'>
