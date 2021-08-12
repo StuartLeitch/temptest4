@@ -74,7 +74,7 @@ const ProjectsDashboard: React.FC = () => {
     });
   }
 
-  const [fetchResults, { loading, error, data }] = useManualQuery(
+  let [fetchResults, { loading, error, data }] = useManualQuery(
     INVOICES_AND_CREDIT_NOTES_QUERY
   );
 
@@ -85,23 +85,28 @@ const ProjectsDashboard: React.FC = () => {
 
     if (_.isEmpty(searchValue)) return;
 
+
     if (isSearchByRefNumberChecked) {
       filters['referenceNumber'] = searchValue;
+      delete filters['customId'];
     }
 
     if (isSearchByManuscriptIdChecked) {
+      delete filters['referenceNumber'];
       filters['customId'] = searchValue;
     }
 
     setSearchFilters(filters);
 
     async function fetchData() {
+      loading = true;
       const results = await fetchResults({
         variables: {
           filters: Filters.collect(filters),
           pagination,
         },
       });
+      loading = false;
 
       setSearchResults(results.data);
     }

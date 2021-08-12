@@ -23,7 +23,7 @@ enum CreditNoteReason {
   WAIVED_MANUSCRIPT
   CHANGED_PAYER_DETAILS
   BAD_DEBT
-  OTHER_REASON
+  OTHER
 }
 
 type Article @model(id: "articles") {

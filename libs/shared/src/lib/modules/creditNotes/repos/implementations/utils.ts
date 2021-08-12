@@ -81,7 +81,7 @@ export function applyFilters(src: QueryBuilder, filters: Filters) {
 
       case '/referenceNumber':
         const invoiceRef = filter[0];
-        here = here.where({ persistentReferenceNumber: invoiceRef });
+        here = here.where({[`${TABLES.CREDIT_NOTES}.persistentReferenceNumber`]: `CN-${invoiceRef}` });
         break;
 
       case '/reason':
@@ -91,7 +91,7 @@ export function applyFilters(src: QueryBuilder, filters: Filters) {
           'WAIVED_MANUSCRIPT': 'waived-manuscript',
           'CHANGED_PAYER_DETAILS': 'changed-payer-details',
           'BAD_DEBT': 'bad-debt',
-          'OTHER_REASON': 'other-reason'
+          'OTHER': 'other'
         }
         const filtr = filter.map((filter) => lookup[filter]);
         here = here.whereIn(`${TABLES.CREDIT_NOTES}.creationReason`, filtr);

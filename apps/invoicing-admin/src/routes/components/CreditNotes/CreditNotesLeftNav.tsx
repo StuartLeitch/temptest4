@@ -108,9 +108,9 @@ const CreditNotesLeftNav = (props) => {
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
-            name='reason.OTHER_REASON'
+            name='reason.OTHER'
             onChange={(evt: any) => onFilterHandler.callback(evt.target)}
-            checked={reason.includes('OTHER_REASON')}
+            checked={reason.includes('OTHER')}
             className='text-info'
             type='checkbox'
             id='creditnote-reason-other'

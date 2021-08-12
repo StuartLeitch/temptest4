@@ -33,6 +33,15 @@ export enum InvoiceStatus {
   FINAL = 'FINAL'
 }
 
+export enum CreditNoteReason {
+  WITHDRAWN_MANUSCRIPT = 'WITHDRAWN_MANUSCRIPT',
+  REDUCTION_APPLIED = 'REDUCTION_APPLIED',
+  WAIVED_MANUSCRIPT = 'WAIVED_MANUSCRIPT',
+  CHANGED_PAYER_DETAILS = 'CHANGED_PAYER_DETAILS',
+  BAD_DEBT = 'BAD_DEBT',
+  OTHER = 'OTHER'
+}
+
 export type Article = {
   __typename?: 'Article';
   id?: Maybe<Scalars['String']>;
@@ -325,6 +334,7 @@ export type InvoiceItemFilters = {
 };
 
 export type InvoiceFilters = {
+  reason?: Maybe<Array<Maybe<CreditNoteReason>>>;
   invoiceStatus?: Maybe<Array<Maybe<InvoiceStatus>>>;
   transactionStatus?: Maybe<Array<Maybe<TransactionStatus>>>;
   referenceNumber?: Maybe<Array<Maybe<Scalars['ReferenceNumber']>>>;
@@ -675,6 +685,7 @@ export type ResolversTypes = {
   Error: ResolverTypeWrapper<Error>;
   String: ResolverTypeWrapper<Scalars['String']>;
   InvoiceStatus: InvoiceStatus;
+  CreditNoteReason: CreditNoteReason;
   Article: ResolverTypeWrapper<Article>;
   Transaction: ResolverTypeWrapper<Transaction>;
   ErpReference: ResolverTypeWrapper<ErpReference>;

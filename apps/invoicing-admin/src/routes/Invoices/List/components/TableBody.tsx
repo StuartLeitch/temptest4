@@ -16,11 +16,11 @@ const InvoicesTableBody = (props) => {
         <thead>
           <tr>
             <th className='align-middle bt-0'>Status</th>
-            <th className='align-middle bt-0'>Reference</th>
             <th className='align-middle bt-0'>Manuscript Custom ID</th>
+            <th className='align-middle bt-0'>Reference No</th>
             <th className='align-middle bt-0'>Issue Date</th>
-            <th className='align-middle bt-0'>Manuscript Acceptance Date</th>
-            <th className='align-middle bt-0'>Net Amount</th>
+            <th className='align-middle bt-0'>Total</th>
+            <th className='align-middle bt-0'>Accepted Date</th>
           </tr>
         </thead>
         <tbody>

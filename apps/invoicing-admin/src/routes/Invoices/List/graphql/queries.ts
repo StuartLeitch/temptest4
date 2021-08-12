@@ -179,6 +179,7 @@ fragment articleFragment on Article {
 fragment creditNoteFragment on CreditNote {
   id
   invoiceId
+  price
   dateCreated
   dateIssued
   dateUpdated

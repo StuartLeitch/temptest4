@@ -15,10 +15,11 @@ const CreditNotesTableBody = (props) => {
       <Table className='mb-0 table-striped' hover>
           <thead>
             <tr>
+              <th className='align-middle bt-0'>Reason</th>
               <th className='align-middle bt-0'>Manuscript Custom ID</th>
               <th className='align-middle bt-0'>Reference number</th>
-              <th className='align-middle bt-0'>Reason</th>
-              <th className='align-middle bt-0'>Net Amount</th>
+              <th className='align-middle bt-0'>Issue Date</th>
+              <th className='align-middle bt-0'>Total</th>
             </tr>
           </thead>
         <tbody>

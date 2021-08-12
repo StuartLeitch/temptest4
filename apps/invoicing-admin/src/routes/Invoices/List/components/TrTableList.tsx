@@ -48,6 +48,16 @@ const TrTableInvoicesList = ({ invoices }) => {
                 to={`/invoices/details/${id}`}
                 className='text-decoration-none'
               >
+                <span className='text-secondary'>
+                  {invoiceItem?.article?.customId}
+                </span>
+              </Link>
+            </td>
+            <td className='align-middle'>
+              <Link
+                to={`/invoices/details/${id}`}
+                className='text-decoration-none'
+              >
                 <span
                   className={'text-secondary'}
                 >
@@ -57,21 +67,8 @@ const TrTableInvoicesList = ({ invoices }) => {
                 </span>
               </Link>
             </td>
-            <td className='align-middle'>
-              <Link
-                to={`/invoices/details/${id}`}
-                className='text-decoration-none'
-              >
-                <span className='text-secondary'>
-                  {invoiceItem?.article?.customId}
-                </span>
-              </Link>
-            </td>
             <td className='align-middle text-nowrap'>
               {dateIssued && format(new Date(dateIssued), 'dd MMM yyyy')}
-            </td>
-            <td className='align-middle text-nowrap'>
-              {dateAccepted && format(new Date(dateAccepted), 'dd MMM yyyy')}
             </td>
             <td className='align-middle'>
               <strong
@@ -81,6 +78,9 @@ const TrTableInvoicesList = ({ invoices }) => {
               >
                 {numeral(invoiceItem && invoiceItem.price).format('$0.00')}
               </strong>
+            </td>
+            <td className='align-middle text-nowrap'>
+              {dateAccepted && format(new Date(dateAccepted), 'dd MMM yyyy')}
             </td>
           </tr>
         )

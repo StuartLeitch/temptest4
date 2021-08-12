@@ -11,7 +11,7 @@ const CREATION_REASON = {
   'withdrawn-manuscript' : 'Withdrawn Manuscript',
   'reduction-applied' : 'Reduction Applied',
   'waived-manuscript' : 'Waived Manuscript',
-  'changed-payer-details' : 'Changed Payer Details',
+  'change-payer-details' : 'Change Payer Details',
   'bad-debt' : 'Bad Debt',
   'other' : 'Other',
 };
@@ -29,8 +29,11 @@ const TrTableCreditNotesList = ({creditNotes}) => (
         dateCreated,
         invoice
       }) => (
-        <tr key={id}>
-          <td className='align-middle'><strong>{invoice?.invoiceItem?.article?.customId}</strong></td>
+        <tr key={id} className='table-warning'>
+          <td className='align-middle'>
+            <Badge>{CREATION_REASON[creationReason]}</Badge>
+          </td>
+          <td className='align-left'>{invoice?.invoiceItem?.article?.customId}</td>
           <td className='align-middle'>
             <Link
               to={`/credit-notes/details/${id}`}
@@ -44,14 +47,11 @@ const TrTableCreditNotesList = ({creditNotes}) => (
             </Link>
           </td>
 
-          <td className='align-middle'>
-            <div>{CREATION_REASON[creationReason]}</div>
-          </td>
-
+          <td className='align-middle'>{dateIssued && format(new Date(dateIssued), 'dd MMM yyyy')}</td>
 
           <td className='align-middle'>
             <strong
-              className={price < 0 ? 'text-danger' : 'text-success'}
+              className='text-danger'
             >
               {numeral(price).format('$0.00')}
             </strong>
