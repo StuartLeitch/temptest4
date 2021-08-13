@@ -29,6 +29,7 @@ import { GetItemsForInvoiceUsecase } from '../../../../invoices/usecases/getItem
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 import { PublishCreditNoteToErpResponse as Response } from './publishCreditNoteToErpResponse';
 import type { PublishCreditNoteToErpRequestDTO as DTO } from './publishCreditNoteToErpDTO';
+import { InvoiceErpReferences } from '../../../../invoices/domain/InvoiceErpReferences';
 
 export class PublishCreditNoteToErpUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
@@ -156,16 +157,20 @@ export class PublishCreditNoteToErpUsecase
           invoice,
         };
 
-        const invoiceErpRefItems = invoice
+        const maybeInvoiceErpReferences = invoice
           .getErpReferences()
           .getItems()
           .filter(
             (er) => er.vendor === 'netsuite' && er.attribute === 'confirmation'
           );
 
-        if (invoiceErpRefItems.length === 0) {
+        const invoiceErpReferences =
+          maybeInvoiceErpReferences.length !== 0 &&
+          maybeInvoiceErpReferences.find(Boolean);
+
+        if (maybeInvoiceErpReferences.length === 0) {
           const erpReference = ErpReferenceMap.toDomain({
-            entity_id: creditNote.invoiceId.id.toString(),
+            entity_id: creditNote.id.toString(),
             type: 'invoice',
             vendor: this.erpService.vendorName,
             attribute:
@@ -179,12 +184,37 @@ export class PublishCreditNoteToErpUsecase
           }
           await this.erpReferenceRepo.save(erpReference.value);
 
-          return left(
-            new UnexpectedError(
-              new Error('Non-existent Invoice'),
-              `Referenced credit note's invoice with id ${creditNote.invoiceId.id.toString()} does not exist in the ERP system.`
-            )
+          this.loggerService.info(
+            `Referenced credit note's invoice with id ${creditNote.invoiceId.id.toString()} does not exist in the ERP system.`
           );
+
+          return right(null);
+        }
+
+        if (
+          invoiceErpReferences &&
+          invoiceErpReferences.value === 'NON_INVOICEABLE'
+        ) {
+          const erpReference = ErpReferenceMap.toDomain({
+            entity_id: creditNote.id.toString(),
+            type: 'invoice',
+            vendor: this.erpService.vendorName,
+            attribute:
+              this.erpService?.referenceMappings?.creditNote || 'creditNote',
+            value: String('NONEXISTENT_INVOICE'),
+          });
+          if (erpReference.isLeft()) {
+            return left(
+              new UnexpectedError(new Error(erpReference.value.message))
+            );
+          }
+          await this.erpReferenceRepo.save(erpReference.value);
+
+          this.loggerService.info(
+            `Credit Note for non-invoiceable Invoice with id ${creditNote.invoiceId.id.toString()} marked!`
+          );
+
+          return right(null);
         }
 
         const erpResponse = await this.erpService.registerCreditNote(erpData);

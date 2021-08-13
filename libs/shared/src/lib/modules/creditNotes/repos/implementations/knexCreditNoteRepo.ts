@@ -49,10 +49,7 @@ export class KnexCreditNoteRepo
   }
 
   private filterCreditNotesReadyForErpRegistration(): any {
-    return (query) =>
-      query
-        .whereNull('creditnoteref.value')
-        .whereNot('creditnoteref.value', 'NONEXISTENT_INVOICE');
+    return (query) => query.whereNull('creditnoteref.value');
   }
 
   public async getCreditNoteByInvoiceId(
