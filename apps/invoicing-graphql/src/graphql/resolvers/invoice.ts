@@ -485,7 +485,6 @@ export const invoice: Resolvers<Context> = {
         creditNoteRequest,
         usecaseContext
       );
-
       if (creditNote.isLeft()) {
         return null;
       }
@@ -493,11 +492,9 @@ export const invoice: Resolvers<Context> = {
         creditNote.value.id
       );
 
-      if (maybeErpCreditNoteReferences.isLeft()) {
-        return maybeErpCreditNoteReferences.value;
-      }
-
-      const creditNoteErpReference = maybeErpCreditNoteReferences.value;
+      const creditNoteErpReference = maybeErpCreditNoteReferences.isRight()
+        ? maybeErpCreditNoteReferences.value
+        : null;
 
       return {
         ...CreditNoteMap.toPersistence(creditNote.value),
