@@ -87,12 +87,15 @@ export const coupon: Resolvers<Context> = {
   Mutation: {
     async createCoupon(parent, args, context) {
       const roles = getAuthRoles(context);
+      const userData = (context.keycloakAuth.accessToken as any)?.content;
 
       const {
         repos: { coupon: couponRepo },
+        auditLoggerService
       } = context;
 
-      const createCouponUsecase = new CreateCouponUsecase(couponRepo);
+      auditLoggerService.setUserData(userData);
+      const createCouponUsecase = new CreateCouponUsecase(couponRepo, auditLoggerService);
 
       const usecaseContext = {
         roles,

@@ -30,11 +30,15 @@ import {
 } from '../../domain/Coupon';
 
 import { sanityChecksRequestParameters } from './utils';
+import { AuditLoggerServiceContract } from '../../../../infrastructure/audit';
 
 export class CreateCouponUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
-  constructor(private couponRepo: CouponRepoContract) {
+  constructor(
+    private couponRepo: CouponRepoContract,
+    private auditLoggerService: AuditLoggerServiceContract
+  ) {
     super();
     this.createCoupon = this.createCoupon.bind(this);
     this.saveCoupon = this.saveCoupon.bind(this);
@@ -43,13 +47,24 @@ export class CreateCouponUsecase
   @Authorize('coupon:create')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      const finalResult = await new AsyncEither(request)
-        .then(sanityChecksRequestParameters(this.couponRepo))
-        .then(this.createCoupon)
-        .then(this.saveCoupon)
-        .execute();
+      // const finalResult = await new AsyncEither(request)
+      //   .then(sanityChecksRequestParameters(this.couponRepo))
+      //   .then(this.createCoupon)
+      //   .then(this.saveCoupon)
+      //   .execute();
 
-      return finalResult;
+      // * Save information as audit log
+      this.auditLoggerService.log({
+        action: 'added new',
+        entity: 'coupon',
+        oldValue: null,
+        timestamp: new Date(),
+        // currentValue: finalResult.value
+        currentValue: { "ciuciu": "bau" }
+      });
+
+      // return finalResult;
+      return right(null);
     } catch (err) {
       return left(new UnexpectedError(err));
     }

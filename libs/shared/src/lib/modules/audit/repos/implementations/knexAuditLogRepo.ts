@@ -25,7 +25,18 @@ export class KnexAuditLogRepo
     auditLog: AuditLog
   ): Promise<Either<GuardFailure | RepoError, AuditLog>> {
     const { db } = this;
-    await db(TABLES.AUDIT_LOGS).insert(auditLog);
+
+    const newAuditLog = {
+      id: auditLog.id.toString(),
+      timestamp: auditLog.timestamp.toISOString(),
+      user_account: auditLog.userAccount,
+      entity: auditLog.entity,
+      action: auditLog.action,
+      old_value: auditLog.oldValue,
+      current_value: auditLog.currentValue,
+    }
+
+    await db(TABLES.AUDIT_LOGS).insert(newAuditLog);
 
     return right(auditLog);
   }
