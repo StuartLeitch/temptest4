@@ -205,33 +205,6 @@ export class AfterCreditNoteCreatedEvent
       this.loggerService.info(
         `[AfterCreditNoteCreated]: Successfully executed onCreditNoteCreated event usecase.`
       );
-
-      // * Find Netsuite revenue recognition entry for Invoice
-      // const nsRevRecReference = invoice
-      //   .getErpReferences()
-      //   .getItems()
-      //   .filter(
-      //     (er) =>
-      //       er.vendor === 'netsuite' && er.attribute === 'revenueRecognition'
-      //   )
-      //   .find(Boolean);
-
-      // // * Publish Revenue recognition reversal
-      // if (manuscript.datePublished && nsRevRecReference) {
-      //   const publishRevenueRecognitionReversal = await this.publishRevenueRecognitionReversal.execute(
-      //     { invoiceId: invoiceId.id.toString() },
-      //     defaultContext
-      //   );
-
-      //   if (publishRevenueRecognitionReversal.isLeft()) {
-      //     return left(publishRevenueRecognitionReversal.value.message);
-      //   }
-      //   this.loggerService.info(
-      //     `[PublishRevenueRecognitionReversal]: ${JSON.stringify(
-      //       publishRevenueRecognitionReversal
-      //     )}`
-      //   );
-      // }
     } catch (err) {
       console.error(err);
       console.log(

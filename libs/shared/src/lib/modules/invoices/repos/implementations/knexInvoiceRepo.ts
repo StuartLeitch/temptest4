@@ -104,6 +104,11 @@ export class KnexInvoiceRepo
       );
   }
 
+  private withCreditNoteDetailsQuery(): any {
+    return (query) =>
+      query.leftJoin(TABLES.INVOICES, 'invoices.id', 'credit_notes.invoiceId');
+  }
+
   private withErpReferenceQuery(
     alias: string,
     associatedField: string,
@@ -442,7 +447,6 @@ export class KnexInvoiceRepo
       query
         .whereNot('invoices.deleted', 1)
         .whereIn('invoices.status', ['FINAL'])
-        .whereNotNull('invoices.cancelledInvoiceReference')
         .whereNull('revenuerecognitionreversalref.value');
   }
 
@@ -779,18 +783,20 @@ export class KnexInvoiceRepo
     return Number(CNT);
   }
 
-  public async getUnrecognizedReversalsNetsuiteErp(): Promise<Either<GuardFailure | RepoError, any[]>> {
+  public async getUnrecognizedReversalsNetsuiteErp(): Promise<
+    Either<GuardFailure | RepoError, any[]>
+  > {
     const { db, logger } = this;
 
-    const erpReferencesQuery = db(TABLES.INVOICES)
-      .column({ invoiceId: 'invoices.cancelledInvoiceReference' })
+    const erpReferencesQuery = db(TABLES.CREDIT_NOTES)
+      .column({ invoiceId: 'invoices.id' })
       .select();
 
-    const withInvoiceItems = this.withInvoicesItemsDetailsQuery();
+    const withCreditNoteDetails = this.withCreditNoteDetailsQuery();
 
     const withRevenueRecognitionReversalErpReference = this.withErpReferenceQuery(
       'revenuerecognitionreversalref',
-      'invoices.cancelledInvoiceReference',
+      'invoices.id',
       'invoice',
       'netsuite',
       'revenueRecognitionReversal'
@@ -801,7 +807,7 @@ export class KnexInvoiceRepo
 
     const withCreditNoteErpReference = this.withErpReferenceQuery(
       'creditnoteref',
-      'invoices.id',
+      'credit_notes.id',
       'invoice',
       'netsuite',
       'creditNote'
@@ -811,7 +817,7 @@ export class KnexInvoiceRepo
 
     const withRevenueRecognitionErpReference = this.withErpReferenceQuery(
       'revenuerecognitionref',
-      'invoices.cancelledInvoiceReference',
+      'invoices.id',
       'invoice',
       'netsuite',
       'revenueRecognition'
@@ -825,7 +831,7 @@ export class KnexInvoiceRepo
           withCreditNoteErpReference(
             filterRevenueRecognitionReadyForERP(
               withRevenueRecognitionReversalErpReference(
-                withInvoiceItems(erpReferencesQuery)
+                withCreditNoteDetails(erpReferencesQuery)
               )
             )
           )
@@ -840,17 +846,17 @@ export class KnexInvoiceRepo
     const revenueRecognitionReversals: Array<any> = await prepareIdsSQL;
 
     return right(
-      revenueRecognitionReversals.map((i) => InvoiceId.create(new UniqueEntityID(i.invoiceId)))
+      revenueRecognitionReversals.map((i) =>
+        InvoiceId.create(new UniqueEntityID(i.invoiceId))
+      )
     );
   }
 
   private filterRegisteredCreditNotesForErpRegistration(): any {
-    return (query) =>
-      query.whereNotNull('creditnoteref.value');
+    return (query) => query.whereNotNull('creditnoteref.value');
   }
 
   private filterRegisteredRevenueRecognitionForErpRegistration(): any {
-    return (query) =>
-      query.whereNotNull('revenuerecognitionref.value');
+    return (query) => query.whereNotNull('revenuerecognitionref.value');
   }
 }
