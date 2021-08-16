@@ -21,7 +21,7 @@ import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
 
 import { PublishInvoiceCreditedUsecase } from '../../invoices/usecases/publishEvents/publishInvoiceCredited';
-import { PublishRevenueRecognitionReversalUsecase } from '../../invoices/usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
+// import { PublishRevenueRecognitionReversalUsecase } from '../../invoices/usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
 import { GetInvoiceDetailsUsecase } from '../../invoices/usecases/getInvoiceDetails';
 import { GetItemsForInvoiceUsecase } from '../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
@@ -44,7 +44,7 @@ export class AfterCreditNoteCreatedEvent
     private publishCreditNoteCreated:
       | PublishInvoiceCreditedUsecase
       | NoOpUseCase,
-    private publishRevenueRecognitionReversal: PublishRevenueRecognitionReversalUsecase,
+    // private publishRevenueRecognitionReversal: PublishRevenueRecognitionReversalUsecase,
     private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
@@ -184,16 +184,19 @@ export class AfterCreditNoteCreatedEvent
       const billingAddress = maybeBillingAddress.value;
 
       //* Run publish Credit Note created usecase
-      const publishResult = await this.publishCreditNoteCreated.execute({
-        payer,
-        invoice,
-        payments,
-        manuscript,
-        creditNote,
-        invoiceItems,
-        paymentMethods,
-        billingAddress,
-      }, defaultContext);
+      const publishResult = await this.publishCreditNoteCreated.execute(
+        {
+          payer,
+          invoice,
+          payments,
+          manuscript,
+          creditNote,
+          invoiceItems,
+          paymentMethods,
+          billingAddress,
+        },
+        defaultContext
+      );
 
       if (publishResult.isLeft()) {
         return left(publishResult.value.message);
@@ -204,31 +207,31 @@ export class AfterCreditNoteCreatedEvent
       );
 
       // * Find Netsuite revenue recognition entry for Invoice
-      const nsRevRecReference = invoice
-        .getErpReferences()
-        .getItems()
-        .filter(
-          (er) =>
-            er.vendor === 'netsuite' && er.attribute === 'revenueRecognition'
-        )
-        .find(Boolean);
+      // const nsRevRecReference = invoice
+      //   .getErpReferences()
+      //   .getItems()
+      //   .filter(
+      //     (er) =>
+      //       er.vendor === 'netsuite' && er.attribute === 'revenueRecognition'
+      //   )
+      //   .find(Boolean);
 
-      // * Publish Revenue recognition reversal
-      if (manuscript.datePublished && nsRevRecReference) {
-        const publishRevenueRecognitionReversal = await this.publishRevenueRecognitionReversal.execute(
-          { invoiceId: invoiceId.id.toString() },
-          defaultContext
-        );
+      // // * Publish Revenue recognition reversal
+      // if (manuscript.datePublished && nsRevRecReference) {
+      //   const publishRevenueRecognitionReversal = await this.publishRevenueRecognitionReversal.execute(
+      //     { invoiceId: invoiceId.id.toString() },
+      //     defaultContext
+      //   );
 
-        if (publishRevenueRecognitionReversal.isLeft()) {
-          return left(publishRevenueRecognitionReversal.value.message);
-        }
-        this.loggerService.info(
-          `[PublishRevenueRecognitionReversal]: ${JSON.stringify(
-            publishRevenueRecognitionReversal
-          )}`
-        );
-      }
+      //   if (publishRevenueRecognitionReversal.isLeft()) {
+      //     return left(publishRevenueRecognitionReversal.value.message);
+      //   }
+      //   this.loggerService.info(
+      //     `[PublishRevenueRecognitionReversal]: ${JSON.stringify(
+      //       publishRevenueRecognitionReversal
+      //     )}`
+      //   );
+      // }
     } catch (err) {
       console.error(err);
       console.log(

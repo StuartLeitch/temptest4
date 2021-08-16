@@ -14,7 +14,7 @@ import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/mo
 import { PublishInvoiceConfirmedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceConfirmed';
 import { PublishInvoiceFinalizedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceFinalized';
 import { PublishInvoicePaidUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoicePaid';
-import { PublishRevenueRecognitionReversalUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
+// import { PublishRevenueRecognitionReversalUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
 
 import { AfterCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/creditNotes/subscriptions/AfterCreditNoteCreatedEvent';
 import { AfterInvoiceDraftDueAmountUpdatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDueAmountUpdateEvent';
@@ -45,30 +45,27 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         payment,
         coupon,
         waiver,
-        publisher,
-        erpReference,
         payer,
-        catalog
       },
       services: { logger: loggerService, schedulingService, qq: queue, erp },
     } = context;
 
     const publishCreditNoteCreated = new PublishCreditNoteCreatedUsecase(queue);
 
-    const publishRevenueRecognitionReversal = new PublishRevenueRecognitionReversalUsecase(
-      invoice,
-      invoiceItem,
-      coupon,
-      waiver,
-      payer,
-      address,
-      manuscript,
-      catalog,
-      publisher,
-      erpReference,
-      erp?.netsuite ?? null,
-      loggerService
-    );
+    // const publishRevenueRecognitionReversal = new PublishRevenueRecognitionReversalUsecase(
+    //   invoice,
+    //   invoiceItem,
+    //   coupon,
+    //   waiver,
+    //   payer,
+    //   address,
+    //   manuscript,
+    //   catalog,
+    //   publisher,
+    //   erpReference,
+    //   erp?.netsuite ?? null,
+    //   loggerService
+    // );
 
     const publishInvoiceDraftCreated = new PublishInvoiceDraftCreatedUseCase(
       queue
@@ -191,7 +188,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       waiver,
       payer,
       publishInvoiceCredited,
-      publishRevenueRecognitionReversal,
+      // publishRevenueRecognitionReversal,
       loggerService
     );
   }
