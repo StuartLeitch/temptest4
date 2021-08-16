@@ -6,11 +6,11 @@
  * This is the main AuditLogger Object.
  * ------------------------------------------------
  */
+export class AuditLoggerService {
+  constructor(private auditLogRepo) {}
 
-export class AuditLogger {
-  private scope: string;
-
-  constructor() {}
-
-  private log(args: any[]): void {}
+  public log(args: any[]): void {
+    const o = {};
+    this.auditLogRepo.save(o);
+  }
 }

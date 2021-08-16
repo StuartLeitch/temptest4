@@ -116,6 +116,7 @@ export async function buildServices(
 
   return {
     logger: loggerBuilder.getLogger(),
+    // auditLogger: auditLoggerBuilder.getLogger(),
     pdfGenerator: createPdfGenerator(loggerBuilder.getLogger()),
     vatService: new VATService(),
     waiverService: new WaiverService(

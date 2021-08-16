@@ -276,8 +276,15 @@ import * as QueuePayloads from './infrastructure/message-queues/payloads';
 export { QueuePayloads };
 export * from './infrastructure/message-queues/payloadBuilder';
 
+// * LoggerBuilder/Logger
 export * from './infrastructure/logging/LoggerBuilder';
 export * from './infrastructure/logging/implementations/Logger';
+
+// * Audit Logger
+export * from './infrastructure/audit/AuditLoggerService';
+export * from './infrastructure/audit/implementations/AuditLoggerService';
+export * from './modules/audit/repos/auditLogRepo';
+export * from './modules/audit/repos/implementations/knexAuditLogRepo';
 
 // * Services Contracts
 export * from './domain/services/payment/braintree-service';
