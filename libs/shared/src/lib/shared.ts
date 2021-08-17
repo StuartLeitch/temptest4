@@ -286,6 +286,7 @@ export * from './infrastructure/audit/implementations/AuditLoggerService';
 export * from './modules/audit/repos/auditLogRepo';
 export * from './modules/audit/repos/implementations/knexAuditLogRepo';
 export * from './modules/audit/usecases/getRecentLogs/getRecentLogs';
+export * from './modules/audit/usecases/getLogById/getLogById';
 
 // * Services Contracts
 export * from './domain/services/payment/braintree-service';

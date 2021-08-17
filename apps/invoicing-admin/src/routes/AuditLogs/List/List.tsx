@@ -2,7 +2,7 @@ import React from 'react';
 import format from 'date-fns/format';
 import { Link } from 'react-router-dom';
 
-import  { formatDate } from '../../../utils/date';
+import  { formatDateWithMinutes } from '../../../utils/date';
 import { Table, Badge } from '../../../components';
 import { AuditLogType } from '../types';
 
@@ -25,61 +25,36 @@ const AuditLogsList: React.FC<AuditLogsListProps> = ({ logs }) => {
       <Table className='mb-0 table-striped' hover>
         <thead>
           <tr>
-            <th className='align-middle bt-0'>Description</th>
-            <th className='align-middle bt-0'>Type</th>
-            <th className='align-middle bt-0'>Code</th>
-            <th className='align-middle bt-0'>Reduction</th>
-            <th className='align-middle bt-0'>Status</th>
-            <th className='align-middle bt-0'>Redeem Count</th>
-            <th className='align-middle bt-0'>Date Created</th>
-            <th className='align-middle bt-0'>Date Updated</th>
-            <th className='align-middle bt-0'>Expiration Date</th>
+            <th className='align-middle bt-0'>Timestamp</th>
+            <th className='align-middle bt-0'>User Account</th>
+            <th className='align-middle bt-0'>Action</th>
+            <th className='align-middle bt-0'>Entity</th>
           </tr>
         </thead>
         <tbody>
           {logs && logs.map((log, index) => {
             const {
-              id
-              // reduction,
-              // type,
-              // code,
-              // dateCreated,
-              // dateUpdated,
-              // expirationDate,
-              // redeemCount,
-              // status,
-              // name,
+              id,
+              userAccount,
+              action,
+              entity,
+              timestamp
             } = log;
 
             return (
               <tr key={index}>
-                <td className='align-middle bt-0'>{id}</td>
-                {/* <td className='align-middle bt-0 font-weight-bold'>{type}</td>
                 <td className='align-middle bt-0 font-weight-bold'>
                   <Link
-                    to={`/coupons/details/${code}`}
+                    to={`/dashboards/audit_logs/diff/${id}`}
                     className='text-decoration-none'
                   >
-                    <span className='bg-twitter text-white pl-2 pr-2'>
-                      {code}
-                    </span>
-                  </Link>
-                </td>
-                <td className='align-middle bt-0 font-weight-bold'>
-                  {reduction}%
-                </td>
-                <td className='align-middle bt-0'>{COUPON_STATUS[status]}</td>
-                <td className='align-middle bt-0'>{redeemCount}</td>
+                    <span className='bg-twitter text-white pl-2 pr-2'>{timestamp && format(new Date(timestamp), 'dd MMM yyyy HH:mm')}</span>
+                  </Link></td>
+                <td className='align-middle bt-0 font-weight-bold'>{userAccount}</td>
                 <td className='align-middle bt-0'>
-                  {dateCreated && formatDate(new Date(dateCreated))}
+                  {action}
                 </td>
-                <td className='align-middle bt-0'>
-                  {dateUpdated && formatDate(new Date(dateUpdated))}
-                </td>
-                <td className='align-middle bt-0'>
-                  {expirationDate &&
-                    formatDate(new Date(expirationDate))}
-                </td> */}
+                <td className='align-middle bt-0'>{entity}</td>
               </tr>
             );
           })}

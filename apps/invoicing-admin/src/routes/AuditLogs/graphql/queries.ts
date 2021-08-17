@@ -1,6 +1,12 @@
 export const LOG_FRAGMENT = `
   fragment logFragment on Log {
     id
+    userAccount
+    entity
+    action
+    timestamp
+    oldValue
+    currentValue
   }
 `;
 

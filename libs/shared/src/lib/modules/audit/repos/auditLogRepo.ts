@@ -8,6 +8,7 @@ import { AuditLog } from '../domain/AuditLog';
 import { AuditLogPaginated } from '../domain/AuditLogPaginated';
 
 export interface AuditLogRepoContract extends Repo<AuditLog> {
+  getLogById(logId: string): Promise<Either<GuardFailure | RepoError, AuditLog>>;
   getRecentAuditLogs(args?: any): Promise<Either<GuardFailure | RepoError, AuditLogPaginated>>;
   save(
     auditLog: AuditLog

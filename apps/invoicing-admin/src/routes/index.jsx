@@ -12,6 +12,7 @@ import CreditNoteDetails from './Invoice/Details/CreditNote';
 import CouponsList from './Coupons';
 import { CouponDetails, CouponCreate } from './Coupon';
 import AuditLogs from './AuditLogs';
+import AuditLog from './AuditLog';
 
 import SplitInvoice from './Invoice/SplitInvoice';
 
@@ -86,6 +87,9 @@ export const RoutedContent = () => {
 
       <PrivateRoute path='/dashboards/audit_logs' exact>
         <AuditLogs />
+      </PrivateRoute>
+      <PrivateRoute path='/dashboards/audit_logs/diff/:id' exact>
+        <AuditLog />
       </PrivateRoute>
 
       {/*    404    */}

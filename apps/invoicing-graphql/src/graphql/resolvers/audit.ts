@@ -13,6 +13,7 @@ import {
   CreateCreditNoteUsecase,
   GetInvoiceDetailsDTO,
   GetRecentLogsUsecase,
+  GetLogByIdUsecase,
   GetVATNoteUsecase,
   PaymentMethodMap,
   InvoiceItemMap,
@@ -65,6 +66,28 @@ export const audit: Resolvers<Context> = {
         totalCount: logsList.totalCount,
         logs: logsList.auditLogs
       };
+    },
+
+    async auditlog(parent, args, context) {
+      const contextRoles = getAuthRoles(context);
+
+      const { repos } = context;
+
+      const usecase = new GetLogByIdUsecase(repos.audit);
+      const usecaseContext = {
+         roles: contextRoles,
+      };
+      const result = await usecase.execute({ id: args.logId }, usecaseContext);
+
+      handleForbiddenUsecase(result);
+
+      if (result.isLeft()) {
+        return undefined;
+      }
+
+      const log = result.value;
+
+      return log;
     }
   }
 };

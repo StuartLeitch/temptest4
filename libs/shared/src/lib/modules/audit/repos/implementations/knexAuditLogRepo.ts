@@ -9,18 +9,66 @@ import { AuditLog } from '../../domain/AuditLog'
 import { AuditLogPaginated } from '../../domain/AuditLogPaginated';
 
 import { AuditLogRepoContract } from '../auditLogRepo';
+import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
 
 export class KnexAuditLogRepo
   extends AbstractBaseDBRepo<Knex, AuditLog>
   implements AuditLogRepoContract {
 
-  async getRecentAuditLogs(): Promise<Either<GuardFailure | RepoError, AuditLogPaginated>> {
+  async getRecentAuditLogs(args?: any): Promise<Either<GuardFailure | RepoError, AuditLogPaginated>> {
+    const { pagination } = args;
+    const { db } = this;
+
+    const getModel = () =>
+      db(TABLES.AUDIT_LOGS);
+
+    const totalCount = await getModel().count(
+      `${TABLES.AUDIT_LOGS}.id`
+    );
+
+    const offset = pagination.offset * pagination.limit;
+
+    const rawLogs: Array<any> = await getModel()
+      .orderBy(`${TABLES.AUDIT_LOGS}.timestamp`, 'desc')
+      .offset(offset < totalCount[0].count ? offset : 0)
+      .limit(pagination.limit)
+      .select([`${TABLES.AUDIT_LOGS}.*`]);
+
+    const logs = rawLogs.map(l => ({
+      id: l.id,
+      userAccount: l.user_account,
+      timestamp: l.timestamp,
+      action: l.action,
+      entity: l.entity,
+      oldValue: l.old_value,
+      currentValue: l.current_value,
+    }) as any);
+
     return right({
-      auditLogs: [{
-        id: '666'
-      }],
-      totalCount: '1'
+      totalCount: `${totalCount[0]['count']}`,
+      auditLogs: logs
     });
+  }
+
+  async getLogById(logId: string): Promise<Either<GuardFailure | RepoError, any>> {
+    const { db } = this;
+
+    const rawLog = await db(TABLES.AUDIT_LOGS)
+      .select()
+      .where('id', logId.toString())
+      .first();
+
+    const auditLog = {
+      id: rawLog.id,
+      userAccount: rawLog.user_account,
+      timestamp: rawLog.timestamp,
+      action: rawLog.action,
+      entity: rawLog.entity,
+      oldValue: rawLog.old_value,
+      currentValue: rawLog.current_value
+    };
+
+    return right(auditLog);
   }
 
   async save(

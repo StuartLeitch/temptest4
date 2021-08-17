@@ -212,6 +212,12 @@ type Coupon @model(id: "coupons") {
 
 type Log {
   id: ID
+  userAccount: String
+  entity: String
+  action: String
+  timestamp: Date
+  oldValue: String
+  currentValue: String
 }
 
 type CouponCode {
@@ -339,6 +345,7 @@ type Query {
   remindersStatus(invoiceId: ID!): RemindersStatus
   remindersSent(invoiceId: ID!): [SentReminder]
   auditlogs(pagination: Pagination): PaginatedLogs
+  auditlog(logId: ID): Log
 }
 
 type Mutation {

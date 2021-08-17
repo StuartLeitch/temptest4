@@ -243,6 +243,12 @@ export type Coupon = {
 export type Log = {
   __typename?: 'Log';
   id?: Maybe<Scalars['ID']>;
+  userAccount?: Maybe<Scalars['String']>;
+  entity?: Maybe<Scalars['String']>;
+  action?: Maybe<Scalars['String']>;
+  timestamp?: Maybe<Scalars['Date']>;
+  oldValue?: Maybe<Scalars['String']>;
+  currentValue?: Maybe<Scalars['String']>;
 };
 
 export type CouponCode = {
@@ -375,6 +381,7 @@ export type Query = {
   remindersStatus?: Maybe<RemindersStatus>;
   remindersSent?: Maybe<Array<Maybe<SentReminder>>>;
   auditlogs?: Maybe<PaginatedLogs>;
+  auditlog?: Maybe<Log>;
 };
 
 
@@ -430,6 +437,11 @@ export type QueryRemindersSentArgs = {
 
 export type QueryAuditlogsArgs = {
   pagination?: Maybe<Pagination>;
+};
+
+
+export type QueryAuditlogArgs = {
+  logId?: Maybe<Scalars['ID']>;
 };
 
 export type Mutation = {
@@ -902,6 +914,12 @@ export type CouponResolvers<ContextType = any, ParentType extends ResolversParen
 
 export type LogResolvers<ContextType = any, ParentType extends ResolversParentTypes['Log'] = ResolversParentTypes['Log']> = {
   id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  userAccount?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  entity?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  action?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  timestamp?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
+  oldValue?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  currentValue?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -968,6 +986,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   remindersStatus?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, RequireFields<QueryRemindersStatusArgs, 'invoiceId'>>;
   remindersSent?: Resolver<Maybe<Array<Maybe<ResolversTypes['SentReminder']>>>, ParentType, ContextType, RequireFields<QueryRemindersSentArgs, 'invoiceId'>>;
   auditlogs?: Resolver<Maybe<ResolversTypes['PaginatedLogs']>, ParentType, ContextType, RequireFields<QueryAuditlogsArgs, never>>;
+  auditlog?: Resolver<Maybe<ResolversTypes['Log']>, ParentType, ContextType, RequireFields<QueryAuditlogArgs, never>>;
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
