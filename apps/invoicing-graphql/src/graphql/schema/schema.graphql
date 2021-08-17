@@ -210,6 +210,10 @@ type Coupon @model(id: "coupons") {
   name: String
 }
 
+type Log {
+  id: ID
+}
+
 type CouponCode {
   code: String
 }
@@ -242,6 +246,11 @@ type PaginatedInvoices {
 type PaginatedCoupons {
   totalCount: Int
   coupons: [Coupon]
+}
+
+type PaginatedLogs {
+  totalCount: Int
+  logs: [Log]
 }
 
 type RemindersStatus {
@@ -329,6 +338,7 @@ type Query {
   echo(value: String): String
   remindersStatus(invoiceId: ID!): RemindersStatus
   remindersSent(invoiceId: ID!): [SentReminder]
+  auditlogs(pagination: Pagination): PaginatedLogs
 }
 
 type Mutation {

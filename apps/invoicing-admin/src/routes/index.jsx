@@ -11,6 +11,7 @@ import InvoiceDetails from './Invoice/Details';
 import CreditNoteDetails from './Invoice/Details/CreditNote';
 import CouponsList from './Coupons';
 import { CouponDetails, CouponCreate } from './Coupon';
+import AuditLogs from './AuditLogs';
 
 import SplitInvoice from './Invoice/SplitInvoice';
 
@@ -82,6 +83,11 @@ export const RoutedContent = () => {
       </PrivateRoute>
 
       <Route path='/dashboards/financial' exact component={Financial} />
+
+      <PrivateRoute path='/dashboards/audit_logs' exact>
+        <AuditLogs />
+      </PrivateRoute>
+
       {/*    404    */}
       <Redirect to='/pages/error-404' />
     </Switch>

@@ -16,8 +16,10 @@ export class KnexAuditLogRepo
 
   async getRecentAuditLogs(): Promise<Either<GuardFailure | RepoError, AuditLogPaginated>> {
     return right({
-      auditLogs: [],
-      totalCount: '0'
+      auditLogs: [{
+        id: '666'
+      }],
+      totalCount: '1'
     });
   }
 

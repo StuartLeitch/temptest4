@@ -240,6 +240,11 @@ export type Coupon = {
   name?: Maybe<Scalars['String']>;
 };
 
+export type Log = {
+  __typename?: 'Log';
+  id?: Maybe<Scalars['ID']>;
+};
+
 export type CouponCode = {
   __typename?: 'CouponCode';
   code?: Maybe<Scalars['String']>;
@@ -277,6 +282,12 @@ export type PaginatedCoupons = {
   __typename?: 'PaginatedCoupons';
   totalCount?: Maybe<Scalars['Int']>;
   coupons?: Maybe<Array<Maybe<Coupon>>>;
+};
+
+export type PaginatedLogs = {
+  __typename?: 'PaginatedLogs';
+  totalCount?: Maybe<Scalars['Int']>;
+  logs?: Maybe<Array<Maybe<Log>>>;
 };
 
 export type RemindersStatus = {
@@ -363,6 +374,7 @@ export type Query = {
   echo?: Maybe<Scalars['String']>;
   remindersStatus?: Maybe<RemindersStatus>;
   remindersSent?: Maybe<Array<Maybe<SentReminder>>>;
+  auditlogs?: Maybe<PaginatedLogs>;
 };
 
 
@@ -415,6 +427,11 @@ export type QueryRemindersSentArgs = {
   invoiceId: Scalars['ID'];
 };
 
+
+export type QueryAuditlogsArgs = {
+  pagination?: Maybe<Pagination>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   confirmInvoice: Payer;
@@ -451,11 +468,6 @@ export type MutationUpdateCouponArgs = {
 
 export type MutationCreateCouponArgs = {
   coupon?: Maybe<CouponInput>;
-};
-
-
-export type MutationSetTransactionToActiveArgs = {
-  customId?: Maybe<Scalars['ID']>;
 };
 
 
@@ -629,12 +641,14 @@ export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Coupon: ResolverTypeWrapper<Coupon>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
+  Log: ResolverTypeWrapper<Log>;
   CouponCode: ResolverTypeWrapper<CouponCode>;
   CouponInput: CouponInput;
   Waiver: ResolverTypeWrapper<Waiver>;
   ClientToken: ResolverTypeWrapper<ClientToken>;
   PaginatedInvoices: ResolverTypeWrapper<PaginatedInvoices>;
   PaginatedCoupons: ResolverTypeWrapper<PaginatedCoupons>;
+  PaginatedLogs: ResolverTypeWrapper<PaginatedLogs>;
   RemindersStatus: ResolverTypeWrapper<RemindersStatus>;
   ReminderType: ReminderType;
   SentReminder: ResolverTypeWrapper<SentReminder>;
@@ -678,12 +692,14 @@ export type ResolversParentTypes = {
   Boolean: Scalars['Boolean'];
   Coupon: Coupon;
   Int: Scalars['Int'];
+  Log: Log;
   CouponCode: CouponCode;
   CouponInput: CouponInput;
   Waiver: Waiver;
   ClientToken: ClientToken;
   PaginatedInvoices: PaginatedInvoices;
   PaginatedCoupons: PaginatedCoupons;
+  PaginatedLogs: PaginatedLogs;
   RemindersStatus: RemindersStatus;
   SentReminder: SentReminder;
   ArticleFilters: ArticleFilters;
@@ -884,6 +900,11 @@ export type CouponResolvers<ContextType = any, ParentType extends ResolversParen
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type LogResolvers<ContextType = any, ParentType extends ResolversParentTypes['Log'] = ResolversParentTypes['Log']> = {
+  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type CouponCodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['CouponCode'] = ResolversParentTypes['CouponCode']> = {
   code?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -909,6 +930,12 @@ export type PaginatedInvoicesResolvers<ContextType = any, ParentType extends Res
 export type PaginatedCouponsResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaginatedCoupons'] = ResolversParentTypes['PaginatedCoupons']> = {
   totalCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   coupons?: Resolver<Maybe<Array<Maybe<ResolversTypes['Coupon']>>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type PaginatedLogsResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaginatedLogs'] = ResolversParentTypes['PaginatedLogs']> = {
+  totalCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  logs?: Resolver<Maybe<Array<Maybe<ResolversTypes['Log']>>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -940,6 +967,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   echo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<QueryEchoArgs, never>>;
   remindersStatus?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, RequireFields<QueryRemindersStatusArgs, 'invoiceId'>>;
   remindersSent?: Resolver<Maybe<Array<Maybe<ResolversTypes['SentReminder']>>>, ParentType, ContextType, RequireFields<QueryRemindersSentArgs, 'invoiceId'>>;
+  auditlogs?: Resolver<Maybe<ResolversTypes['PaginatedLogs']>, ParentType, ContextType, RequireFields<QueryAuditlogsArgs, never>>;
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
@@ -978,11 +1006,13 @@ export type Resolvers<ContextType = any> = {
   CreditNote?: CreditNoteResolvers<ContextType>;
   PaymentMethod?: PaymentMethodResolvers<ContextType>;
   Coupon?: CouponResolvers<ContextType>;
+  Log?: LogResolvers<ContextType>;
   CouponCode?: CouponCodeResolvers<ContextType>;
   Waiver?: WaiverResolvers<ContextType>;
   ClientToken?: ClientTokenResolvers<ContextType>;
   PaginatedInvoices?: PaginatedInvoicesResolvers<ContextType>;
   PaginatedCoupons?: PaginatedCouponsResolvers<ContextType>;
+  PaginatedLogs?: PaginatedLogsResolvers<ContextType>;
   RemindersStatus?: RemindersStatusResolvers<ContextType>;
   SentReminder?: SentReminderResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;

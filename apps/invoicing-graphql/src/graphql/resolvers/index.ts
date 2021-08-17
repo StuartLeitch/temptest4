@@ -11,6 +11,7 @@ import { journals } from './journals';
 import { generateCompensatoryEvents } from './generateCompensatoryEvents';
 import { reminders } from './reminders';
 import { generateDraftCompensatoryEvents } from './generateDraftCompensatoryEvents';
+import { audit } from './audit';
 
 export const resolvers: Resolvers<Context> = merge(
   {},
@@ -21,5 +22,6 @@ export const resolvers: Resolvers<Context> = merge(
   journals,
   generateCompensatoryEvents,
   reminders,
-  generateDraftCompensatoryEvents
+  generateDraftCompensatoryEvents,
+  audit
 );
