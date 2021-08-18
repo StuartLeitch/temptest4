@@ -50,7 +50,7 @@ const TrTableCreditNotesList = ({creditNotes}) => {
           dateCreated,
           persistentReferenceNumber
         }) => (
-          <tr key={id} className='table-warning'>
+          <tr key={id}>
             <td className='align-middle'>
               <Badge>{CREATION_REASON[creationReason]}</Badge>
             </td>
