@@ -55,9 +55,9 @@ const SidebarTopA = () => {
               <i className='fas fa-angle-down ml-2'></i>
             </DropdownToggle>
             <DropdownMenu persist>
-              <DropdownItem header><h6>{name}</h6></DropdownItem>
+              <DropdownItem header><strong>{name}</strong></DropdownItem>
               <DropdownItem header>
-                <i className='fas fa-user-secret mr-2'></i> {roles[0].replace(/_/g, ' ').replace(/(^|\s)\S/g, function(t) { return t.toUpperCase() })}</DropdownItem>
+                <i className='fas fa-user-secret mr-2'></i> {roles && roles[0].replace(/_/g, ' ').replace(/(^|\s)\S/g, function(t) { return t.toUpperCase() })}</DropdownItem>
               <DropdownItem divider />
               <DropdownItem
                 onClick={(evt) => {
