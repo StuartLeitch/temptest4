@@ -89,7 +89,7 @@ export function applyFilters(src: QueryBuilder, filters: Filters) {
           'WITHDRAWN_MANUSCRIPT': 'withdrawn-manuscript',
           'REDUCTION_APPLIED': 'reduction-applied',
           'WAIVED_MANUSCRIPT': 'waived-manuscript',
-          'CHANGED_PAYER_DETAILS': 'changed-payer-details',
+          'CHANGE_PAYER_DETAILS': 'change-payer-details',
           'BAD_DEBT': 'bad-debt',
           'OTHER': 'other'
         }

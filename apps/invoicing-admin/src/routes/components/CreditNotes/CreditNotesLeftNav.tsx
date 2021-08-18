@@ -43,7 +43,7 @@ const CreditNotesLeftNav = (props) => {
         <NavItem className='mb-2'>
           <NavLink href='#' className='d-flex px-1'>
             <span>Reason</span>
-            <i className='fas fa-angle-down align-self-center ml-auto'></i>
+            <i className='fas align-self-center ml-auto'></i>
           </NavLink>
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
@@ -51,7 +51,6 @@ const CreditNotesLeftNav = (props) => {
             onChange={(evt) => onFilterHandler.callback(evt.target)}
             name='reason.WITHDRAWN_MANUSCRIPT'
             checked={reason.includes('WITHDRAWN_MANUSCRIPT')}
-            className='text-info'
             type='checkbox'
             id='creditnote-reason-withdrawn-manuscript'
             label='Withdrawn Manuscript'
@@ -63,7 +62,6 @@ const CreditNotesLeftNav = (props) => {
             name='reason.REDUCTION_APPLIED'
             onChange={(evt) => onFilterHandler.callback(evt.target)}
             checked={reason.includes('REDUCTION_APPLIED')}
-            className='text-info'
             type='checkbox'
             id='creditnote-reason-reduction-applied'
             label='Reduction Applied'
@@ -75,7 +73,6 @@ const CreditNotesLeftNav = (props) => {
             name='reason.WAIVED_MANUSCRIPT'
             onChange={(evt: any) => onFilterHandler.callback(evt.target)}
             checked={reason.includes('WAIVED_MANUSCRIPT')}
-            className='text-info'
             type='checkbox'
             id='creditnote-reason-waived-manuscript'
             label='Waived Manuscript'
@@ -84,10 +81,9 @@ const CreditNotesLeftNav = (props) => {
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
           <CustomInput
-            name='reason.CHANGED_PAYER_DETAILS'
+            name='reason.CHANGE_PAYER_DETAILS'
             onChange={(evt: any) => onFilterHandler.callback(evt.target)}
-            checked={reason.includes('CHANGED_PAYER_DETAILS')}
-            className='text-info'
+            checked={reason.includes('CHANGE_PAYER_DETAILS')}
             type='checkbox'
             id='creditnote-reason-change-payer-details'
             label='Change Payer Details'
@@ -99,7 +95,6 @@ const CreditNotesLeftNav = (props) => {
             name='reason.BAD_DEBT'
             onChange={(evt: any) => onFilterHandler.callback(evt.target)}
             checked={reason.includes('BAD_DEBT')}
-            className='text-info'
             type='checkbox'
             id='creditnote-reason-bad-debt'
             label='Bad Debt'
@@ -111,7 +106,6 @@ const CreditNotesLeftNav = (props) => {
             name='reason.OTHER'
             onChange={(evt: any) => onFilterHandler.callback(evt.target)}
             checked={reason.includes('OTHER')}
-            className='text-info'
             type='checkbox'
             id='creditnote-reason-other'
             label='Other Reason'
