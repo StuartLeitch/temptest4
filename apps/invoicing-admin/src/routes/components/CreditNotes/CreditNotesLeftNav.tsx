@@ -108,7 +108,7 @@ const CreditNotesLeftNav = (props) => {
             checked={reason.includes('OTHER')}
             type='checkbox'
             id='creditnote-reason-other'
-            label='Other Reason'
+            label='Other'
             inline
           />
         </NavItem>

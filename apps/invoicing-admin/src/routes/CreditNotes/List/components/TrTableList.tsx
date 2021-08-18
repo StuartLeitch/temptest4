@@ -60,7 +60,7 @@ const TrTableCreditNotesList = ({creditNotes}) => {
                 to={`/credit-notes/details/${id}`}
                 className='text-decoration-none'
               >
-                <span className={'text-secondary'}>
+                <span className={'text-warning'}>
                   <strong>
                       {persistentReferenceNumber}
                   </strong>
