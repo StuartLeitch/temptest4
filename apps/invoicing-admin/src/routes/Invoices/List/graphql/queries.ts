@@ -186,9 +186,19 @@ fragment creditNoteFragment on CreditNote {
   persistentReferenceNumber
   creationReason
   invoice {
-  	invoiceItem {
+    invoiceItem {
+      id
+      type
+      vat
+      price
+      coupons {
+       reduction
+      }
+      waivers {
+       reduction
+      }
       article {
-        customId
+       customId
       }
     }
   }
