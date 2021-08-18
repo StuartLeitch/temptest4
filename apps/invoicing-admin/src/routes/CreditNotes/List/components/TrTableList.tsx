@@ -31,7 +31,9 @@ const TrTableCreditNotesList = ({creditNotes}) => {
       waivers += w.reduction;
     })
 
-    i.total = -(Math.round(i.invoice.invoiceItem.price * (1 - (coupons + waivers) / 100) * 100) / 100);
+    const netCharges = i.invoice.invoiceItem.price * (1 - (coupons + waivers) / 100) * 100;
+    const total = netCharges + ((netCharges * i.invoice.invoiceItem.vat) / 100);
+    i.total = -(Math.round(total) / 100);
 
     return i;
   });

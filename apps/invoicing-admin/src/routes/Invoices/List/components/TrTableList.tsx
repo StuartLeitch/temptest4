@@ -40,7 +40,9 @@ const TrTableInvoicesList = ({ invoices }) => {
       waivers += w.reduction;
     })
 
-    i.total = Math.round(i.invoiceItem.price * (1 - (coupons + waivers) / 100) * 100) / 100;
+    const netCharges = i.invoiceItem.price * (1 - (coupons + waivers) / 100) * 100;
+    const total = netCharges + ((netCharges * i.invoiceItem.vat) / 100);
+    i.total = Math.round(total) / 100;
 
     return i;
   });
