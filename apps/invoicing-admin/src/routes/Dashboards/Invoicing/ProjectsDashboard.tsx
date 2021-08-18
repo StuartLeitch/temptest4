@@ -11,6 +11,7 @@ import {
   Row,
   CustomInput,
   Button,
+  Form,
   Input,
   InputGroup,
   InputGroupAddon,
@@ -78,13 +79,15 @@ const ProjectsDashboard: React.FC = () => {
     INVOICES_AND_CREDIT_NOTES_QUERY
   );
 
-  const handleSearch = useCallback(async (eventTarget: any) => {
+  const handleSearch = useCallback(async (ev: any) => {
+
+    ev.preventDefault();
+
     const searchValue = (document.getElementById('search') as any).value;
     const isSearchByRefNumberChecked = (document.getElementById('searchByReferenceNumber') as any).checked;
     const isSearchByManuscriptIdChecked = (document.getElementById('searchByManuscriptId') as any).checked;
 
     if (_.isEmpty(searchValue)) return;
-
 
     if (isSearchByRefNumberChecked) {
       filters['referenceNumber'] = searchValue;
@@ -125,14 +128,16 @@ const ProjectsDashboard: React.FC = () => {
           </p> */}
         </Col>
         <Col lg={12}>
-          <InputGroup>
-            <Input placeholder='Search for...' className='bg-white' id="search" />
-            <InputGroupAddon addonType='append'>
-              <Button color='primary' onClick={handleSearch}>
-                <i className='fa fa-search'></i>
-              </Button>
-            </InputGroupAddon>
-          </InputGroup>
+          <Form onSubmit={handleSearch}>
+            <InputGroup>
+              <Input placeholder='Search for...' className='bg-white' id="search" />
+              <InputGroupAddon addonType='append'>
+                <Button color='primary' onClick={handleSearch}>
+                  <i className='fa fa-search'></i>
+                </Button>
+              </InputGroupAddon>
+            </InputGroup>
+          </Form>
         </Col>
         <Col lg={12}>
           <FormGroup row>
