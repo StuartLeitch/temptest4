@@ -39,7 +39,8 @@ export const RoutedContent = () => {
   const { token } = auth.data;
 
   const client = useContext(ClientContext);
-  if(client.headers['Authorization'] === null) {
+  // ! Do not use '===' for checking
+  if(client.headers['Authorization'] == null) {
     client.setHeader('Authorization', `Bearer ${token}`)
   }
 

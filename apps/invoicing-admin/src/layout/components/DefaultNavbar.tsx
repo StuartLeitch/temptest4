@@ -30,7 +30,7 @@ export const DefaultNavbar: React.FC = () => {
         </NavItem>
         <Breadcrumb tag='nav' listTag='div' className='d-none d-md-block'>
           <BreadcrumbItem className='navbar-text'>
-            <a href='#'>Home</a>
+            <a href='/dashboards/invoicing'>Home</a>
           </BreadcrumbItem>
           {breadcrumbs.map((breadcrumb, index) => {
             let bc;
