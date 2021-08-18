@@ -54,7 +54,13 @@ const TrTableCreditNotesList = ({creditNotes}) => {
             <td className='align-middle'>
               <Badge>{CREATION_REASON[creationReason]}</Badge>
             </td>
-            <td className='align-left'>{invoice?.invoiceItem?.article?.customId}</td>
+            <td className='align-left'>
+              <Link
+                  to={`/credit-notes/details/${id}`}
+                  className='text-decoration-none'
+                >{invoice?.invoiceItem?.article?.customId}
+              </Link>
+            </td>
             <td className='align-middle'>
               <Link
                 to={`/credit-notes/details/${id}`}
