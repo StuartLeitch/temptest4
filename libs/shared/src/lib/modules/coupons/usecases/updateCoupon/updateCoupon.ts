@@ -16,12 +16,14 @@ import {
 // * Usecase specific
 import { CouponId } from '../../domain/CouponId';
 import { Coupon } from '../../domain/Coupon';
+import { CouponMap } from '../../mappers/CouponMap';
 
 import { CouponRepoContract } from '../../repos/couponRepo';
 
 import { UpdateCouponResponse as Response } from './updateCouponResponse';
 import type { UpdateCouponDTO as DTO } from './updateCouponDTO';
 import * as Errors from './updateCouponErrors';
+import { AuditLoggerServiceContract } from '../../../../infrastructure/audit';
 
 import {
   sanityChecksRequestParameters,
@@ -32,57 +34,73 @@ import {
 export class UpdateCouponUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
-  constructor(private couponRepo: CouponRepoContract) {
-    super();
-    this.getCouponWithInput = this.getCouponWithInput.bind(this);
-    this.saveCoupon = this.saveCoupon.bind(this);
-  }
+    private couponOldValue;
+    private couponCurrentValue;
 
-  @Authorize('coupon:update')
-  public async execute(request: DTO, context?: Context): Promise<Response> {
-    const maybeCoupon = await new AsyncEither(request)
-      .then(sanityChecksRequestParameters)
-      .then(this.getCouponWithInput)
-      .map(updateCoupon)
-      .then(this.saveCoupon)
-      .execute();
-
-    return maybeCoupon;
-  }
-
-  private async getCouponWithInput(
-    request: DTO
-  ): Promise<
-    Either<Errors.CouponNotFoundError | GuardFailure, UpdateCouponData>
-  > {
-    const couponId = CouponId.create(new UniqueEntityID(request.id));
-
-    const maybeCoupon = await this.couponRepo.getCouponById(couponId);
-
-    if (maybeCoupon.isLeft()) {
-      return left(new Errors.CouponNotFoundError(request.id));
+    constructor(private couponRepo: CouponRepoContract, private auditLoggerService: AuditLoggerServiceContract) {
+      super();
+      this.getCouponWithInput = this.getCouponWithInput.bind(this);
+      this.saveCoupon = this.saveCoupon.bind(this);
     }
 
-    return right({ coupon: maybeCoupon.value, request });
-  }
+    @Authorize('coupon:update')
+    public async execute(request: DTO, context?: Context): Promise<Response> {
+      const maybeCoupon = await new AsyncEither(request)
+        .then(sanityChecksRequestParameters)
+        .then(this.getCouponWithInput)
+        .map(updateCoupon)
+        .then(this.saveCoupon)
+        .execute();
 
-  private async saveCoupon(
-    coupon: Coupon
-  ): Promise<Either<Errors.CouldNotSaveCouponError, Coupon>> {
-    try {
-      const savedCoupon = await this.couponRepo.update(coupon);
+      return maybeCoupon;
+    }
 
-      if (savedCoupon.isLeft()) {
-        return left(
-          new Errors.CouldNotSaveCouponError(
-            new Error(savedCoupon.value.message)
-          )
-        );
+    private async getCouponWithInput(
+      request: DTO
+    ): Promise<
+      Either<Errors.CouponNotFoundError | GuardFailure, UpdateCouponData>
+    > {
+      const couponId = CouponId.create(new UniqueEntityID(request.id));
+
+      const maybeCoupon = await this.couponRepo.getCouponById(couponId);
+
+      if (maybeCoupon.isLeft()) {
+        return left(new Errors.CouponNotFoundError(request.id));
       }
 
-      return right(savedCoupon.value);
-    } catch (e) {
-      return left(new Errors.CouldNotSaveCouponError(e));
+      // * Save the old value for the audit log
+      this.couponOldValue = CouponMap.toPersistence(maybeCoupon.value);
+
+      return right({ coupon: maybeCoupon.value, request });
     }
-  }
+
+    private async saveCoupon(
+      coupon: Coupon
+    ): Promise<Either<Errors.CouldNotSaveCouponError, Coupon>> {
+      try {
+        const savedCoupon = await this.couponRepo.update(coupon);
+
+        if (savedCoupon.isLeft()) {
+          return left(
+            new Errors.CouldNotSaveCouponError(
+              new Error(savedCoupon.value.message)
+            )
+          );
+        }
+
+        // * Save the audit log
+        this.couponCurrentValue = CouponMap.toPersistence(savedCoupon.value);
+        this.auditLoggerService.log({
+          action: 'has edited',
+          entity: 'coupon',
+          oldValue: this.couponOldValue,
+          timestamp: new Date(),
+          currentValue: this.couponCurrentValue,
+        });
+
+        return right(savedCoupon.value);
+      } catch (e) {
+        return left(new Errors.CouldNotSaveCouponError(e));
+      }
+    }
 }

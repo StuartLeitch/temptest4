@@ -283,6 +283,7 @@ export * from './infrastructure/logging/implementations/Logger';
 // * Audit Logger
 export * from './infrastructure/audit/AuditLoggerService';
 export * from './infrastructure/audit/implementations/AuditLoggerService';
+export * from './infrastructure/audit/implementations/AuditLoggerServiceProvider';
 export * from './modules/audit/repos/auditLogRepo';
 export * from './modules/audit/repos/implementations/knexAuditLogRepo';
 export * from './modules/audit/usecases/getRecentLogs/getRecentLogs';

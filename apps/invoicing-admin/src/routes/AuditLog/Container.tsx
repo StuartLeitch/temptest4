@@ -34,7 +34,7 @@ const AuditLogContainer: React.FC = () => {
     if (error) return <Error error={error} />;
 
     if (data) {
-      const oldData = `${data.auditlog.oldValue}`;
+      const oldData = JSON.stringify(JSON.parse(data.auditlog.oldValue), null, '\t')
       const newData = JSON.stringify(JSON.parse(data.auditlog.currentValue), null, '\t');
 
       return (

@@ -2,21 +2,17 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import { AuditLog } from "../../../modules/audit/domain/AuditLog";
+import { AuditLoggerServiceContract } from "../AuditLoggerService";
 
 /**
  * ------------------------------------------------
  * This is the main AuditLogger Object.
  * ------------------------------------------------
  */
-export class AuditLoggerService {
-  private userData: any;
+export class AuditLoggerService implements AuditLoggerServiceContract{
 
-  constructor(private auditLogRepo) {
+  constructor(private auditLogRepo, private readonly userData: any) {
     // * do nothing yet
-  }
-
-  setUserData(userData: any) {
-    this.userData = userData;
   }
 
   public log(args: any): void {

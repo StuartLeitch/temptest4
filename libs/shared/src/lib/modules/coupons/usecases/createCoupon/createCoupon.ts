@@ -28,6 +28,7 @@ import {
   CouponType,
   Coupon,
 } from '../../domain/Coupon';
+import { CouponMap } from '../../mappers/CouponMap';
 
 import { sanityChecksRequestParameters } from './utils';
 import { AuditLoggerServiceContract } from '../../../../infrastructure/audit';
@@ -47,24 +48,13 @@ export class CreateCouponUsecase
   @Authorize('coupon:create')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      // const finalResult = await new AsyncEither(request)
-      //   .then(sanityChecksRequestParameters(this.couponRepo))
-      //   .then(this.createCoupon)
-      //   .then(this.saveCoupon)
-      //   .execute();
+      const finalResult = await new AsyncEither(request)
+        .then(sanityChecksRequestParameters(this.couponRepo))
+        .then(this.createCoupon)
+        .then(this.saveCoupon)
+        .execute();
 
-      // * Save information as audit log
-      this.auditLoggerService.log({
-        action: 'added new',
-        entity: 'coupon',
-        oldValue: null,
-        timestamp: new Date(),
-        // currentValue: finalResult.value
-        currentValue: { "ciuciu": "bau" }
-      });
-
-      // return finalResult;
-      return right(null);
+      return finalResult;
     } catch (err) {
       return left(new UnexpectedError(err));
     }
@@ -102,6 +92,17 @@ export class CreateCouponUsecase
           new Errors.CouponNotSavedError(new Error(result.value.message))
         );
       }
+
+      // * Save information as audit log
+      this.auditLoggerService.log({
+        action: 'added new',
+        entity: 'coupon',
+        oldValue: null,
+        timestamp: new Date(),
+        currentValue: CouponMap.toPersistence(result.value)
+      });
+
+
       return right(result.value);
     } catch (err) {
       return left(new Errors.CouponNotSavedError(err));
