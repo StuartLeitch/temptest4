@@ -300,6 +300,16 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     this.addDomainEvent(new InvoiceFinalizedEvent(this, now));
   }
 
+  public getInvoicePercentage(): number {
+    if (this.invoiceItems.length === 0) {
+      throw new Error(
+        `Invoice with id {${this.id.toString()}} does not have any invoice items attached and it was tried to calculate invoice total`
+      );
+    }
+
+    return this.invoiceItems.map((item) => item.vat).pop();
+  }
+
   public getInvoiceTotal(): number {
     if (this.invoiceItems.length === 0) {
       throw new Error(

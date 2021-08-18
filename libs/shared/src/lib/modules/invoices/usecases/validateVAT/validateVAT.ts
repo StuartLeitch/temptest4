@@ -18,18 +18,15 @@ import { ValidateVATRequestDTO as DTO } from './validateVATDTO';
 import * as Errors from './validateVATErrors';
 
 export class ValidateVATUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private vatService: VATService) {
+    super();
+
     this.vatService = vatService;
   }
 
-  private async getAccessControlContext(request, context?) {
-    return {};
-  }
-
-  @Authorize('validate:vatnumber')
+  @Authorize('VAT:validate')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const { vatNumber, countryCode } = request;
 

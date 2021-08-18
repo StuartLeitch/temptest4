@@ -21,6 +21,12 @@ export enum PaymentStatus {
   FAILED = 'FAILED',
 }
 
+export enum PaymentTypes {
+  BANK_TRANSFER = 'BANK_TRANSFER',
+  CREDIT_CARD = 'CREDIT_CARD',
+  PAYPAL = 'PAYPAL',
+}
+
 import { PaymentCompleted } from './events';
 
 export interface PaymentProps {

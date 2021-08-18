@@ -6,6 +6,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { PayerRepoContract } from '../../repos/payerRepo';
 import { PayerId } from '../../domain/PayerId';
@@ -13,13 +18,17 @@ import { Payer } from '../../domain/Payer';
 
 // * Usecase specific
 import { GetPayerDetailsResponse as Response } from './getPayerDetailsResponse';
-import { GetPayerDetailsDTO as DTO } from './getPayerDetailsDTO';
+import type { GetPayerDetailsDTO as DTO } from './getPayerDetailsDTO';
 import * as Errors from './getPayerDetailsErrors';
 
 export class GetPayerDetailsUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
-  constructor(private payerRepo: PayerRepoContract) {}
+  constructor(private payerRepo: PayerRepoContract) {
+    super();
+  }
 
+  @Authorize('payer:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     let payer: Payer;
 

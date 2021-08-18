@@ -51,9 +51,8 @@ import type { UpdateTransactionOnAcceptManuscriptDTO as DTO } from './updateTran
 import * as Errors from './updateTransactionOnAcceptManuscriptErrors';
 
 export class UpdateTransactionOnAcceptManuscriptUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private addressRepo: AddressRepoContract,
     private catalogRepo: CatalogRepoContract,
@@ -68,10 +67,8 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
     private emailService: EmailService,
     private vatService: VATService,
     private loggerService: LoggerContract
-  ) {}
-
-  private async getAccessControlContext(request, context?) {
-    return {};
+  ) {
+    super();
   }
 
   @Authorize('transaction:update')

@@ -56,7 +56,7 @@ let response: PublishInvoiceToErpResponse;
 let invoice: Invoice;
 
 const context: UsecaseAuthorizationContext = {
-  roles: [Roles.ADMIN],
+  roles: [Roles.CHRON_JOB],
 };
 
 Before({ tags: '@ValidatePublishInvoiceToErp' }, function () {
@@ -398,10 +398,10 @@ Then(
 );
 
 Then(
-  /The tax code selected for the Invoice with the ID "([\w-]+)" is ([\d]+)/,
-  function (invoiceId: string, taxRate: string) {
+  /The tax code selected for the Invoice with the ID "([\w-]+)" is ([\d\w_-]+)/,
+  function (invoiceId: string, taxCode: string) {
     expect(response.isRight()).to.be.true;
     const netsuiteData = mockErpService.getInvoice(invoiceId);
-    expect(netsuiteData.taxRateId).to.equal(taxRate);
+    expect(netsuiteData.taxDetails.taxCode).to.equal(taxCode);
   }
 );

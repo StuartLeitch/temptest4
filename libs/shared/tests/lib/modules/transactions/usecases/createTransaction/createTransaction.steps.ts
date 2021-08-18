@@ -31,7 +31,7 @@ import { CreateTransactionResponse } from '../../../../../../src/lib/modules/tra
 import { CreateTransactionUsecase } from '../../../../../../src/lib/modules/transactions/usecases/createTransaction/createTransaction';
 
 const defaultContext: UsecaseAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN],
+  roles: [Roles.QUEUE_EVENT_HANDLER],
 };
 
 interface Context {

@@ -19,17 +19,14 @@ import {
 import { UnexpectedError } from '../../../../core/logic/AppError';
 
 export class GetRecentCreditNotesUesecase
-  implements
-    UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext>,
-    AccessControlledUsecase<
-      DTO,
-      UsecaseAuthorizationContext,
-      AccessControlContext
-    > {
-  constructor(private creditNoteRepo: CreditNoteRepoContract) {}
-
-  private async getAccessControlContext(request, context?) {
-    return {};
+  extends AccessControlledUsecase<
+    DTO,
+    UsecaseAuthorizationContext,
+    AccessControlContext
+  >
+  implements UseCase<DTO, Promise<Response>, UsecaseAuthorizationContext> {
+  constructor(private creditNoteRepo: CreditNoteRepoContract) {
+    super();
   }
 
   @Authorize('creditNote:read')

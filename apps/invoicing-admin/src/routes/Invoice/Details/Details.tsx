@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useParams, Route } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useQuery } from 'graphql-hooks';
 
 import {
@@ -60,6 +60,7 @@ const Details: React.FC = (props) => {
   
 
   // * -> Net and total charges computing
+
   const { vat, coupons, waivers, price } = invoice?.invoiceItem;
   const reductions = [...coupons, ...waivers];
   let totalDiscountFromReductions = reductions.reduce(

@@ -1,6 +1,11 @@
 // * Authorization imports
 
-import { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../../domain/authorization';
 
 // * Core domain imports
 import { ErpInvoiceResponse } from '../../../../../domain/services/ErpService';
@@ -21,6 +26,7 @@ import { PublishCreditNoteToErpUsecase } from '../publishCreditNoteToErp/publish
 import { RetryCreditNotesResponse as Response } from './retryCreditNotesResponse';
 
 export class RetryCreditNotesUsecase
+  extends AccessControlledUsecase<Record<string, unknown>, Context, AccessControlContext>
   implements UseCase<Record<string, unknown>, Promise<Response>, Context> {
   private publishCreditNoteToErpUsecase: PublishCreditNoteToErpUsecase;
   constructor(
@@ -33,6 +39,8 @@ export class RetryCreditNotesUsecase
     private erpService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {
+    super();
+
     this.publishCreditNoteToErpUsecase = new PublishCreditNoteToErpUsecase(
       this.creditNoteRepo,
       this.invoiceRepo,
@@ -44,14 +52,9 @@ export class RetryCreditNotesUsecase
       this.loggerService
     );
   }
-  private async getAccessControlContext(_request: any, _context?: any) {
-    return {};
-  }
 
-  public async execute(
-    request?: Record<string, unknown>,
-    context?: Context
-  ): Promise<Response> {
+  @Authorize('erp:publish')
+  public async execute(request?: Record<string, unknown>, context?: Context): Promise<Response> {
     try {
       const maybeUnregisteredErpCreditNotesIds = await this.creditNoteRepo.getUnregisteredErpCreditNotes();
       const registeredCreditNotes: ErpInvoiceResponse[] = [];
@@ -80,7 +83,10 @@ export class RetryCreditNotesUsecase
 
       for (const unregisteredCreditNote of unregisteredErpCreditNotesIds) {
         const publishedCreditNoteResponse = await this.publishCreditNoteToErpUsecase.execute(
-          { creditNoteId: unregisteredCreditNote.id.toString() }
+          {
+            creditNoteId: unregisteredCreditNote.id.toString(),
+          },
+          context
         );
         if (publishedCreditNoteResponse.isLeft()) {
           errs.push(publishedCreditNoteResponse.value);

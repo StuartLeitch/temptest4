@@ -17,7 +17,7 @@ import { EventHandler } from '../event-handler';
 
 const SUBMISSION_WITHDRAWN = 'SubmissionWithdrawn';
 const defaultContext: UsecaseAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN],
+  roles: [Roles.QUEUE_EVENT_HANDLER],
 };
 
 export const SubmissionWithdrawn: EventHandler<SubmissionWithdrawnPayload> = {

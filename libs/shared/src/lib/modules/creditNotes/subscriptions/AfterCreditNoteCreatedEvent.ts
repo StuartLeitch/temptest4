@@ -9,7 +9,6 @@ import {
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
 
 import { CreditNoteCreated as CreditNoteCreatedEvent } from '../domain/events/CreditNoteCreated';
-
 import { CreditNoteRepoContract } from '../repos/creditNoteRepo';
 import { PaymentMethodRepoContract } from '../../payments/repos/paymentMethodRepo';
 import { ArticleRepoContract } from '../../manuscripts/repos/articleRepo';
@@ -22,16 +21,12 @@ import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
 
 import { PublishInvoiceCreditedUsecase } from '../../invoices/usecases/publishEvents/publishInvoiceCredited';
-import { PublishRevenueRecognitionReversalUsecase } from '../../invoices/usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
+// import { PublishRevenueRecognitionReversalUsecase } from '../../invoices/usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
 import { GetInvoiceDetailsUsecase } from '../../invoices/usecases/getInvoiceDetails';
 import { GetItemsForInvoiceUsecase } from '../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
 import { left } from '../../../core/logic/Either';
 import { UnexpectedError } from '../../../core/logic/AppError';
-
-const defaultContext: UsecaseAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN],
-};
 
 export class AfterCreditNoteCreatedEvent
   implements HandleContract<CreditNoteCreatedEvent> {
@@ -49,7 +44,7 @@ export class AfterCreditNoteCreatedEvent
     private publishCreditNoteCreated:
       | PublishInvoiceCreditedUsecase
       | NoOpUseCase,
-    private publishRevenueRecognitionReversal: PublishRevenueRecognitionReversalUsecase,
+    // private publishRevenueRecognitionReversal: PublishRevenueRecognitionReversalUsecase,
     private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
@@ -65,6 +60,9 @@ export class AfterCreditNoteCreatedEvent
   private async onCreditNoteCreatedEvent(
     event: CreditNoteCreatedEvent
   ): Promise<any> {
+    const defaultContext = {
+      roles: [Roles.DOMAIN_EVENT_HANDLER],
+    };
     const getInvoiceDetails = new GetInvoiceDetailsUsecase(this.invoiceRepo);
     try {
       const maybeCreditNote = await this.creditNoteRepo.getCreditNoteById(
@@ -102,18 +100,18 @@ export class AfterCreditNoteCreatedEvent
           this.waiverRepo
         );
 
-        const maybeInvoiceItemResult = await getItemsUsecase.execute({
-          invoiceId: creditNote.invoiceId.id.toString(),
-        });
-
-        if (maybeInvoiceItemResult.isLeft()) {
-          return left(
-            new Error(
-              `CreditNote ${creditNote.id.toString()} has no related invoice items.`
-            )
+        const invoiceItemsResult = await getItemsUsecase.execute(
+          {
+            invoiceId: creditNote.invoiceId.id.toString(),
+          },
+          defaultContext
+        );
+        if (invoiceItemsResult.isLeft()) {
+          throw new Error(
+            `CreditNote ${creditNote.id.toString()} has no invoice items.`
           );
         }
-        invoiceItems = maybeInvoiceItemResult.value;
+        invoiceItems = invoiceItemsResult.value;
       }
 
       // * Get Manuscript details
@@ -135,16 +133,8 @@ export class AfterCreditNoteCreatedEvent
       );
 
       if (maybePayer.isLeft()) {
-        if (creditNote.invoiceId.id.toString() === invoice.id.toString()) {
-          maybePayer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
-          if (maybePayer.isLeft()) {
-            return left(
-              new Error(
-                `Credit Note ${creditNote.id.toString()} has no payers.`
-              )
-            );
-          }
-        } else {
+        maybePayer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
+        if (maybePayer.isLeft()) {
           return left(
             new Error(`Credit Note ${creditNote.id.toString()} has no payers.`)
           );
@@ -158,7 +148,10 @@ export class AfterCreditNoteCreatedEvent
         this.loggerService
       );
 
-      const maybePaymentMethods = await paymentMethodsUsecase.execute();
+      const maybePaymentMethods = await paymentMethodsUsecase.execute(
+        null,
+        defaultContext
+      );
 
       if (maybePaymentMethods.isLeft()) {
         return left(
@@ -191,16 +184,19 @@ export class AfterCreditNoteCreatedEvent
       const billingAddress = maybeBillingAddress.value;
 
       //* Run publish Credit Note created usecase
-      const publishResult = await this.publishCreditNoteCreated.execute({
-        payer,
-        invoice,
-        payments,
-        manuscript,
-        creditNote,
-        invoiceItems,
-        paymentMethods,
-        billingAddress,
-      });
+      const publishResult = await this.publishCreditNoteCreated.execute(
+        {
+          payer,
+          invoice,
+          payments,
+          manuscript,
+          creditNote,
+          invoiceItems,
+          paymentMethods,
+          billingAddress,
+        },
+        defaultContext
+      );
 
       if (publishResult.isLeft()) {
         return left(publishResult.value.message);
@@ -209,33 +205,6 @@ export class AfterCreditNoteCreatedEvent
       this.loggerService.info(
         `[AfterCreditNoteCreated]: Successfully executed onCreditNoteCreated event usecase.`
       );
-
-      // * Find Netsuite revenue recognition entry for Invoice
-      const nsRevRecReference = invoice
-        .getErpReferences()
-        .getItems()
-        .filter(
-          (er) =>
-            er.vendor === 'netsuite' && er.attribute === 'revenueRecognition'
-        )
-        .find(Boolean);
-
-      // * Publish Revenue recognition reversal
-      if (manuscript.datePublished && nsRevRecReference) {
-        const publishRevenueRecognitionReversal = await this.publishRevenueRecognitionReversal.execute(
-          { invoiceId: invoiceId.id.toString() },
-          defaultContext
-        );
-
-        if (publishRevenueRecognitionReversal.isLeft()) {
-          return left(publishRevenueRecognitionReversal.value.message);
-        }
-        this.loggerService.info(
-          `[PublishRevenueRecognitionReversal]: ${JSON.stringify(
-            publishRevenueRecognitionReversal
-          )}`
-        );
-      }
     } catch (err) {
       console.error(err);
       console.log(

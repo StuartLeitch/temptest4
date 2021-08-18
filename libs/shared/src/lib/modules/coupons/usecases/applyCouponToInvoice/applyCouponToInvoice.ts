@@ -9,6 +9,11 @@ import { RepoErrorCode, RepoError } from '../../../../infrastructure/RepoError';
 // * Authorization Logic
 
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 import { EmailService } from '../../../../infrastructure/communication-channels';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
@@ -45,10 +50,11 @@ import {
 } from '../../../invoices/usecases/confirmInvoice';
 
 import { ApplyCouponToInvoiceResponse as Response } from './applyCouponToInvoiceResponse';
-import { ApplyCouponToInvoiceDTO as DTO } from './applyCouponToInvoiceDTO';
+import type { ApplyCouponToInvoiceDTO as DTO } from './applyCouponToInvoiceDTO';
 import * as Errors from './applyCouponToInvoiceErrors';
 
 export class ApplyCouponToInvoiceUsecase
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
@@ -62,8 +68,11 @@ export class ApplyCouponToInvoiceUsecase
     private emailService: EmailService,
     private vatService: VATService,
     private loggerService: LoggerContract
-  ) {}
+  ) {
+    super();
+  }
 
+  @Authorize('coupon:apply')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const {
       invoiceItemRepo,

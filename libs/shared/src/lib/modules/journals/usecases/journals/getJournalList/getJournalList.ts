@@ -18,16 +18,13 @@ import { GetJournalListResponse as Response } from './getJournalListResponse';
 import type { GetJournalListDTO as DTO } from './getJournalListDTO';
 
 export class GetJournalListUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
-  constructor(private journalRepo: CatalogRepoContract) {}
-
-  private async getAccessControlContext(request, context?) {
-    return {};
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
+  constructor(private journalRepo: CatalogRepoContract) {
+    super();
   }
 
-  @Authorize('journal:read')
+  @Authorize('journals:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
       const result = await this.journalRepo.getCatalogCollection();

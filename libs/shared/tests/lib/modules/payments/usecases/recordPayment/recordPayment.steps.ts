@@ -23,13 +23,14 @@ import {
   PaymentMap,
   InvoiceId,
   PayerMap,
+  PaymentTypes,
 } from '../../../../../../src';
 
 import { RecordPaymentResponse } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPaymentResponse';
 import { RecordPaymentUsecase } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPayment';
 import { RecordPaymentDTO } from '../../../../../../src/lib/modules/payments/usecases/recordPayment/recordPaymentDTO';
 
-const authContext: UsecaseAuthorizationContext = {
+const baseAuthContext: UsecaseAuthorizationContext = {
   roles: [Roles.PAYER],
 };
 
@@ -164,6 +165,13 @@ When(
     }
 
     await context.repos.paymentMethod.save(maybePaymentMethod.value);
+
+    const authContext = {
+      ...baseAuthContext,
+      roles: [Roles.ADMIN],
+      paymentType: PaymentTypes.BANK_TRANSFER,
+    };
+
     response = await usecase.execute(request, authContext);
   }
 );
@@ -186,6 +194,12 @@ When(/^1 PayPal payment is applied$/, async function () {
   }
 
   await context.repos.paymentMethod.save(maybePaymentMethod.value);
+
+  const authContext = {
+    ...baseAuthContext,
+    paymentType: PaymentTypes.PAYPAL,
+  };
+
   response = await usecase.execute(request, authContext);
 });
 
@@ -208,6 +222,12 @@ When(/^1 Credit Card payment is applied$/, async function () {
   }
 
   await context.repos.paymentMethod.save(maybePaymentMethod.value);
+
+  const authContext = {
+    ...baseAuthContext,
+    paymentType: PaymentTypes.CREDIT_CARD,
+  };
+
   response = await usecase.execute(request, authContext);
 });
 

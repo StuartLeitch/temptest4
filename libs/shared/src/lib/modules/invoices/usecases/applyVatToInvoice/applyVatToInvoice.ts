@@ -4,6 +4,11 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlledUsecase,
+  AccessControlContext,
+  Authorize,
+} from '../../../../domain/authorization';
 
 // * Usecase specific
 import { PayerType } from '../../../payers/domain/Payer';
@@ -18,27 +23,27 @@ import { UpdateInvoiceItemsUsecase } from '../updateInvoiceItems';
 
 import { VATService } from '../../../../domain/services/VATService';
 
-import type { ApplyVatToInvoiceDTO } from './applyVatToInvoiceDTO';
-import type { ApplyVatToInvoiceResponse } from './applyVatToInvoiceResponse';
+import type { ApplyVatToInvoiceResponse as Response } from './applyVatToInvoiceResponse';
+import type { ApplyVatToInvoiceDTO as DTO } from './applyVatToInvoiceDTO';
 
 export class ApplyVatToInvoiceUsecase
-  implements
-    UseCase<ApplyVatToInvoiceDTO, Promise<ApplyVatToInvoiceResponse>, Context> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private vatService: VATService
   ) {
+    super();
+
     this.attachVatToApcItems = this.attachVatToApcItems.bind(this);
     this.updateInvoiceItems = this.updateInvoiceItems.bind(this);
     this.getInvoiceItems = this.getInvoiceItems.bind(this);
   }
 
-  public async execute(
-    request: ApplyVatToInvoiceDTO,
-    context?: Context
-  ): Promise<ApplyVatToInvoiceResponse> {
+  @Authorize('invoice:applyVAT')
+  public async execute(request: DTO, context?: Context): Promise<Response> {
     const { postalCode, payerType, invoiceId, country, state } = request;
     const vat = this.vatService.calculateVAT(
       {
@@ -51,29 +56,36 @@ export class ApplyVatToInvoiceUsecase
     );
 
     const execution = await new AsyncEither(invoiceId)
-      .then(this.getInvoiceItems)
+      .then(this.getInvoiceItems(context))
       .map(this.attachVatToApcItems(vat))
-      .then(this.updateInvoiceItems)
+      .then(this.updateInvoiceItems(context))
       .execute();
     return execution;
   }
 
-  private async getInvoiceItems(invoiceId: string) {
-    const getItemsForInvoiceUsecase = new GetItemsForInvoiceUsecase(
-      this.invoiceItemRepo,
-      this.couponRepo,
-      this.waiverRepo
-    );
-    return await getItemsForInvoiceUsecase.execute({
-      invoiceId,
-    });
+  private getInvoiceItems(context: Context) {
+    return async (invoiceId: string) => {
+      const getItemsForInvoiceUsecase = new GetItemsForInvoiceUsecase(
+        this.invoiceItemRepo,
+        this.couponRepo,
+        this.waiverRepo
+      );
+      return await getItemsForInvoiceUsecase.execute(
+        {
+          invoiceId,
+        },
+        context
+      );
+    };
   }
 
-  private async updateInvoiceItems(invoiceItems: InvoiceItem[]) {
-    const updateInvoiceItemsUsecase = new UpdateInvoiceItemsUsecase(
-      this.invoiceItemRepo
-    );
-    return await updateInvoiceItemsUsecase.execute({ invoiceItems });
+  private updateInvoiceItems(context: Context) {
+    return async (invoiceItems: InvoiceItem[]) => {
+      const updateInvoiceItemsUsecase = new UpdateInvoiceItemsUsecase(
+        this.invoiceItemRepo
+      );
+      return await updateInvoiceItemsUsecase.execute({ invoiceItems }, context);
+    };
   }
 
   private attachVatToApcItems(vat: number) {

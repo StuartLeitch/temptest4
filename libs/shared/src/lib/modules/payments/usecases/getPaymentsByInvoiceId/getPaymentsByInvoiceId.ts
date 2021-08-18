@@ -23,16 +23,13 @@ import type { GetPaymentsByInvoiceIdDTO as DTO } from './getPaymentsByInvoiceIdD
 import * as Errors from './getPaymentsByInvoiceIdErrors';
 
 export class GetPaymentsByInvoiceIdUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private paymentRepo: PaymentRepoContract
-  ) {}
-
-  private async getAccessControlContext(request, context?) {
-    return {};
+  ) {
+    super();
   }
 
   @Authorize('payments:read')

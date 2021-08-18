@@ -122,19 +122,22 @@ export const creditNote: Resolvers<Context> = {
   CreditNote: {
     async invoice(parent: any, args, context) {
       const {
-        repos: {
-          invoice: invoiceRepo,
-        }
+        repos: { invoice: invoiceRepo },
       } = context;
 
       const usecaseContext = {
         roles: [Roles.ADMIN],
       };
-      const associatedInvoiceUsecase = new GetInvoiceDetailsUsecase(invoiceRepo);
+      const associatedInvoiceUsecase = new GetInvoiceDetailsUsecase(
+        invoiceRepo
+      );
 
       const request: any = { invoiceId: parent.invoiceId };
 
-      const result = await associatedInvoiceUsecase.execute(request, usecaseContext);
+      const result = await associatedInvoiceUsecase.execute(
+        request,
+        usecaseContext
+      );
 
       if (result.isLeft()) {
         throw new Error(result.value.message);
@@ -160,7 +163,7 @@ export const creditNote: Resolvers<Context> = {
         dateIssued: invoiceDetails?.dateIssued?.toISOString(),
         referenceNumber: invoiceDetails.persistentReferenceNumber,
       };
-    }
+    },
   },
   Mutation: {
     async createCreditNote(parent, args, context) {

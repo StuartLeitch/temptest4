@@ -22,13 +22,10 @@ import * as Errors from './getCreditNoteByIdErrors';
 import type { GetCreditNoteByIdDTO as DTO } from './getCreditNoteByIdDTO';
 
 export class GetCreditNoteByIdUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
-  constructor(private creditNoteRepo: CreditNoteRepoContract) {}
-
-  private async getAccessControlContext(request, context?) {
-    return {};
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
+  constructor(private creditNoteRepo: CreditNoteRepoContract) {
+    super();
   }
 
   @Authorize('creditNote:read')

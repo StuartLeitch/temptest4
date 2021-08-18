@@ -1,9 +1,10 @@
 import React from 'react';
 import _ from 'lodash';
 import { Link } from 'react-router-dom';
-import format from 'date-fns/format';
 import numeral from 'numeral';
 
+import { formatDate } from '../../../../utils/date';
+import { totalAmount } from '../../../../utils/totalAmount'
 import { Badge } from '../../../../components';
 
 /*eslint-disable */
@@ -22,12 +23,11 @@ const TrTableCreditNotesList = ({creditNotes}) => (
       ({
         id,
         creationReason,
-        persistentReferenceNumber,
+        invoice,
         price,
         vat,
         dateIssued,
         dateCreated,
-        invoice
       }) => (
         <tr key={id} className='table-warning'>
           <td className='align-middle'>
@@ -41,13 +41,13 @@ const TrTableCreditNotesList = ({creditNotes}) => (
             >
               <span className={'text-secondary'}>
                 <strong>
-                    {persistentReferenceNumber}
+                    {invoice?.invoiceItem?.article?.customId}
                 </strong>
               </span>
             </Link>
           </td>
 
-          <td className='align-middle'>{dateIssued && format(new Date(dateIssued), 'dd MMM yyyy')}</td>
+          <td className='align-middle'>{dateIssued && formatDate(new Date(dateIssued))}</td>
 
           <td className='align-middle'>
             <strong

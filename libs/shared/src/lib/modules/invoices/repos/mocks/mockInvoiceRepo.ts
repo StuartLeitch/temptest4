@@ -508,4 +508,9 @@ export class MockInvoiceRepo
   ): Promise<Either<GuardFailure | RepoError, any[]>> {
     return right([]);
   }
+
+  async getUnrecognizedReversalsNetsuiteErp(): Promise<Either<GuardFailure | RepoError, any[]>> {
+    return right([]);
+  }
+
 }

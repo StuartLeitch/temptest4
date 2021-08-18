@@ -56,7 +56,7 @@ import {
 } from '../../../../../../src/lib/modules/transactions/usecases/updateTransactionOnAcceptManuscript';
 
 const defaultContext: UsecaseAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN],
+  roles: [Roles.QUEUE_EVENT_HANDLER],
 };
 
 const mockTransactionRepo: TransactionRepoContract = new MockTransactionRepo();

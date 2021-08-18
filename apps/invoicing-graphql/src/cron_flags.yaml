@@ -8,3 +8,4 @@ cronFlags:
   erpRegisterRevenueRecognitionEnabled: true
   erpRegisterCreditNotesEnabled: true
   erpRegisterPaymentsEnabled: true
+  erpRegisterRevenueRecognitionReversalsEnabled: true

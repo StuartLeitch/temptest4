@@ -32,24 +32,21 @@ import type { GetTransactionDetailsByManuscriptCustomIdDTO as DTO } from './getT
 import * as Errors from './getTransactionDetailsByManuscriptCustomId.errors';
 
 export class GetTransactionDetailsByManuscriptCustomIdUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  extends AccessControlledUsecase<DTO, Context, AccessControlContext>
+  implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
     private transactionRepo: TransactionRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private invoiceRepo: InvoiceRepoContract
   ) {
+    super();
+
     this.attachTransaction = this.attachTransaction.bind(this);
     this.attachInvoiceId = this.attachInvoiceId.bind(this);
     this.getTransaction = this.getTransaction.bind(this);
     this.attachInvoice = this.attachInvoice.bind(this);
     this.verifyInput = this.verifyInput.bind(this);
-  }
-
-  private async getAccessControlContext(request, context?) {
-    return {};
   }
 
   @Authorize('transaction:read')

@@ -55,7 +55,10 @@ export const INVOICE_QUERY = `
     invoiceId
     creationReason
     persistentReferenceNumber
-    dateCreated
+    dateIssued
+    erpReference {
+      ...erpReferenceFragment
+    }
   }
   fragment payerFragment on Payer {
     id

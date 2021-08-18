@@ -32,7 +32,7 @@ const vatService: VATService = new VATService();
 
 const validateVATUsecase = new ValidateVATUsecase(vatService);
 const defaultContext: UsecaseAuthorizationContext = {
-  roles: [Roles.SUPER_ADMIN],
+  roles: [Roles.PAYER],
 };
 let payer: Payer;
 let invoice: Invoice;

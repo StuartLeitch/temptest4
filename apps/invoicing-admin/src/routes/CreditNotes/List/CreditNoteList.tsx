@@ -1,6 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
 import { useManualQuery } from 'graphql-hooks';
-import { useQueryState } from 'react-router-use-location-state';
 import { useLocalStorage } from '@rehooks/local-storage';
 import { Filters } from '@utils';
 
@@ -10,11 +9,9 @@ import {
   CardFooter,
   Error,
   ListPagination,
-  Table,
 } from '../../../components';
 
 import { Loading } from '../../components';
-import { HeaderMain } from '../../components/HeaderMain';
 
 import { CREDIT_NOTES_QUERY } from './graphql';
 import { CreditNotesTableBody } from './components/TableBody';

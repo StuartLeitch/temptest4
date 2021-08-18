@@ -3,11 +3,7 @@ import { flatten, right, left } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import {
-  UsecaseAuthorizationContext as Context,
-  AccessControlledUsecase,
-  AccessControlContext,
-} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 
 import { EventMappingRegistryContract } from '../../contracts/EventMappingRegistry';
 
@@ -19,9 +15,7 @@ import { SaveEventsResponse as Response } from './saveEventsResponse';
 import { SaveEventsDTO as DTO } from './saveEventsDTO';
 
 export class SaveEventsUsecase
-  implements
-    UseCase<DTO, Promise<Response>, Context>,
-    AccessControlledUsecase<DTO, Context, AccessControlContext> {
+  implements UseCase<DTO, Promise<Response>, Context> {
   authorizationContext: Context;
 
   constructor(
