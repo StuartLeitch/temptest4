@@ -24,6 +24,22 @@ import { InvoiceRepoContract } from '../invoiceRepo';
 
 import { applyFilters } from './utils';
 
+export class TransactionInvoice {
+  constructor(private trx: Knex.Transaction, private qb: Knex.QueryBuilder) {}
+
+  public async action(aa: (qb: Knex.QueryBuilder) => Knex.QueryBuilder) {
+    return aa(this.qb);
+  }
+
+  // async finish() {
+  //   this.trx.commit();
+  // }
+
+  // async abort() {
+  //   this.trx.rollback();
+  // }
+}
+
 export class KnexInvoiceRepo
   extends AbstractBaseDBRepo<Knex, Invoice>
   implements InvoiceRepoContract {
@@ -69,6 +85,81 @@ export class KnexInvoiceRepo
             .andOn(`${alias}.type`, db.raw('?', [type]))
             .andOn(`${alias}.attribute`, db.raw('?', [attribute]));
         });
+  }
+
+  public async withTransaction(
+    aa: (qb: TransactionInvoice) => Promise<void>
+  ): Promise<any> {
+    const trx = await this.db.transaction(null, {
+      isolationLevel: 'serializable',
+    });
+
+    const tt = new TransactionInvoice(trx, trx(TABLES.INVOICES));
+
+    try {
+      await aa(tt);
+
+      trx.commit();
+    } catch (err) {
+      console.log('-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*');
+      console.log(err);
+      console.log('-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*');
+      trx.rollback();
+    }
+
+    // try {
+    //   const res1 = await aa(trx(TABLES.INVOICES));
+    //   trx.commit();
+    //   return res1;
+    // } catch (err) {
+    //   console.log('-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*');
+    //   console.log(err);
+    //   console.log('-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*');
+    //   trx.rollback();
+    // }
+  }
+
+  public calculateNextInvoiceNumberInTransaction(
+    qb: Knex.QueryBuilder
+  ): Knex.QueryBuilder {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth();
+
+    // * Hindawi fiscal year starts at 1st of January
+    let from = `${currentYear}-01-01`;
+    let to = `${currentYear + 1}-01-01`;
+
+    // * Wiley fiscal year starts at 1st of May
+    if (currentMonth < 5) {
+      from = `${currentYear - 1}-05-01`;
+      to = `${currentYear}-04-30`;
+    } else {
+      from = `${currentYear}-05-01`;
+      to = `${currentYear + 1}-04-30`;
+    }
+
+    qb.max('invoiceNumber')
+      .whereBetween('dateIssued', [from, to])
+      .union(function () {
+        this.select('invoiceReferenceNumber AS invoiceNumber').from(
+          'configurations'
+        );
+      })
+      .orderByRaw('max DESC NULLS LAST')
+      .first();
+
+    return qb;
+  }
+
+  public updateInvoiceTransaction(invoice: Invoice) {
+    return (qb: Knex.QueryBuilder): Knex.QueryBuilder => {
+      const updateObject = InvoiceMap.toPersistence(invoice);
+
+      return qb
+        .where({ id: invoice.invoiceId.toString() })
+        .update(updateObject);
+    };
   }
 
   public async getInvoiceById(

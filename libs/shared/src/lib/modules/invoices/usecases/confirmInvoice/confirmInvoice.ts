@@ -156,35 +156,45 @@ export class ConfirmInvoiceUsecase
       const { invoice } = payerData;
 
       try {
-        if (
-          invoice.status === InvoiceStatus.ACTIVE ||
-          invoice.status === InvoiceStatus.FINAL
-        ) {
-          const lastInvoiceNumber = await this.invoiceRepo.getCurrentInvoiceNumber();
-          invoice.assignInvoiceNumber(lastInvoiceNumber);
-          const maybeUpdated = await this.invoiceRepo.update(invoice);
+        const tt: any = this.invoiceRepo;
 
-          if (maybeUpdated.isLeft()) {
-            return left(
-              new Errors.InvoiceNumberAssignationError(
-                invoice.id.toString(),
-                new Error(maybeUpdated.value.message)
-              )
-            );
-          }
+        await tt.withTransaction(async (transaction) => {
+          const res1 = await transaction.action(
+            tt.calculateNextInvoiceNumberInTransaction
+          );
+          const maxInvoiceNumber = res1.max;
 
-          payerData.invoice = maybeUpdated.value;
-        }
+          invoice.assignInvoiceNumber(maxInvoiceNumber);
 
-        const aa = await this.getInvoiceItems(
+          const res2 = await transaction.action(
+            tt.updateInvoiceTransaction(invoice)
+          );
+        });
+
+        // const lastInvoiceNumber = await this.invoiceRepo.getCurrentInvoiceNumber();
+        // invoice.assignInvoiceNumber(lastInvoiceNumber);
+        // const maybeUpdated = await this.invoiceRepo.update(invoice);
+
+        // if (maybeUpdated.isLeft()) {
+        //   return left(
+        //     new Errors.InvoiceNumberAssignationError(
+        //       invoice.id.toString(),
+        //       new Error(maybeUpdated.value.message)
+        //     )
+        //   );
+        // }
+
+        // payerData.invoice = maybeUpdated.value;
+
+        const maybeInvoiceItems = await this.getInvoiceItems(
           { invoiceId: invoice.id.toString() },
           context
         )(payerData);
 
-        if (aa.isLeft()) {
-          return aa;
+        if (maybeInvoiceItems.isLeft()) {
+          return maybeInvoiceItems;
         } else {
-          payerData.invoice = aa.value.invoice;
+          payerData.invoice = maybeInvoiceItems.value.invoice;
         }
       } catch (e) {
         return left(
