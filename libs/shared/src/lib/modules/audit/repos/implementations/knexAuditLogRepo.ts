@@ -9,7 +9,6 @@ import { AuditLog } from '../../domain/AuditLog'
 import { AuditLogPaginated } from '../../domain/AuditLogPaginated';
 
 import { AuditLogRepoContract } from '../auditLogRepo';
-import { UniqueEntityID } from 'libs/shared/src/lib/core/domain/UniqueEntityID';
 
 export class KnexAuditLogRepo
   extends AbstractBaseDBRepo<Knex, AuditLog>
