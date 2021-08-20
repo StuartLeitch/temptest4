@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import React, { useState, useCallback } from 'react';
+import MaskedInput from 'react-text-mask';
 import { useManualQuery } from 'graphql-hooks';
 import { useQueryState } from 'react-router-use-location-state';
 import { useLocalStorage, writeStorage } from '@rehooks/local-storage';
@@ -130,7 +131,23 @@ const ProjectsDashboard: React.FC = () => {
         <Col lg={12}>
           <Form onSubmit={handleSearch}>
             <InputGroup>
-              <Input placeholder='Search for...' className='bg-white' id="search" />
+              {/*<Input placeholder='Search for...' className='bg-white' id="search" />*/}
+              <MaskedInput
+                mask={() => {
+                  const isSearchByRefNumberChecked = (document.getElementById('searchByReferenceNumber') as any).checked;
+                  if (isSearchByRefNumberChecked) {
+                    return [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]
+                  } else {
+                    return [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
+                  }
+                }}
+                className="form-control bg-white"
+                placeholder="Search for..."
+                guide={false}
+                id="search"
+                onBlur={() => {}}
+                onChange={() => {}}
+              />
               <InputGroupAddon addonType='append'>
                 <Button color='primary' onClick={handleSearch}>
                   <i className='fa fa-search'></i>
