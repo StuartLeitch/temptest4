@@ -152,6 +152,7 @@ export class CreateCreditNoteUsecase
           erpReferences: null,
           cancelledInvoiceReference: null,
           persistentReferenceNumber: null,
+          dateCreated: new Date(),
           dateIssued: null,
         } as any; // TODO: should reference the real invoice props, as in its domain
 
@@ -169,6 +170,7 @@ export class CreateCreditNoteUsecase
             rawInvoiceItem.invoiceId = draftInvoice.id.toString();
             rawInvoiceItem.price = invoiceItem.price;
             rawInvoiceItem.dateCreated = new Date();
+            rawInvoiceItem.vat = 0;
             delete rawInvoiceItem.id;
 
             const draftInvoiceItem = InvoiceItemMap.toDomain(rawInvoiceItem);
