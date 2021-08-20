@@ -157,7 +157,7 @@ const ProjectsDashboard: React.FC = () => {
                 type='radio'
                 id='searchByManuscriptId'
                 name='searchBy'
-                label='Manuscript ID'
+                label='Manuscript Custom ID'
                 inline
               />
             </Col>
