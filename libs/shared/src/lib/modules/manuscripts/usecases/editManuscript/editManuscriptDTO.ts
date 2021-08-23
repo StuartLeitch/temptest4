@@ -9,4 +9,5 @@ export interface EditManuscriptDTO {
   authorSurname?: string;
   authorFirstName?: string;
   preprintValue?: string;
+  is_cascaded?: number;
 }
