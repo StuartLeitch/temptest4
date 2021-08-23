@@ -123,7 +123,7 @@ export class CreateCreditNoteUsecase
       let creditNoteProps = {
         id: new UniqueEntityID(),
         creationReason: request.reason,
-        vat: invoice.getInvoicePercentage() * -1,
+        vat: invoice.getInvoicePercentage(),
         price: invoice.invoiceNetTotal * -1,
         persistentReferenceNumber: `CN-${invoice.persistentReferenceNumber}`,
         dateCreated: new Date(),
