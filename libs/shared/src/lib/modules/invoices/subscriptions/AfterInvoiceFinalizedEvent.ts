@@ -87,19 +87,7 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
         invoice.invoiceId
       );
       if (maybePayer.isLeft()) {
-        if (invoice.cancelledInvoiceReference) {
-          const invoiceId = InvoiceId.create(
-            new UniqueEntityID(invoice.cancelledInvoiceReference)
-          );
-          maybePayer = await this.payerRepo.getPayerByInvoiceId(invoiceId);
-          if (maybePayer.isLeft()) {
-            throw new Error(`Invoice ${invoice.id.toString()} has no payers.`);
-          } else {
-            payer = maybePayer.value;
-          }
-        } else {
-          throw new Error(`Invoice ${invoice.id.toString()} has no payers.`);
-        }
+        throw new Error(`Invoice ${invoice.id.toString()} has no payers.`);
       } else {
         payer = maybePayer.value;
       }

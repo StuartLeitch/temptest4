@@ -17,7 +17,6 @@ import { InvoiceItem } from './InvoiceItem';
 import { InvoiceId } from './InvoiceId';
 
 import { InvoiceDraftDueAmountUpdated } from './events/invoiceDraftDueAmountUpdated';
-import { InvoiceCreditNoteCreated } from './events/invoiceCreditNoteCreated';
 import { InvoicePaymentAddedEvent } from './events/invoicePaymentAdded';
 import { InvoiceDraftCreated } from './events/invoiceDraftCreated';
 import { InvoiceDraftDeleted } from './events/invoiceDraftDeleted';
@@ -52,8 +51,6 @@ interface InvoiceProps {
   dateMovedToFinal?: Date;
   totalNumInvoiceItems?: number;
   vatnote?: string;
-  creationReason?: string;
-  cancelledInvoiceReference?: string;
   erpReferences?: InvoiceErpReferences;
   persistentReferenceNumber?: string;
   rate?: number;
@@ -148,20 +145,6 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     return this.props.erpReferences;
   }
 
-  get cancelledInvoiceReference(): string {
-    return this.props.cancelledInvoiceReference;
-  }
-
-  set cancelledInvoiceReference(cancelledInvoiceReference: string) {
-    this.props.cancelledInvoiceReference = cancelledInvoiceReference;
-
-    if (cancelledInvoiceReference) {
-      this.addDomainEvent(
-        new InvoiceCreditNoteCreated(this.invoiceId, new Date())
-      );
-    }
-  }
-
   get invoiceTotal(): number {
     return this.getInvoiceTotal();
   }
@@ -184,14 +167,6 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
 
   get invoiceDiscountPercentageTotal(): number {
     return this.getInvoiceDiscountPercentageTotal();
-  }
-
-  get creationReason(): string {
-    return this.props.creationReason;
-  }
-
-  set creationReason(creationReason: string) {
-    this.props.creationReason = creationReason;
   }
 
   private removeInvoiceItemIfExists(invoiceItem: InvoiceItem): void {
@@ -380,10 +355,6 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     return twoDigitPrecision(
       this.invoiceItems.reduce((acc, item) => acc + item.calculateNetPrice(), 0)
     );
-  }
-
-  public isCreditNote(): boolean {
-    return !!this.props.cancelledInvoiceReference;
   }
 
   public assignInvoiceNumber(

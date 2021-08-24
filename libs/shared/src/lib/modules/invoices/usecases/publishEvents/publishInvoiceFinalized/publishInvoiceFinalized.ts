@@ -59,8 +59,8 @@ export class PublishInvoiceFinalizedUsecase
     const data: InvoiceFinalizedEvent = {
       ...EventUtils.createEventObject(),
 
-      referenceNumber: this.formatReferenceNumber(invoice),
-      isCreditNote: !!invoice.cancelledInvoiceReference,
+      referenceNumber: invoice.persistentReferenceNumber,
+      isCreditNote: false,
       transactionId: invoice.transactionId.toString(),
       erpReference: erpReference?.value ?? null,
       invoiceId: invoice.id.toString(),
@@ -88,14 +88,6 @@ export class PublishInvoiceFinalizedUsecase
       return right(null);
     } catch (err) {
       return left(new UnexpectedError(err.toString()));
-    }
-  }
-
-  private formatReferenceNumber(invoice: Invoice): string {
-    if (!invoice.cancelledInvoiceReference) {
-      return invoice.persistentReferenceNumber;
-    } else {
-      return `CN-${invoice.persistentReferenceNumber}`;
     }
   }
 

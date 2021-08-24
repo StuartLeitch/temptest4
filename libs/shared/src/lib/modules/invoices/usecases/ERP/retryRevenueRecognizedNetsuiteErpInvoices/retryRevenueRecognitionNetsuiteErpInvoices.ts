@@ -11,6 +11,7 @@ import {
   Authorize,
 } from '../../../../../domain/authorization';
 
+import { CreditNoteRepoContract } from '../../../../creditNotes/repos/creditNoteRepo';
 import { ArticleRepoContract } from '../../../../manuscripts/repos/articleRepo';
 import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
 import { InvoiceItemRepoContract } from '../../../repos/invoiceItemRepo';
@@ -46,6 +47,7 @@ export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract,
     private erpReferenceRepo: ErpReferenceRepoContract,
+    private creditNoteRepo: CreditNoteRepoContract,
     private netsuiteService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {
@@ -62,6 +64,7 @@ export class RetryRevenueRecognitionNetsuiteErpInvoicesUsecase
       this.catalogRepo,
       this.publisherRepo,
       this.erpReferenceRepo,
+      this.creditNoteRepo,
       this.netsuiteService,
       this.loggerService
     );

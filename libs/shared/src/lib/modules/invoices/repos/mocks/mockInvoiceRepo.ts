@@ -477,24 +477,6 @@ export class MockInvoiceRepo
     return items;
   }
 
-  async findByCancelledInvoiceReference(
-    id: InvoiceId
-  ): Promise<Either<GuardFailure | RepoError, Invoice>> {
-    const found = this._items.find(
-      (item) => item.cancelledInvoiceReference === id.id.toString()
-    );
-
-    if (!found) {
-      return left(
-        new Error(
-          `No invoice with cancelled invoice reference ${id.id.toString()}`
-        )
-      );
-    }
-
-    return right(found);
-  }
-
   async isInvoiceDeleted(
     id: InvoiceId
   ): Promise<Either<GuardFailure | RepoError, boolean>> {
@@ -509,8 +491,9 @@ export class MockInvoiceRepo
     return right([]);
   }
 
-  async getUnrecognizedReversalsNetsuiteErp(): Promise<Either<GuardFailure | RepoError, any[]>> {
+  async getUnrecognizedReversalsNetsuiteErp(): Promise<
+    Either<GuardFailure | RepoError, any[]>
+  > {
     return right([]);
   }
-
 }

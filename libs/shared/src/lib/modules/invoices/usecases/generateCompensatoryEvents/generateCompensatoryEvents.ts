@@ -82,11 +82,7 @@ import {
 } from './actionTypes';
 
 function originalInvoiceId(invoice: Invoice): string {
-  if (invoice.cancelledInvoiceReference) {
-    return invoice.cancelledInvoiceReference.toString();
-  } else {
-    return invoice.id.toString();
-  }
+  return invoice.id.toString();
 }
 
 export class GenerateCompensatoryEventsUsecase
@@ -110,7 +106,6 @@ export class GenerateCompensatoryEventsUsecase
     this.publishInvoiceConfirmed = this.publishInvoiceConfirmed.bind(this);
     this.publishInvoiceFinalized = this.publishInvoiceFinalized.bind(this);
     this.removeCouponsAndWaivers = this.removeCouponsAndWaivers.bind(this);
-    this.publishInvoiceCredited = this.publishInvoiceCredited.bind(this);
     this.publishInvoiceCreated = this.publishInvoiceCreated.bind(this);
     this.attachPaymentMethods = this.attachPaymentMethods.bind(this);
     this.havePaymentsBeenMade = this.havePaymentsBeenMade.bind(this);
@@ -120,7 +115,6 @@ export class GenerateCompensatoryEventsUsecase
     this.attachInvoiceItems = this.attachInvoiceItems.bind(this);
     this.sendConfirmedEvent = this.sendConfirmedEvent.bind(this);
     this.sendFinalizedEvent = this.sendFinalizedEvent.bind(this);
-    this.shouldSendCredited = this.shouldSendCredited.bind(this);
     this.shouldSendFinalize = this.shouldSendFinalize.bind(this);
     this.attachPaymentDate = this.attachPaymentDate.bind(this);
     this.shouldSendCreated = this.shouldSendCreated.bind(this);
@@ -144,7 +138,6 @@ export class GenerateCompensatoryEventsUsecase
         .then(this.publishInvoiceCreated(context))
         .then(this.publishInvoiceConfirmed(context))
         .then(this.publishInvoicePayed(context))
-        .then(this.publishInvoiceCredited(context))
         .then(this.publishInvoiceFinalized(context))
         .map((): void => null)
         .execute();
@@ -302,10 +295,6 @@ export class GenerateCompensatoryEventsUsecase
   private async shouldSendCreated<T extends WithInvoice>({
     invoice,
   }: T): Promise<Either<null, boolean>> {
-    if (invoice.cancelledInvoiceReference) {
-      return right(false);
-    }
-
     if (!invoice.dateAccepted) {
       return right(false);
     }
@@ -316,10 +305,6 @@ export class GenerateCompensatoryEventsUsecase
   private async shouldSendConfirmed<T extends WithInvoice>({
     invoice,
   }: T): Promise<Either<null, boolean>> {
-    if (invoice.cancelledInvoiceReference) {
-      return right(false);
-    }
-
     if (
       invoice.status === InvoiceStatus.PENDING ||
       invoice.status === InvoiceStatus.DRAFT ||
@@ -334,10 +319,6 @@ export class GenerateCompensatoryEventsUsecase
   private async shouldSendPayed<T extends WithInvoice>({
     invoice,
   }: T): Promise<Either<null, boolean>> {
-    if (invoice.cancelledInvoiceReference) {
-      return right(false);
-    }
-
     if (
       invoice.status !== InvoiceStatus.FINAL ||
       !invoice.dateAccepted ||
@@ -358,16 +339,6 @@ export class GenerateCompensatoryEventsUsecase
     ) {
       return right(false);
     }
-    return right(true);
-  }
-
-  private async shouldSendCredited<T extends WithInvoice>({
-    invoice,
-  }: T): Promise<Either<null, boolean>> {
-    if (!invoice.cancelledInvoiceReference) {
-      return right(false);
-    }
-
     return right(true);
   }
 
@@ -558,25 +529,6 @@ export class GenerateCompensatoryEventsUsecase
         .then(this.attachPayments(context))
         .then(this.attachPaymentMethods(context))
         .then(this.sendFinalizedEvent(context))
-        .map(() => request)
-        .execute();
-    };
-  }
-
-  private publishInvoiceCredited(context: Context) {
-    return async (request: DTO) => {
-      return new AsyncEither(request)
-        .then(this.attachInvoice(context))
-        .advanceOrEnd(this.shouldSendCredited)
-        .then(this.attachInvoiceItems(context))
-        .then(this.attachManuscript(context))
-        .then(this.attachPayer(context))
-        .then(this.attachAddress(context))
-        .then(this.attachPayments(context))
-        .then(this.attachPaymentMethods(context))
-        .then(this.attachCreditNote(context))
-        .map(this.updateInvoiceStatus('DRAFT', 'dateCreated'))
-        .then(this.sendCreditedEvent(context))
         .map(() => request)
         .execute();
     };

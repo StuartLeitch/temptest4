@@ -81,18 +81,6 @@ export const invoice: Resolvers<Context> = {
 
       let assocInvoice = null;
       // * this is a credit note, let's ask for the reference number of the associated invoice
-      if (invoiceDetails.cancelledInvoiceReference) {
-        const result = await getCreditNoteByInvoiceIdUsecase.execute(
-          { invoiceId: invoiceDetails.cancelledInvoiceReference },
-          usecaseContext
-        );
-
-        if (result.isLeft()) {
-          return undefined;
-        }
-        const invoice = result.value;
-        assocInvoice = InvoiceMap.toPersistence(invoice);
-      }
       const maybePayments = await repos.payment.getPaymentsByInvoiceId(
         invoiceDetails.invoiceId
       );
@@ -125,7 +113,6 @@ export const invoice: Resolvers<Context> = {
           .getErpReferences()
           .getItems()
           .concat(erpPaymentReferences),
-        cancelledInvoiceReference: invoiceDetails.cancelledInvoiceReference,
         dateIssued: invoiceDetails?.dateIssued?.toISOString(),
         referenceNumber: assocInvoice
           ? assocInvoice.persistentReferenceNumber

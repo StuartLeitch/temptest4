@@ -155,11 +155,6 @@ export const creditNote: Resolvers<Context> = {
         dateCreated: invoiceDetails?.dateCreated?.toISOString(),
         dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
         dateMovedToFinal: invoiceDetails?.dateMovedToFinal?.toISOString(),
-        // erpReferences: invoiceDetails
-        //   .getErpReferences()
-        //   .getItems()
-        //   .concat(erpPaymentReferences),
-        cancelledInvoiceReference: invoiceDetails.cancelledInvoiceReference,
         dateIssued: invoiceDetails?.dateIssued?.toISOString(),
         referenceNumber: invoiceDetails.persistentReferenceNumber,
       };

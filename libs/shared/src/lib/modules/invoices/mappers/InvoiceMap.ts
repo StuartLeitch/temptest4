@@ -41,8 +41,6 @@ export class InvoiceMap extends Mapper<Invoice> {
         dateMovedToFinal: raw.dateMovedToFinal
           ? new Date(raw.dateMovedToFinal)
           : null,
-        cancelledInvoiceReference: raw.cancelledInvoiceReference ?? null,
-        creationReason: raw.creationReason ?? null,
         persistentReferenceNumber: raw.persistentReferenceNumber ?? null,
         erpReferences: InvoiceErpReferences.create(maybeErpReference.value),
       },
@@ -62,8 +60,6 @@ export class InvoiceMap extends Mapper<Invoice> {
       dateAccepted: invoice.dateAccepted,
       dateIssued: invoice.dateIssued,
       dateMovedToFinal: invoice.dateMovedToFinal,
-      cancelledInvoiceReference: invoice.cancelledInvoiceReference ?? null,
-      creationReason: invoice.creationReason ?? null,
       persistentReferenceNumber: invoice.persistentReferenceNumber ?? null,
     };
   }
