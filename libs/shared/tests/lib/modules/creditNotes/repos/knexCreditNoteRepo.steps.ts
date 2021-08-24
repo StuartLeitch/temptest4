@@ -4,7 +4,10 @@ import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 import { UniqueEntityID } from '../../../../../src/lib/core/domain/UniqueEntityID';
 import { Either } from '../../../../../src/lib/core/logic/Either';
 import { GuardFailure } from '../../../../../src/lib/core/logic/GuardFailure';
-import { RepoError } from '../../../../../src/lib/infrastructure/RepoError';
+import {
+  RepoError,
+  RepoErrorCode,
+} from '../../../../../src/lib/infrastructure/RepoError';
 
 import { InvoiceId } from '../../../../../src/lib/modules/invoices/domain/InvoiceId';
 import { CreditNoteId } from '../../../../../src/lib/modules/creditNotes/domain/CreditNoteId';
@@ -32,6 +35,7 @@ let creditNote: CreditNote;
 let foundCreditNote: CreditNote;
 let creditNoteExists: boolean;
 let saveCreditNote: CreditNote;
+let maybeCreditNote: Either<GuardFailure | RepoError, CreditNote>;
 
 Before({ tags: '@ValidateKnexCreditNoteRepo' }, async () => {
   mockCreditNoteRepo = new MockCreditNoteRepo();
@@ -84,6 +88,8 @@ When(
     const maybeFoundCreditNote = await mockCreditNoteRepo.getCreditNoteByInvoiceId(
       invoiceId
     );
+
+    maybeCreditNote = maybeFoundCreditNote;
     if (maybeFoundCreditNote.isRight()) {
       foundCreditNote = maybeFoundCreditNote.value;
     }
@@ -91,7 +97,10 @@ When(
 );
 
 Then('getCreditNoteByInvoiceId returns null', async () => {
-  expect(foundCreditNote).to.equal(null);
+  expect(maybeCreditNote.isLeft()).to.be.true;
+  if (maybeCreditNote.isLeft() && maybeCreditNote.value instanceof RepoError) {
+    expect(maybeCreditNote.value.code).to.equal(RepoErrorCode.ENTITY_NOT_FOUND);
+  }
 });
 
 When(
@@ -104,11 +113,13 @@ When(
       creditNoteIdObj
     );
 
+    maybeCreditNote = maybeFoundCreditNote;
     if (maybeFoundCreditNote.isLeft()) {
-      throw maybeFoundCreditNote.value;
+      // throw maybeFoundCreditNote.value;
+      foundCreditNote = null;
+    } else {
+      foundCreditNote = maybeFoundCreditNote.value;
     }
-
-    foundCreditNote = maybeFoundCreditNote.value;
   }
 );
 
@@ -123,14 +134,18 @@ When(
 
     const maybeFoundCreditNote = await mockCreditNoteRepo.getCreditNoteById(id);
 
+    maybeCreditNote = maybeFoundCreditNote;
     if (maybeFoundCreditNote.isRight()) {
       foundCreditNote = maybeFoundCreditNote.value;
     }
   }
 );
 
-Then('getCreditNoteById returns null', async () => {
-  expect(foundCreditNote).to.equal(null);
+Then('getCreditNoteById returns not found', async () => {
+  expect(maybeCreditNote.isLeft()).to.be.true;
+  if (maybeCreditNote.isLeft() && maybeCreditNote.value instanceof RepoError) {
+    expect(maybeCreditNote.value.code).to.equal(RepoErrorCode.ENTITY_NOT_FOUND);
+  }
 });
 
 When(/^we call update for credit note "([\w-]+)"$/, async (id: string) => {
@@ -167,10 +182,12 @@ When(/^we call exists for ([\w-]+) credit note id$/, async (id: string) => {
     creditNoteIdObj
   );
 
+  maybeCreditNote = maybeFoundCreditNote;
   if (maybeFoundCreditNote.isLeft()) {
-    throw maybeFoundCreditNote.value;
+    foundCreditNote = null;
+  } else {
+    foundCreditNote = maybeFoundCreditNote.value;
   }
-  foundCreditNote = maybeFoundCreditNote.value;
 
   if (!foundCreditNote) {
     foundCreditNote = makeCreditNoteData({ id });

@@ -17,7 +17,7 @@ Feature: Credit Note Repo
         Then getCreditNoteById returns the credit note
 
         When we call getCreditNoteById for un-existent credit note "test-creditNote2"
-        Then getCreditNoteById returns null
+        Then getCreditNoteById returns not found
 
     @ValidateKnexCreditNoteRepo
     Scenario: Test CreditNote.update() method
@@ -33,7 +33,7 @@ Feature: Credit Note Repo
             | creditNote       | exists |
             | test-creditNote  | true   |
             | test-creditNote2 | false  |
-    
+
     @ValidateKnexCreditNoteRepo
     Scenario: Test CreditNote.save()
         Given a credit note object with id "test-creditNote"

@@ -179,6 +179,7 @@ When(
   'The manuscript associated with the invoice is published',
   async function () {
     manuscript.markAsPublished();
+    await mockManuscriptRepo.update(manuscript);
   }
 );
 

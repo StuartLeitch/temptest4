@@ -42,7 +42,7 @@ import type { PublishRevenueRecognitionToErpRequestDTO as DTO } from './publishR
 import {
   RepoError,
   RepoErrorCode,
-} from 'libs/shared/src/lib/infrastructure/RepoError';
+} from '../../../../../infrastructure/RepoError';
 
 export class PublishRevenueRecognitionToErpUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
@@ -147,18 +147,20 @@ export class PublishRevenueRecognitionToErpUsecase
       );
 
       if (maybeCreditNote.isLeft()) {
-        if (
-          !(maybeCreditNote.value instanceof RepoError) ||
-          maybeCreditNote.value.code !== RepoErrorCode.ENTITY_NOT_FOUND
-        ) {
-          return left(maybeCreditNote.value);
+        const err = maybeCreditNote.value;
+        if (err instanceof RepoError) {
+          if (err.code !== RepoErrorCode.ENTITY_NOT_FOUND) {
+            return left(err);
+          }
+        } else {
+          return left(err);
         }
       } else {
         const creditNote = maybeCreditNote.value;
 
         if (
           manuscript.datePublished &&
-          creditNote.dateIssued.getTime() > manuscript.datePublished.getTime()
+          creditNote.dateIssued.getTime() < manuscript.datePublished.getTime()
         ) {
           return right(null);
         }

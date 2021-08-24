@@ -24,7 +24,13 @@ export class MockCreditNoteRepo
   ): Promise<Either<GuardFailure | RepoError, CreditNote>> {
     const match = this._items.find((i) => i.invoiceId.id.equals(invoiceId.id));
 
-    return right(match ? match : null);
+    if (match) {
+      return right(match);
+    } else {
+      return left(
+        RepoError.createEntityNotFoundError('credit note', invoiceId.toString())
+      );
+    }
   }
 
   public async getCreditNoteById(
@@ -33,7 +39,12 @@ export class MockCreditNoteRepo
     let filterCreditNoteById = null;
     filterCreditNoteById = this.filterCreditNoteById(creditNoteId);
     if (!filterCreditNoteById) {
-      return right(null);
+      return left(
+        RepoError.createEntityNotFoundError(
+          'credit note',
+          creditNoteId.toString()
+        )
+      );
     }
 
     return CreditNoteMap.toDomain({

@@ -268,8 +268,6 @@ export class MockInvoiceRepo
   async getUnrecognizedNetsuiteErpInvoices(): Promise<
     Either<GuardFailure | RepoError, InvoiceId[]>
   > {
-    const excludedCreditNotes = this.excludeCreditNotesForRevenueRecognition();
-
     const [
       filterArticlesByNotNullDatePublished,
     ] = await this.articleRepo.filterBy({
@@ -302,7 +300,7 @@ export class MockInvoiceRepo
       );
     }
 
-    return right(excludedCreditNotes(invoicesWithPublishedManuscripts.value));
+    return right(invoicesWithPublishedManuscripts.value);
   }
 
   async getUnrecognizedNetsuiteErpInvoicesDeprecated(): Promise<
@@ -397,26 +395,6 @@ export class MockInvoiceRepo
             ['value', '<>', 'MigrationRef'],
             ['value', '<>', 'migrationRef'],
           ],
-        },
-        items
-      );
-  }
-
-  public excludeCreditNotesForRevenueRecognition() {
-    return (items) =>
-      this.filterBy(
-        {
-          whereIn: [['status', ['ACTIVE', 'FINAL']]],
-          whereNull: [
-            ['cancelledInvoiceReference'],
-            // ['revenueRecognitionReference'],
-          ],
-          // whereNotNull: ['erpReference'],
-          // where: [
-          //   ['erpReference', '<>', 'NON_INVOICEABLE'],
-          //   ['erpReference', '<>', 'MigrationRef'],
-          //   ['erpReference', '<>', 'migrationRef'],
-          // ],
         },
         items
       );
