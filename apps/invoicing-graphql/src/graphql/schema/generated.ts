@@ -118,9 +118,7 @@ export type Invoice = {
   erpReference?: Maybe<Scalars['String']>;
   erpReferences?: Maybe<Array<Maybe<ErpReference>>>;
   revenueRecognitionReference?: Maybe<Scalars['String']>;
-  creationReason?: Maybe<Scalars['String']>;
   referenceNumber?: Maybe<Scalars['ReferenceNumber']>;
-  cancelledInvoiceReference?: Maybe<Scalars['ID']>;
   invoiceItem?: Maybe<InvoiceItem>;
   title?: Maybe<Scalars['String']>;
   price?: Maybe<Scalars['Float']>;
@@ -838,9 +836,7 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
   erpReference?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   erpReferences?: Resolver<Maybe<Array<Maybe<ResolversTypes['ErpReference']>>>, ParentType, ContextType>;
   revenueRecognitionReference?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  creationReason?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   referenceNumber?: Resolver<Maybe<ResolversTypes['ReferenceNumber']>, ParentType, ContextType>;
-  cancelledInvoiceReference?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   invoiceItem?: Resolver<Maybe<ResolversTypes['InvoiceItem']>, ParentType, ContextType>;
   title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;

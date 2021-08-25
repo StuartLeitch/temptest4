@@ -53,9 +53,6 @@ export const invoice: Resolvers<Context> = {
     async invoice(parent, args, context): Promise<any> {
       const { repos } = context;
 
-      const getCreditNoteByInvoiceIdUsecase = new GetInvoiceDetailsUsecase(
-        repos.invoice
-      );
       const usecase = new GetInvoiceDetailsUsecase(repos.invoice);
 
       const request: GetInvoiceDetailsDTO = {
@@ -124,9 +121,6 @@ export const invoice: Resolvers<Context> = {
       const { repos } = context;
       const contextRoles = getAuthRoles(context);
 
-      const getCreditNoteByInvoiceIdUsecase = new GetInvoiceDetailsUsecase(
-        repos.invoice
-      );
       const usecase = new GetInvoiceDetailsUsecase(repos.invoice);
 
       const request: GetInvoiceDetailsDTO = {
@@ -151,19 +145,7 @@ export const invoice: Resolvers<Context> = {
       const invoiceDetails = result.value;
 
       let assocInvoice = null;
-      // * this is a credit note, let's ask for the reference number of the associated invoice
-      if (invoiceDetails.cancelledInvoiceReference) {
-        const result = await getCreditNoteByInvoiceIdUsecase.execute(
-          { invoiceId: invoiceDetails.cancelledInvoiceReference },
-          usecaseContext
-        );
 
-        if (result.isLeft()) {
-          return undefined;
-        }
-        const invoice = result.value;
-        assocInvoice = InvoiceMap.toPersistence(invoice);
-      }
       const maybePayments = await repos.payment.getPaymentsByInvoiceId(
         invoiceDetails.invoiceId
       );
@@ -196,7 +178,6 @@ export const invoice: Resolvers<Context> = {
           .getErpReferences()
           .getItems()
           .concat(erpPaymentReferences),
-        cancelledInvoiceReference: invoiceDetails.cancelledInvoiceReference,
         dateIssued: invoiceDetails?.dateIssued?.toISOString(),
         referenceNumber: assocInvoice
           ? assocInvoice.persistentReferenceNumber
@@ -207,9 +188,7 @@ export const invoice: Resolvers<Context> = {
       const contextRoles = getAuthRoles(context);
 
       const { repos } = context;
-      const getCreditNoteByInvoiceIdUsecase = new GetInvoiceDetailsUsecase(
-        repos.invoice
-      );
+
       const usecase = new GetRecentInvoicesUsecase(repos.invoice);
       const usecaseContext = {
         roles: contextRoles,
@@ -224,26 +203,10 @@ export const invoice: Resolvers<Context> = {
 
       const invoicesList = result.value;
 
-      const retrieveAssociatedInvoice = async (item: any) => {
-        const result = await getCreditNoteByInvoiceIdUsecase.execute(
-          { invoiceId: item.cancelledInvoiceReference },
-          usecaseContext
-        );
-        if (result.isLeft()) {
-          return undefined;
-        }
-        const invoice = result.value;
-        return InvoiceMap.toPersistence(invoice);
-      };
-
       const getInvoices = async () =>
         Promise.all(
           invoicesList.invoices.map(async (invoiceDetails: any) => {
             let assocInvoice = null;
-            if (invoiceDetails.cancelledInvoiceReference) {
-              // * this is a credit note, let's ask for the reference number of the associated invoice
-              assocInvoice = await retrieveAssociatedInvoice(invoiceDetails);
-            }
 
             return {
               ...InvoiceMap.toPersistence(invoiceDetails),
@@ -381,18 +344,7 @@ export const invoice: Resolvers<Context> = {
       let maybePayer = await payerRepo.getPayerByInvoiceId(invoiceId);
 
       if (maybePayer.isLeft()) {
-        if (parent.cancelledInvoiceReference) {
-          invoiceId = InvoiceId.create(
-            new UniqueEntityID(parent.cancelledInvoiceReference)
-          );
-          maybePayer = await payerRepo.getPayerByInvoiceId(invoiceId);
-          if (maybePayer.isLeft()) {
-            // throw new Error(maybePayer.value.message);
-            return null;
-          }
-        } else {
-          return null;
-        }
+        return null;
       }
       return PayerMap.toPersistence(maybePayer.value);
     },

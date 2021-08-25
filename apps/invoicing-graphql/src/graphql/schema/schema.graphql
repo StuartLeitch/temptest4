@@ -97,9 +97,7 @@ type Invoice @model(id: "invoices") {
   erpReference: String
   erpReferences: [ErpReference]
   revenueRecognitionReference: String
-  creationReason: String
   referenceNumber: ReferenceNumber @filter
-  cancelledInvoiceReference: ID
   invoiceItem: InvoiceItem
   title: String
   price: Float
@@ -299,7 +297,6 @@ input InvoiceFilters {
   referenceNumber: [ReferenceNumber]
   invoiceItem: InvoiceItemFilters
 }
-
 
 input Pagination {
   page: Int

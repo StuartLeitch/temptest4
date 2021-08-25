@@ -54,7 +54,7 @@ const TrTableInvoicesList = ({ invoices }) => {
           id,
           status,
           referenceNumber,
-          cancelledInvoiceReference,
+          // cancelledInvoiceReference,
           // customId,
           // manuscriptTitle,
           total,
@@ -65,7 +65,6 @@ const TrTableInvoicesList = ({ invoices }) => {
         }) => (
           <tr
             key={id}
-            className={cancelledInvoiceReference ? 'table-warning' : ''}
           >
             <td className='align-middle'>
               <div>{INVOICE_STATUS[status]}</div>
@@ -73,9 +72,7 @@ const TrTableInvoicesList = ({ invoices }) => {
             <td className='align-middle'>
               <Link
                 to={
-                  cancelledInvoiceReference
-                    ? `/credit-notes/details/${id}`
-                    : `/invoices/details/${id}`
+                  `/invoices/details/${id}`
                 }
                 className='text-decoration-none'
               >
@@ -87,9 +84,7 @@ const TrTableInvoicesList = ({ invoices }) => {
             <td className='align-middle'>
               <Link
                 to={
-                  cancelledInvoiceReference
-                    ? `/credit-notes/details/${id}`
-                    : `/invoices/details/${id}`
+                `/invoices/details/${id}`
                 }
                 className='text-decoration-none'
               >
@@ -99,9 +94,7 @@ const TrTableInvoicesList = ({ invoices }) => {
                   }
                 >
                   <strong>
-                    {(cancelledInvoiceReference
-                      ? `CN-${referenceNumber}`
-                      : referenceNumber) || ' '}
+                    { referenceNumber || ' '}
                   </strong>
                 </span>
               </Link>

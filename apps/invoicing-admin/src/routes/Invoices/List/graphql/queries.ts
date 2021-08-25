@@ -20,7 +20,6 @@ fragment invoiceFragment on Invoice {
   dateIssued
   dateAccepted
   referenceNumber
-  cancelledInvoiceReference
   payer {
     ...payerFragment
   }
@@ -83,7 +82,6 @@ fragment articleFragment on Article {
 }
 `;
 
-
 export const INVOICES_AND_CREDIT_NOTES_QUERY = `
 query search(
   $filters: InvoiceFilters,
@@ -115,7 +113,6 @@ fragment invoiceFragment on Invoice {
   dateIssued
   dateAccepted
   referenceNumber
-  cancelledInvoiceReference
   payer {
     ...payerFragment
   }
