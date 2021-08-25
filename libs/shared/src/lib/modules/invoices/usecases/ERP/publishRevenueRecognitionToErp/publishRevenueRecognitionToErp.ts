@@ -20,6 +20,7 @@ import { Invoice } from '../../../domain/Invoice';
 
 import { ErpReferenceMap } from './../../../../vendors/mapper/ErpReference';
 
+import { CreditNoteRepoContract } from '../../../../creditNotes/repos/creditNoteRepo';
 import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
 import { InvoiceItemRepoContract } from './../../../repos/invoiceItemRepo';
 import { PayerRepoContract } from '../../../../payers/repos/payerRepo';
@@ -38,6 +39,10 @@ import { GetItemsForInvoiceUsecase } from './../../getItemsForInvoice/getItemsFo
 
 import { PublishRevenueRecognitionToErpResponse as Response } from './publishRevenueRecognitionToErpResponse';
 import type { PublishRevenueRecognitionToErpRequestDTO as DTO } from './publishRevenueRecognitionToErpDTO';
+import {
+  RepoError,
+  RepoErrorCode,
+} from '../../../../../infrastructure/RepoError';
 
 export class PublishRevenueRecognitionToErpUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
@@ -53,6 +58,7 @@ export class PublishRevenueRecognitionToErpUsecase
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract,
     private erpReferenceRepo: ErpReferenceRepoContract,
+    private creditNoteRepo: CreditNoteRepoContract,
     private erpService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {
@@ -104,25 +110,23 @@ export class PublishRevenueRecognitionToErpUsecase
 
       invoice.addItems(invoiceItems);
 
-      if (!invoice.isCreditNote()) {
-        const maybePayer = await this.payerRepo.getPayerByInvoiceId(
-          invoice.invoiceId
-        );
-        if (maybePayer.isLeft()) {
-          throw new Error(`Invoice ${invoice.id} has no payers.`);
-        }
-
-        payer = maybePayer.value;
-
-        const maybeAddress = await this.addressRepo.findById(
-          payer.billingAddressId
-        );
-        if (maybeAddress.isLeft()) {
-          throw new Error(`Invoice ${invoice.id} has no address associated.`);
-        }
-
-        address = maybeAddress.value;
+      const maybePayer = await this.payerRepo.getPayerByInvoiceId(
+        invoice.invoiceId
+      );
+      if (maybePayer.isLeft()) {
+        throw new Error(`Invoice ${invoice.id} has no payers.`);
       }
+
+      payer = maybePayer.value;
+
+      const maybeAddress = await this.addressRepo.findById(
+        payer.billingAddressId
+      );
+      if (maybeAddress.isLeft()) {
+        throw new Error(`Invoice ${invoice.id} has no address associated.`);
+      }
+
+      address = maybeAddress.value;
 
       const maybeManuscript = await this.manuscriptRepo.findById(
         invoiceItems[0].manuscriptId
@@ -137,36 +141,26 @@ export class PublishRevenueRecognitionToErpUsecase
         return right(null);
       }
 
-      // * If it's a credit node and the manuscript has been published
-      if (invoice.isCreditNote() && manuscript.datePublished) {
-        return right(null);
-      }
-
-      const { customId } = manuscript;
-
-      // * Get all invoices associated with this custom id
-      const maybeRef = await this.invoiceRepo.getInvoicesByCustomId(customId);
-
-      if (maybeRef.isLeft()) {
-        return left(this.getReturnError(maybeRef));
-      }
-
-      const referencedInvoicesByCustomId = maybeRef.value;
-
-      // * If the invoice has a credit note
-      // * and the manuscript has been published before its creation
-      const associatedCreditNote = referencedInvoicesByCustomId.find(
-        (item) =>
-          item.cancelledInvoiceReference === invoice.invoiceId.id.toString()
+      // * If it's a credit note and the manuscript has been published
+      const maybeCreditNote = await this.creditNoteRepo.getCreditNoteByInvoiceId(
+        invoice.invoiceId
       );
 
-      if (associatedCreditNote) {
-        const creditNoteCreatedOn = new Date(associatedCreditNote.dateCreated);
-        const { datePublished: manuscriptPublishedOn } = manuscript;
+      if (maybeCreditNote.isLeft()) {
+        const err = maybeCreditNote.value;
+        if (err instanceof RepoError) {
+          if (err.code !== RepoErrorCode.ENTITY_NOT_FOUND) {
+            return left(err);
+          }
+        } else {
+          return left(err);
+        }
+      } else {
+        const creditNote = maybeCreditNote.value;
 
         if (
-          !invoice.isCreditNote() &&
-          creditNoteCreatedOn.getTime() > manuscriptPublishedOn.getTime()
+          manuscript.datePublished &&
+          creditNote.dateIssued.getTime() < manuscript.datePublished.getTime()
         ) {
           return right(null);
         }

@@ -5,6 +5,7 @@ import { Payment } from '../../../payments/domain/Payment';
 import { InvoiceItem } from '../../domain/InvoiceItem';
 import { Payer } from '../../../payers/domain/Payer';
 import { Invoice } from '../../domain/Invoice';
+import { CreditNote } from '../../../creditNotes/domain/CreditNote';
 
 export interface WithInvoice {
   invoice: Invoice;
@@ -72,5 +73,6 @@ export interface InvoiceCreditedData {
   manuscript: Manuscript;
   payments: Payment[];
   invoice: Invoice;
+  creditNote: CreditNote;
   payer: Payer;
 }

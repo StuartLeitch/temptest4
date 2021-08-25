@@ -46,13 +46,13 @@ Feature: Generate Compensatory Events Usecase
         Then It should send an InvoiceCreated Event
         And No Credit Note is created
 
-    @ValidateGenerateCompensatoryEvents
-    Scenario Outline: Generate Compensatory Events for a Credit Note
-        Given There is a Credit Note
-        When I try to generate a compensatory event
-        Then It should send an <EventName> Event
+    # @ValidateGenerateCompensatoryEvents
+    # Scenario Outline: Generate Compensatory Events for a Credit Note
+    #     Given There is a Credit Note
+    #     When I try to generate a compensatory event
+    #     Then It should send an <EventName> Event
 
-        Examples:
-            | EventName                |
-            | InvoiceCreditNoteCreated |
-            | InvoiceFinalized         |
+    #     Examples:
+    #         | EventName                |
+    #         | InvoiceCreditNoteCreated |
+    #         | InvoiceFinalized         |

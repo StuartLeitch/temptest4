@@ -11,6 +11,7 @@ import {
   PaymentMethod,
   InvoiceItem,
   Manuscript,
+  CreditNote,
   Address,
   Invoice,
   Payment,
@@ -665,15 +666,15 @@ export class NetSuiteService implements ErpServiceContract {
   }
 
   private async transformCreditNote(data: {
-    originalInvoice?: Invoice;
-    creditNote?: Invoice;
+    invoice?: Invoice;
+    creditNote?: CreditNote;
   }) {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { originalInvoice, creditNote } = data;
+    const { invoice, creditNote } = data;
 
-    const originalNSErpReference = originalInvoice
+    const originalNSErpReference = invoice
       .getErpReferences()
       .getItems()
       .filter(
@@ -683,7 +684,7 @@ export class NetSuiteService implements ErpServiceContract {
 
     if (originalNSErpReference.value === 'NON_INVOICEABLE') {
       this.logger.warn({
-        message: `CreditNote in NetSuite cancelled for "NON_INVOICEABLE" Invoice ${originalInvoice.id.toString()}.`,
+        message: `CreditNote in NetSuite cancelled for "NON_INVOICEABLE" Invoice ${invoice.id.toString()}.`,
       });
       return;
     }
@@ -699,7 +700,7 @@ export class NetSuiteService implements ErpServiceContract {
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
       saleseffectivedate: format(
-        new Date(originalInvoice.dateAccepted),
+        new Date(invoice.dateAccepted),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ),
     };
@@ -725,14 +726,14 @@ export class NetSuiteService implements ErpServiceContract {
   }
 
   private async patchCreditNote(data: {
-    creditNote?: Invoice;
+    creditNote?: CreditNote;
     creditNoteId?: string;
-    originalInvoice?: Invoice;
+    invoice?: Invoice;
   }) {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { creditNote, originalInvoice, creditNoteId } = data;
+    const { creditNote, invoice, creditNoteId } = data;
 
     const creditNoteRequestOpts = {
       url: `${config.endpoint}record/v1/creditmemo/${creditNoteId}`,
@@ -759,13 +760,13 @@ export class NetSuiteService implements ErpServiceContract {
     }
 
     const patchCreditNotePayload: Record<string, any> = {
-      tranId: `CN-${originalInvoice.persistentReferenceNumber}`,
+      tranId: `CN-${invoice.persistentReferenceNumber}`,
       tranDate: format(
         new Date(creditNote.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
       saleseffectivedate: format(
-        new Date(creditNote.dateAccepted),
+        new Date(invoice.dateAccepted),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ),
       memo,
@@ -839,7 +840,6 @@ export class NetSuiteService implements ErpServiceContract {
       url: `${config.endpoint}record/v1/invoice/${invoiceErpReference}`,
       method: 'GET',
     };
-
     try {
       const headers = oauth.toHeader(
         oauth.authorize(invoiceExistsRequestOpts, token)

@@ -34,7 +34,6 @@ export class GetInvoiceDetailsUsecase
     let invoice: Invoice;
 
     const invoiceId = InvoiceId.create(new UniqueEntityID(request.invoiceId));
-
     try {
       try {
         const maybeInvoice = await this.invoiceRepo.getInvoiceById(invoiceId);

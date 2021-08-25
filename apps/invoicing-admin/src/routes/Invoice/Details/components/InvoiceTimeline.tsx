@@ -5,7 +5,7 @@ import { TimelineMini } from '../../../components/Timeline/TimelineMini';
 import  { formatDate } from '../../../../utils/date';
 
 import compareDesc from 'date-fns/compareDesc';
-import { Invoice } from '../types';
+import { Invoice, CreditNote } from '../types';
 
 function renderSwitch(reason) {
   switch (reason) {
@@ -24,7 +24,7 @@ function renderSwitch(reason) {
   }
 }
 
-const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ({ invoice }) => (
+const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ({ creditNote, invoice }) => (
   <Card className='mb-3'>
     <CardBody>
       <CardTitle tag='h6'>Timeline</CardTitle>
@@ -78,18 +78,18 @@ const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ({ invoice }) => (
         />
       )}
 
-      {invoice?.creditNote && (
+      {creditNote && (
         <TimelineMini
           icon='check-circle'
           iconClassName='text-warning'
           badgeTitle='Credit Note'
           badgeColor='warning'
           date={formatDate(
-            new Date(invoice?.creditNote?.dateCreated)
+            new Date(creditNote?.dateIssued)
           )}
           phrase={`
           Credit Note issued.
-          Reason: ${renderSwitch(invoice?.creditNote?.creationReason)}
+          Reason: ${renderSwitch(creditNote?.creationReason)}
           `}
         />
       )}
@@ -112,6 +112,7 @@ const InvoiceTimeline: React.FC<InvoiceTimelineProps> = ({ invoice }) => (
 
 interface InvoiceTimelineProps {
   invoice: Invoice;
+  creditNote: CreditNote;
 }
 
 export default InvoiceTimeline;

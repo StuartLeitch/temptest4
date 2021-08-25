@@ -1,3 +1,3 @@
-import { INVOICES_QUERY } from './queries';
+import { INVOICES_QUERY, INVOICES_AND_CREDIT_NOTES_QUERY } from './queries';
 
-export { INVOICES_QUERY };
+export { INVOICES_QUERY, INVOICES_AND_CREDIT_NOTES_QUERY };
