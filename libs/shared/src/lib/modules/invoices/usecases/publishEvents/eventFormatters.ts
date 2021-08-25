@@ -19,6 +19,7 @@ import { Waiver } from '../../../waivers/domain/Waiver';
 import { InvoiceItem } from '../../domain/InvoiceItem';
 import { Payer } from '../../../payers/domain/Payer';
 import { Invoice } from '../../domain/Invoice';
+import { CreditNote } from '../../../creditNotes/domain/CreditNote';
 
 export function formatCoupons(coupons: Coupon[]): PhenomCoupon[] {
   if (!coupons) return undefined;
@@ -71,7 +72,8 @@ export function formatPayer(
 export function formatCosts(
   invoiceItems: InvoiceItem[],
   payments: Payment[],
-  invoice: Invoice
+  invoice: Invoice,
+  creditNote?: CreditNote
 ): PhenomCosts {
   const apcItems = invoiceItems.filter((item) => item.type === 'APC');
   const totalPrice = apcItems.reduce((acc, item) => acc + item.price, 0);
@@ -88,8 +90,11 @@ export function formatCosts(
     .reduce((acc, payment) => acc + payment.amount.value, 0);
   const dueAmount = totalPrice - totalDiscount + vatAmount - paid;
 
+  const creditNoteExists =
+    invoice.invoiceId.id.toString() === creditNote?.invoiceId.id.toString();
+
   return {
-    dueAmount: invoice.cancelledInvoiceReference ? 0 : dueAmount,
+    dueAmount: creditNoteExists ? 0 : dueAmount,
     netAmount: totalPrice - totalDiscount + vatAmount,
     netApc: totalPrice - totalDiscount,
     grossApc: totalPrice,

@@ -216,4 +216,14 @@ export class KnexInvoiceItemRepo
 
     return flatten(items.map((item) => InvoiceItemMap.toDomain(item)));
   }
+
+  public invoiceItemCreditNoteJoinQuery(): any {
+    return (query) =>
+      query.leftJoin(
+        'credit_notes',
+        'invoice_items.invoiceId',
+        '=',
+        'credit_notes.invoiceId'
+      );
+  }
 }

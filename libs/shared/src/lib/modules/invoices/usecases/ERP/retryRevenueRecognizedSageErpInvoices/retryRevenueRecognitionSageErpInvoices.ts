@@ -9,6 +9,7 @@ import {
   Authorize,
 } from '../../../../../domain/authorization';
 
+import { CreditNoteRepoContract } from '../../../../creditNotes/repos/creditNoteRepo';
 import { ArticleRepoContract } from '../../../../manuscripts/repos/articleRepo';
 import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
 import { InvoiceItemRepoContract } from '../../../repos/invoiceItemRepo';
@@ -44,6 +45,7 @@ export class RetryRevenueRecognitionSageErpInvoicesUsecase
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract,
     private erpReferenceRepo: ErpReferenceRepoContract,
+    private creditNoteRepo: CreditNoteRepoContract,
     private sageService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {
@@ -60,6 +62,7 @@ export class RetryRevenueRecognitionSageErpInvoicesUsecase
       this.catalogRepo,
       this.publisherRepo,
       this.erpReferenceRepo,
+      this.creditNoteRepo,
       this.sageService,
       this.loggerService
     );

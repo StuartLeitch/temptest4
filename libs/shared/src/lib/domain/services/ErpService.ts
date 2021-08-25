@@ -1,6 +1,7 @@
 import {
   PaymentMethod,
   InvoiceItem,
+  CreditNote,
   Invoice,
   Address,
   Payment,
@@ -18,7 +19,7 @@ export interface ErpTaxDetails {
 export interface ErpInvoiceRequest {
   invoice: Invoice;
   originalInvoice?: Invoice;
-  creditNote?: Invoice;
+  creditNote?: CreditNote;
   items: InvoiceItem[];
   payer: Payer;
   manuscript: Manuscript;

@@ -4,6 +4,7 @@ import { Resolvers } from '../schema';
 import { Context } from '../../builders';
 
 import { payer } from './payer';
+import { creditNote } from './creditNote';
 import { invoice } from './invoice';
 import { coupon } from './coupon';
 import { payments } from './payments';
@@ -15,6 +16,7 @@ import { generateDraftCompensatoryEvents } from './generateDraftCompensatoryEven
 export const resolvers: Resolvers<Context> = merge(
   {},
   payer,
+  creditNote,
   invoice,
   coupon,
   payments,

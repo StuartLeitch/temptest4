@@ -4,7 +4,7 @@ import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
-import { RepoError } from '../../../../infrastructure/RepoError';
+import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
 
 import { CatalogItem } from './../../domain/CatalogItem';
 import { CatalogMap } from './../../mappers/CatalogMap';
@@ -26,10 +26,7 @@ export class KnexCatalogRepo
 
     if (!catalogItem) {
       return left(
-        RepoError.createEntityNotFoundError(
-          'catalogItem',
-          catalogItem.id.toString()
-        )
+        RepoError.createEntityNotFoundError('catalogItem', catalogId.toString())
       );
     }
 
@@ -40,10 +37,21 @@ export class KnexCatalogRepo
     catalogItem: CatalogItem
   ): Promise<Either<GuardFailure | RepoError, boolean>> {
     try {
-      const c = await this.getCatalogItemById(catalogItem.id);
-      return right(!!c);
+      const result = await this.getCatalogItemById(catalogItem.id);
+
+      if (result.isRight()) {
+        return right(true);
+      } else {
+        if (
+          result.value instanceof RepoError &&
+          result.value.code === RepoErrorCode.ENTITY_NOT_FOUND
+        ) {
+          return right(false);
+        } else {
+          return left(result.value);
+        }
+      }
     } catch (error) {
-      // ! do nothing yet
       return left(RepoError.fromDBError(error));
     }
   }

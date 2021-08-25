@@ -189,9 +189,10 @@ const InvoicesContainer: React.FC = () => {
     const [name, status] = ParseUtils.parseEvent(key);
     let newStatus = [];
     let newTransactionStatus = [];
-    let newJournalId = [];
 
     switch (name) {
+
+      // * invoices status filter
       case 'invoiceStatus':
         if (filters.invoiceStatus.includes(status)) {
           newStatus = filters.invoiceStatus.filter((s) => s !== status);
@@ -214,7 +215,23 @@ const InvoicesContainer: React.FC = () => {
 
         break;
 
-      case 'transactionStatus':
+
+      // * pagination
+      case 'page':
+        setPage(value as string);
+        writeStorage('invoicesList', {
+          filters,
+          pagination:{
+            ...pagination,
+            page: value,
+            offset: Number(value) - 1,
+          }
+        });
+        break;
+
+
+      // * transaction status filter
+      default:
         if (filters.transactionStatus.includes(status)) {
           newTransactionStatus = filters.transactionStatus.filter(
             (s) => s !== status
@@ -234,54 +251,6 @@ const InvoicesContainer: React.FC = () => {
           page: 1,
         }});
         break;
-
-      case 'journalTitle':
-        newJournalId = (value as any[]).map((j) => j.journalId);
-        setJournalId(newJournalId);
-        setPage(1);
-        writeStorage('invoicesList', { filters: {
-          ...filters,
-          journalId: newJournalId,
-        }, pagination: {
-          ...pagination,
-          page: 1,
-        }});
-        break;
-
-      case 'referenceNumber':
-        setPage(1);
-        setReferenceNumber(value as string);
-        writeStorage('invoicesList',{ filters: {
-          ...filters,
-          referenceNumber: value,
-        }, pagination: {
-          ...pagination,
-          page: 1,
-        }});
-        break;
-
-      case 'page':
-        setPage(value as string);
-        writeStorage('invoicesList', {
-          filters,
-          pagination:{
-            ...pagination,
-            page: value,
-            offset: Number(value) - 1,
-          }
-        });
-        break;
-
-      default:
-        setCustomId(value as string);
-        setPage(1);
-        writeStorage('invoicesList', {
-          filters: { ...filters, customId: value },
-          pagination: {
-            ...pagination,
-            page: 1,
-          }
-        });
     }
   }
 };
