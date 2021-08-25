@@ -179,9 +179,9 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
           // * send nonce and verification data to our server
           const ccPayload = {
             paymentMethodNonce: token.nonce,
-            paymentMethodId: this.props.paymentMethodId,
-            payerId: this.props.payerId,
-            amount: this.props.total,
+            paymentMethodId: self.props.paymentMethodId,
+            payerId: self.props.payerId,
+            amount: self.props.total,
           };
           self.props.handleSubmit(ccPayload);
         },
