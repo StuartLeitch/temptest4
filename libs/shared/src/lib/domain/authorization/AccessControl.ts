@@ -390,58 +390,68 @@ accessControl
   .action('generateCode');
 
 accessControl
-  .grant(Roles.FINANCIAL_CONTROLLER)
-  .resource('invoices')
-  .action('read')
+  .grant(Roles.FINANCIAL_ADMIN)
+  .inherits(Roles.FINANCIAL_BASIC)
   .resource('invoice')
-  .action('read')
-  .resource('coupons')
-  .action('read')
+  .action('create')
+  .action('update')
+  .action('delete')
+  .action('restore')
+  .action('confirm')
+  .action('applyVAT')
   .resource('coupon')
-  .action('read')
+  // * Allow coupon creation
+  .action('create')
   // * Allow coupon apply
   .action('apply')
-  // * Allow credit note creation
-  .resource('creditNote')
-  .action('create')
-  .action('read')
+  // * Allow coupon edit
+  .action('update')
+  .action('generateCode')
   // * Allow payment registration
   .resource('payment')
   .action('register')
   .where(paymentIsBankTransfer)
-  .action('read')
   .action('create')
   .action('update')
-  .resource('paymentMethods')
-  .action('read')
-  .resource('paymentMethod')
-  .action('read')
-  .resource('payer')
-  .action('read')
-  .resource('address')
-  .action('read')
-  .resource('manuscript')
-  .action('read')
-  .resource('journals')
-  .action('read')
-  .resource('transaction')
-  .action('read')
-  .resource('payments')
-  .action('read')
+  // * Allow credit note creation
+  .resource('creditNote')
+  .action('create')
+  // * Allow toggle reminders
   .resource('reminder')
-  .action('read');
+  .action('toggle')
+  .action('send')
+  .action('add')
+  .resource('manuscript')
+  .action('create');
+
+accessControl
+  .grant(Roles.FINANCIAL_CONTROLLER)
+  .inherits(Roles.FINANCIAL_BASIC)
+  .resource('invoice')
+  .action('update')
+  .action('confirm')
+  .action('applyVAT')
+  // * Allow coupon apply
+  .resource('coupon')
+  .action('apply')
+  // * Allow credit note creation
+  .resource('creditNote')
+  .action('create')
+  // * Allow payment registration
+  .resource('payment')
+  .action('register')
+  .where(paymentIsBankTransfer)
+  .action('create')
+  .action('update');
 
 accessControl
   .grant(Roles.FINANCIAL_SUPPORT)
-  .resource('invoices')
-  .action('read')
   .resource('invoice')
-  .action('read')
-  .resource('coupons')
-  .action('read')
-  .resource('coupon')
-  .action('read')
+  .action('update')
+  .action('confirm')
+  .action('applyVAT')
   // * Allow coupon apply
+  .resource('coupon')
   .action('apply')
   .action('generateCode')
   .resource('manuscript')
@@ -457,14 +467,11 @@ accessControl
 
 accessControl
   .grant(Roles.MARKETING)
-  .resource('invoices')
-  .action('read')
   .resource('invoice')
-  .action('read')
-  .resource('coupons')
-  .action('read')
+  .action('update')
+  .action('confirm')
+  .action('applyVAT')
   .resource('coupon')
-  .action('read')
   // * Allow coupon creation
   .action('create')
   // * Allow coupon apply
