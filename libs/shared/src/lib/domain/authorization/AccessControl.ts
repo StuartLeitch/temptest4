@@ -53,7 +53,6 @@ accessControl
   .action('getPDF')
   .resource('creditNote')
   .action('read')
-  .action('create')
   .resource('payer')
   .action('create')
   .action('read')
@@ -281,6 +280,8 @@ accessControl
   .resource('payer')
   .action('read')
   .resource('address')
+  .action('read')
+  .resource('waiver')
   .action('read');
 
 accessControl
@@ -293,6 +294,10 @@ accessControl
   .action('restore')
   .action('confirm')
   .action('applyVAT')
+  .resource('address')
+  .action('create')
+  .resource('payer')
+  .action('create')
   .resource('coupon')
   // * Allow coupon creation
   .action('create')
@@ -325,8 +330,12 @@ accessControl
   .action('update')
   .action('confirm')
   .action('applyVAT')
-  // * Allow coupon apply
+  .resource('address')
+  .action('create')
+  .resource('payer')
+  .action('create')
   .resource('coupon')
+  // * Allow coupon apply
   .action('apply')
   // * Allow credit note creation
   .resource('creditNote')
@@ -345,8 +354,12 @@ accessControl
   .action('update')
   .action('confirm')
   .action('applyVAT')
-  // * Allow coupon apply
+  .resource('address')
+  .action('create')
+  .resource('payer')
+  .action('create')
   .resource('coupon')
+  // * Allow coupon apply
   .action('apply')
   .action('generateCode');
 
@@ -357,6 +370,10 @@ accessControl
   .action('update')
   .action('confirm')
   .action('applyVAT')
+  .resource('address')
+  .action('create')
+  .resource('payer')
+  .action('create')
   .resource('coupon')
   // * Allow coupon creation
   .action('create')
