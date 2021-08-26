@@ -23,6 +23,17 @@ const PERMISSIONS = {
     'add.payment',
     'stop.reminders'
   ],
+  ADMIN: [
+    'list.invoices',
+    'list.credit-notes',
+    'create.credit-note',
+    'create.coupon',
+    'list.coupons',
+    'edit.coupon',
+    'apply.coupon',
+    'add.payment',
+    'stop.reminders'
+  ],
   FINANCIAL_ADMIN: [
     'list.invoices',
     'list.credit-notes',
