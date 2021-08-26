@@ -340,6 +340,7 @@ accessControl
 
 accessControl
   .grant(Roles.FINANCIAL_SUPPORT)
+  .inherits(Roles.FINANCIAL_BASIC)
   .resource('invoice')
   .action('update')
   .action('confirm')
@@ -351,6 +352,7 @@ accessControl
 
 accessControl
   .grant(Roles.MARKETING)
+  .inherits(Roles.FINANCIAL_BASIC)
   .resource('invoice')
   .action('update')
   .action('confirm')
