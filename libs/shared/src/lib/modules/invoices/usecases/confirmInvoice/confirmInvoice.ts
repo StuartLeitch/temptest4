@@ -156,7 +156,10 @@ export class ConfirmInvoiceUsecase
       const { invoice } = payerData;
 
       try {
-        if (invoice.status === InvoiceStatus.ACTIVE) {
+        if (
+          invoice.status === InvoiceStatus.ACTIVE ||
+          invoice.status === InvoiceStatus.FINAL
+        ) {
           const lastInvoiceNumber = await this.invoiceRepo.getCurrentInvoiceNumber();
           invoice.assignInvoiceNumber(lastInvoiceNumber);
           const maybeUpdated = await this.invoiceRepo.update(invoice);
