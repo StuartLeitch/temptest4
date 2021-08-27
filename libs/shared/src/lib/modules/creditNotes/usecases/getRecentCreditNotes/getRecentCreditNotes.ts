@@ -29,7 +29,7 @@ export class GetRecentCreditNotesUesecase
     super();
   }
 
-  @Authorize('creditNote:read')
+  @Authorize('creditNotes:read')
   public async execute(
     request: DTO,
     context?: UsecaseAuthorizationContext
