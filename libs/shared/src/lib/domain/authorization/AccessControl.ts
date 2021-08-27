@@ -51,8 +51,6 @@ accessControl
   .action('applyVAT')
   .action('confirm')
   .action('getPDF')
-  .resource('creditNote')
-  .action('read')
   .resource('payer')
   .action('create')
   .action('read')
