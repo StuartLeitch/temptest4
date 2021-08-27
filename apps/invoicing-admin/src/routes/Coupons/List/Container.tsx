@@ -20,6 +20,7 @@ import Restricted from '../../../contexts/Restricted';
 
 import { HeaderMain } from '../../components/HeaderMain';
 import { Loading } from '../../components';
+import NotAuthorized from '../../components/NotAuthorized';
 
 import List from './List';
 
@@ -89,6 +90,7 @@ const CouponsContainer: React.FC = () => {
 
   return (
     <React.Fragment>
+      <Restricted to='list.coupons' fallback={<NotAuthorized />}>
       <Container fluid={true}>
         <HeaderMain title='Coupons' className='mb-5 mt-4' />
         <Col lg={12} className='d-flex mb-3 mr-0 pr-0'>
@@ -109,6 +111,7 @@ const CouponsContainer: React.FC = () => {
           </Col>
         </Row>
       </Container>
+      </Restricted>
     </React.Fragment>
   );
 };

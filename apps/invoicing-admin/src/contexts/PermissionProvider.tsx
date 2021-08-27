@@ -52,7 +52,7 @@ const PERMISSIONS = {
     'apply.coupon',
     'add.payment'
   ],
-  MARKETING: ['list.invoices', 'list.credit-notes', 'create.coupon', 'apply.coupon', 'edit.coupon'],
+  MARKETING: ['list.invoices','list.coupons', 'list.credit-notes', 'create.coupon', 'apply.coupon', 'edit.coupon'],
   FINANCIAL_SUPPORT: ['list.invoices', 'list.credit-notes', 'apply.coupon'],
 }
 
