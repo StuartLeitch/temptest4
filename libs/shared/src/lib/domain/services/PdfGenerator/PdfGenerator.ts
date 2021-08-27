@@ -63,7 +63,7 @@ export class PdfGeneratorService {
       vatNumber: process.env.COMPANY_VAT_NUMBER,
       assistanceEmail: process.env.ASSISTANCE_EMAIL,
       tenantAddress: process.env.TENANT_ADDRESS,
-      logo: logoData,
+      logo: `data:image/svg+xml;base64, ${logoData}`,
       bankDetails: {
         accountName: process.env.BANK_ACCOUNT_NAME,
         accountType: process.env.BANK_ACCOUNT_TYPE,
