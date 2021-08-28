@@ -18,7 +18,7 @@ import {
 } from '../../../../domain/authorization';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 
-export class GetRecentCreditNotesUesecase
+export class GetRecentCreditNotesUsecase
   extends AccessControlledUsecase<
     DTO,
     UsecaseAuthorizationContext,

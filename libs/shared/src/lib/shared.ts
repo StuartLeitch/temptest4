@@ -254,16 +254,12 @@ export * from './modules/creditNotes/mappers/CreditNoteMap';
 export * from './modules/creditNotes/repos/creditNoteRepo';
 export * from './modules/creditNotes/repos/implementations/knexCreditNoteRepo';
 export * from './modules/creditNotes/repos/mocks/mockCreditNoteRepo';
-export * from './modules/creditNotes/usecases/getCreditNoteById/getCreditNoteById';
-export * from './modules/creditNotes/usecases/getCreditNoteById/getCreditNoteByIdDTO';
-export * from './modules/creditNotes/usecases/getCreditNoteByCustomId/getCreditNoteByCustomId';
-export * from './modules/creditNotes/usecases/getRecentCreditNotes/getRecentCreditNotes';
-export * from './modules/creditNotes/usecases/getRecentCreditNotes/getRecentCreditNotesDTO';
-export * from './modules/creditNotes/usecases/createCreditNote/createCreditNote';
-export * from './modules/creditNotes/usecases/getCreditNoteByInvoiceId/getCreditNoteByInvoiceId';
-export * from './modules/creditNotes/usecases/getCreditNoteByInvoiceId/getCreditNoteByInvoiceIdDTO';
-export * from './modules/creditNotes/usecases/getCreditNoteByReferenceNumber/getCreditNoteByReferenceNumber';
-export * from './modules/creditNotes/usecases/getCreditNoteByReferenceNumber/getCreditNoteByReferenceNumberDTO';
+export * from './modules/creditNotes/usecases/getCreditNoteById';
+export * from './modules/creditNotes/usecases/getCreditNoteByCustomId';
+export * from './modules/creditNotes/usecases/getRecentCreditNotes';
+export * from './modules/creditNotes/usecases/createCreditNote';
+export * from './modules/creditNotes/usecases/getCreditNoteByInvoiceId';
+export * from './modules/creditNotes/usecases/getCreditNoteByReferenceNumber';
 
 // * Export user Subdomain
 export * from './modules/invoices/usecases/ERP/retryFailedNetsuiteErpInvoices/retryFailedNetsuiteErpInvoices';
