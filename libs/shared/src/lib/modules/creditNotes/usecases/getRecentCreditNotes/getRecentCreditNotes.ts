@@ -1,22 +1,22 @@
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { left, right } from '../../../../core/logic/Either';
-
-import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
-
-// * Usecase specifics
-import { GetRecentCreditNotesResponse as Response } from './getRecentCreditNotesResponse';
-import type { GetRecentCreditNotesDTO as DTO } from './getRecentCreditNotesDTO';
-import * as Errors from './getRecentCreditNotesErrors';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization logic
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
-  Authorize,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
-import { UnexpectedError } from '../../../../core/logic/AppError';
+
+// * Usecase specifics
+import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
+
+import { GetRecentCreditNotesResponse as Response } from './getRecentCreditNotesResponse';
+import type { GetRecentCreditNotesDTO as DTO } from './getRecentCreditNotesDTO';
+import * as Errors from './getRecentCreditNotesErrors';
 
 export class GetRecentCreditNotesUsecase
   extends AccessControlledUsecase<
