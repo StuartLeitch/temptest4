@@ -367,7 +367,7 @@ export class KnexInvoiceRepo
         .whereNull('revrec.value')
         .whereNotIn(
           'invoices.id',
-          db.raw(`SELECT invoiceId FROM credit_notes`)
+          db.raw(`SELECT "invoiceId" FROM credit_notes`)
         );
   }
 
@@ -449,7 +449,10 @@ export class KnexInvoiceRepo
       query
         .whereNot('invoices.deleted', 1)
         .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
-        .whereNotIn('invoices.id', db.raw(`SELECT invoiceId FROM credit_notes`))
+        .whereNotIn(
+          'invoices.id',
+          db.raw(`SELECT "invoiceId" FROM credit_notes`)
+        )
         .whereNull('erprefs.value');
   }
 
