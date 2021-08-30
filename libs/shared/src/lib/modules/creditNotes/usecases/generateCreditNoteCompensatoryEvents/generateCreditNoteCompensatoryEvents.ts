@@ -1,11 +1,11 @@
 // * Core Domain
+import { RepoErrorCode, RepoError } from '../../../../infrastructure/RepoError';
+import { flatten, Either, right, left } from '../../../../core/logic/Either';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
-import { RepoErrorCode, RepoError } from '../../../../infrastructure/RepoError';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
@@ -17,10 +17,14 @@ import {
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 
+import { CouponAssigned } from '../../../coupons/domain/CouponAssigned';
+import { WaiverAssigned } from '../../../waivers/domain/WaiverAssigned';
 import { PaymentMethod } from '../../../payments/domain/PaymentMethod';
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
+import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
 import { Address } from '../../../addresses/domain/Address';
 import { Invoice } from '../../../invoices/domain/Invoice';
+import { Payment } from '../../../payments/domain/Payment';
 import { CreditNoteId } from '../../domain/CreditNoteId';
 import { CreditNote } from '../../domain/CreditNote';
 import { Payer } from '../../../payers/domain/Payer';
@@ -36,7 +40,10 @@ import { CouponRepoContract } from '../../../coupons/repos/couponRepo';
 import { WaiverRepoContract } from '../../../waivers/repos/waiverRepo';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 
-import { PublishCreditNoteCreatedUsecase } from '../publishEvents/publishCreditNoteCreated';
+import {
+  PublishCreditNoteCreatedUsecase,
+  PublishCreditNoteCreatedDTO,
+} from '../publishEvents/publishCreditNoteCreated';
 
 // * Usecase specific
 import { GenerateCreditNoteCompensatoryEventsResponse as Response } from './generateCreditNoteCompensatoryEventsResponse';
@@ -44,8 +51,10 @@ import type { GenerateCreditNoteCompensatoryEventsDTO as DTO } from './generateC
 import * as Errors from './generateCreditNoteCompensatoryEventsErrors';
 
 import {
-  WithCreditNote,
   WithCreditNoteId,
+  WithInvoiceItems,
+  WithPublishDTO,
+  WithCreditNote,
   WithInvoice,
   WithPayer,
 } from './actionTypes';
@@ -69,6 +78,9 @@ export class GenerateCreditNoteCompensatoryEventsUsecase
   ) {
     super();
 
+    this.sendCreditNoteCreatedEvent = this.sendCreditNoteCreatedEvent.bind(
+      this
+    );
     this.publishCreditNoteCreated = this.publishCreditNoteCreated.bind(this);
     this.attachPaymentMethods = this.attachPaymentMethods.bind(this);
     this.attachInvoiceItems = this.attachInvoiceItems.bind(this);
@@ -76,6 +88,9 @@ export class GenerateCreditNoteCompensatoryEventsUsecase
     this.attachAddress = this.attachAddress.bind(this);
     this.attachArticle = this.attachArticle.bind(this);
     this.attachInvoice = this.attachInvoice.bind(this);
+    this.attachPayments = this.attachPayments.bind(this);
+    this.attachCoupons = this.attachCoupons.bind(this);
+    this.attachWaivers = this.attachWaivers.bind(this);
     this.verifyInput = this.verifyInput.bind(this);
     this.attachPayer = this.attachPayer.bind(this);
   }
@@ -85,7 +100,8 @@ export class GenerateCreditNoteCompensatoryEventsUsecase
     try {
       const execution = await new AsyncEither<null, DTO>(request)
         .then(this.verifyInput)
-        .map((): void => null)
+        .then(this.publishCreditNoteCreated(context))
+        .map(() => null)
         .execute();
       return execution as Response;
     } catch (err) {
@@ -104,166 +120,273 @@ export class GenerateCreditNoteCompensatoryEventsUsecase
   }
 
   private publishCreditNoteCreated(context: Context) {
-    return async (request: DTO) => {
-      const usecase = new PublishCreditNoteCreatedUsecase(this.sqsPublish);
-
-      const result = await new AsyncEither(request).execute();
+    return async (request: DTO): Promise<Either<UnexpectedError, DTO>> => {
+      const result = await new AsyncEither(request)
+        .then(this.attachPaymentMethods)
+        .then(this.attachCreditNote)
+        .then(this.attachInvoice)
+        .then(this.attachInvoiceItems)
+        .then(this.attachCoupons)
+        .then(this.attachWaivers)
+        .then(this.attachArticle)
+        .then(this.attachPayer)
+        .then(this.attachAddress)
+        .then(this.attachPayments)
+        .then(this.sendCreditNoteCreatedEvent(context))
+        .map(() => request)
+        .execute();
 
       return result;
     };
   }
 
-  private attachCreditNote(context: Context) {
-    return async <T extends WithCreditNoteId>(
-      request: T
-    ): Promise<Either<UnexpectedError, T & { creditNote: CreditNote }>> => {
-      const creditNoteId = CreditNoteId.create(
-        new UniqueEntityID(request.creditNoteId)
-      );
-
-      const maybeCreditNote = await this.creditNoteRepo.getCreditNoteById(
-        creditNoteId
-      );
-
-      if (maybeCreditNote.isLeft()) {
-        return left(
-          new UnexpectedError(new Error(maybeCreditNote.value.message))
-        );
-      }
-      return right({ ...request, creditNote: maybeCreditNote.value });
-    };
-  }
-
-  private attachInvoice(context: Context) {
-    return async <T extends WithCreditNote>(
-      request: T
-    ): Promise<Either<UnexpectedError, T & { invoice: Invoice }>> => {
-      const maybeInvoice = await this.invoiceRepo.getInvoiceById(
-        request.creditNote.invoiceId
-      );
-
-      if (maybeInvoice.isLeft()) {
-        return left(new UnexpectedError(new Error(maybeInvoice.value.message)));
-      }
-
-      return right({ ...request, invoice: maybeInvoice.value });
-    };
-  }
-
-  private attachInvoiceItems(context: Context) {
-    return async <T extends WithInvoice>(
+  private sendCreditNoteCreatedEvent(context: Context) {
+    return async <T extends WithPublishDTO>(
       request: T
     ): Promise<Either<UnexpectedError, T>> => {
-      const { invoice } = request;
+      const usecase = new PublishCreditNoteCreatedUsecase(this.sqsPublish);
+      console.log('------------------------------------------------------');
 
-      const maybeInvoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
-        invoice.invoiceId
-      );
-
-      if (maybeInvoiceItems.isLeft()) {
-        return left(
-          new UnexpectedError(new Error(maybeInvoiceItems.value.message))
+      const invoiceItems = request.invoiceItems.map((item) => {
+        const coupons = request.coupons.filter((c) =>
+          c.invoiceItemId.equals(item.invoiceItemId)
         );
-      }
-
-      invoice.addItems(maybeInvoiceItems.value);
-
-      return right({ ...request, invoice });
-    };
-  }
-
-  private attachArticle(context: Context) {
-    return async <T extends WithCreditNote>(
-      request: T
-    ): Promise<Either<UnexpectedError, T & { article: Manuscript }>> => {
-      const maybeInvoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
-        request.creditNote.invoiceId
-      );
-
-      if (maybeInvoiceItems.isLeft()) {
-        return left(
-          new UnexpectedError(new Error(maybeInvoiceItems.value.message))
+        const waivers = request.waivers.filter((w) =>
+          w.invoiceItemId.equals(item.invoiceItemId)
         );
+
+        item.addAssignedCoupons(coupons);
+        item.addAssignedWaivers(waivers);
+
+        return item;
+      });
+
+      const dto: PublishCreditNoteCreatedDTO = {
+        paymentMethods: request.paymentMethods,
+        billingAddress: request.billingAddress,
+        creditNote: request.creditNote,
+        manuscript: request.article,
+        invoiceItems: invoiceItems,
+        payments: request.payments,
+        invoice: request.invoice,
+        payer: request.payer,
+      };
+
+      const maybeSent = await usecase.execute(dto, context);
+
+      if (maybeSent.isLeft()) {
+        return left(new UnexpectedError(new Error(maybeSent.value.message)));
       }
 
-      const [item] = maybeInvoiceItems.value;
+      return right(request);
+    };
+  }
 
-      const maybeArticle = await this.manuscriptRepo.findById(
-        item.manuscriptId
+  private async attachCreditNote<T extends WithCreditNoteId>(
+    request: T
+  ): Promise<Either<UnexpectedError, T & { creditNote: CreditNote }>> {
+    const creditNoteId = CreditNoteId.create(
+      new UniqueEntityID(request.creditNoteId)
+    );
+
+    const maybeCreditNote = await this.creditNoteRepo.getCreditNoteById(
+      creditNoteId
+    );
+
+    if (maybeCreditNote.isLeft()) {
+      return left(
+        new UnexpectedError(new Error(maybeCreditNote.value.message))
+      );
+    }
+    return right({ ...request, creditNote: maybeCreditNote.value });
+  }
+
+  private async attachInvoice<T extends WithCreditNote>(
+    request: T
+  ): Promise<Either<UnexpectedError, T & { invoice: Invoice }>> {
+    const maybeInvoice = await this.invoiceRepo.getInvoiceById(
+      request.creditNote.invoiceId
+    );
+
+    if (maybeInvoice.isLeft()) {
+      return left(new UnexpectedError(new Error(maybeInvoice.value.message)));
+    }
+
+    return right({ ...request, invoice: maybeInvoice.value });
+  }
+
+  private async attachInvoiceItems<T extends WithInvoice>(
+    request: T
+  ): Promise<Either<UnexpectedError, T & { invoiceItems: InvoiceItem[] }>> {
+    const maybeInvoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
+      request.invoice.invoiceId
+    );
+
+    if (maybeInvoiceItems.isLeft()) {
+      return left(
+        new UnexpectedError(new Error(maybeInvoiceItems.value.message))
+      );
+    }
+
+    return right({ ...request, invoiceItems: maybeInvoiceItems.value });
+  }
+
+  private async attachWaivers<T extends WithInvoiceItems>(
+    request: T
+  ): Promise<Either<UnexpectedError, T & { waivers: WaiverAssigned[] }>> {
+    const getMaybeWaivers = async (
+      item
+    ): Promise<Either<UnexpectedError, WaiverAssigned[]>> => {
+      const maybeWaivers = await this.waiverRepo.getWaiversByInvoiceItemId(
+        item.invoiceItemId
       );
 
-      if (maybeArticle.isLeft()) {
-        return left(new UnexpectedError(new Error(maybeArticle.value.message)));
+      if (maybeWaivers.isLeft()) {
+        return left(new UnexpectedError(new Error(maybeWaivers.value.message)));
       }
 
-      return right({ ...request, article: maybeArticle.value });
+      return right(maybeWaivers.value.currentItems);
     };
+
+    const maybeWaivers = flatten(
+      await Promise.all(request.invoiceItems.map(getMaybeWaivers))
+    );
+
+    if (maybeWaivers.isLeft()) {
+      return left(maybeWaivers.value);
+    }
+
+    const [initialList, ...remainingWaivers] = maybeWaivers.value;
+
+    const waivers = initialList.concat(...remainingWaivers);
+
+    return right({ ...request, waivers });
   }
 
-  private attachPaymentMethods(context: Context) {
-    return async <T>(
-      request: T
-    ): Promise<
-      Either<UnexpectedError, T & { paymentMethods: PaymentMethod[] }>
-    > => {
-      const maybeMethods = await this.paymentMethodRepo.getPaymentMethods();
-
-      if (maybeMethods.isLeft()) {
-        return left(new UnexpectedError(new Error(maybeMethods.value.message)));
-      }
-
-      return right({ ...request, paymentMethods: maybeMethods.value });
-    };
-  }
-
-  private attachPayer(context: Context) {
-    return async <T extends WithCreditNote>(
-      request: T
-    ): Promise<Either<UnexpectedError, T & { payer: Payer }>> => {
-      const maybePayer = await this.payerRepo.getPayerByInvoiceId(
-        request.creditNote.invoiceId
+  private async attachCoupons<T extends WithInvoiceItems>(
+    request: T
+  ): Promise<Either<UnexpectedError, T & { coupons: CouponAssigned[] }>> {
+    const getMaybeCoupons = async (
+      item
+    ): Promise<Either<UnexpectedError, CouponAssigned[]>> => {
+      const maybeCoupons = await this.couponRepo.getCouponsByInvoiceItemId(
+        item.invoiceItemId
       );
 
-      if (maybePayer.isLeft()) {
-        const err = maybePayer.value;
-        if (
-          err instanceof RepoError &&
-          err.code === RepoErrorCode.ENTITY_NOT_FOUND
-        ) {
-          return right({ ...request, payer: null });
-        } else {
-          return left(new UnexpectedError(new Error(err.message)));
-        }
+      if (maybeCoupons.isLeft()) {
+        return left(new UnexpectedError(new Error(maybeCoupons.value.message)));
       }
 
-      return right({ ...request, payer: maybePayer.value });
+      return right(maybeCoupons.value.currentItems);
     };
+
+    const maybeCoupons = flatten(
+      await Promise.all(request.invoiceItems.map(getMaybeCoupons))
+    );
+
+    if (maybeCoupons.isLeft()) {
+      return left(maybeCoupons.value);
+    }
+
+    const [initialList, ...remainingWaivers] = maybeCoupons.value;
+
+    const coupons = initialList.concat(...remainingWaivers);
+
+    return right({ ...request, coupons });
   }
 
-  private attachAddress(context: Context) {
-    return async <T extends WithPayer>(
-      request: T
-    ): Promise<Either<UnexpectedError, T & { billingAddress: Address }>> => {
-      const maybeAddress = await this.addressRepo.findById(
-        request.payer.billingAddressId
+  private async attachArticle<T extends WithCreditNote>(
+    request: T
+  ): Promise<Either<UnexpectedError, T & { article: Manuscript }>> {
+    const maybeInvoiceItems = await this.invoiceItemRepo.getItemsByInvoiceId(
+      request.creditNote.invoiceId
+    );
+
+    if (maybeInvoiceItems.isLeft()) {
+      return left(
+        new UnexpectedError(new Error(maybeInvoiceItems.value.message))
       );
+    }
 
-      if (maybeAddress.isLeft()) {
-        const err = maybeAddress.value;
+    const [item] = maybeInvoiceItems.value;
 
-        if (
-          err instanceof RepoError &&
-          err.code === RepoErrorCode.ENTITY_NOT_FOUND
-        ) {
-          return right({ ...request, billingAddress: null });
-        } else {
-          return left(new UnexpectedError(new Error(err.message)));
-        }
-      }
+    const maybeArticle = await this.manuscriptRepo.findById(item.manuscriptId);
 
-      return right({ ...request, billingAddress: maybeAddress.value });
-    };
+    if (maybeArticle.isLeft()) {
+      return left(new UnexpectedError(new Error(maybeArticle.value.message)));
+    }
+
+    return right({ ...request, article: maybeArticle.value });
   }
 
-  private attachPayments(context: Context) {}
+  private async attachPaymentMethods<T>(
+    request: T
+  ): Promise<Either<UnexpectedError, T & { paymentMethods: PaymentMethod[] }>> {
+    const maybeMethods = await this.paymentMethodRepo.getPaymentMethods();
+
+    if (maybeMethods.isLeft()) {
+      return left(new UnexpectedError(new Error(maybeMethods.value.message)));
+    }
+
+    return right({ ...request, paymentMethods: maybeMethods.value });
+  }
+
+  private async attachPayer<T extends WithCreditNote>(
+    request: T
+  ): Promise<Either<UnexpectedError, T & { payer: Payer }>> {
+    const maybePayer = await this.payerRepo.getPayerByInvoiceId(
+      request.creditNote.invoiceId
+    );
+
+    if (maybePayer.isLeft()) {
+      const err = maybePayer.value;
+      if (
+        err instanceof RepoError &&
+        err.code === RepoErrorCode.ENTITY_NOT_FOUND
+      ) {
+        return right({ ...request, payer: null });
+      } else {
+        return left(new UnexpectedError(new Error(err.message)));
+      }
+    }
+
+    return right({ ...request, payer: maybePayer.value });
+  }
+
+  private async attachAddress<T extends WithPayer>(
+    request: T
+  ): Promise<Either<UnexpectedError, T & { billingAddress: Address }>> {
+    const maybeAddress = await this.addressRepo.findById(
+      request.payer.billingAddressId
+    );
+
+    if (maybeAddress.isLeft()) {
+      const err = maybeAddress.value;
+
+      if (
+        err instanceof RepoError &&
+        err.code === RepoErrorCode.ENTITY_NOT_FOUND
+      ) {
+        return right({ ...request, billingAddress: null });
+      } else {
+        return left(new UnexpectedError(new Error(err.message)));
+      }
+    }
+
+    return right({ ...request, billingAddress: maybeAddress.value });
+  }
+
+  private async attachPayments<T extends WithCreditNote>(
+    request: T
+  ): Promise<Either<UnexpectedError, T & { payments: Payment[] }>> {
+    const maybePayments = await this.paymentRepo.getPaymentsByInvoiceId(
+      request.creditNote.invoiceId
+    );
+
+    if (maybePayments.isLeft()) {
+      return left(new UnexpectedError(new Error(maybePayments.value.message)));
+    }
+
+    return right({ ...request, payments: maybePayments.value });
+  }
 }

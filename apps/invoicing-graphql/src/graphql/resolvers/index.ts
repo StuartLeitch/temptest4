@@ -4,6 +4,7 @@ import { Context } from '../../builders';
 import { Resolvers } from '../schema';
 
 import { generateInvoiceDraftCompensatoryEvents } from './generateInvoiceDraftCompensatoryEvents';
+import { generateCreditNoteCompensatoryEvents } from './generateCreditNoteCompensatoryEvents';
 import { generateInvoiceCompensatoryEvents } from './generateInvoiceCompensatoryEvents';
 import { creditNote } from './creditNote';
 import { reminders } from './reminders';
@@ -23,5 +24,6 @@ export const resolvers: Resolvers<Context> = merge(
   journals,
   generateInvoiceCompensatoryEvents,
   reminders,
-  generateInvoiceDraftCompensatoryEvents
+  generateInvoiceDraftCompensatoryEvents,
+  generateCreditNoteCompensatoryEvents
 );

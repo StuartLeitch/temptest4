@@ -277,10 +277,10 @@ export class KnexCreditNoteRepo
     journalIds: string[],
     omitDeleted: boolean
   ): AsyncGenerator<string, void, undefined> {
-    const extractInvoiceId = new Transform({
+    const extractCreditNoteId = new Transform({
       objectMode: true,
       transform(item, encoding, callback) {
-        callback(null, item.invoiceId);
+        callback(null, item.id);
       },
     });
 
@@ -303,9 +303,10 @@ export class KnexCreditNoteRepo
       query = query.where('i.deleted', 0);
     }
 
-    const stream = query.stream({ objectMode: true }).pipe(extractInvoiceId);
+    const stream = query.stream({ objectMode: true }).pipe(extractCreditNoteId);
 
     for await (const a of stream) {
+      console.log('yield', a);
       yield a;
     }
   }
