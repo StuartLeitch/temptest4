@@ -5,6 +5,7 @@ import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
+import { RepoErrorCode, RepoError } from '../../../../infrastructure/RepoError';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
@@ -16,9 +17,13 @@ import {
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
 
+import { PaymentMethod } from '../../../payments/domain/PaymentMethod';
+import { Manuscript } from '../../../manuscripts/domain/Manuscript';
+import { Address } from '../../../addresses/domain/Address';
 import { Invoice } from '../../../invoices/domain/Invoice';
 import { CreditNoteId } from '../../domain/CreditNoteId';
 import { CreditNote } from '../../domain/CreditNote';
+import { Payer } from '../../../payers/domain/Payer';
 
 import { PaymentMethodRepoContract } from '../../../payments/repos/paymentMethodRepo';
 import { CreditNoteRepoContract } from '../../../creditNotes/repos/creditNoteRepo';
@@ -38,9 +43,12 @@ import { GenerateCreditNoteCompensatoryEventsResponse as Response } from './gene
 import type { GenerateCreditNoteCompensatoryEventsDTO as DTO } from './generateCreditNoteCompensatoryEventsDTO';
 import * as Errors from './generateCreditNoteCompensatoryEventsErrors';
 
-import { WithCreditNote, WithCreditNoteId, WithInvoice } from './actionTypes';
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { PaymentMethod } from '../../../payments/domain/PaymentMethod';
+import {
+  WithCreditNote,
+  WithCreditNoteId,
+  WithInvoice,
+  WithPayer,
+} from './actionTypes';
 
 export class GenerateCreditNoteCompensatoryEventsUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
@@ -62,11 +70,14 @@ export class GenerateCreditNoteCompensatoryEventsUsecase
     super();
 
     this.publishCreditNoteCreated = this.publishCreditNoteCreated.bind(this);
+    this.attachPaymentMethods = this.attachPaymentMethods.bind(this);
     this.attachInvoiceItems = this.attachInvoiceItems.bind(this);
     this.attachCreditNote = this.attachCreditNote.bind(this);
+    this.attachAddress = this.attachAddress.bind(this);
     this.attachArticle = this.attachArticle.bind(this);
     this.attachInvoice = this.attachInvoice.bind(this);
     this.verifyInput = this.verifyInput.bind(this);
+    this.attachPayer = this.attachPayer.bind(this);
   }
 
   @Authorize('creditNote:generateCompensatoryEvents')
@@ -204,4 +215,55 @@ export class GenerateCreditNoteCompensatoryEventsUsecase
       return right({ ...request, paymentMethods: maybeMethods.value });
     };
   }
+
+  private attachPayer(context: Context) {
+    return async <T extends WithCreditNote>(
+      request: T
+    ): Promise<Either<UnexpectedError, T & { payer: Payer }>> => {
+      const maybePayer = await this.payerRepo.getPayerByInvoiceId(
+        request.creditNote.invoiceId
+      );
+
+      if (maybePayer.isLeft()) {
+        const err = maybePayer.value;
+        if (
+          err instanceof RepoError &&
+          err.code === RepoErrorCode.ENTITY_NOT_FOUND
+        ) {
+          return right({ ...request, payer: null });
+        } else {
+          return left(new UnexpectedError(new Error(err.message)));
+        }
+      }
+
+      return right({ ...request, payer: maybePayer.value });
+    };
+  }
+
+  private attachAddress(context: Context) {
+    return async <T extends WithPayer>(
+      request: T
+    ): Promise<Either<UnexpectedError, T & { billingAddress: Address }>> => {
+      const maybeAddress = await this.addressRepo.findById(
+        request.payer.billingAddressId
+      );
+
+      if (maybeAddress.isLeft()) {
+        const err = maybeAddress.value;
+
+        if (
+          err instanceof RepoError &&
+          err.code === RepoErrorCode.ENTITY_NOT_FOUND
+        ) {
+          return right({ ...request, billingAddress: null });
+        } else {
+          return left(new UnexpectedError(new Error(err.message)));
+        }
+      }
+
+      return right({ ...request, billingAddress: maybeAddress.value });
+    };
+  }
+
+  private attachPayments(context: Context) {}
 }
