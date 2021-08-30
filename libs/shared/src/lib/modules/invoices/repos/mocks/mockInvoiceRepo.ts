@@ -268,8 +268,6 @@ export class MockInvoiceRepo
   async getUnrecognizedNetsuiteErpInvoices(): Promise<
     Either<GuardFailure | RepoError, InvoiceId[]>
   > {
-    const excludedCreditNotes = this.excludeCreditNotesForRevenueRecognition();
-
     const [
       filterArticlesByNotNullDatePublished,
     ] = await this.articleRepo.filterBy({
@@ -302,7 +300,7 @@ export class MockInvoiceRepo
       );
     }
 
-    return right(excludedCreditNotes(invoicesWithPublishedManuscripts.value));
+    return right(invoicesWithPublishedManuscripts.value);
   }
 
   async getUnrecognizedNetsuiteErpInvoicesDeprecated(): Promise<
@@ -402,26 +400,6 @@ export class MockInvoiceRepo
       );
   }
 
-  public excludeCreditNotesForRevenueRecognition() {
-    return (items) =>
-      this.filterBy(
-        {
-          whereIn: [['status', ['ACTIVE', 'FINAL']]],
-          whereNull: [
-            ['cancelledInvoiceReference'],
-            // ['revenueRecognitionReference'],
-          ],
-          // whereNotNull: ['erpReference'],
-          // where: [
-          //   ['erpReference', '<>', 'NON_INVOICEABLE'],
-          //   ['erpReference', '<>', 'MigrationRef'],
-          //   ['erpReference', '<>', 'migrationRef'],
-          // ],
-        },
-        items
-      );
-  }
-
   private filterInvoiceById(invoiceId: InvoiceId): Invoice | null {
     const found = this._items.find((item) => item.id.equals(invoiceId.id));
 
@@ -477,24 +455,6 @@ export class MockInvoiceRepo
     return items;
   }
 
-  async findByCancelledInvoiceReference(
-    id: InvoiceId
-  ): Promise<Either<GuardFailure | RepoError, Invoice>> {
-    const found = this._items.find(
-      (item) => item.cancelledInvoiceReference === id.id.toString()
-    );
-
-    if (!found) {
-      return left(
-        new Error(
-          `No invoice with cancelled invoice reference ${id.id.toString()}`
-        )
-      );
-    }
-
-    return right(found);
-  }
-
   async isInvoiceDeleted(
     id: InvoiceId
   ): Promise<Either<GuardFailure | RepoError, boolean>> {
@@ -509,8 +469,9 @@ export class MockInvoiceRepo
     return right([]);
   }
 
-  async getUnrecognizedReversalsNetsuiteErp(): Promise<Either<GuardFailure | RepoError, any[]>> {
+  async getUnrecognizedReversalsNetsuiteErp(): Promise<
+    Either<GuardFailure | RepoError, any[]>
+  > {
     return right([]);
   }
-
 }

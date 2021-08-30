@@ -121,7 +121,7 @@ const InvoicesLeftNav = (props) => {
       </Nav>
       {/* END Transaction Status */}
       {/* START Journal Title */}
-      <Nav accent vertical className='mb-3'>
+      {/* <Nav accent vertical className='mb-3'>
         <NavItem className='mb-2'>
           <NavLink href='#' className='d-flex px-1'>
             <span>Journal Title</span>
@@ -135,12 +135,12 @@ const InvoicesLeftNav = (props) => {
             onFilterHandler.callback(target);
           }}
         />
-        {/* <NavItem className='d-flex p-0 form-control'>
-      </NavItem> */}
-      </Nav>
+        <NavItem className='d-flex p-0 form-control'>
+      </NavItem>
+      </Nav> */}
       {/* END Journal Title */}
       {/* START Reference Number */}
-      <Nav accent vertical className='mb-3'>
+      {/* <Nav accent vertical className='mb-3'>
         <NavItem className='mb-2'>
           <NavLink href='#' className='d-flex px-1'>
             <span>Reference Number</span>
@@ -180,10 +180,10 @@ const InvoicesLeftNav = (props) => {
             </InputGroupAddon>
           </InputGroup>
         </NavItem>
-      </Nav>
+      </Nav> */}
       {/* END Reference Number */}
       {/* START Custom ID */}
-      <Nav accent vertical className='mb-3'>
+      {/* <Nav accent vertical className='mb-3'>
         <NavItem className='mb-2'>
           <NavLink href='#' className='d-flex px-1'>
             <span>Custom ID</span>
@@ -216,7 +216,7 @@ const InvoicesLeftNav = (props) => {
             </InputGroupAddon>
           </InputGroup>
         </NavItem>
-      </Nav>
+      </Nav> */}
       {/* END Reference Number */}
     </React.Fragment>
   );

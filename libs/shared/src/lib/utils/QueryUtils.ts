@@ -5,15 +5,21 @@ function wrap(value) {
 export class Filters {
   static collect(src) {
     return {
-      invoiceStatus: [...src.invoiceStatus],
-      transactionStatus: [...src.transactionStatus],
-      referenceNumber: wrap(src.referenceNumber),
+      referenceNumber: src.referenceNumber,
+      invoiceStatus: src.invoiceStatus && [...src.invoiceStatus],
+      transactionStatus: src.transactionStatus && [...src.transactionStatus],
       invoiceItem: {
         article: {
-          journalId: src.journalId,
+          // journalId: src.journalId,
           customId: wrap(src.customId),
         },
       },
     };
+  }
+
+  static collectCreditNotes(src) {
+    return {
+      reason: src.reason && [...src.reason],
+    }
   }
 }

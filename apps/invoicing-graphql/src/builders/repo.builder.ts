@@ -19,6 +19,7 @@ import {
   KnexWaiverRepo,
   KnexPayerRepo,
   KnexErpReferenceRepo,
+  KnexCreditNoteRepo,
   LoggerBuilder,
 } from '@hindawi/shared';
 
@@ -33,6 +34,7 @@ export interface Repos {
   paymentMethod: KnexPaymentMethodRepo;
   waiver: KnexWaiverRepo;
   manuscript: KnexArticleRepo;
+  creditNote: KnexCreditNoteRepo;
   editor: KnexEditorRepo;
   coupon: KnexCouponRepo;
   publisher: KnexPublisherRepo;
@@ -65,6 +67,12 @@ export function buildRepos(db: Knex, loggerBuilder: LoggerBuilder): Repos {
     paymentMethod: new KnexPaymentMethodRepo(db, loggerBuilder.getLogger()),
     waiver: new KnexWaiverRepo(db, loggerBuilder.getLogger()),
     manuscript: articleRepo,
+    creditNote: new KnexCreditNoteRepo(
+      db,
+      invoiceItemRepo,
+      articleRepo,
+      loggerBuilder.getLogger()
+    ),
     editor: new KnexEditorRepo(db, loggerBuilder.getLogger()),
     coupon: new KnexCouponRepo(db, loggerBuilder.getLogger()),
     publisher: new KnexPublisherRepo(db, loggerBuilder.getLogger()),

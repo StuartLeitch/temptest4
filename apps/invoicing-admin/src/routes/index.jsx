@@ -6,9 +6,10 @@ import { ClientContext } from 'graphql-hooks';
 import { useAuth } from '../contexts/Auth';
 
 // Invoicing Admin App
+import CreditNotesList from './CreditNotes/List'
 import InvoicesList from './Invoices/List';
 import InvoiceDetails from './Invoice/Details';
-import CreditNoteDetails from './Invoice/Details/CreditNote';
+import CreditNoteDetails from './CreditNote/CreditNote';
 import CouponsList from './Coupons';
 import { CouponDetails, CouponCreate } from './Coupon';
 
@@ -20,7 +21,7 @@ import InvoicingDashboard from './Dashboards/Invoicing';
 import Financial from './Dashboards/Financial';
 import NavbarOnly from './Layouts/NavbarOnly';
 import SidebarWithNavbar from './Layouts/SidebarWithNavbar';
-import PendingLogging from './components/PendingLogging';
+// import PendingLogging from './components/PendingLogging';
 
 // ----------- Layout Imports ---------------
 import { DefaultNavbar } from '../layout/components/DefaultNavbar';
@@ -38,7 +39,8 @@ export const RoutedContent = () => {
   const { token } = auth.data;
 
   const client = useContext(ClientContext);
-  if(client.headers['Authorization']== null) {
+  // ! Do not use '===' for checking
+  if(client.headers['Authorization'] == null) {
     client.setHeader('Authorization', `Bearer ${token}`)
   }
 
@@ -57,6 +59,10 @@ export const RoutedContent = () => {
         <SplitInvoice />
       </PrivateRoute>
       {/* Credit Notes Routes */}
+      <PrivateRoute path='/credit-notes/list' exact>
+        <CreditNotesList />
+      </PrivateRoute>
+
       <PrivateRoute path='/credit-notes/details/:id' exact>
         <CreditNoteDetails />
       </PrivateRoute>

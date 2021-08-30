@@ -26,6 +26,7 @@ import {
   CouponMap,
   Invoice,
   InvoiceItemMap,
+  MockCreditNoteRepo,
   PayerMap,
   Roles,
   TransactionMap,
@@ -48,6 +49,7 @@ let mockSalesforceService: MockErpService;
 let mockPublisherRepo: MockPublisherRepo;
 let mockErpReferenceRepo: MockErpReferenceRepo;
 let mockLogger: MockLogger;
+let mockCreditNoteRepo: MockCreditNoteRepo;
 
 let useCase: PublishRevenueRecognitionToErpUsecase;
 let response: PublishRevenueRecognitionToErpResponse;
@@ -75,6 +77,7 @@ Before({ tags: '@ValidatePublishRevRecToErp' }, function () {
     mockInvoiceItemRepo,
     mockErpReferenceRepo
   );
+  mockCreditNoteRepo = new MockCreditNoteRepo();
 
   setupVatService();
 
@@ -89,6 +92,7 @@ Before({ tags: '@ValidatePublishRevRecToErp' }, function () {
     mockCatalogRepo,
     mockPublisherRepo,
     mockErpReferenceRepo,
+    mockCreditNoteRepo,
     mockSalesforceService,
     mockLogger
   );

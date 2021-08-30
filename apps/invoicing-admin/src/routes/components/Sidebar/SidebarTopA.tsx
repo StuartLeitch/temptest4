@@ -18,7 +18,7 @@ const SidebarTopA = () => {
   if (!auth) {
     return null;
   }
-  const { picture, name, profile, username } = auth.data;
+  const { picture, name, profile, username, roles } = auth.data;
 
   return (
     <React.Fragment>
@@ -55,11 +55,14 @@ const SidebarTopA = () => {
               <i className='fas fa-angle-down ml-2'></i>
             </DropdownToggle>
             <DropdownMenu persist>
-              <DropdownItem header>{name}</DropdownItem>
+              <DropdownItem header><strong>{name}</strong></DropdownItem>
+              <DropdownItem header>
+                <i className='fas fa-user-secret mr-2'></i> {roles && roles[0].replace(/_/g, ' ').replace(/(^|\s)\S/g, function(t) { return t.toUpperCase() })}</DropdownItem>
               <DropdownItem divider />
               <DropdownItem
                 onClick={(evt) => {
-                  // logout();
+                  evt.preventDefault();
+                  auth.logout();
                 }}
               >
                 <i className='fas fa-sign-out-alt mr-2'></i>

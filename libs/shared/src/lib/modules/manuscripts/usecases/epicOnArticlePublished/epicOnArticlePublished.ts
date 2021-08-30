@@ -192,10 +192,7 @@ export class EpicOnArticlePublishedUsecase
 
       const invoice = maybeInvoice.value;
 
-      if (
-        !invoice.cancelledInvoiceReference &&
-        invoice.status === InvoiceStatus.DRAFT
-      ) {
+      if (invoice.status === InvoiceStatus.DRAFT) {
         if (typeof manuscript.authorCountry === 'undefined') {
           this.loggerService.info('sendEmail', {
             correlationId: context.correlationId,

@@ -73,7 +73,9 @@ export function applyFilters(src: QueryBuilder, filters: Filters) {
         break;
 
       case '/invoiceItem/article/customId':
-        here = here.whereIn(`${TABLES.ARTICLES}.customId`, filter);
+        if (filter[0] !== '') {
+          here = here.whereIn(`${TABLES.ARTICLES}.customId`, filter);
+        }
         break;
 
       case '/transactionStatus':
@@ -87,10 +89,11 @@ export function applyFilters(src: QueryBuilder, filters: Filters) {
       case '/referenceNumber':
         // [invoiceNumber, creationYear] = ParseUtils.parseRefNumber(filter[0]);
         const invoiceRef = filter[0];
-        here = here.where({ persistentReferenceNumber: invoiceRef });
+        if (invoiceRef) {
+          here = here.where({ persistentReferenceNumber: invoiceRef });
+        }
         break;
     }
   }
-
   return here;
 }
