@@ -139,12 +139,14 @@ export const creditNote: Resolvers<Context> = {
   },
   CreditNote: {
     async invoice(parent: any, args, context) {
+      const contextRoles = getAuthRoles(context);
+
       const {
         repos: { invoice: invoiceRepo },
       } = context;
 
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles: contextRoles,
       };
       const associatedInvoiceUsecase = new GetInvoiceDetailsUsecase(
         invoiceRepo
@@ -156,6 +158,8 @@ export const creditNote: Resolvers<Context> = {
         request,
         usecaseContext
       );
+
+      handleForbiddenUsecase(result);
 
       if (result.isLeft()) {
         throw new Error(result.value.message);

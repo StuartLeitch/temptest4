@@ -81,8 +81,8 @@ export * from './modules/invoices/usecases/confirmInvoice/confirmInvoiceDTO';
 export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdf';
 export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdfDTO';
 export * from './modules/invoices/usecases/getItemsForInvoice/getItemsForInvoice';
-export * from './modules/invoices/usecases/generateCompensatoryEvents';
-export * from './modules/invoices/usecases/generateDraftCompensatoryEvents';
+export * from './modules/invoices/usecases/generateInvoiceCompensatoryEvents';
+export * from './modules/invoices/usecases/generateInvoiceDraftCompensatoryEvents';
 export * from './modules/invoices/usecases/getInvoicesIds';
 export * from './modules/invoices/usecases/getRecentInvoices/getRecentInvoices';
 export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
@@ -260,6 +260,8 @@ export * from './modules/creditNotes/usecases/getRecentCreditNotes';
 export * from './modules/creditNotes/usecases/createCreditNote';
 export * from './modules/creditNotes/usecases/getCreditNoteByInvoiceId';
 export * from './modules/creditNotes/usecases/getCreditNoteByReferenceNumber';
+export * from './modules/creditNotes/usecases/getCreditNoteIds';
+export * from './modules/creditNotes/usecases/generateCreditNoteCompensatoryEvents';
 
 // * Export user Subdomain
 export * from './modules/invoices/usecases/ERP/retryFailedNetsuiteErpInvoices/retryFailedNetsuiteErpInvoices';

@@ -164,4 +164,13 @@ export class MockCreditNoteRepo
 
     return found;
   }
+
+  public async *getCreditNoteIds(
+    ids: string[],
+    journalIds: string[],
+    omitDeleted: boolean
+  ): AsyncGenerator<string, void, undefined> {
+    yield* this._items.map((item) => item.id.toString());
+    // TODO: add the omitDeleted option searching in invoices
+  }
 }

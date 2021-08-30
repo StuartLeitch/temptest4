@@ -11,7 +11,6 @@ import {
   AccessControlledUsecase,
   AccessControlContext,
   Authorize,
-  Roles,
 } from '../../../../domain/authorization';
 
 import { SQSPublishServiceContract } from '../../../../domain/services/SQSPublishService';
@@ -30,7 +29,6 @@ import { WaiverRepoContract } from '../../../waivers/repos/waiverRepo';
 import { InvoiceItemRepoContract } from '../../repos/invoiceItemRepo';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 import { InvoiceRepoContract } from '../../repos/invoiceRepo';
-import { CreditNoteRepoContract } from '../../../creditNotes/repos/creditNoteRepo';
 
 import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 import { GetPayerDetailsByInvoiceIdUsecase } from '../../../payers/usecases/getPayerDetailsByInvoiceId';
@@ -39,7 +37,6 @@ import { GetPaymentMethodsUseCase } from '../../../payments/usecases/getPaymentM
 import { GetAddressUsecase } from '../../../addresses/usecases/getAddress/getAddress';
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../getInvoiceDetails/getInvoiceDetails';
-import { GetCreditNoteByInvoiceIdUsecase } from '../../../creditNotes/usecases/getCreditNoteByInvoiceId/getCreditNoteByInvoiceId';
 
 import {
   PublishInvoiceConfirmedUsecase,
@@ -63,9 +60,9 @@ import {
 } from '../publishEvents/publishInvoiceCreated';
 
 // * Usecase specific
-import { GenerateCompensatoryEventsResponse as Response } from './generateCompensatoryEventsResponse';
-import type { GenerateCompensatoryEventsDTO as DTO } from './generateCompensatoryEventsDTO';
-import * as Errors from './generateCompensatoryEventsErrors';
+import { GenerateInvoiceCompensatoryEventsResponse as Response } from './generateInvoiceCompensatoryEventsResponse';
+import type { GenerateInvoiceCompensatoryEventsDTO as DTO } from './generateInvoiceCompensatoryEventsDTO';
+import * as Errors from './generateInvoiceCompensatoryEventsErrors';
 
 import {
   InvoiceConfirmedData,
@@ -85,7 +82,7 @@ function originalInvoiceId(invoice: Invoice): string {
   return invoice.id.toString();
 }
 
-export class GenerateCompensatoryEventsUsecase
+export class GenerateInvoiceCompensatoryEventsUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
@@ -95,7 +92,6 @@ export class GenerateCompensatoryEventsUsecase
     private manuscriptRepo: ArticleRepoContract,
     private addressRepo: AddressRepoContract,
     private invoiceRepo: InvoiceRepoContract,
-    private creditNoteRepo: CreditNoteRepoContract,
     private paymentRepo: PaymentRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
@@ -118,7 +114,6 @@ export class GenerateCompensatoryEventsUsecase
     this.shouldSendFinalize = this.shouldSendFinalize.bind(this);
     this.attachPaymentDate = this.attachPaymentDate.bind(this);
     this.shouldSendCreated = this.shouldSendCreated.bind(this);
-    this.attachCreditNote = this.attachCreditNote.bind(this);
     this.attachManuscript = this.attachManuscript.bind(this);
     this.sendCreatedEvent = this.sendCreatedEvent.bind(this);
     this.shouldSendPayed = this.shouldSendPayed.bind(this);
@@ -171,19 +166,6 @@ export class GenerateCompensatoryEventsUsecase
     };
   }
 
-  private attachCreditNote(context: Context) {
-    return async <T extends WithInvoiceId>(request: T) => {
-      const usecase = new GetCreditNoteByInvoiceIdUsecase(this.creditNoteRepo);
-
-      return new AsyncEither(request.invoiceId)
-        .then((invoiceId) => usecase.execute({ invoiceId }, context))
-        .map((creditNote) => ({
-          ...request,
-          creditNote,
-        }))
-        .execute();
-    };
-  }
   private attachInvoiceItems(context: Context) {
     return async <T extends WithInvoiceId>(request: T) => {
       const usecase = new GetItemsForInvoiceUsecase(
@@ -433,18 +415,6 @@ export class GenerateCompensatoryEventsUsecase
       const data: PublishInvoiceFinalizedDTO = {
         ...request,
         messageTimestamp: request.invoice.dateMovedToFinal,
-      };
-      return publishUsecase.execute(data, context);
-    };
-  }
-
-  private sendCreditedEvent(context: Context) {
-    return async <T extends InvoiceCreditedData>(request: T) => {
-      const publishUsecase = new PublishInvoiceCreditedUsecase(this.sqsPublish);
-      const data: PublishInvoiceCreditedDTO = {
-        ...request,
-        messageTimestamp: request.invoice.dateIssued,
-        creditNote: request.creditNote,
       };
       return publishUsecase.execute(data, context);
     };

@@ -49,11 +49,12 @@ const PERMISSIONS = {
     'list.invoices',
     'list.credit-notes',
     'create.credit-note',
+    'list.coupons',
     'apply.coupon',
     'add.payment'
   ],
   MARKETING: ['list.invoices','list.coupons', 'list.credit-notes', 'create.coupon', 'apply.coupon', 'edit.coupon'],
-  FINANCIAL_SUPPORT: ['list.invoices', 'list.credit-notes', 'apply.coupon'],
+  FINANCIAL_SUPPORT: ['list.invoices', 'list.coupons','list.credit-notes', 'apply.coupon'],
 }
 
 // This provider is intended to be surrounding the whole application.
@@ -65,6 +66,8 @@ const PermissionProvider: React.FunctionComponent<{}> = ({children}) => {
     // * passed as parameter
     const isAllowedTo = async (permission: Permission): Promise<boolean> => {
       let permissions = [];
+
+      const roles = data.roles ?? []
 
       permissions = [...new Set(data.roles.reduce((permissions, role) => {
         const assignedRole = role.toUpperCase();
