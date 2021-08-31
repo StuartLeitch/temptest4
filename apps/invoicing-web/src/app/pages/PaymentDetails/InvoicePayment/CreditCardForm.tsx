@@ -128,7 +128,9 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
     }
 
     if (obj && ('name' in obj) && obj.name === 'BraintreeError') {
-      return (<Text type="warning" key='braintree_error'>{obj.details.originalError.details.originalError.error.message}</Text>)
+      if (obj.details?.originalError?.details?.originalError?.error) {
+        return (<Text type="warning" key='braintree_error'>{obj.details.originalError.details.originalError.error.message}</Text>)
+      }
     }
 
     if (obj && ('liabilityShifted' in obj) && obj.liabilityShifted === false) {
@@ -239,18 +241,18 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
                 </Label>
                 <div className="form-control" id="hf-cvv" />
               </FormGroup>
+
+              <Button
+                mt={3}
+                mb={2}
+                size="medium"
+                onClick={this.onSubmit}
+                loading={this.props.loading}
+              >
+                Pay
+              </Button>
             </Flex>
 
-
-            <Button
-              mt={6}
-              mb={2}
-              size="medium"
-              onClick={this.onSubmit}
-              loading={this.props.loading}
-            >
-              Pay
-            </Button>
           </CardContainer>
 
         {this.renderError('Error', this.state.error)}
@@ -321,5 +323,10 @@ const FormGroup = styled('div')`
     -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
     -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
     transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+  }
+
+  #hf-cvv,
+  #hf-date {
+    width: 100px
   }
 `;
