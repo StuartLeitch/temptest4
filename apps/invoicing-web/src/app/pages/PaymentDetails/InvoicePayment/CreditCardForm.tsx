@@ -83,15 +83,15 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
         fields: {
           number: {
             selector: '#hf-number',
-            placeholder: '4111 1111 1111 1111'
+            placeholder: '•••• •••• •••• ••••'
           },
           cvv: {
             selector: '#hf-cvv',
-            placeholder: '123'
+            placeholder: '•••'
           },
           expirationDate: {
             selector: '#hf-date',
-            placeholder: '12/34'
+            placeholder: 'MM/YYYY'
           }
         }
       }),
@@ -123,7 +123,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
       return null;
     }
 
-    if (this.props.serverError) {
+    if (this.props.serverError && !this.state.error) {
       return (<Text type="warning" key='3dsecure_error'>{'Your credit card was declined by the supplier.'}</Text>)
     }
 
@@ -217,8 +217,8 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
           <CardContainer
             className={this.state.isBraintreeReady ? "" : "disabled"}
           >
-            <Flex justifyContent="flex-start" mb={2}>
-              <FormGroup style={{ marginRight: 10 }}>
+            <Flex justifyContent="flex-start" mb={0} mt={3}>
+              <FormGroup style={{ marginRight: '16px' }}>
                 <Label required htmlFor="cardNumber">
                   Card Number
                 </Label>
@@ -228,14 +228,14 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
                 />
               </FormGroup>
 
-              <FormGroup style={{ marginRight: 10 }}>
+              <FormGroup style={{ marginRight: '16px' }}>
                 <Label required htmlFor="expirationDate">
                   Expiration Date
                 </Label>
                 <div className="form-control" id="hf-date" />
               </FormGroup>
 
-              <FormGroup style={{ marginRight: 10 }}>
+              <FormGroup style={{ marginRight: '16px' }}>
                 <Label required htmlFor="cvv">
                   CVV
                 </Label>
@@ -243,8 +243,8 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
               </FormGroup>
 
               <Button
-                mt={3}
-                mb={2}
+                mt={0}
+                mb={3}
                 size="medium"
                 onClick={this.onSubmit}
                 loading={this.props.loading}
@@ -267,9 +267,7 @@ const CardContainer = styled('div')`
   width: 100%;
   background-color: ${th("colors.background")};
   border-radius: ${th("gridUnit")};
-  padding: 0 calc(${th("gridUnit")} * 4);
-  padding-top: calc(${th("gridUnit")} * 3);
-  padding-bottom: calc(${th("gridUnit")} * 3);
+  padding: 0 16px;
 
   &.disabled {
     pointer-events: none;
@@ -286,13 +284,18 @@ const CardContainer = styled('div')`
     padding: calc(4px * 2);
     height: 32px;
     border: 1px solid rgb(201, 201, 201);
-    padding: 0 1rem;
+    padding: 0 0rem;
   }
   .braintree-hosted-field.braintree-hosted-field-focused {
     border-color: rgb(51, 51, 51);
   }
   .braintree-hosted-field.error {
     border-color: rgb(254, 186, 172);
+  }
+
+  button {
+    height: 33px;
+    margin-top: 18px;
   }
 `;
 
@@ -325,8 +328,10 @@ const FormGroup = styled('div')`
     transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
   }
 
-  #hf-cvv,
+  #hf-cvv {
+    width: 104px;
+  }
   #hf-date {
-    width: 100px
+    width: 124px;
   }
 `;
