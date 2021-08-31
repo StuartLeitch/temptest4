@@ -2,7 +2,6 @@ import React from "react";
 import styled from "styled-components";
 import PaymentIcon from "./PaymentIcon";
 import { Flex, Label, Button, Text, th } from "@hindawi/react-components";
-import { O_NONBLOCK } from "constants";
 // import { Braintree, HostedField } from "react-braintree-fields";
 
 interface Props {
@@ -124,8 +123,13 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
       return null;
     }
 
+
     if (this.props.serverError) {
       return (<Text type="warning" key='3dsecure_error'>{'Your credit card was declined by the supplier.'}</Text>)
+    }
+
+    if (obj && ('name' in obj) && obj.name === 'BrainTreeError') {
+      return (<Text type="warning" key='braintree_error'>{obj.details.originalError.details.originalError.error.message}</Text>)
     }
 
     if (obj && ('liabilityShifted' in obj) && obj.liabilityShifted === false) {
