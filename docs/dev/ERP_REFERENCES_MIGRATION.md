@@ -52,7 +52,6 @@ SELECT
 FROM
   "invoices" AS i
 WHERE ("i"."nsReference" IS NOT NULL)
-AND("i"."cancelledInvoiceReference" IS NULL)
 ```
 
 To actually move the data:
@@ -68,7 +67,6 @@ INSERT INTO erp_references (entity_id, TYPE, vendor, attribute, value) (
   FROM
     "invoices" AS i
   WHERE ("i"."nsReference" IS NOT NULL)
-  AND("i"."cancelledInvoiceReference" IS NULL)
   GROUP BY
     "i"."id"
 )

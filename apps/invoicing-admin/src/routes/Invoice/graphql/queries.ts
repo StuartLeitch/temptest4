@@ -1,6 +1,6 @@
 export const INVOICE_QUERY = `
   query invoice($id: ID) {
-    invoice(invoiceId: $id) {
+    invoiceWithAuthorization(invoiceId: $id) {
       ...invoiceFragment
     }
     getPaymentMethods {

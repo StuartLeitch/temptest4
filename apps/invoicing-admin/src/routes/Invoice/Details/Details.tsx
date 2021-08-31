@@ -49,15 +49,17 @@ const Details: React.FC = (props) => {
       },
     }
   );
-  
+
   if (loading) return <Loading />;
 
   if (error || typeof data === undefined)
     return <div>Something Bad Happened</div>;
 
-  const { invoice, getPaymentMethods } = data;
+    console.log(data)
+
+  const { invoiceWithAuthorization:invoice, getPaymentMethods } = data;
   const { status, id: invoiceId, transaction } = invoice;
-  
+
 
   // * -> Net and total charges computing
 

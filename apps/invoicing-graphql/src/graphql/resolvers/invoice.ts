@@ -53,9 +53,6 @@ export const invoice: Resolvers<Context> = {
     async invoice(parent, args, context): Promise<any> {
       const { repos } = context;
 
-      const getCreditNoteByInvoiceIdUsecase = new GetInvoiceDetailsUsecase(
-        repos.invoice
-      );
       const usecase = new GetInvoiceDetailsUsecase(repos.invoice);
 
       const request: GetInvoiceDetailsDTO = {
@@ -120,13 +117,78 @@ export const invoice: Resolvers<Context> = {
       };
     },
 
+    async invoiceWithAuthorization(parent, args, context): Promise<any> {
+      const { repos } = context;
+      const contextRoles = getAuthRoles(context);
+
+      const usecase = new GetInvoiceDetailsUsecase(repos.invoice);
+
+      const request: GetInvoiceDetailsDTO = {
+        invoiceId: args.invoiceId,
+      };
+
+      const usecaseContext = {
+        roles: contextRoles,
+      };
+
+      const result = await usecase.execute(request, usecaseContext);
+
+      handleForbiddenUsecase(result);
+
+      if (result.isLeft()) {
+        const err = result.value;
+        context.services.logger.error(err.message, err);
+        return undefined;
+      }
+
+      // There is a TSLint error for when try to use a shadowed variable!
+      const invoiceDetails = result.value;
+
+      let assocInvoice = null;
+
+      const maybePayments = await repos.payment.getPaymentsByInvoiceId(
+        invoiceDetails.invoiceId
+      );
+
+      if (maybePayments.isLeft()) {
+        throw maybePayments.value;
+      }
+
+      const payments = maybePayments.value;
+
+      const paymentsIds = payments.map((p) => p.id);
+
+      const maybeErpPaymentReferences = await repos.erpReference.getErpReferencesById(
+        paymentsIds
+      );
+
+      if (maybeErpPaymentReferences.isLeft()) {
+        throw maybeErpPaymentReferences.value;
+      }
+
+      const erpPaymentReferences = maybeErpPaymentReferences.value;
+
+      return {
+        invoiceId: invoiceDetails.id.toString(),
+        status: invoiceDetails.status,
+        dateCreated: invoiceDetails?.dateCreated?.toISOString(),
+        dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
+        dateMovedToFinal: invoiceDetails?.dateMovedToFinal?.toISOString(),
+        erpReferences: invoiceDetails
+          .getErpReferences()
+          .getItems()
+          .concat(erpPaymentReferences),
+        dateIssued: invoiceDetails?.dateIssued?.toISOString(),
+        referenceNumber: assocInvoice
+          ? assocInvoice.persistentReferenceNumber
+          : invoiceDetails.persistentReferenceNumber,
+      };
+    },
     async invoices(parent, args, context) {
       const contextRoles = getAuthRoles(context);
 
       const { repos } = context;
-      const getCreditNoteByInvoiceIdUsecase = new GetInvoiceDetailsUsecase(
-        repos.invoice
-      );
+
       const usecase = new GetRecentInvoicesUsecase(repos.invoice);
       const usecaseContext = {
         roles: contextRoles,
@@ -141,26 +203,10 @@ export const invoice: Resolvers<Context> = {
 
       const invoicesList = result.value;
 
-      const retrieveAssociatedInvoice = async (item: any) => {
-        const result = await getCreditNoteByInvoiceIdUsecase.execute(
-          { invoiceId: item.cancelledInvoiceReference },
-          usecaseContext
-        );
-        if (result.isLeft()) {
-          return undefined;
-        }
-        const invoice = result.value;
-        return InvoiceMap.toPersistence(invoice);
-      };
-
       const getInvoices = async () =>
         Promise.all(
           invoicesList.invoices.map(async (invoiceDetails: any) => {
             let assocInvoice = null;
-            if (invoiceDetails.cancelledInvoiceReference) {
-              // * this is a credit note, let's ask for the reference number of the associated invoice
-              assocInvoice = await retrieveAssociatedInvoice(invoiceDetails);
-            }
 
             return {
               ...InvoiceMap.toPersistence(invoiceDetails),
@@ -298,18 +344,7 @@ export const invoice: Resolvers<Context> = {
       let maybePayer = await payerRepo.getPayerByInvoiceId(invoiceId);
 
       if (maybePayer.isLeft()) {
-        if (parent.cancelledInvoiceReference) {
-          invoiceId = InvoiceId.create(
-            new UniqueEntityID(parent.cancelledInvoiceReference)
-          );
-          maybePayer = await payerRepo.getPayerByInvoiceId(invoiceId);
-          if (maybePayer.isLeft()) {
-            // throw new Error(maybePayer.value.message);
-            return null;
-          }
-        } else {
-          return null;
-        }
+        return null;
       }
       return PayerMap.toPersistence(maybePayer.value);
     },
