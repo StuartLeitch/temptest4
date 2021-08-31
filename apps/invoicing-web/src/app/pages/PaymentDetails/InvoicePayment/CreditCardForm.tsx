@@ -118,8 +118,14 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
 
   renderError(title: string, obj: any) {
 
+    console.info('BrainTree Server error: ', this.props.serverError);
+
     if (!obj && !this.props.serverError) {
       return null;
+    }
+
+    if (this.props.serverError) {
+      return (<Text type="warning" key='3dsecure_error'>{'Your credit card was declined by the supplier.'}</Text>)
     }
 
     if (obj && ('liabilityShifted' in obj) && obj.liabilityShifted === false) {
@@ -186,7 +192,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
           self.props.handleSubmit(ccPayload);
         },
       );
-    }).catch(function (err) {
+    }).catch(function (err: any) {
       self.onError(err);
     });
   }
