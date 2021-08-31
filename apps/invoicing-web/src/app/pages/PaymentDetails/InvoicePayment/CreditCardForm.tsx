@@ -123,12 +123,11 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
       return null;
     }
 
-
     if (this.props.serverError) {
       return (<Text type="warning" key='3dsecure_error'>{'Your credit card was declined by the supplier.'}</Text>)
     }
 
-    if (obj && ('name' in obj) && obj.name === 'BrainTreeError') {
+    if (obj && ('name' in obj) && obj.name === 'BraintreeError') {
       return (<Text type="warning" key='braintree_error'>{obj.details.originalError.details.originalError.error.message}</Text>)
     }
 
