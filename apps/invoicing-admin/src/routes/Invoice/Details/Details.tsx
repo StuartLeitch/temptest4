@@ -17,6 +17,7 @@ import {
   UncontrolledButtonDropdown,
   UncontrolledTabs,
 } from '../../../components';
+import Restricted from '../../../contexts/Restricted';
 
 import { HeaderMain } from '../../components/HeaderMain';
 import { InvoiceReminders } from '../../components/Invoice/reminders';
@@ -30,7 +31,7 @@ import InvoiceDetailsTab from './components/InvoiceDetailsTab';
 import ArticleDetailsTab from './components/ArticleDetailsTab';
 import PayerDetailsTab from './components/PayerDetailsTab';
 import InvoiceTimeline from './components/InvoiceTimeline';
-import ErpReferencesTab from './components/ErpReferencesTab'
+import ErpReferencesTab from './components/ErpReferencesTab';
 
 import { INVOICE_QUERY } from '../graphql';
 import AddPaymentModal from './components/AddPaymentModal';
@@ -124,7 +125,7 @@ const Details: React.FC = (props) => {
   }
 
   return (
-    <React.Fragment>
+    <>
       <Container fluid={true}>
         <Link
           to={`/invoices/list${queryString}`}
@@ -169,31 +170,47 @@ const Details: React.FC = (props) => {
                 </UncontrolledButtonDropdown>
 
                 {status === 'ACTIVE' && (
-                  <AddPaymentModal
-                    invoice={invoice}
-                    getPaymentMethods={getPaymentMethods}
-                    onSuccessCallback={invoiceQueryRefetch}
-                  />
+                  <Restricted to='add.payment'>
+                    <AddPaymentModal
+                      invoice={invoice}
+                      getPaymentMethods={getPaymentMethods}
+                      onSuccessCallback={invoiceQueryRefetch}
+                    />
+                  </Restricted>
                 )}
 
                 {invoice.creditNote === null &&
                   (status === 'ACTIVE' || status === 'FINAL') &&
                   invoice.payments.every((p) => p.status !== 'PENDING') && (
-                    <>
+                    <Restricted to='create.credit-note'>
                       <Button
                         id={CREATE_CREDIT_NOTE_MODAL_TARGET}
                         color='danger'
                         className='mr-2'
-                      >
+                        >
                         Create Credit Note
                       </Button>
-                    </>
+                      <CreateCreditNoteModal
+                        invoiceItem={invoice?.invoiceItem}
+                        invoiceId={invoiceId}
+                        target={CREATE_CREDIT_NOTE_MODAL_TARGET}
+                        total={totalCharges}
+                        onSaveCallback={invoiceQueryRefetch}
+                      />
+                    </Restricted>
                   )}
 
                 {status === 'DRAFT' && (
-                  <Button id={APPLY_COUPON_MODAL_TARGET} color='twitter'>
-                    Apply Coupon
-                  </Button>
+                  <Restricted to='apply.coupon'>
+                    <Button id={APPLY_COUPON_MODAL_TARGET} color='twitter'>
+                      Apply Coupon
+                    </Button>
+                    <ApplyCouponModal
+                      target={APPLY_COUPON_MODAL_TARGET}
+                      invoiceId={invoiceId}
+                      onSuccessCallback={invoiceQueryRefetch}
+                    />
+                  </Restricted>
                 )}
 
                 {transaction.status === 'ACTIVE' && status === 'DRAFT' && (
@@ -269,20 +286,7 @@ const Details: React.FC = (props) => {
           </Col>
         </Row>
       </Container>
-
-      <ApplyCouponModal
-        target={APPLY_COUPON_MODAL_TARGET}
-        invoiceId={invoiceId}
-        onSuccessCallback={invoiceQueryRefetch}
-      />
-      <CreateCreditNoteModal
-        invoiceItem={invoice?.invoiceItem}
-        invoiceId={invoiceId}
-        target={CREATE_CREDIT_NOTE_MODAL_TARGET}
-        total={totalCharges}
-        onSaveCallback={invoiceQueryRefetch}
-      />
-    </React.Fragment>
+    </>
   );
 };
 

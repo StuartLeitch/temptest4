@@ -2,9 +2,9 @@ import { Before, Given, When, Then, After } from '@cucumber/cucumber';
 import { expect } from 'chai';
 
 import { UsecaseAuthorizationContext } from '../../../../../../src/lib/domain/authorization';
-import { MockLogger } from './../../../../../../src/lib/infrastructure/logging';
+import { MockLogger } from '../../../../../../src/lib/infrastructure/logging';
 
-import { MockSqsPublishService } from './../../../../../../src/lib/domain/services/SQSPublishService';
+import { MockSqsPublishService } from '../../../../../../src/lib/domain/services/SQSPublishService';
 import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEntityID';
 
 import { InvoiceId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceId';
@@ -16,14 +16,14 @@ import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappe
 import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 import { WaiverMap } from '../../../../../../src/lib/modules/waivers/mappers/WaiverMap';
 
-import { MockInvoiceItemRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
-import { MockArticleRepo } from './../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
-import { MockInvoiceRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
-import { MockCouponRepo } from './../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
-import { MockWaiverRepo } from './../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
-import { MockErpReferenceRepo } from './../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
+import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
+import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
+import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+import { MockCouponRepo } from '../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
+import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
+import { MockErpReferenceRepo } from '../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
 
-import { GenerateDraftCompensatoryEventsUsecase } from '../../../../../../src/lib/modules/invoices/usecases/generateDraftCompensatoryEvents';
+import { GenerateInvoiceDraftCompensatoryEventsUsecase } from '../../../../../../src/lib/modules/invoices/usecases/generateInvoiceDraftCompensatoryEvents';
 
 const defaultUsecaseContext: UsecaseAuthorizationContext = {
   roles: [Roles.SERVICE],
@@ -51,7 +51,7 @@ const waiverAcceptanceDate = '2020-10-20T14:25:14';
 const submissionDate = '2020-10-15T14:25:13';
 const updateDate = '2020-10-17T14:25:13';
 
-let usecase: GenerateDraftCompensatoryEventsUsecase = null;
+let usecase: GenerateInvoiceDraftCompensatoryEventsUsecase = null;
 let context: Context = null;
 
 Before(tag, () => {
@@ -80,7 +80,7 @@ Before(tag, () => {
     },
   };
 
-  usecase = new GenerateDraftCompensatoryEventsUsecase(
+  usecase = new GenerateInvoiceDraftCompensatoryEventsUsecase(
     invoiceItem,
     manuscript,
     invoice,

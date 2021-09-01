@@ -5,29 +5,27 @@ import { UsecaseAuthorizationContext } from '../../../../../../src/lib/domain/au
 import {
   LoggerContract,
   MockLogger,
-} from './../../../../../../src/lib/infrastructure/logging';
-import { MockSqsPublishService } from './../../../../../../src/lib/domain/services/SQSPublishService';
+} from '../../../../../../src/lib/infrastructure/logging';
+import { MockSqsPublishService } from '../../../../../../src/lib/domain/services/SQSPublishService';
 
-import { MockPaymentMethodRepo } from './../../../../../../src/lib/modules/payments/repos/mocks/mockPaymentMethodRepo';
-import { MockArticleRepo } from './../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
-import { MockAddressRepo } from './../../../../../../src/lib/modules/addresses/repos/mocks/mockAddressRepo';
-import { MockPaymentRepo } from './../../../../../../src/lib/modules/payments/repos/mocks/mockPaymentRepo';
-import { MockCouponRepo } from './../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
-import { MockWaiverRepo } from './../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
-import { MockInvoiceItemRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
-import { MockPayerRepo } from './../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
-import { MockInvoiceRepo } from './../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
-import { MockErpReferenceRepo } from './../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
-import { MockCreditNoteRepo } from './../../../../../../src/lib/modules/creditNotes/repos/mocks/mockCreditNoteRepo';
+import { MockPaymentMethodRepo } from '../../../../../../src/lib/modules/payments/repos/mocks/mockPaymentMethodRepo';
+import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
+import { MockAddressRepo } from '../../../../../../src/lib/modules/addresses/repos/mocks/mockAddressRepo';
+import { MockPaymentRepo } from '../../../../../../src/lib/modules/payments/repos/mocks/mockPaymentRepo';
+import { MockCouponRepo } from '../../../../../../src/lib/modules/coupons/repos/mocks/mockCouponRepo';
+import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
+import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
+import { MockPayerRepo } from '../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
+import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
+import { MockErpReferenceRepo } from '../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
 
-import { GenerateCompensatoryEventsUsecase } from './../../../../../../src/lib/modules/invoices/usecases/generateCompensatoryEvents/generateCompensatoryEvents';
+import { GenerateInvoiceCompensatoryEventsUsecase } from '../../../../../../src/lib/modules/invoices/usecases/generateInvoiceCompensatoryEvents';
 
 import {
   addBillingAddresses,
   addPaymentMethods,
   addInvoiceItems,
   addManuscripts,
-  addCreditNote,
   addInvoices,
   addPayments,
   addCoupons,
@@ -36,7 +34,7 @@ import {
   addErpReferences,
 } from './testUtils';
 
-import { Roles } from './../../../../../../src/lib/modules/users/domain/enums/Roles';
+import { Roles } from '../../../../../../src/lib/modules/users/domain/enums/Roles';
 
 let mockPaymentMethodRepo: MockPaymentMethodRepo;
 let mockSqsPublishService: MockSqsPublishService;
@@ -44,7 +42,6 @@ let mockInvoiceItemRepo: MockInvoiceItemRepo;
 let mockManuscriptRepo: MockArticleRepo;
 let mockAddressRepo: MockAddressRepo;
 let mockInvoiceRepo: MockInvoiceRepo;
-let mockCreditNoteRepo: MockCreditNoteRepo;
 let mockPaymentRepo: MockPaymentRepo;
 let mockCouponRepo: MockCouponRepo;
 let mockWaiverRepo: MockWaiverRepo;
@@ -52,7 +49,7 @@ let mockPayerRepo: MockPayerRepo;
 let mockErpReferenceRepo: MockErpReferenceRepo;
 let loggerService: LoggerContract;
 
-let useCase: GenerateCompensatoryEventsUsecase;
+let useCase: GenerateInvoiceCompensatoryEventsUsecase;
 let context: UsecaseAuthorizationContext;
 
 let payload;
@@ -69,7 +66,6 @@ Before({ tags: '@ValidateGenerateCompensatoryEvents' }, function () {
   mockWaiverRepo = new MockWaiverRepo();
   mockPayerRepo = new MockPayerRepo();
   mockErpReferenceRepo = new MockErpReferenceRepo();
-  mockCreditNoteRepo = new MockCreditNoteRepo();
   mockInvoiceRepo = new MockInvoiceRepo(
     mockManuscriptRepo,
     mockInvoiceItemRepo,
@@ -85,21 +81,19 @@ Before({ tags: '@ValidateGenerateCompensatoryEvents' }, function () {
   addInvoiceItems(mockInvoiceItemRepo);
   addManuscripts(mockManuscriptRepo);
   addInvoices(mockInvoiceRepo);
-  addCreditNote(mockCreditNoteRepo);
   addPayments(mockPaymentRepo);
   addCoupons(mockCouponRepo);
   addWaivers(mockWaiverRepo);
   addPayers(mockPayerRepo);
   addErpReferences(mockErpReferenceRepo);
 
-  useCase = new GenerateCompensatoryEventsUsecase(
+  useCase = new GenerateInvoiceCompensatoryEventsUsecase(
     mockPaymentMethodRepo,
     mockInvoiceItemRepo,
     mockSqsPublishService,
     mockManuscriptRepo,
     mockAddressRepo,
     mockInvoiceRepo,
-    mockCreditNoteRepo,
     mockPaymentRepo,
     mockCouponRepo,
     mockWaiverRepo,

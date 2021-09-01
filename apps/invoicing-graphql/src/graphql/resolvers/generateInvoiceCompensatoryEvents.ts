@@ -1,5 +1,5 @@
 import {
-  GenerateCompensatoryEventsUsecase,
+  GenerateInvoiceCompensatoryEventsUsecase,
   GetInvoicesIdsUsecase,
 } from '@hindawi/shared';
 
@@ -8,9 +8,9 @@ import { Resolvers } from '../schema';
 
 import { handleForbiddenUsecase, getAuthRoles } from './utils';
 
-export const generateCompensatoryEvents: Resolvers<Context> = {
+export const generateInvoiceCompensatoryEvents: Resolvers<Context> = {
   Mutation: {
-    async generateCompensatoryEvents(parent, args, context) {
+    async generateInvoiceCompensatoryEvents(parent, args, context) {
       const roles = getAuthRoles(context);
       const { invoiceIds, journalIds } = args;
       const {
@@ -20,7 +20,6 @@ export const generateCompensatoryEvents: Resolvers<Context> = {
           manuscript,
           address,
           invoice,
-          creditNote,
           coupon,
           waiver,
           payer,
@@ -33,14 +32,13 @@ export const generateCompensatoryEvents: Resolvers<Context> = {
         roles,
       };
 
-      const usecase = new GenerateCompensatoryEventsUsecase(
+      const usecase = new GenerateInvoiceCompensatoryEventsUsecase(
         paymentMethod,
         invoiceItem,
         sqsQueService,
         manuscript,
         address,
         invoice,
-        creditNote,
         payment,
         coupon,
         waiver,

@@ -40,9 +40,9 @@ import { PublishInvoiceDraftCreatedUseCase } from '../publishEvents/publishInvoi
 import { PublishInvoiceDraftDeletedUseCase } from '../publishEvents/publishInvoiceDraftDeleted';
 
 // * Usecase specific
-import { GenerateDraftCompensatoryEventsResponse as Response } from './generate-draft-compensatory-events.response';
-import type { GenerateDraftCompensatoryEventsDTO as DTO } from './generate-draft-compensatory-events.dto';
-import * as Errors from './generate-draft-compensatory-events.errors';
+import { GenerateInvoiceDraftCompensatoryEventsResponse as Response } from './generate-invoice-draft-compensatory-events.response';
+import type { GenerateInvoiceDraftCompensatoryEventsDTO as DTO } from './generate-invoice-draft-compensatory-events.dto';
+import * as Errors from './generate-invoice-draft-compensatory-events.errors';
 
 interface WithInvoiceId {
   invoiceId: string;
@@ -69,7 +69,7 @@ function roundToHour(dateToRound: Date): Date {
   return date;
 }
 
-export class GenerateDraftCompensatoryEventsUsecase
+export class GenerateInvoiceDraftCompensatoryEventsUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(

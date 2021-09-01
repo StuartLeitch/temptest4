@@ -1,9 +1,9 @@
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { Either } from '../../../../core/logic/Either';
 
-import * as Errors from './generate-draft-compensatory-events.errors';
+import * as Errors from './generate-invoice-draft-compensatory-events.errors';
 
-export type GenerateDraftCompensatoryEventsResponse = Either<
+export type GenerateInvoiceDraftCompensatoryEventsResponse = Either<
   | Errors.InvoiceIdRequiredError
   | Errors.InvoiceHasNoManuscript
   | UnexpectedError,
