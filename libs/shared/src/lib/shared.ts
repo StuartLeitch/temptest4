@@ -81,14 +81,12 @@ export * from './modules/invoices/usecases/confirmInvoice/confirmInvoiceDTO';
 export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdf';
 export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdfDTO';
 export * from './modules/invoices/usecases/getItemsForInvoice/getItemsForInvoice';
-export * from './modules/invoices/usecases/generateCompensatoryEvents';
-export * from './modules/invoices/usecases/generateDraftCompensatoryEvents';
+export * from './modules/invoices/usecases/generateInvoiceCompensatoryEvents';
+export * from './modules/invoices/usecases/generateInvoiceDraftCompensatoryEvents';
 export * from './modules/invoices/usecases/getInvoicesIds';
 export * from './modules/invoices/usecases/getRecentInvoices/getRecentInvoices';
 export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
 export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomIdDTO';
-export * from './modules/invoices/usecases/createCreditNote/createCreditNote';
-export * from './modules/invoices/usecases/getCreditNoteByInvoiceId/getCreditNoteByInvoiceId';
 export * from './modules/invoices/usecases/ERP/retryRevenueRecognizedNetsuiteErpInvoices/retryRevenueRecognitionNetsuiteErpInvoices';
 export * from './modules/invoices/usecases/ERP/retryRevenueRecognizedReversalsNetsuiteErp/retryRevenueRecognitionReversalsNetsuiteErp';
 
@@ -106,7 +104,6 @@ export * from './modules/invoices/usecases/getVATNote/getVATNoteDTO';
 export * from './modules/invoices/usecases/getVATNote/getVATNote';
 
 export * from './modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
-export * from './modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
 export * from './modules/invoices/subscriptions/AfterInvoiceFinalizedEvent';
 export * from './modules/invoices/subscriptions/AfterInvoicePaidEvents';
 export * from './modules/invoices/subscriptions/afterInvoiceConfirmedEvent';
@@ -250,11 +247,26 @@ export * from './modules/authors/mappers/AuthorMap';
 export * from './modules/authors/usecases/getAuthorDetails/getAuthorDetails';
 export * from './modules/authors/usecases/getAuthorDetails/getAuthorDetailsDTO';
 
-// * Export user Subdomain
+// * Export Credit Note Subdomain
+export * from './modules/creditNotes/domain/CreditNote';
+export * from './modules/creditNotes/domain/CreditNoteId';
+export * from './modules/creditNotes/mappers/CreditNoteMap';
+export * from './modules/creditNotes/repos/creditNoteRepo';
+export * from './modules/creditNotes/repos/implementations/knexCreditNoteRepo';
+export * from './modules/creditNotes/repos/mocks/mockCreditNoteRepo';
+export * from './modules/creditNotes/usecases/getCreditNoteById';
+export * from './modules/creditNotes/usecases/getCreditNoteByCustomId';
+export * from './modules/creditNotes/usecases/getRecentCreditNotes';
+export * from './modules/creditNotes/usecases/createCreditNote';
+export * from './modules/creditNotes/usecases/getCreditNoteByInvoiceId';
+export * from './modules/creditNotes/usecases/getCreditNoteByReferenceNumber';
+export * from './modules/creditNotes/usecases/getCreditNoteIds';
+export * from './modules/creditNotes/usecases/generateCreditNoteCompensatoryEvents';
 
+// * Export user Subdomain
 export * from './modules/invoices/usecases/ERP/retryFailedNetsuiteErpInvoices/retryFailedNetsuiteErpInvoices';
 export * from './modules/payments/usecases/retryPaymentsRegistration/retryPaymentRegistration';
-export * from './modules/invoices/usecases/ERP/retryCreditNotes/retryCreditNotes';
+export * from './modules/creditNotes/usecases/ERP/retryCreditNotes/retryCreditNotesUsecase';
 export * from './modules/invoices/usecases/ERP/retryFailedSageErpInvoices/retryFailedSageErpInvoices';
 export * from './modules/invoices/usecases/ERP/retryRevenueRecognizedSageErpInvoices/retryRevenueRecognitionSageErpInvoices';
 

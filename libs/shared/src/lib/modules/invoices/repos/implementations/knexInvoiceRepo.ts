@@ -38,63 +38,6 @@ export class KnexInvoiceRepo
     super(db, logger);
   }
 
-  private createBaseDetailsQuery(): any {
-    const { db } = this;
-    const LIMIT = 200;
-
-    return db(TABLES.INVOICES)
-      .select(
-        'invoices.id as invoiceId',
-        'invoices.transactionId as transactionId',
-        'invoices.status as invoiceStatus'
-        // 'articles.id AS manuscriptId',
-        // 'articles.datePublished'
-      )
-      .leftJoin(TABLES.INVOICE_ITEMS, 'invoice_items.invoiceId', 'invoices.id')
-      .limit(LIMIT)
-      .offset(0);
-  }
-
-  private createErpDetailsQuery(): any {
-    const { db } = this;
-
-    return db(TABLES.INVOICES)
-      .select(
-        'invoices.id',
-        'erp_references.type',
-        'erp_references.vendor',
-        'erp_references.attribute',
-        'erp_references.value'
-      )
-      .leftJoin(
-        TABLES.ERP_REFERENCES,
-        'erp_references.entity_id',
-        'invoices.id'
-      );
-  }
-
-  private createBaseArticleDetailsQuery(): any {
-    const { db } = this;
-
-    return db(TABLES.ARTICLES)
-      .select(
-        'articles.id AS manuscriptId',
-        'articles.datePublished',
-        'invoices.id as invoiceId',
-        'invoices.transactionId as transactionId',
-        'invoices.status as invoiceStatus',
-        'invoices.invoiceNumber AS invoiceNumber',
-        'invoices.revenueRecognitionReference',
-        'invoices.nsReference',
-        'invoices.nsRevRecReference'
-      )
-      .leftJoin(
-        TABLES.INVOICE_ITEMS,
-        'invoice_items.manuscriptId',
-        'articles.id'
-      );
-  }
-
   private withInvoicesItemsDetailsQuery(): any {
     return (query) =>
       query.leftJoin(
@@ -102,6 +45,11 @@ export class KnexInvoiceRepo
         'invoice_items.invoiceId',
         'invoices.id'
       );
+  }
+
+  private withCreditNoteDetailsQuery(): any {
+    return (query) =>
+      query.leftJoin(TABLES.INVOICES, 'invoices.id', 'credit_notes.invoiceId');
   }
 
   private withErpReferenceQuery(
@@ -142,7 +90,6 @@ export class KnexInvoiceRepo
     });
 
     const invoice = await sql;
-
     if (!invoice) {
       return left(
         RepoError.createEntityNotFoundError('invoice', invoiceId.id.toString())
@@ -217,11 +164,14 @@ export class KnexInvoiceRepo
 
     const offset = pagination.offset * pagination.limit;
 
-    const invoices: Array<any> = await applyFilters(getModel(), filters)
+    const sql = applyFilters(getModel(), filters)
       .orderBy(`${TABLES.INVOICES}.dateCreated`, 'desc')
       .offset(offset < totalCount[0].count ? offset : 0)
       .limit(pagination.limit)
       .select([`${TABLES.INVOICES}.*`]);
+    console.info(sql.toString());
+
+    const invoices: Array<any> = await sql;
 
     const maybeInvoices = flatten(invoices.map(InvoiceMap.toDomain));
 
@@ -265,7 +215,6 @@ export class KnexInvoiceRepo
     const result = await db
       .select(
         'invoices.id AS invoiceId',
-        'invoices.cancelledInvoiceReference AS cancelledInvoiceReference',
         'invoices.status AS invoiceStatus',
         'invoices.dateCreated as invoiceDateCreated',
         'articles.customId as customId',
@@ -286,26 +235,6 @@ export class KnexInvoiceRepo
     }
 
     return flatten(result.map(InvoiceMap.toDomain));
-  }
-
-  async findByCancelledInvoiceReference(
-    invoiceId: InvoiceId
-  ): Promise<Either<GuardFailure | RepoError, Invoice>> {
-    const { db } = this;
-
-    const invoice = await db(TABLES.INVOICES)
-      .select()
-      .where('cancelledInvoiceReference', invoiceId.id.toString())
-      .first();
-
-    if (!invoice) {
-      throw RepoError.createEntityNotFoundError(
-        'creditNote',
-        invoiceId.id.toString()
-      );
-    }
-
-    return InvoiceMap.toDomain(invoice);
   }
 
   async getCurrentInvoiceNumber(): Promise<number> {
@@ -430,7 +359,6 @@ export class KnexInvoiceRepo
       query
         .whereNot('invoices.deleted', 1)
         .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
-        .whereNull('invoices.cancelledInvoiceReference')
         .whereNotNull('erprefs.value')
         .where('erprefs.value', '<>', 'ERP_NOT_FOUND')
         .where('erprefs.value', '<>', 'NON_INVOICEABLE')
@@ -439,19 +367,8 @@ export class KnexInvoiceRepo
         .whereNull('revrec.value')
         .whereNotIn(
           'invoices.id',
-          db.raw(
-            `SELECT invoices."cancelledInvoiceReference" from invoices where invoices."cancelledInvoiceReference" is not NULL`
-          )
+          db.raw(`SELECT "invoiceId" FROM credit_notes`)
         );
-  }
-
-  private filterCreditNotesReadyForErpRegistration(): any {
-    return (query) =>
-      query
-        .whereNot('invoices.deleted', 1)
-        .whereIn('invoices.status', ['FINAL'])
-        .whereNotNull('invoices.cancelledInvoiceReference')
-        .whereNull('creditnoteref.value');
   }
 
   private filterRevenueRecognitionReadyForErpRegistration(): any {
@@ -459,7 +376,6 @@ export class KnexInvoiceRepo
       query
         .whereNot('invoices.deleted', 1)
         .whereIn('invoices.status', ['FINAL'])
-        .whereNotNull('invoices.cancelledInvoiceReference')
         .whereNull('revenuerecognitionreversalref.value');
   }
 
@@ -528,11 +444,15 @@ export class KnexInvoiceRepo
   }
 
   private filterReadyForRegistration(): any {
+    const { db } = this;
     return (query) =>
       query
         .whereNot('invoices.deleted', 1)
         .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
-        .whereNull('invoices.cancelledInvoiceReference')
+        .whereNotIn(
+          'invoices.id',
+          db.raw(`SELECT "invoiceId" FROM credit_notes`)
+        )
         .whereNull('erprefs.value');
   }
 
@@ -583,43 +503,6 @@ export class KnexInvoiceRepo
   > {
     const maybeIds = await this.getUnregisteredInvoices('sage');
     return right(maybeIds);
-  }
-
-  async getUnregisteredErpCreditNotes(): Promise<
-    Either<GuardFailure | RepoError, InvoiceId[]>
-  > {
-    const { db, logger } = this;
-
-    const erpReferencesQuery = db(TABLES.INVOICES)
-      .column({ invoiceId: 'invoices.id' })
-      .select();
-
-    const withInvoiceItems = this.withInvoicesItemsDetailsQuery();
-
-    const withCreditNoteErpReference = this.withErpReferenceQuery(
-      'creditnoteref',
-      'invoices.id',
-      'invoice',
-      'netsuite',
-      'creditNote'
-    );
-
-    // * SQL for retrieving results needed only for ERP registration
-    const filterCreditNotesReadyForERP = this.filterCreditNotesReadyForErpRegistration();
-
-    const prepareIdsSQL = filterCreditNotesReadyForERP(
-      withCreditNoteErpReference(withInvoiceItems(erpReferencesQuery))
-    );
-
-    logger.debug('select', {
-      unregisteredCreditNotes: prepareIdsSQL.toString(),
-    });
-
-    const creditNotes: Array<any> = await prepareIdsSQL;
-
-    return right(
-      creditNotes.map((i) => InvoiceId.create(new UniqueEntityID(i.invoiceId)))
-    );
   }
 
   async delete(
@@ -776,7 +659,6 @@ export class KnexInvoiceRepo
 
     const countInvoicesSQL = db(TABLES.INVOICES)
       .count('id as CNT')
-      .whereNull('cancelledInvoiceReference')
       .where('status', criteria.status)
       .where('dateCreated', '>=', criteria.range.from.toString())
       .where('dateCreated', '<=', criteria.range.to.toString())
@@ -791,18 +673,20 @@ export class KnexInvoiceRepo
     return Number(CNT);
   }
 
-  public async getUnrecognizedReversalsNetsuiteErp(): Promise<Either<GuardFailure | RepoError, any[]>> {
+  public async getUnrecognizedReversalsNetsuiteErp(): Promise<
+    Either<GuardFailure | RepoError, any[]>
+  > {
     const { db, logger } = this;
 
-    const erpReferencesQuery = db(TABLES.INVOICES)
-      .column({ invoiceId: 'invoices.cancelledInvoiceReference' })
+    const erpReferencesQuery = db(TABLES.CREDIT_NOTES)
+      .column({ invoiceId: 'invoices.id' })
       .select();
 
-    const withInvoiceItems = this.withInvoicesItemsDetailsQuery();
+    const withCreditNoteDetails = this.withCreditNoteDetailsQuery();
 
     const withRevenueRecognitionReversalErpReference = this.withErpReferenceQuery(
       'revenuerecognitionreversalref',
-      'invoices.cancelledInvoiceReference',
+      'invoices.id',
       'invoice',
       'netsuite',
       'revenueRecognitionReversal'
@@ -813,7 +697,7 @@ export class KnexInvoiceRepo
 
     const withCreditNoteErpReference = this.withErpReferenceQuery(
       'creditnoteref',
-      'invoices.id',
+      'credit_notes.id',
       'invoice',
       'netsuite',
       'creditNote'
@@ -823,7 +707,7 @@ export class KnexInvoiceRepo
 
     const withRevenueRecognitionErpReference = this.withErpReferenceQuery(
       'revenuerecognitionref',
-      'invoices.cancelledInvoiceReference',
+      'invoices.id',
       'invoice',
       'netsuite',
       'revenueRecognition'
@@ -837,7 +721,7 @@ export class KnexInvoiceRepo
           withCreditNoteErpReference(
             filterRevenueRecognitionReadyForERP(
               withRevenueRecognitionReversalErpReference(
-                withInvoiceItems(erpReferencesQuery)
+                withCreditNoteDetails(erpReferencesQuery)
               )
             )
           )
@@ -852,17 +736,17 @@ export class KnexInvoiceRepo
     const revenueRecognitionReversals: Array<any> = await prepareIdsSQL;
 
     return right(
-      revenueRecognitionReversals.map((i) => InvoiceId.create(new UniqueEntityID(i.invoiceId)))
+      revenueRecognitionReversals.map((i) =>
+        InvoiceId.create(new UniqueEntityID(i.invoiceId))
+      )
     );
   }
 
   private filterRegisteredCreditNotesForErpRegistration(): any {
-    return (query) =>
-      query.whereNotNull('creditnoteref.value');
+    return (query) => query.whereNotNull('creditnoteref.value');
   }
 
   private filterRegisteredRevenueRecognitionForErpRegistration(): any {
-    return (query) =>
-      query.whereNotNull('revenuerecognitionref.value');
+    return (query) => query.whereNotNull('revenuerecognitionref.value');
   }
 }

@@ -5,15 +5,16 @@ import { Payment } from '../../../../payments/domain/Payment';
 import { InvoiceItem } from '../../../domain/InvoiceItem';
 import { Payer } from '../../../../payers/domain/Payer';
 import { Invoice } from '../../../domain/Invoice';
+import { CreditNote } from '../../../../creditNotes/domain/CreditNote';
 
 export interface PublishInvoiceCreditedDTO {
-  paymentMethods: PaymentMethod[];
-  invoiceItems: InvoiceItem[];
-  billingAddress?: Address;
-  messageTimestamp?: Date;
-  manuscript: Manuscript;
-  payments?: Payment[];
-  creditNote: Invoice;
   payer?: Payer;
   invoice?: Invoice;
+  payments?: Payment[];
+  manuscript: Manuscript;
+  creditNote: CreditNote;
+  invoiceItems: InvoiceItem[];
+  paymentMethods: PaymentMethod[];
+  billingAddress?: Address;
+  messageTimestamp?: Date;
 }

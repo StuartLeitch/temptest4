@@ -17,6 +17,7 @@ import {
   CardBody,
   CardHeader,
 } from '../../components';
+import Restricted from '../../contexts/Restricted';
 
 import CouponCreate from './components/CouponCreate';
 

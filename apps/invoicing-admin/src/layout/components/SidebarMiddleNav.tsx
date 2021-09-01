@@ -12,6 +12,13 @@ export const SidebarMiddleNav: React.FC = () => (
     </SidebarMenu.Item>
 
     <SidebarMenu.Item
+      icon={<i className='fas fa-fw fa-minus-square'></i>}
+      title='Credit Notes'
+    >
+      <SidebarMenu.Item title='List' to='/credit-notes/list' exact />
+    </SidebarMenu.Item>
+
+    <SidebarMenu.Item
       icon={<i className='fas fa-ticket-alt'></i>}
       title='Coupons'
     >

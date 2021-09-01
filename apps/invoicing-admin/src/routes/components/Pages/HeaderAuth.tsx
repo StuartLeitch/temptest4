@@ -1,8 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { LogoThemed } from './../LogoThemed/LogoThemed';
+
 const HeaderAuth = props => (
   <div className='mb-4'>
+    <div className="mb-4 text-center">
+      {
+          props.icon ? (
+              <i className={ `fas fa-fw fa-times fa-3x ${ props.iconClassName }` }></i>
+          ) : (
+              <LogoThemed checkBackground />
+          )
+      }
+        </div>
     <h5 className='text-center mb-4'>{props.title}</h5>
     <p className='text-center'>{props.text}</p>
   </div>

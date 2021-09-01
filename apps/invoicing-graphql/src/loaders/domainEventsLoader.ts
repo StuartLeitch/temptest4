@@ -5,6 +5,7 @@ import {
   MicroframeworkSettings,
 } from 'microframework-w3tec';
 
+import { PublishCreditNoteCreatedUsecase } from '../../../../libs/shared/src/lib/modules/creditNotes/usecases/publishEvents/publishCreditNoteCreated/publishCreditNoteCreated';
 import { PublishInvoiceCreditedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCredited/publishInvoiceCredited';
 import { PublishInvoiceDraftCreatedUseCase } from 'libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftCreated';
 import { PublishInvoiceDraftDeletedUseCase } from 'libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftDeleted';
@@ -13,9 +14,8 @@ import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/mo
 import { PublishInvoiceConfirmedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceConfirmed';
 import { PublishInvoiceFinalizedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceFinalized';
 import { PublishInvoicePaidUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoicePaid';
-import { PublishRevenueRecognitionReversalUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
 
-import { AfterInvoiceCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreditNoteCreatedEvents';
+import { AfterCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/creditNotes/subscriptions/AfterCreditNoteCreatedEvent';
 import { AfterInvoiceDraftDueAmountUpdatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDueAmountUpdateEvent';
 import { AfterInvoiceDraftDeletedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDraftDeletedEvent';
 import { AfterInvoiceDraftCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDraftCreatedEvent';
@@ -38,6 +38,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         paymentMethod,
         invoiceItem,
         manuscript,
+        creditNote,
         address,
         invoice,
         payment,
@@ -47,6 +48,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       },
       services: { logger: loggerService, schedulingService, qq: queue, erp },
     } = context;
+
+    const publishCreditNoteCreated = new PublishCreditNoteCreatedUsecase(queue);
 
     const publishInvoiceDraftCreated = new PublishInvoiceDraftCreatedUseCase(
       queue
@@ -108,22 +111,6 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
     );
 
     // tslint:disable-next-line: no-unused-expression
-    new AfterInvoiceCreditNoteCreatedEvent(
-      paymentMethod,
-      invoiceItem,
-      manuscript,
-      address,
-      invoice,
-      payment,
-      coupon,
-      waiver,
-      payer,
-      publishInvoiceCredited,
-      // publishRevenueRecognitionReversal,
-      loggerService
-    );
-
-    // tslint:disable-next-line: no-unused-expression
     new AfterInvoiceConfirmed(
       invoiceItem,
       coupon,
@@ -170,5 +157,22 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
 
     // tslint:disable-next-line: no-unused-expression
     new AfterPaymentCompleted(invoice, loggerService);
+
+    // * Registering CreditNote events
+
+    new AfterCreditNoteCreatedEvent(
+      creditNote,
+      paymentMethod,
+      invoiceItem,
+      manuscript,
+      address,
+      invoice,
+      payment,
+      coupon,
+      waiver,
+      payer,
+      publishInvoiceCredited,
+      loggerService
+    );
   }
 };

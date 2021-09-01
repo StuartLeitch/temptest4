@@ -15,10 +15,12 @@ import {
   ButtonToolbar,
   UncontrolledTooltip,
 } from './../../../components';
+import Restricted from '../../../contexts/Restricted';
 import { HeaderMain } from '../../components/HeaderMain';
 import { InvoicesLeftNav } from '../../components/Invoices/InvoicesLeftNav';
 import InvoicesList from './List';
 import SuccessfulUrlCopiedToClipboardToast from './components/SuccessfulUrlCopiedToClipboardToast';
+import NotAuthorized from '../../components/NotAuthorized';
 
 const InvoicesContainer: React.FC = () => {
   const defaultFilters = {
@@ -141,41 +143,44 @@ const InvoicesContainer: React.FC = () => {
 
   return (
     <React.Fragment>
-      <Container fluid={true}>
-        <HeaderMain title='Invoices' className='mb-5 mt-4' />
-        <Row>
-          <Col lg={3}>
-            <InvoicesLeftNav filters={filters} setFilter={setFilter} />
-          </Col>
-          <Col lg={9} className='mt-n4 mb-5'>
-            <ButtonToolbar className='d-flex justify-content-end'>
-              <ButtonGroup className='mr-2'>
-                <Button
-                  color='link'
-                  className='text-decoration-none align-self-center pr-0'
-                  id='tooltipFav'
-                  onClick={() => {
-                    const urlToShare = buildURLWithFilters(filters, pagination);
-                    copyToClipboard(urlToShare);
-                    return toast.success(
-                      <SuccessfulUrlCopiedToClipboardToast />
-                    );
-                  }}
-                >
-                  <i className='text-blue fas fa-fw fa-share-square'></i>
-                </Button>
-                <UncontrolledTooltip placement='bottom' target='tooltipFav'>
-                  Share Search Filters
-                </UncontrolledTooltip>
-              </ButtonGroup>
-            </ButtonToolbar>
-            <InvoicesList
-              state={listState}
-              setPage={setFilter}
-            />
-          </Col>
-        </Row>
-      </Container>
+      <Restricted to='list.invoices' fallback={<NotAuthorized />}>
+        <Container fluid={true}>
+          <HeaderMain title='Invoices' className='mb-5 mt-4' />
+          <Row>
+            <Col lg={3}>
+              <InvoicesLeftNav filters={filters} setFilter={setFilter} />
+            </Col>
+            <Col lg={9} className='mt-n4 mb-5'>
+              <ButtonToolbar className='d-flex justify-content-end'>
+                <ButtonGroup className='mr-2'>
+                  <Button
+                    color='link'
+                    className='text-decoration-none align-self-center pr-0'
+                    id='tooltipFav'
+                    onClick={() => {
+                      const urlToShare = buildURLWithFilters(filters, pagination);
+                      copyToClipboard(urlToShare);
+                      return toast.success(
+                        <SuccessfulUrlCopiedToClipboardToast />
+                      );
+                    }}
+                  >
+                    <i className='text-blue fas fa-fw fa-share-square'></i>
+                  </Button>
+                  <UncontrolledTooltip placement='bottom' target='tooltipFav'>
+                    Share Search Filters
+                  </UncontrolledTooltip>
+                </ButtonGroup>
+              </ButtonToolbar>
+              <InvoicesList
+                state={listState}
+                setPage={setFilter}
+              />
+
+            </Col>
+          </Row>
+        </Container>
+      </Restricted>
     </React.Fragment>
   );
 
@@ -189,9 +194,10 @@ const InvoicesContainer: React.FC = () => {
     const [name, status] = ParseUtils.parseEvent(key);
     let newStatus = [];
     let newTransactionStatus = [];
-    let newJournalId = [];
 
     switch (name) {
+
+      // * invoices status filter
       case 'invoiceStatus':
         if (filters.invoiceStatus.includes(status)) {
           newStatus = filters.invoiceStatus.filter((s) => s !== status);
@@ -214,7 +220,23 @@ const InvoicesContainer: React.FC = () => {
 
         break;
 
-      case 'transactionStatus':
+
+      // * pagination
+      case 'page':
+        setPage(value as string);
+        writeStorage('invoicesList', {
+          filters,
+          pagination:{
+            ...pagination,
+            page: value,
+            offset: Number(value) - 1,
+          }
+        });
+        break;
+
+
+      // * transaction status filter
+      default:
         if (filters.transactionStatus.includes(status)) {
           newTransactionStatus = filters.transactionStatus.filter(
             (s) => s !== status
@@ -234,54 +256,6 @@ const InvoicesContainer: React.FC = () => {
           page: 1,
         }});
         break;
-
-      case 'journalTitle':
-        newJournalId = (value as any[]).map((j) => j.journalId);
-        setJournalId(newJournalId);
-        setPage(1);
-        writeStorage('invoicesList', { filters: {
-          ...filters,
-          journalId: newJournalId,
-        }, pagination: {
-          ...pagination,
-          page: 1,
-        }});
-        break;
-
-      case 'referenceNumber':
-        setPage(1);
-        setReferenceNumber(value as string);
-        writeStorage('invoicesList',{ filters: {
-          ...filters,
-          referenceNumber: value,
-        }, pagination: {
-          ...pagination,
-          page: 1,
-        }});
-        break;
-
-      case 'page':
-        setPage(value as string);
-        writeStorage('invoicesList', {
-          filters,
-          pagination:{
-            ...pagination,
-            page: value,
-            offset: Number(value) - 1,
-          }
-        });
-        break;
-
-      default:
-        setCustomId(value as string);
-        setPage(1);
-        writeStorage('invoicesList', {
-          filters: { ...filters, customId: value },
-          pagination: {
-            ...pagination,
-            page: 1,
-          }
-        });
     }
   }
 };
