@@ -1,3 +1,5 @@
+import { Transform } from 'stream';
+
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { Either, flatten, right, left } from '../../../../core/logic/Either';
 import { GuardFailure } from '../../../../core/logic/GuardFailure';
@@ -10,13 +12,11 @@ import { CreditNoteRepoContract } from './../creditNoteRepo';
 import { KnexInvoiceItemRepo } from '../../../invoices/repos';
 import { CreditNoteMap } from '../../mappers/CreditNoteMap';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
-import { ManuscriptId } from '../../../manuscripts/domain/ManuscriptId';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { PaginatedCreditNoteResult } from '../creditNoteRepo';
 import { applyFilters } from './utils';
 import { KnexArticleRepo } from '../../../manuscripts/repos';
 
-// to be updated with GuardFailure
 export class KnexCreditNoteRepo
   extends AbstractBaseDBRepo<Knex, CreditNote>
   implements CreditNoteRepoContract {
@@ -242,10 +242,10 @@ export class KnexCreditNoteRepo
     const offset = pagination.offset * pagination.limit;
 
     const sql = applyFilters(getModel(), filters)
-    .orderBy(`${TABLES.CREDIT_NOTES}.dateCreated`, 'desc')
-    .offset(offset < totalCount[0].count ? offset : 0)
-    .limit(pagination.limit)
-    .select([`${TABLES.CREDIT_NOTES}.*`]);
+      .orderBy(`${TABLES.CREDIT_NOTES}.dateCreated`, 'desc')
+      .offset(offset < totalCount[0].count ? offset : 0)
+      .limit(pagination.limit)
+      .select([`${TABLES.CREDIT_NOTES}.*`]);
 
     console.info(sql.toString());
 
@@ -270,5 +270,44 @@ export class KnexCreditNoteRepo
         'articles.customId AS customId',
         'articles.datePublished AS datePublished'
       );
+  }
+
+  async *getCreditNoteIds(
+    ids: string[],
+    journalIds: string[],
+    omitDeleted: boolean
+  ): AsyncGenerator<string, void, undefined> {
+    const extractCreditNoteId = new Transform({
+      objectMode: true,
+      transform(item, encoding, callback) {
+        callback(null, item.id);
+      },
+    });
+
+    let query = this.db(`${TABLES.CREDIT_NOTES} as c`)
+      .join(`${TABLES.INVOICES} as i`, 'c.invoiceId', 'i.id')
+      .join(`${TABLES.INVOICE_ITEMS} as ii`, 'c.invoiceId', 'ii.invoiceId')
+      .join(`${TABLES.ARTICLES} as a`, 'a.id', 'ii.manuscriptId')
+      .join(`${TABLES.CATALOG} as ct`, 'ct.journalId', 'a.journalId')
+      .select('c.id');
+
+    if (ids.length) {
+      query = query.whereIn('c.id', ids);
+    }
+
+    if (journalIds.length) {
+      query = query.whereIn('ct.id', journalIds);
+    }
+
+    if (omitDeleted) {
+      query = query.where('i.deleted', 0);
+    }
+
+    const stream = query.stream({ objectMode: true }).pipe(extractCreditNoteId);
+
+    for await (const a of stream) {
+      console.log('yield', a);
+      yield a;
+    }
   }
 }

@@ -1,39 +1,43 @@
-import { Resolvers, Invoice, CreditNote } from '../schema';
+import { Resolvers } from '../schema';
 
 import { Context } from '../../builders';
+
 import {
+  GetCreditNoteByReferenceNumberUsecase,
+  GetCreditNoteByReferenceNumberDTO,
+  GetCreditNoteByInvoiceIdUsecase,
+  GetCreditNoteByInvoiceIdDTO,
+  GetRecentCreditNotesUsecase,
+  CreateCreditNoteRequestDTO,
   GetCreditNoteByIdUsecase,
+  GetInvoiceDetailsUsecase,
+  CreateCreditNoteUsecase,
+  GetRecentCreditNotesDTO,
   GetCreditNoteByIdDTO,
+  GetInvoiceDetailsDTO,
   CreditNoteMap,
   InvoiceMap,
   Roles,
-  GetRecentCreditNotesUesecase,
-  GetRecentCreditNotesDTO,
-  GetCreditNoteByReferenceNumberUsecase,
-  GetCreditNoteByReferenceNumberDTO,
-  GetInvoiceDetailsUsecase,
-  GetInvoiceDetailsDTO,
-  GetCreditNoteByInvoiceIdUsecase,
-  GetCreditNoteByInvoiceIdDTO,
-  GetArticleDetailsUsecase,
-  ArticleMap,
 } from '@hindawi/shared';
 
-import { CreateCreditNoteUsecase } from '../../../../../libs/shared/src/lib/modules/creditNotes/usecases/createCreditNote/createCreditNote';
-import { CreateCreditNoteRequestDTO } from '../../../../../libs/shared/src/lib/modules/creditNotes/usecases/createCreditNote/createCreditNoteDTO';
+import { handleForbiddenUsecase, getAuthRoles } from './utils';
 
 export const creditNote: Resolvers<Context> = {
   Query: {
     async getCreditNoteById(parent, args, context) {
+      const contextRoles = getAuthRoles(context);
+
       const { repos } = context;
       const usecase = new GetCreditNoteByIdUsecase(repos.creditNote);
       const associatedInvoice = new GetInvoiceDetailsUsecase(repos.invoice);
 
       const request: GetCreditNoteByIdDTO = { creditNoteId: args.creditNoteId };
 
-      const usecaseContext = { roles: [Roles.ADMIN] };
+      const usecaseContext = { roles: contextRoles };
 
       const result = await usecase.execute(request, usecaseContext);
+
+      handleForbiddenUsecase(result);
 
       if (result.isLeft()) {
         throw new Error(result.value.message);
@@ -60,6 +64,8 @@ export const creditNote: Resolvers<Context> = {
       };
     },
     async getCreditNoteByInvoiceId(parent, args, context) {
+      const contextRoles = getAuthRoles(context);
+
       const { repos } = context;
       const usecase = new GetCreditNoteByInvoiceIdUsecase(repos.creditNote);
 
@@ -67,9 +73,11 @@ export const creditNote: Resolvers<Context> = {
         invoiceId: args.invoiceId,
       };
 
-      const usecaseContext = { roles: [Roles.ADMIN] };
+      const usecaseContext = { roles: contextRoles };
 
       const result = await usecase.execute(request, usecaseContext);
+
+      handleForbiddenUsecase(result);
 
       if (result.isLeft()) {
         throw new Error(result.value.message);
@@ -78,14 +86,19 @@ export const creditNote: Resolvers<Context> = {
       return CreditNoteMap.toPersistence(result.value);
     },
     async getRecentCreditNotes(parent, args: GetRecentCreditNotesDTO, context) {
+      const contextRoles = getAuthRoles(context);
+
       const { repos } = context;
-      const usecase = new GetRecentCreditNotesUesecase(repos.creditNote);
+      const usecase = new GetRecentCreditNotesUsecase(repos.creditNote);
 
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles: contextRoles,
       };
 
       const result = await usecase.execute(args, usecaseContext);
+
+      handleForbiddenUsecase(result);
+
       if (result.isLeft()) {
         throw new Error(result.value.message);
       }
@@ -101,17 +114,22 @@ export const creditNote: Resolvers<Context> = {
     },
 
     async getCreditNoteByReferenceNumber(parents, args, context) {
+      const contextRoles = getAuthRoles(context);
+
       const { repos } = context;
       const usecase = new GetCreditNoteByReferenceNumberUsecase(
         repos.creditNote
       );
 
-      const usecaseContext = { roles: [Roles.ADMIN] };
+      const usecaseContext = { roles: contextRoles };
       const request: GetCreditNoteByReferenceNumberDTO = {
         referenceNumber: args.referenceNumber,
       };
 
       const result = await usecase.execute(request, usecaseContext);
+
+      handleForbiddenUsecase(result);
+
       if (result.isLeft()) {
         throw new Error(result.value.message);
       }
@@ -121,12 +139,14 @@ export const creditNote: Resolvers<Context> = {
   },
   CreditNote: {
     async invoice(parent: any, args, context) {
+      const contextRoles = getAuthRoles(context);
+
       const {
         repos: { invoice: invoiceRepo },
       } = context;
 
       const usecaseContext = {
-        roles: [Roles.ADMIN],
+        roles: contextRoles,
       };
       const associatedInvoiceUsecase = new GetInvoiceDetailsUsecase(
         invoiceRepo
@@ -138,6 +158,8 @@ export const creditNote: Resolvers<Context> = {
         request,
         usecaseContext
       );
+
+      handleForbiddenUsecase(result);
 
       if (result.isLeft()) {
         throw new Error(result.value.message);
@@ -162,6 +184,8 @@ export const creditNote: Resolvers<Context> = {
   },
   Mutation: {
     async createCreditNote(parent, args, context) {
+      const contextRoles = getAuthRoles(context);
+
       const {
         repos: {
           creditNote: creditNoteRepo,
@@ -172,7 +196,6 @@ export const creditNote: Resolvers<Context> = {
           waiver: waiverRepo,
           pausedReminder: pausedReminderRepo,
         },
-        services: { waiverService },
       } = context;
 
       const request: CreateCreditNoteRequestDTO = {
@@ -190,9 +213,12 @@ export const creditNote: Resolvers<Context> = {
         waiverRepo,
         pausedReminderRepo
       );
-      const usecaseContext = { roles: [Roles.ADMIN] };
+      const usecaseContext = { roles: contextRoles };
 
       const result = await usecase.execute(request, usecaseContext);
+
+      handleForbiddenUsecase(result);
+
       if (result.isLeft()) {
         throw new Error(result.value.message);
       }

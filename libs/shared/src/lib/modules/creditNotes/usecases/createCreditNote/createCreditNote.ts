@@ -150,7 +150,6 @@ export class CreateCreditNoteUsecase
           dateMovedToFinal: null,
           invoiceNumber: null,
           erpReferences: null,
-          cancelledInvoiceReference: null,
           persistentReferenceNumber: null,
           dateCreated: new Date(),
           dateIssued: null,

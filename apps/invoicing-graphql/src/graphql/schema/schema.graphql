@@ -97,9 +97,7 @@ type Invoice @model(id: "invoices") {
   erpReference: String
   erpReferences: [ErpReference]
   revenueRecognitionReference: String
-  creationReason: String
   referenceNumber: ReferenceNumber @filter
-  cancelledInvoiceReference: ID
   invoiceItem: InvoiceItem
   title: String
   price: Float
@@ -300,7 +298,6 @@ input InvoiceFilters {
   invoiceItem: InvoiceItemFilters
 }
 
-
 input Pagination {
   page: Int
   offset: Int
@@ -345,6 +342,7 @@ type Query {
   getClientToken: ClientToken
   generateCouponCode: CouponCode
   invoice(invoiceId: ID): Invoice
+  invoiceWithAuthorization(invoiceId: ID): Invoice
   invoiceVat(
     invoiceId: ID
     country: String
@@ -390,8 +388,15 @@ type Mutation {
   ): CreditNote!
   createPayPalOrder(invoiceId: ID!): PayPalOrderId!
   recordPayPalPayment(invoiceId: ID!, orderId: ID!): ID!
-  generateCompensatoryEvents(invoiceIds: [String], journalIds: [String]): String
-  generateDraftCompensatoryEvents(
+  generateInvoiceCompensatoryEvents(
+    invoiceIds: [String]
+    journalIds: [String]
+  ): String
+  generateCreditNoteCompensatoryEvents(
+    creditNoteIds: [String]
+    journalIds: [String]
+  ): String
+  generateInvoiceDraftCompensatoryEvents(
     invoiceIds: [String]
     journalIds: [String]
   ): String

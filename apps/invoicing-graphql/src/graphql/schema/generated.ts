@@ -118,9 +118,7 @@ export type Invoice = {
   erpReference?: Maybe<Scalars['String']>;
   erpReferences?: Maybe<Array<Maybe<ErpReference>>>;
   revenueRecognitionReference?: Maybe<Scalars['String']>;
-  creationReason?: Maybe<Scalars['String']>;
   referenceNumber?: Maybe<Scalars['ReferenceNumber']>;
-  cancelledInvoiceReference?: Maybe<Scalars['ID']>;
   invoiceItem?: Maybe<InvoiceItem>;
   title?: Maybe<Scalars['String']>;
   price?: Maybe<Scalars['Float']>;
@@ -383,6 +381,7 @@ export type Query = {
   getClientToken?: Maybe<ClientToken>;
   generateCouponCode?: Maybe<CouponCode>;
   invoice?: Maybe<Invoice>;
+  invoiceWithAuthorization?: Maybe<Invoice>;
   invoiceVat?: Maybe<InvoiceVat>;
   invoices?: Maybe<PaginatedInvoices>;
   coupon?: Maybe<Coupon>;
@@ -417,6 +416,11 @@ export type QueryGetCreditNoteByReferenceNumberArgs = {
 
 
 export type QueryInvoiceArgs = {
+  invoiceId?: Maybe<Scalars['ID']>;
+};
+
+
+export type QueryInvoiceWithAuthorizationArgs = {
   invoiceId?: Maybe<Scalars['ID']>;
 };
 
@@ -476,8 +480,9 @@ export type Mutation = {
   createCreditNote: CreditNote;
   createPayPalOrder: PayPalOrderId;
   recordPayPalPayment: Scalars['ID'];
-  generateCompensatoryEvents?: Maybe<Scalars['String']>;
-  generateDraftCompensatoryEvents?: Maybe<Scalars['String']>;
+  generateInvoiceCompensatoryEvents?: Maybe<Scalars['String']>;
+  generateCreditNoteCompensatoryEvents?: Maybe<Scalars['String']>;
+  generateInvoiceDraftCompensatoryEvents?: Maybe<Scalars['String']>;
   togglePauseConfirmationReminders?: Maybe<RemindersStatus>;
   togglePausePaymentReminders?: Maybe<RemindersStatus>;
 };
@@ -501,11 +506,6 @@ export type MutationUpdateCouponArgs = {
 
 export type MutationCreateCouponArgs = {
   coupon?: Maybe<CouponInput>;
-};
-
-
-export type MutationSetTransactionToActiveArgs = {
-  customId?: Maybe<Scalars['ID']>;
 };
 
 
@@ -547,13 +547,18 @@ export type MutationRecordPayPalPaymentArgs = {
 };
 
 
-export type MutationGenerateCompensatoryEventsArgs = {
+export type MutationGenerateInvoiceCompensatoryEventsArgs = {
   invoiceIds?: Maybe<Array<Maybe<Scalars['String']>>>;
   journalIds?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
+export type MutationGenerateCreditNoteCompensatoryEventsArgs = {
+  creditNoteIds?: Maybe<Array<Maybe<Scalars['String']>>>;
+  journalIds?: Maybe<Array<Maybe<Scalars['String']>>>;
+};
 
-export type MutationGenerateDraftCompensatoryEventsArgs = {
+
+export type MutationGenerateInvoiceDraftCompensatoryEventsArgs = {
   invoiceIds?: Maybe<Array<Maybe<Scalars['String']>>>;
   journalIds?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
@@ -837,9 +842,7 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
   erpReference?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   erpReferences?: Resolver<Maybe<Array<Maybe<ResolversTypes['ErpReference']>>>, ParentType, ContextType>;
   revenueRecognitionReference?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  creationReason?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   referenceNumber?: Resolver<Maybe<ResolversTypes['ReferenceNumber']>, ParentType, ContextType>;
-  cancelledInvoiceReference?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   invoiceItem?: Resolver<Maybe<ResolversTypes['InvoiceItem']>, ParentType, ContextType>;
   title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
@@ -1003,6 +1006,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   getClientToken?: Resolver<Maybe<ResolversTypes['ClientToken']>, ParentType, ContextType>;
   generateCouponCode?: Resolver<Maybe<ResolversTypes['CouponCode']>, ParentType, ContextType>;
   invoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<QueryInvoiceArgs, never>>;
+  invoiceWithAuthorization?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<QueryInvoiceWithAuthorizationArgs, never>>;
   invoiceVat?: Resolver<Maybe<ResolversTypes['InvoiceVat']>, ParentType, ContextType, RequireFields<QueryInvoiceVatArgs, never>>;
   invoices?: Resolver<Maybe<ResolversTypes['PaginatedInvoices']>, ParentType, ContextType, RequireFields<QueryInvoicesArgs, never>>;
   coupon?: Resolver<Maybe<ResolversTypes['Coupon']>, ParentType, ContextType, RequireFields<QueryCouponArgs, 'couponCode'>>;
@@ -1024,8 +1028,9 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   createCreditNote?: Resolver<ResolversTypes['CreditNote'], ParentType, ContextType, RequireFields<MutationCreateCreditNoteArgs, 'invoiceId'>>;
   createPayPalOrder?: Resolver<ResolversTypes['PayPalOrderId'], ParentType, ContextType, RequireFields<MutationCreatePayPalOrderArgs, 'invoiceId'>>;
   recordPayPalPayment?: Resolver<ResolversTypes['ID'], ParentType, ContextType, RequireFields<MutationRecordPayPalPaymentArgs, 'invoiceId' | 'orderId'>>;
-  generateCompensatoryEvents?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationGenerateCompensatoryEventsArgs, never>>;
-  generateDraftCompensatoryEvents?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationGenerateDraftCompensatoryEventsArgs, never>>;
+  generateInvoiceCompensatoryEvents?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationGenerateInvoiceCompensatoryEventsArgs, never>>;
+  generateCreditNoteCompensatoryEvents?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationGenerateCreditNoteCompensatoryEventsArgs, never>>;
+  generateInvoiceDraftCompensatoryEvents?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<MutationGenerateInvoiceDraftCompensatoryEventsArgs, never>>;
   togglePauseConfirmationReminders?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, RequireFields<MutationTogglePauseConfirmationRemindersArgs, 'invoiceId' | 'state'>>;
   togglePausePaymentReminders?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, RequireFields<MutationTogglePausePaymentRemindersArgs, 'invoiceId' | 'state'>>;
 };

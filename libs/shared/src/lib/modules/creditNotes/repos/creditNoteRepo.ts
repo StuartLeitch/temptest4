@@ -38,4 +38,9 @@ export interface CreditNoteRepoContract extends Repo<CreditNote> {
   update(
     creditNote: CreditNote
   ): Promise<Either<GuardFailure | RepoError, CreditNote>>;
+  getCreditNoteIds(
+    ids: string[],
+    journalIds: string[],
+    omitDeleted: boolean
+  ): AsyncGenerator<string, void, undefined>;
 }

@@ -352,12 +352,6 @@ export class MockInvoiceRepo
     return right([]);
   }
 
-  public async getUnregisteredErpCreditNotes(): Promise<
-    Either<GuardFailure | RepoError, InvoiceId[]>
-  > {
-    return right([]);
-  }
-
   public filterReadyForRevenueRecognition() {
     return (items) =>
       this.filterBy(

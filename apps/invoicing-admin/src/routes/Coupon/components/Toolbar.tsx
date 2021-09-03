@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 
 import { Button, ButtonToolbar } from '../../../components';
+import Restricted from '../../../contexts/Restricted';
 
 import { CouponEditContext, CouponCreateContext } from '../Context';
 
@@ -30,37 +31,39 @@ const Toolbar: React.FC<ToolbarProps> = ({
   );
 
   return (
-    <ButtonToolbar className='ml-auto'>
-      {isViewModeOn && (
-        <Button color='success' size='sm' className='mr-2' onClick={onEdit}>
-          <i className='fas fa-edit mr-2'></i>
-          EDIT
-        </Button>
-      )}
+    <Restricted to='edit.coupon'>
+      <ButtonToolbar className='ml-auto'>
+        {isViewModeOn && (
+          <Button color='success' size='sm' className='mr-2' onClick={onEdit}>
+            <i className='fas fa-edit mr-2'></i>
+            EDIT
+          </Button>
+        )}
 
-      {canBeSaved && (
-        <Button
+        {canBeSaved && (
+          <Button
           color='primary'
           size='sm'
           className='mr-2'
           onClick={onSave}
           disabled={hasFormErrors}
-        >
-          {isSaveInProgress ? (
-            <i className='fas fa-fw fa-spinner fa-spin mr-2'></i>
-          ) : (
-            <i className='fas fa-check mr-2'></i>
-          )}
-          SAVE
-        </Button>
-      )}
+          >
+            {isSaveInProgress ? (
+              <i className='fas fa-fw fa-spinner fa-spin mr-2'></i>
+              ) : (
+                <i className='fas fa-check mr-2'></i>
+                )}
+            SAVE
+          </Button>
+        )}
 
-      {canBeSaved && (
-        <Button color='danger' outline size='sm' onClick={onCancel}>
-          Cancel
-        </Button>
-      )}
-    </ButtonToolbar>
+        {canBeSaved && (
+          <Button color='danger' outline size='sm' onClick={onCancel}>
+            Cancel
+          </Button>
+        )}
+      </ButtonToolbar>
+    </Restricted>
   );
 };
 

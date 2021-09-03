@@ -4,6 +4,7 @@ import LoadingOverlay from 'react-loading-overlay';
 import { useParams } from 'react-router-dom';
 
 import { ListGroup, CardTitle, Spinner, Card } from './../../../../components';
+import Restricted from '../../../../contexts/Restricted';
 
 import { QueryRemindersState, QuerySentReminders } from './types';
 import { TOGGLE_CONFIRMATION, TOGGLE_PAYMENT } from './mutations';
@@ -87,24 +88,28 @@ const InvoiceReminders = () => {
         </CardTitle>
 
         <dl className='row'>
-          <ReminderToggle
-            isActive={!remindersPauseState.confirmation}
-            reminderName='Confirmation Reminders'
-            name='confirmation'
-            onChange={toggleReminderState(
-              confirmationMutation,
-              'togglePauseConfirmationReminders'
-            )}
-          />
-          <ReminderToggle
-            isActive={!remindersPauseState.payment}
-            reminderName='Payment Reminders'
-            name='payment'
-            onChange={toggleReminderState(
-              paymentMutation,
-              'togglePausePaymentReminders'
-            )}
-          />
+          <Restricted to='stop.reminders'>
+            <ReminderToggle
+              isActive={!remindersPauseState.confirmation}
+              reminderName='Confirmation Reminders'
+              name='confirmation'
+              onChange={toggleReminderState(
+                confirmationMutation,
+                'togglePauseConfirmationReminders'
+              )}
+            />
+          </Restricted>
+          <Restricted to='stop.reminders'>
+            <ReminderToggle
+              isActive={!remindersPauseState.payment}
+              reminderName='Payment Reminders'
+              name='payment'
+              onChange={toggleReminderState(
+                paymentMutation,
+                'togglePausePaymentReminders'
+              )}
+            />
+          </Restricted>
         </dl>
 
         <ListGroup flush style={{ boxShadow: 'none' }}>
