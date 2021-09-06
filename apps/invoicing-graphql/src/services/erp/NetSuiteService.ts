@@ -142,6 +142,7 @@ export class NetSuiteService implements ErpServiceContract {
         customSegmentId,
         creditAccountId,
         debitAccountId,
+        creditAccountIdForCascaded
       },
     } = data;
 
@@ -151,6 +152,7 @@ export class NetSuiteService implements ErpServiceContract {
         creditAccountId,
         customSegmentId,
         debitAccountId,
+        creditAccountIdForCascaded
       }
     );
 
