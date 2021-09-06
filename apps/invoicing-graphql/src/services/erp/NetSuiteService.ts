@@ -599,7 +599,7 @@ export class NetSuiteService implements ErpServiceContract {
     creditAccountId: string;
     debitAccountId: string;
     customSegmentId: string;
-    creditAccountIdForCascaded: string
+    creditAccountIdForCascaded?: string
   }) {
     const {
       connection: { config, oauth, token },
