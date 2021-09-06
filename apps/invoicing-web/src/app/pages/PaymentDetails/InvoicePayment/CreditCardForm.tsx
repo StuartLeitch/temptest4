@@ -206,6 +206,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
             >
               Pay
             </Button>
+
           </CardContainer>
         </Braintree>
 
