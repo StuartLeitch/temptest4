@@ -127,12 +127,6 @@ const Details: React.FC = (props) => {
   return (
     <>
       <Container fluid={true}>
-        <Link
-          to={`/invoices/list${queryString}`}
-          className='text-decoration-none d-block mb-4 mt-0'
-        >
-          <i className='fas fa-angle-left mr-2' /> Back to invoices list
-        </Link>
         <HeaderMain
           title={`Invoice #${invoice.referenceNumber ?? '---'}`}
           className='mb-1 mt-0'

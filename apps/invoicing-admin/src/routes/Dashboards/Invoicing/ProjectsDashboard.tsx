@@ -1,6 +1,5 @@
 import _ from 'lodash';
-import React, { useState, useCallback } from 'react';
-import MaskedInput from 'react-text-mask';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useManualQuery } from 'graphql-hooks';
 import { useQueryState } from 'react-router-use-location-state';
 import { useLocalStorage, writeStorage } from '@rehooks/local-storage';
@@ -64,6 +63,8 @@ const ProjectsDashboard: React.FC = () => {
 
   const [searchFilters, setSearchFilters] = useState(filters);
 
+  const [value, setValue] = useState("");
+
   const [page, setPage] = useQueryState(
     'page',
     (defaultPagination as any).page
@@ -80,9 +81,17 @@ const ProjectsDashboard: React.FC = () => {
     INVOICES_AND_CREDIT_NOTES_QUERY
   );
 
-  const handleSearch = useCallback(async (ev: any) => {
+  const handleChange = (e) => {
+    const re = /^[0-9/\b]+$/;
+    if (e.target.value === '' || re.test(e.target.value)) {
+       setValue(e.target.value)
+      }
+  };
 
+  const handleSearch = useCallback(async (ev: any) => {
+    
     ev.preventDefault();
+    
 
     const searchValue = (document.getElementById('search') as any).value;
     const isSearchByRefNumberChecked = (document.getElementById('searchByReferenceNumber') as any).checked;
@@ -91,17 +100,19 @@ const ProjectsDashboard: React.FC = () => {
     if (_.isEmpty(searchValue)) return;
 
     if (isSearchByRefNumberChecked) {
-      filters['referenceNumber'] = searchValue;
       delete filters['customId'];
+      filters['referenceNumber'] = searchValue;
+      setFilter('referenceNumber', searchValue);
     }
 
     if (isSearchByManuscriptIdChecked) {
       delete filters['referenceNumber'];
       filters['customId'] = searchValue;
+      setFilter('customId', searchValue)
+      
     }
 
     setSearchFilters(filters);
-
     async function fetchData() {
       loading = true;
       const results = await fetchResults({
@@ -111,12 +122,34 @@ const ProjectsDashboard: React.FC = () => {
         },
       });
       loading = false;
-
       setSearchResults(results.data);
     }
 
     fetchData();
   }, [searchFilters]);
+ 
+
+  
+  useEffect(() => {
+    async function fetchData() {
+        
+      const result = await fetchResults({
+        variables: {
+          filters: Filters.collect(listState.filters),
+          pagination,
+        },
+      });
+
+      const searchValue = listState.filters.referenceNumber || listState.filters.customId
+
+      if(searchValue){
+        setSearchResults(result.data)
+        setValue(searchValue)
+      }
+   }
+  fetchData();
+}, [searchFilters]);
+  
 
   return (
     <Container>
@@ -132,21 +165,14 @@ const ProjectsDashboard: React.FC = () => {
           <Form onSubmit={handleSearch}>
             <InputGroup>
               {/*<Input placeholder='Search for...' className='bg-white' id="search" />*/}
-              <MaskedInput
-                mask={() => {
-                  const isSearchByRefNumberChecked = (document.getElementById('searchByReferenceNumber') as any).checked;
-                  if (isSearchByRefNumberChecked) {
-                    return [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]
-                  } else {
-                    return [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
-                  }
-                }}
+              <Input
+                maxLength={20}
                 className="form-control bg-white"
                 placeholder="Search for..."
-                guide={false}
                 id="search"
+                value = { value }
                 onBlur={() => {}}
-                onChange={() => {}}
+                onChange={handleChange}
               />
               <InputGroupAddon addonType='append'>
                 <Button color='primary' onClick={handleSearch}>
@@ -168,7 +194,6 @@ const ProjectsDashboard: React.FC = () => {
                 name='searchBy'
                 label='Reference Number'
                 inline
-                defaultChecked
               />
               <CustomInput
                 type='radio'
@@ -176,6 +201,7 @@ const ProjectsDashboard: React.FC = () => {
                 name='searchBy'
                 label='Manuscript Custom ID'
                 inline
+                defaultChecked
               />
             </Col>
           </FormGroup>
@@ -239,28 +265,33 @@ function setFilter(key: string, value: boolean | string | any[]) {
       });
       break;
 
-    case 'customId':
-      setCustomId(value as string);
+    case 'referenceNumber':
       setPage(1);
+      setReferenceNumber(value as string);
       writeStorage('searchList', {
-        filters: { ...filters, customId: value },
+        filters: { 
+          ...filters 
+        },
         pagination: {
           ...pagination,
           page: 1,
-        }
+          }
       });
+      break;
+
     default:
       setPage(1);
-      setReferenceNumber(value as string);
-      writeStorage('searchList',{ filters: {
-        ...filters,
-        referenceNumber: value,
-      }, pagination: {
+      setCustomId(value as string);
+      writeStorage('searchList',{ 
+      filters: {
+        ...filters
+      }, 
+      pagination: {
         ...pagination,
         page: 1,
       }});
       break;
-    }
+  }
   };
 };
 
