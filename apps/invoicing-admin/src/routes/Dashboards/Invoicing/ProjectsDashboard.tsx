@@ -92,7 +92,7 @@ const ProjectsDashboard: React.FC = () => {
     
     ev.preventDefault();
     
-
+    
     const searchValue = (document.getElementById('search') as any).value;
     const isSearchByRefNumberChecked = (document.getElementById('searchByReferenceNumber') as any).checked;
     const isSearchByManuscriptIdChecked = (document.getElementById('searchByManuscriptId') as any).checked;
@@ -103,13 +103,14 @@ const ProjectsDashboard: React.FC = () => {
       delete filters['customId'];
       filters['referenceNumber'] = searchValue;
       setFilter('referenceNumber', searchValue);
+     
     }
 
     if (isSearchByManuscriptIdChecked) {
       delete filters['referenceNumber'];
       filters['customId'] = searchValue;
       setFilter('customId', searchValue)
-      
+    
     }
 
     setSearchFilters(filters);
@@ -132,7 +133,9 @@ const ProjectsDashboard: React.FC = () => {
   
   useEffect(() => {
     async function fetchData() {
-        
+      
+      const { referenceNumber, customId } = listState.filters
+
       const result = await fetchResults({
         variables: {
           filters: Filters.collect(listState.filters),
@@ -140,7 +143,7 @@ const ProjectsDashboard: React.FC = () => {
         },
       });
 
-      const searchValue = listState.filters.referenceNumber || listState.filters.customId
+      const searchValue = referenceNumber || customId
 
       if(searchValue){
         setSearchResults(result.data)
@@ -268,6 +271,7 @@ function setFilter(key: string, value: boolean | string | any[]) {
     case 'referenceNumber':
       setPage(1);
       setReferenceNumber(value as string);
+      setCustomId(null)
       writeStorage('searchList', {
         filters: { 
           ...filters 
@@ -282,6 +286,7 @@ function setFilter(key: string, value: boolean | string | any[]) {
     default:
       setPage(1);
       setCustomId(value as string);
+      setReferenceNumber(null)
       writeStorage('searchList',{ 
       filters: {
         ...filters
