@@ -94,6 +94,8 @@ export class KnexInvoiceRepo
       isolationLevel: 'serializable',
     });
 
+    await trx.raw('set transaction isolation level serializable;');
+
     const tt = new TransactionInvoice(trx, trx(TABLES.INVOICES));
 
     try {
@@ -106,17 +108,6 @@ export class KnexInvoiceRepo
       console.log('-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*');
       trx.rollback();
     }
-
-    // try {
-    //   const res1 = await aa(trx(TABLES.INVOICES));
-    //   trx.commit();
-    //   return res1;
-    // } catch (err) {
-    //   console.log('-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*');
-    //   console.log(err);
-    //   console.log('-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*');
-    //   trx.rollback();
-    // }
   }
 
   public calculateNextInvoiceNumberInTransaction(

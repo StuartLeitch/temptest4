@@ -171,21 +171,6 @@ export class ConfirmInvoiceUsecase
           );
         });
 
-        // const lastInvoiceNumber = await this.invoiceRepo.getCurrentInvoiceNumber();
-        // invoice.assignInvoiceNumber(lastInvoiceNumber);
-        // const maybeUpdated = await this.invoiceRepo.update(invoice);
-
-        // if (maybeUpdated.isLeft()) {
-        //   return left(
-        //     new Errors.InvoiceNumberAssignationError(
-        //       invoice.id.toString(),
-        //       new Error(maybeUpdated.value.message)
-        //     )
-        //   );
-        // }
-
-        // payerData.invoice = maybeUpdated.value;
-
         const maybeInvoiceItems = await this.getInvoiceItems(
           { invoiceId: invoice.id.toString() },
           context
