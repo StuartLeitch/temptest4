@@ -242,7 +242,14 @@ function updateManuscript(context: Context) {
 
     const author = newManuscript.authors.find((a) => a.isCorresponding);
 
-    const hasSourceJournal = newManuscript['sourceJournal']['name'] != null && newManuscript['sourceJournal']['pissn'] != null && newManuscript['sourceJournal']['eissn'] != null;
+    let hasSourceJournal = false;
+    if ('sourceJournal' in newManuscript) {
+      if (newManuscript['sourceJournal']['name'] != null &&
+          newManuscript['sourceJournal']['pissn'] != null &&
+          newManuscript['sourceJournal']['eissn'] != null) {
+            hasSourceJournal = true;
+          }
+    }
 
     const newJournalId =
       newManuscript.journalId !== oldManuscript.journalId
