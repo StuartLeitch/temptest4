@@ -46,6 +46,7 @@ export const creditNote: Resolvers<Context> = {
       const invoiceRequest: GetInvoiceDetailsDTO = {
         invoiceId: result.value.invoiceId.toString(),
       };
+
       const invoiceResult = await associatedInvoice.execute(
         invoiceRequest,
         usecaseContext
