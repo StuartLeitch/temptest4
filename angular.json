@@ -656,6 +656,73 @@
           }
         }
       }
+    },
+    "invoicing-erp-invoice-registration": {
+      "root": "apps/invoicing-erp-invoice-registration",
+      "sourceRoot": "apps/invoicing-erp-invoice-registration/src",
+      "projectType": "application",
+      "prefix": "invoicing-erp-invoice-registration",
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/invoicing-erp-invoice-registration",
+            "main": "apps/invoicing-erp-invoice-registration/src/main.ts",
+            "tsConfig": "apps/invoicing-erp-invoice-registration/tsconfig.app.json",
+            "assets": ["apps/invoicing-erp-invoice-registration/src/Dockerfile"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "invoicing-erp-invoice-registration:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/invoicing-erp-invoice-registration/**/*.ts"
+            ],
+            "linter": "eslint",
+            "config": "apps/invoicing-erp-invoice-registration/.eslintrc",
+            "tsConfig": [
+              "apps/invoicing-erp-invoice-registration/tsconfig.app.json",
+              "apps/invoicing-erp-invoice-registration/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!apps/invoicing-erp-invoice-registration/**"
+            ]
+          }
+        },
+        "test": {
+          "builder": "./tools/builders:cucumber",
+          "options": {
+            "tsConfig": "apps/invoicing-erp-invoice-registration/tsconfig.spec.json",
+            "features": "apps/invoicing-erp-invoice-registration/tests/**/*.feature",
+            "steps": "apps/invoicing-erp-invoice-registration/tests/**/*.steps.ts",
+            "path": "apps/invoicing-erp-invoice-registration",
+            "format": "json",
+            "coverage": true
+          }
+        },
+        "jest": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/invoicing-erp-invoice-registration/jest.config.js",
+            "tsConfig": "apps/invoicing-erp-invoice-registration/tsconfig.spec.json"
+          }
+        }
+      }
     }
   },
   "cli": {
