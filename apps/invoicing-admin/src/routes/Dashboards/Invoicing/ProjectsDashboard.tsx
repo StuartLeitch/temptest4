@@ -82,9 +82,10 @@ const ProjectsDashboard: React.FC = () => {
   );
 
   const handleChange = (e) => {
-    const re = /^[0-9/\b]+$/;
-    if (e.target.value === '' || re.test(e.target.value)) {
-       setValue(e.target.value)
+    const re = /^[0-9\/]+$/;
+    const trimmedInput = e.target.value.trim();
+    if (trimmedInput === '' || re.test(trimmedInput)) {
+       setValue(trimmedInput)
       }
   };
 
