@@ -49,19 +49,28 @@ const ProjectsDashboard: React.FC = () => {
     (defaultFilters as any).customId
   );
 
-  const [listState] = useLocalStorage('searchList', { filters:defaultFilters, pagination: defaultPagination});
-  let { filters, pagination } = listState;
-  const queryFilters = {
-    referenceNumber,
-    customId,
-  };
+  let queryParams = new URLSearchParams(window.location.search)
 
-  // * When no query strings provided in the URL
-  if (!_.isEqual(defaultFilters, queryFilters)) {
-    filters = Object.assign({}, defaultFilters, queryFilters);
+  let customIdParam = queryParams.get('customId')
+  let referenceNumberParam = queryParams.get('referenceNumber')
+  let pageParam = queryParams.get('page')
+  let queryParamsFilter = {
+    referenceNumber: referenceNumberParam,
+    customId: customIdParam
   }
 
-  const [searchFilters, setSearchFilters] = useState(filters);
+  let queryParamsPagination = {
+    page: !pageParam ? defaultPagination.page : parseInt(pageParam),
+    offset: defaultPagination.offset,
+    limit: defaultPagination.limit,
+  }
+
+  // * When no query strings provided in the URL
+  if (!_.isEqual(defaultFilters, queryParamsFilter)) {
+    queryParamsFilter = Object.assign({}, defaultFilters, queryParamsFilter);
+  }
+
+  const [searchFilters, setSearchFilters] = useState(queryParamsFilter);
 
   const [value, setValue] = useState("");
 
@@ -71,7 +80,7 @@ const ProjectsDashboard: React.FC = () => {
   );
 
   if (!_.isEqual(defaultPagination, { page, offset: 0, limit: 10 })) {
-    pagination = Object.assign({}, defaultPagination, {
+    queryParamsPagination = Object.assign({}, defaultPagination, {
       page,
       offset: page > 0 ? page - 1 : 0,
     });
@@ -101,26 +110,26 @@ const ProjectsDashboard: React.FC = () => {
     if (_.isEmpty(searchValue)) return;
 
     if (isSearchByRefNumberChecked) {
-      delete filters['customId'];
-      filters['referenceNumber'] = searchValue;
+      delete queryParamsFilter['customId'];
+      queryParamsFilter['referenceNumber'] = searchValue;
       setFilter('referenceNumber', searchValue);
      
     }
 
     if (isSearchByManuscriptIdChecked) {
-      delete filters['referenceNumber'];
-      filters['customId'] = searchValue;
+      delete queryParamsFilter['referenceNumber'];
+      queryParamsFilter['customId'] = searchValue;
       setFilter('customId', searchValue)
     
     }
 
-    setSearchFilters(filters);
+    setSearchFilters(queryParamsFilter);
     async function fetchData() {
       loading = true;
       const results = await fetchResults({
         variables: {
-          filters: Filters.collect(filters),
-          pagination,
+          filters: Filters.collect(queryParamsFilter),
+          pagination: queryParamsPagination,
         },
       });
       loading = false;
@@ -130,17 +139,17 @@ const ProjectsDashboard: React.FC = () => {
     fetchData();
   }, [searchFilters]);
  
-
-  
   useEffect(() => {
     async function fetchData() {
       
-      const { referenceNumber, customId } = listState.filters
+      const customId = queryParams.get('customId')
+      const referenceNumber = queryParams.get('referenceNumber')
+
 
       const result = await fetchResults({
         variables: {
-          filters: Filters.collect(listState.filters),
-          pagination,
+          filters: Filters.collect(queryParamsFilter),
+          pagination: queryParamsPagination,
         },
       });
 
@@ -236,7 +245,6 @@ const ProjectsDashboard: React.FC = () => {
                   key={category}
                   component={searchResultsToRender}
                   loading={loading}
-                  state={listState}
                   setPage={setFilter}
                 />
               );
@@ -258,44 +266,19 @@ function setFilter(key: string, value: boolean | string | any[]) {
 
   switch (name) {
     case 'page':
-      setPage(value as string);
-      writeStorage('searchList', {
-        filters,
-        pagination:{
-          ...pagination,
-          page: value,
-          offset: Number(value) - 1,
-        }
-      });
+      setPage(value as string); 
       break;
 
     case 'referenceNumber':
       setPage(1);
       setReferenceNumber(value as string);
-      setCustomId(null)
-      writeStorage('searchList', {
-        filters: { 
-          ...filters 
-        },
-        pagination: {
-          ...pagination,
-          page: 1,
-          }
-      });
+      setCustomId(null) 
       break;
 
     default:
       setPage(1);
       setCustomId(value as string);
       setReferenceNumber(null)
-      writeStorage('searchList',{ 
-      filters: {
-        ...filters
-      }, 
-      pagination: {
-        ...pagination,
-        page: 1,
-      }});
       break;
   }
   };
