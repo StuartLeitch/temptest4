@@ -193,7 +193,7 @@ export class PublishRevenueRecognitionReversalUsecase
 
       if (creditNote.creationReason === 'bad-debt') {
         const erpReference = ErpReferenceMap.toDomain({
-          entity_id: creditNote.id.toString(),
+          entity_id: creditNote.invoiceId.id.toString(),
           type: 'invoice',
           vendor: this.erpService.vendorName,
           attribute: this.erpService?.referenceMappings?.revenueRecognitionReversal ||
