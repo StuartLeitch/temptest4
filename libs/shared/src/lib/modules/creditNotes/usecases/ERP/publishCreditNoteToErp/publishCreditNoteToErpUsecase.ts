@@ -22,14 +22,21 @@ import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
 import { ErpReferenceMap } from './../../../../vendors/mapper/ErpReference';
 import { ErpReferenceRepoContract } from './../../../../vendors/repos/ErpReferenceRepo';
+import { PayerRepoContract } from '../../../../payers/repos/payerRepo';
+import { ArticleRepoContract } from '../../../../manuscripts/repos';
+import { CatalogRepoContract } from '../../../../journals/repos';
+import { JournalId } from '../../../../journals/domain/JournalId';
+import { PublisherRepoContract } from '../../../../publishers/repos';
 
 import { GetItemsForInvoiceUsecase } from '../../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
-// import { PublishCreditNoteToErpRequestDTO as DTO } from './publishCreditNoteToErpDTO';
-// import { PublishCreditNoteToErpResponse as Response } from './publishCreditNoteToErpResponse';
+import { GetManuscriptByManuscriptIdUsecase } from './../../../../manuscripts/usecases/getManuscriptByManuscriptId';
+import { GetPayerDetailsByInvoiceIdUsecase } from '../../../../payers/usecases/getPayerDetailsByInvoiceId';
+import { GetPublisherCustomValuesUsecase } from '../../../../publishers/usecases/getPublisherCustomValues';
 import { UniqueEntityID } from '../../../../../core/domain/UniqueEntityID';
 import { PublishCreditNoteToErpResponse as Response } from './publishCreditNoteToErpResponse';
 import type { PublishCreditNoteToErpRequestDTO as DTO } from './publishCreditNoteToErpDTO';
 import { InvoiceErpReferences } from '../../../../invoices/domain/InvoiceErpReferences';
+import * as Errors from './publishCreditNoteToErp.errors';
 
 export class PublishCreditNoteToErpUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
@@ -40,6 +47,10 @@ export class PublishCreditNoteToErpUsecase
     private invoiceItemRepo: InvoiceItemRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
+    private payerRepo: PayerRepoContract,
+    private manuscriptRepo: ArticleRepoContract,
+    private catalogRepo: CatalogRepoContract,
+    private publisherRepo: PublisherRepoContract,
     private erpReferenceRepo: ErpReferenceRepoContract,
     private erpService: ErpServiceContract,
     private loggerService: LoggerContract
@@ -52,6 +63,17 @@ export class PublishCreditNoteToErpUsecase
     this.loggerService.info('PublishCreditNoteToERP Request', request);
     let creditNote: CreditNote;
     let invoice: Invoice;
+
+    const getPayerDetails = new GetPayerDetailsByInvoiceIdUsecase(
+      this.payerRepo,
+      this.loggerService
+    );
+    const getManuscript = new GetManuscriptByManuscriptIdUsecase(
+      this.manuscriptRepo
+    );
+    const getPublisherCustomValue = new GetPublisherCustomValuesUsecase(
+      this.publisherRepo
+    );
 
     try {
       // * Get CreditNote details
@@ -78,7 +100,7 @@ export class PublishCreditNoteToErpUsecase
         invoice
       );
 
-      // *Get Invoice Items
+      // * Get Invoice Items
       let invoiceItems = invoice?.invoiceItems?.currentItems;
       this.loggerService.debug(
         'PublishCreditNoteToERP Invoice Items',
@@ -145,6 +167,50 @@ export class PublishCreditNoteToErpUsecase
 
       invoice.addItems(invoiceItems);
 
+      // * Get Manuscript
+      const manuscriptId = invoiceItems[0].manuscriptId.id.toString();
+      const maybeManuscript = await getManuscript.execute(
+        { manuscriptId },
+        context
+      );
+      if (maybeManuscript.isLeft()) {
+        return left(new Errors.InvoiceManuscriptNotFoundError(invoice.invoiceId.toString()));
+      }
+
+      const manuscript = maybeManuscript.value;
+
+      // * Get Payer details
+      const maybePayer = await getPayerDetails.execute({ invoiceId: invoice.invoiceId.toString() }, context);
+      if (maybePayer.isLeft()) {
+        return left(new Errors.InvoicePayersNotFoundError(invoice.invoiceId.toString()));
+      }
+      const payer = maybePayer.value;
+
+
+      // * Get catalog
+      const maybeCatalog = await this.catalogRepo.getCatalogItemByJournalId(
+        JournalId.create(new UniqueEntityID(manuscript.journalId))
+      );
+
+      if (maybeCatalog.isLeft()) {
+        return left(new Errors.InvoiceCatalogNotFoundError(invoice.invoiceId.toString()));
+      }
+
+      const catalog = maybeCatalog.value;
+
+      // * Get publisher custom values
+      const maybePublisherCustomValue = await getPublisherCustomValue.execute(
+        {
+          publisherId: catalog.publisherId.id.toString(),
+        },
+        context
+      );
+
+      if (maybePublisherCustomValue.isLeft()) {
+        return left(new Errors.InvoiceCatalogNotFoundError(invoice.invoiceId.toString()));
+      }
+      const publisherCustomValues = maybePublisherCustomValue.value;
+
       try {
         await this.invoiceRepo.update(invoice);
         this.loggerService.debug(
@@ -155,6 +221,9 @@ export class PublishCreditNoteToErpUsecase
         const erpData = {
           creditNote,
           invoice,
+          manuscript,
+          payer,
+          publisherCustomValues
         };
 
         const maybeInvoiceErpReferences = invoice

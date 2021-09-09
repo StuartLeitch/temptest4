@@ -22,7 +22,7 @@ export class RegisterCreditNotesCron {
     }
 
     const {
-      repos: { creditNote, invoiceItem, invoice, coupon, waiver, erpReference },
+      repos: { creditNote, invoiceItem, invoice, coupon, waiver, erpReference, manuscript, payer, publisher, catalog },
       services: { erp },
     } = context;
 
@@ -32,6 +32,10 @@ export class RegisterCreditNotesCron {
       invoiceItem,
       coupon,
       waiver,
+      manuscript,
+      payer,
+      catalog,
+      publisher,
       erpReference,
       erp?.netsuite || null,
       loggerService

@@ -163,10 +163,13 @@ export class NetSuiteService implements ErpServiceContract {
   public async registerCreditNote(
     data: ErpInvoiceRequest
   ): Promise<ErpInvoiceResponse> {
+
+    const { creditNote } = data;
+
     const creditNoteId = await this.transformCreditNote(data);
 
     // * Only patch newly created credit notes
-    if (creditNoteId) {
+    if (creditNoteId && creditNote.creationReason !== 'bad-debt') {
       await this.patchCreditNote({ ...data, creditNoteId });
     }
 
@@ -664,6 +667,9 @@ export class NetSuiteService implements ErpServiceContract {
   private async transformCreditNote(data: {
     invoice?: Invoice;
     creditNote?: CreditNote;
+    payer?: any;
+    manuscript?: any;
+    publisherCustomValues?: any;
   }) {
     const {
       connection: { config, oauth, token },
@@ -685,12 +691,17 @@ export class NetSuiteService implements ErpServiceContract {
       return;
     }
 
-    const creditNoteTransformOpts = {
+    // * If this a bad debt credit note, there is another logic for registration
+    if (creditNote.creationReason === 'bad-debt') {
+      return this.registerBadDebt(data as any);
+    }
+
+    let creditNoteTransformOpts = {
       url: `${config.endpoint}record/v1/invoice/${originalNSErpReference.value}/!transform/creditmemo`,
       method: 'POST',
     };
 
-    const creditNotePayload: Record<string, any> = {
+    let creditNotePayload: Record<string, any> = {
       tranDate: format(
         new Date(creditNote.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
@@ -699,6 +710,74 @@ export class NetSuiteService implements ErpServiceContract {
         new Date(invoice.dateAccepted),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ),
+    };
+
+    try {
+      const res = await axios({
+        ...creditNoteTransformOpts,
+        headers: oauth.toHeader(
+          oauth.authorize(creditNoteTransformOpts, token)
+        ),
+        data: creditNotePayload,
+      } as AxiosRequestConfig);
+
+      return res?.headers?.location?.split('/').pop();
+    } catch (err) {
+      this.logger.error({
+        message: 'Failed to create credit note',
+        response: err?.response?.data,
+        requestOptions: creditNoteTransformOpts,
+      });
+      throw err;
+    }
+  }
+
+  private async registerBadDebt(data: {
+    invoice?: Invoice;
+    creditNote?: CreditNote;
+    payer: any;
+    manuscript: any;
+    publisherCustomValues?: any;
+  }) {
+    const {
+      connection: { config, oauth, token },
+    } = this;
+    const { invoice, creditNote, publisherCustomValues } = data;
+
+    const item = invoice.invoiceItems.getItems()[0];
+
+    const customerId = await this.getCustomerId(data);
+
+    const creditNoteTransformOpts = {
+      url: `${config.endpoint}record/v1/creditmemo`,
+      method: 'POST',
+    };
+
+    const creditNotePayload = {
+      "tranDate": format(
+        new Date(creditNote.dateIssued),
+        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      ), // '2020-07-01T14:09:00Z',
+      "saleseffectivedate": format(
+        new Date(invoice.dateAccepted),
+        "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
+      ),
+      "entity": {
+        "id": customerId
+      },
+      "item": {
+        "items": [
+          {
+                "item": publisherCustomValues.badDebtItemId,
+                "amount": item.calculateNetPrice(),
+                "rate": item.price,
+                "description": "Bad Debt Write-Off",
+                "quantity": 1.0,
+                "excludeFromRateRequest": false,
+                "printItems": false
+          }
+        ]
+      }
     };
 
     try {

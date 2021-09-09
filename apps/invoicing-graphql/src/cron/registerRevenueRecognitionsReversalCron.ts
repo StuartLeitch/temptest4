@@ -35,6 +35,7 @@ export class RegisterRevenueRecognitionReversalsCron {
         waiver,
         payer,
         erpReference,
+        creditNote
       },
       services: { erp },
     } = context;
@@ -49,6 +50,7 @@ export class RegisterRevenueRecognitionReversalsCron {
       manuscript,
       catalog,
       publisher,
+      creditNote,
       erpReference,
       erp?.netsuite || null,
       loggerService
