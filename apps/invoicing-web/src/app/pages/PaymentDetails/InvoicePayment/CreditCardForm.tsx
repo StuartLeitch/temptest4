@@ -118,6 +118,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
   renderError(title: string, obj: any) {
 
     console.info('BrainTree Server error: ', this.props.serverError);
+    console.info(obj);
 
     if (!obj && !this.props.serverError) {
       return null;
@@ -128,6 +129,10 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
     }
 
     if (obj && ('name' in obj) && obj.name === 'BraintreeError') {
+      if (obj.details?.originalError?.code) {
+        return (<Text type="warning" key='3dsecure_error'>{'3D Secure authentication failed.'}</Text>)
+      }
+
       if (obj.details?.originalError?.details?.originalError?.error) {
         return (<Text type="warning" key='braintree_error'>{obj.details.originalError.details.originalError.error.message}</Text>)
       }
