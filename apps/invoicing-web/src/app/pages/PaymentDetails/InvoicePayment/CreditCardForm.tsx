@@ -33,7 +33,8 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
   state = {
     isBraintreeReady: false,
     numberFocused: false,
-    error: null
+    error: null,
+    loading: false
   };
 
    componentDidMount() {
@@ -174,9 +175,13 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
   onSubmit() {
     var self = this;
 
+    this.setState({ loading: true });
+
     this.hf.tokenize().then(function (payload) {
+
       return self.threeDS.verifyCard({
         onLookupComplete: function (data, next) {
+          self.setState({ loading: false });
           next();
         },
         amount: self.props.total,
@@ -252,7 +257,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
                 mb={3}
                 size="medium"
                 onClick={this.onSubmit}
-                loading={this.props.loading}
+                loading={this.state.loading || this.props.loading}
               >
                 Pay
               </Button>
