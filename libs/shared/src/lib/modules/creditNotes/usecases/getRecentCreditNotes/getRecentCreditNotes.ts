@@ -1,24 +1,24 @@
 // * Core Domain
-import { UseCase } from '../../../../core/domain/UseCase';
+import { UnexpectedError } from '../../../../core/logic/AppError';
 import { left, right } from '../../../../core/logic/Either';
-
-import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
-
-// * Usecase specifics
-import { GetRecentCreditNotesResponse as Response } from './getRecentCreditNotesResponse';
-import type { GetRecentCreditNotesDTO as DTO } from './getRecentCreditNotesDTO';
-import * as Errors from './getRecentCreditNotesErrors';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization logic
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
 import {
-  Authorize,
   AccessControlledUsecase,
   AccessControlContext,
+  Authorize,
 } from '../../../../domain/authorization';
-import { UnexpectedError } from '../../../../core/logic/AppError';
 
-export class GetRecentCreditNotesUesecase
+// * Usecase specifics
+import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
+
+import { GetRecentCreditNotesResponse as Response } from './getRecentCreditNotesResponse';
+import type { GetRecentCreditNotesDTO as DTO } from './getRecentCreditNotesDTO';
+import * as Errors from './getRecentCreditNotesErrors';
+
+export class GetRecentCreditNotesUsecase
   extends AccessControlledUsecase<
     DTO,
     UsecaseAuthorizationContext,
@@ -29,7 +29,7 @@ export class GetRecentCreditNotesUesecase
     super();
   }
 
-  @Authorize('creditNote:read')
+  @Authorize('creditNotes:read')
   public async execute(
     request: DTO,
     context?: UsecaseAuthorizationContext

@@ -41,10 +41,10 @@ docker build -t 916437579680.dkr.ecr.eu-west-1.amazonaws.com/belzebuth-playgroun
 ```
 
 ```sh
-aws --profile=HindawiDevelopment ecr get-login-password | docker login --username AWS --password-stdin 916437579680.dkr.ecr.eu-west-1.amazonaws.com
-```
-
-```sh
 docker push 916437579680.dkr.ecr.eu-west-1.amazonaws.com/belzebuth-playground:netsuite-pacifier-0.7.0
 ```
 
+## AWS Login
+```sh
+aws --profile=HindawiDevelopment ecr get-login-password | docker login --username AWS --password-stdin 916437579680.dkr.ecr.eu-west-1.amazonaws.com
+```

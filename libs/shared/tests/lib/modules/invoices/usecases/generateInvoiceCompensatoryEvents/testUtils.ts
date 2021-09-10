@@ -1,4 +1,4 @@
-import { UniqueEntityID } from './../../../../../../src/lib/core/domain/UniqueEntityID';
+import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEntityID';
 import { InvoiceItemId } from '../../../../../../src/lib/modules/invoices/domain/InvoiceItemId';
 import { PaymentMethodMap } from '../../../../../../src/lib/modules/payments/mapper/PaymentMethod';
 import { ArticleMap } from '../../../../../../src/lib/modules/manuscripts/mappers/ArticleMap';
@@ -9,8 +9,7 @@ import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappe
 import { PaymentMap } from '../../../../../../src/lib/modules/payments/mapper/Payment';
 import { PayerMap } from '../../../../../../src/lib/modules/payers/mapper/Payer';
 import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
-import { ErpReferenceMap } from './../../../../../../src/lib/modules/vendors/mapper/ErpReference';
-import { CreditNoteMap } from './../../../../../../src/lib/modules/creditNotes/mappers/CreditNoteMap';
+import { ErpReferenceMap } from '../../../../../../src/lib/modules/vendors/mapper/ErpReference';
 
 import { MockPaymentMethodRepo } from '../../../../../../src/lib/modules/payments/repos/mocks/mockPaymentMethodRepo';
 import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
@@ -21,8 +20,7 @@ import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/
 import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
 import { MockPayerRepo } from '../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
 import { MockInvoiceRepo } from '../../../../../../src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
-import { MockErpReferenceRepo } from './../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
-import { MockCreditNoteRepo } from './../../../../../../src/lib/modules/creditNotes/repos/mocks/mockCreditNoteRepo';
+import { MockErpReferenceRepo } from '../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
 
 export function addInvoices(invoicesRepo: MockInvoiceRepo) {
   const invoicesProps = [
@@ -162,26 +160,6 @@ export function addInvoiceItems(invoiceItemRepo: MockInvoiceItemRepo) {
 
     invoiceItemRepo.addMockItem(invoiceItem.value);
   }
-}
-
-export function addCreditNote(creditNoteRepo: MockCreditNoteRepo) {
-  const creditNoteProps = {
-    id: '10',
-    invoiceId: '7',
-    creationReason: 'bad-debt',
-    vat: 20,
-    price: -1500,
-    dateCreated: new Date(),
-    dateIssued: new Date(),
-  };
-
-  const creditNote = CreditNoteMap.toDomain(creditNoteProps);
-
-  if (creditNote.isLeft()) {
-    throw creditNote.value;
-  }
-
-  creditNoteRepo.addMockItem(creditNote.value);
 }
 
 export function addManuscripts(manuscriptRepo: MockArticleRepo) {

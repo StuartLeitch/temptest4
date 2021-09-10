@@ -38,63 +38,6 @@ export class KnexInvoiceRepo
     super(db, logger);
   }
 
-  private createBaseDetailsQuery(): any {
-    const { db } = this;
-    const LIMIT = 200;
-
-    return db(TABLES.INVOICES)
-      .select(
-        'invoices.id as invoiceId',
-        'invoices.transactionId as transactionId',
-        'invoices.status as invoiceStatus'
-        // 'articles.id AS manuscriptId',
-        // 'articles.datePublished'
-      )
-      .leftJoin(TABLES.INVOICE_ITEMS, 'invoice_items.invoiceId', 'invoices.id')
-      .limit(LIMIT)
-      .offset(0);
-  }
-
-  private createErpDetailsQuery(): any {
-    const { db } = this;
-
-    return db(TABLES.INVOICES)
-      .select(
-        'invoices.id',
-        'erp_references.type',
-        'erp_references.vendor',
-        'erp_references.attribute',
-        'erp_references.value'
-      )
-      .leftJoin(
-        TABLES.ERP_REFERENCES,
-        'erp_references.entity_id',
-        'invoices.id'
-      );
-  }
-
-  private createBaseArticleDetailsQuery(): any {
-    const { db } = this;
-
-    return db(TABLES.ARTICLES)
-      .select(
-        'articles.id AS manuscriptId',
-        'articles.datePublished',
-        'invoices.id as invoiceId',
-        'invoices.transactionId as transactionId',
-        'invoices.status as invoiceStatus',
-        'invoices.invoiceNumber AS invoiceNumber',
-        'invoices.revenueRecognitionReference',
-        'invoices.nsReference',
-        'invoices.nsRevRecReference'
-      )
-      .leftJoin(
-        TABLES.INVOICE_ITEMS,
-        'invoice_items.manuscriptId',
-        'articles.id'
-      );
-  }
-
   private withInvoicesItemsDetailsQuery(): any {
     return (query) =>
       query.leftJoin(
@@ -424,25 +367,8 @@ export class KnexInvoiceRepo
         .whereNull('revrec.value')
         .whereNotIn(
           'invoices.id',
-          db.raw(
-            `SELECT invoices."id" FROM invoices LEFT JOIN credit_notes ON invoices."id" = credit_notes."invoiceId" WHERE credit_notes."invoiceId" is NOT NULL`
-          )
+          db.raw(`SELECT "invoiceId" FROM credit_notes`)
         );
-  }
-
-  private filterCreditNotesReadyForErpRegistration(): any {
-    const { db } = this;
-    return (query) =>
-      query
-        .whereNot('invoices.deleted', 1)
-        .whereIn('invoices.status', ['FINAL'])
-        .whereIn(
-          'invoices.id',
-          db.raw(
-            `SELECT invoices."id" FROM invoices LEFT JOIN credit_notes ON invoices."id" = credit_notes."invoiceId" WHERE credit_notes."invoiceId" is NOT NULL`
-          )
-        )
-        .whereNull('creditnoteref.value');
   }
 
   private filterRevenueRecognitionReadyForErpRegistration(): any {
@@ -523,11 +449,9 @@ export class KnexInvoiceRepo
       query
         .whereNot('invoices.deleted', 1)
         .whereIn('invoices.status', ['ACTIVE', 'FINAL'])
-        .whereIn(
+        .whereNotIn(
           'invoices.id',
-          db.raw(
-            `SELECT invoices."id" FROM invoices LEFT JOIN credit_notes ON invoices."id" = credit_notes."invoiceId" WHERE credit_notes."invoiceId" is NULL`
-          )
+          db.raw(`SELECT "invoiceId" FROM credit_notes`)
         )
         .whereNull('erprefs.value');
   }
@@ -579,43 +503,6 @@ export class KnexInvoiceRepo
   > {
     const maybeIds = await this.getUnregisteredInvoices('sage');
     return right(maybeIds);
-  }
-
-  async getUnregisteredErpCreditNotes(): Promise<
-    Either<GuardFailure | RepoError, InvoiceId[]>
-  > {
-    const { db, logger } = this;
-
-    const erpReferencesQuery = db(TABLES.INVOICES)
-      .column({ invoiceId: 'invoices.id' })
-      .select();
-
-    const withInvoiceItems = this.withInvoicesItemsDetailsQuery();
-
-    const withCreditNoteErpReference = this.withErpReferenceQuery(
-      'creditnoteref',
-      'invoices.id',
-      'invoice',
-      'netsuite',
-      'creditNote'
-    );
-
-    // * SQL for retrieving results needed only for ERP registration
-    const filterCreditNotesReadyForERP = this.filterCreditNotesReadyForErpRegistration();
-
-    const prepareIdsSQL = filterCreditNotesReadyForERP(
-      withCreditNoteErpReference(withInvoiceItems(erpReferencesQuery))
-    );
-
-    logger.debug('select', {
-      unregisteredCreditNotes: prepareIdsSQL.toString(),
-    });
-
-    const creditNotes: Array<any> = await prepareIdsSQL;
-
-    return right(
-      creditNotes.map((i) => InvoiceId.create(new UniqueEntityID(i.invoiceId)))
-    );
   }
 
   async delete(

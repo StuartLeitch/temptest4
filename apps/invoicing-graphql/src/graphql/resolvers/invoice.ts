@@ -5,6 +5,7 @@ import {
   GetCreditNoteByInvoiceIdUsecase,
   GetPaymentsByInvoiceIdUsecase,
   ApplyCouponToInvoiceUsecase,
+  GetCreditNoteByInvoiceIdDTO,
   GetPaymentMethodByIdUsecase,
   GetItemsForInvoiceUsecase,
   GetArticleDetailsUsecase,
@@ -16,6 +17,7 @@ import {
   InvoiceItemMap,
   TransactionMap,
   UniqueEntityID,
+  CreditNoteMap,
   InvoiceItemId,
   ArticleMap,
   InvoiceMap,
@@ -26,18 +28,9 @@ import {
   WaiverMap,
   PayerMap,
   Roles,
-  CreditNoteMap,
-  GetCreditNoteByInvoiceIdDTO,
-  // Payer
 } from '@hindawi/shared';
 
-import {
-  Resolvers,
-  Invoice,
-  CreditNote,
-  PayerType,
-  InvoiceStatus,
-} from '../schema';
+import { InvoiceStatus, PayerType, Resolvers, Invoice } from '../schema';
 
 import { Context } from '../../builders';
 import { env } from '../../env';

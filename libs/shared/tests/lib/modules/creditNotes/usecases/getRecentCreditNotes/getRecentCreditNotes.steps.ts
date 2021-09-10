@@ -1,8 +1,10 @@
 import { expect } from 'chai';
 import { Given, Then, Before, When, After } from '@cucumber/cucumber';
 
-import { GetRecentCreditNotesUesecase } from '../../../../../../src/lib/modules/creditNotes/usecases/getRecentCreditNotes/getRecentCreditNotes';
-import { GetRecentCreditNotesResponse } from '../../../../../../src/lib/modules/creditNotes/usecases/getRecentCreditNotes/getRecentCreditNotesResponse';
+import {
+  GetRecentCreditNotesResponse,
+  GetRecentCreditNotesUsecase,
+} from '../../../../../../src/lib/modules/creditNotes/usecases/getRecentCreditNotes';
 
 import { CreditNote } from '../../../../../../src/lib/modules/creditNotes/domain/CreditNote';
 import { MockCreditNoteRepo } from '../../../../../../src/lib/modules/creditNotes/repos/mocks/mockCreditNoteRepo';
@@ -29,13 +31,13 @@ function makeCreditNoteData(overwrites?: any): CreditNote {
 }
 
 let mockCreditNoteRepo: MockCreditNoteRepo;
-let usecase: GetRecentCreditNotesUesecase;
+let usecase: GetRecentCreditNotesUsecase;
 let creditNote: CreditNote;
 let result: GetRecentCreditNotesResponse;
 
 Before({ tags: '@ValidateGetRecentCreditNotesUsecase' }, async () => {
   mockCreditNoteRepo = new MockCreditNoteRepo();
-  usecase = new GetRecentCreditNotesUesecase(mockCreditNoteRepo);
+  usecase = new GetRecentCreditNotesUsecase(mockCreditNoteRepo);
 });
 
 After({ tags: '@ValidateGetRecentCreditNotesUsecase' }, () => {

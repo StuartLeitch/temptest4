@@ -388,8 +388,15 @@ type Mutation {
   ): CreditNote!
   createPayPalOrder(invoiceId: ID!): PayPalOrderId!
   recordPayPalPayment(invoiceId: ID!, orderId: ID!): ID!
-  generateCompensatoryEvents(invoiceIds: [String], journalIds: [String]): String
-  generateDraftCompensatoryEvents(
+  generateInvoiceCompensatoryEvents(
+    invoiceIds: [String]
+    journalIds: [String]
+  ): String
+  generateCreditNoteCompensatoryEvents(
+    creditNoteIds: [String]
+    journalIds: [String]
+  ): String
+  generateInvoiceDraftCompensatoryEvents(
     invoiceIds: [String]
     journalIds: [String]
   ): String

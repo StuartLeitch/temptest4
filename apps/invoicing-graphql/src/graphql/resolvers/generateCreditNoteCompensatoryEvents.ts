@@ -1,6 +1,6 @@
 import {
-  GenerateDraftCompensatoryEventsUsecase,
-  GetInvoicesIdsUsecase,
+  GenerateCreditNoteCompensatoryEventsUsecase,
+  GetCreditNoteIdsUsecase,
 } from '@hindawi/shared';
 
 import { Context } from '../../builders';
@@ -8,13 +8,24 @@ import { Resolvers } from '../schema';
 
 import { handleForbiddenUsecase, getAuthRoles } from './utils';
 
-export const generateDraftCompensatoryEvents: Resolvers<Context> = {
+export const generateCreditNoteCompensatoryEvents: Resolvers<Context> = {
   Mutation: {
-    async generateDraftCompensatoryEvents(parent, args, context) {
+    async generateCreditNoteCompensatoryEvents(parent, args, context) {
       const roles = getAuthRoles(context);
-      const { invoiceIds, journalIds } = args;
+      const { creditNoteIds, journalIds } = args;
       const {
-        repos: { invoiceItem, manuscript, invoice, coupon, waiver },
+        repos: {
+          paymentMethod,
+          invoiceItem,
+          manuscript,
+          address,
+          invoice,
+          creditNote,
+          coupon,
+          waiver,
+          payer,
+          payment,
+        },
         services: { logger: loggerService, qq: sqsQueService },
       } = context;
 
@@ -22,21 +33,26 @@ export const generateDraftCompensatoryEvents: Resolvers<Context> = {
         roles,
       };
 
-      const usecase = new GenerateDraftCompensatoryEventsUsecase(
+      const usecase = new GenerateCreditNoteCompensatoryEventsUsecase(
+        paymentMethod,
         invoiceItem,
+        creditNote,
         manuscript,
+        address,
         invoice,
+        payment,
         coupon,
         waiver,
+        payer,
         sqsQueService,
         loggerService
       );
-      const getIdsUsecase = new GetInvoicesIdsUsecase(invoice);
+      const getIdsUsecase = new GetCreditNoteIdsUsecase(creditNote);
       const maybeResult = await getIdsUsecase.execute(
         {
-          invoiceIds,
+          creditNoteIds,
           journalIds,
-          omitDeleted: false,
+          omitDeleted: true,
         },
         usecaseContext
       );
@@ -49,8 +65,8 @@ export const generateDraftCompensatoryEvents: Resolvers<Context> = {
 
       const errors = [];
 
-      for await (const invoiceId of ids) {
-        const result = await usecase.execute({ invoiceId }, usecaseContext);
+      for await (const creditNoteId of ids) {
+        const result = await usecase.execute({ creditNoteId }, usecaseContext);
 
         handleForbiddenUsecase(result);
 

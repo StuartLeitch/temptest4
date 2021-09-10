@@ -15,10 +15,12 @@ import {
   ButtonToolbar,
   UncontrolledTooltip,
 } from './../../../components';
+import Restricted from '../../../contexts/Restricted';
 import { HeaderMain } from '../../components/HeaderMain';
 import { CreditNotesLeftNav } from '../../components/CreditNotes/CreditNotesLeftNav';
 import CreditNotesList from './CreditNoteList';
 import SuccessfulUrlCopiedToClipboardToast from './components/SuccessfulUrlCopiedToClipboardToast';
+import NotAuthorized from '../../components/NotAuthorized';
 
 const CreditNotesContainer: React.FC = () => {
   const defaultFilters = {
@@ -97,6 +99,7 @@ const CreditNotesContainer: React.FC = () => {
 
   return (
     <React.Fragment>
+    <Restricted to='list.credit-notes' fallback={<NotAuthorized/>}>
       <Container fluid={true}>
         <HeaderMain title='Credit Notes' className='mb-5 mt-4' />
         <Row>
@@ -132,6 +135,7 @@ const CreditNotesContainer: React.FC = () => {
           </Col>
         </Row>
       </Container>
+    </Restricted>
     </React.Fragment>
   );
 
