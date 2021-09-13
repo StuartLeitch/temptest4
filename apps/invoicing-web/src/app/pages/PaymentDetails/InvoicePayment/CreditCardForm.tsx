@@ -133,6 +133,10 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
       }
     }
 
+    if (obj && ('liabilityShiftPossible' in obj) && obj.liabilityShiftPossible === false) {
+      return (<Text type="warning" key='3dsecure_error'>{'Card not eligible for 3D Secure.'}</Text>)
+    }
+
     if (obj && ('liabilityShifted' in obj) && obj.liabilityShifted === false) {
       return (<Text type="warning" key='3dsecure_error'>{'3D Secure authentication failed.'}</Text>)
     }
@@ -168,7 +172,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
 
   onSubmit() {
     var self = this;
-
+   
     this.hf.tokenize().then(function (payload) {
       return self.threeDS.verifyCard({
         onLookupComplete: function (data, next) {
@@ -179,6 +183,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
         bin: payload.details.bin
       })
     }).then(function (token) {
+      console.log(token)
       if (!token.liabilityShifted) {
         self.onError(token);
         return;
@@ -187,6 +192,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
       self.setState(
         state => ({ ...state, token, error: null }),
         () => {
+          
           // * send nonce and verification data to our server
           const ccPayload = {
             paymentMethodNonce: token.nonce,
