@@ -2,7 +2,6 @@ import _ from 'lodash';
 import React, { useState, useCallback, useEffect } from 'react';
 import { useManualQuery } from 'graphql-hooks';
 import { useQueryState } from 'react-router-use-location-state';
-import { useLocalStorage, writeStorage } from '@rehooks/local-storage';
 
 import { ParseUtils, Filters } from '@utils';
 
@@ -34,6 +33,8 @@ const ProjectsDashboard: React.FC = () => {
   const defaultFilters = {
     referenceNumber: '',
     customId: '',
+    isReference: false,
+    isManuscript: false,
   };
   const defaultPagination = {
     page: 1,
@@ -54,6 +55,7 @@ const ProjectsDashboard: React.FC = () => {
   let customIdParam = queryParams.get('customId')
   let referenceNumberParam = queryParams.get('referenceNumber')
   let pageParam = queryParams.get('page')
+
   let queryParamsFilter = {
     referenceNumber: referenceNumberParam,
     customId: customIdParam
@@ -162,7 +164,6 @@ const ProjectsDashboard: React.FC = () => {
    }
   fetchData();
 }, [searchFilters]);
-  
 
   return (
     <Container>
@@ -207,6 +208,7 @@ const ProjectsDashboard: React.FC = () => {
                 name='searchBy'
                 label='Reference Number'
                 inline
+                defaultChecked = {!!referenceNumberParam}
               />
               <CustomInput
                 type='radio'
@@ -214,7 +216,7 @@ const ProjectsDashboard: React.FC = () => {
                 name='searchBy'
                 label='Manuscript Custom ID'
                 inline
-                defaultChecked
+                defaultChecked = {!referenceNumberParam}
               />
             </Col>
           </FormGroup>
@@ -272,13 +274,13 @@ function setFilter(key: string, value: boolean | string | any[]) {
     case 'referenceNumber':
       setPage(1);
       setReferenceNumber(value as string);
-      setCustomId(null) 
+      setCustomId(null);
       break;
 
     default:
       setPage(1);
       setCustomId(value as string);
-      setReferenceNumber(null)
+      setReferenceNumber(null);
       break;
   }
   };
