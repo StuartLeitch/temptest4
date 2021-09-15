@@ -21,6 +21,7 @@ export class ArticleMap extends Mapper<Article> {
         authorFirstName: raw.authorFirstName,
         datePublished: raw.datePublished,
         preprintValue: raw.preprintValue,
+        is_cascaded: raw.is_cascaded,
       },
       new UniqueEntityID(raw.id)
     );
@@ -42,6 +43,7 @@ export class ArticleMap extends Mapper<Article> {
       customId: article.props.customId,
       datePublished: article.props.datePublished,
       preprintValue: article.props.preprintValue,
+      is_cascaded: article.props.is_cascaded
     };
   }
 }

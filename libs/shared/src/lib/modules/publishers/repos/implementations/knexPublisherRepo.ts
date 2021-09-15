@@ -25,6 +25,7 @@ export class KnexPublisherRepo
       creditAccountId: '',
       debitAccountId: '',
       itemId: '',
+      creditAccountIdForCascaded: ''
     };
     const data = await this.db(TABLES.PUBLISHER_CUSTOM_VALUES)
       .select('name', 'value')

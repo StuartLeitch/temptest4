@@ -18,6 +18,7 @@ interface ManuscriptProps {
   authorFirstName?: string;
   datePublished?: Date;
   preprintValue?: string;
+  is_cascaded?: number;
 }
 
 export class Manuscript extends AggregateRoot<ManuscriptProps> {
@@ -111,6 +112,14 @@ export class Manuscript extends AggregateRoot<ManuscriptProps> {
 
   set preprintValue(preprintValue: string) {
     this.props.preprintValue = preprintValue;
+  }
+
+  get is_cascaded(): number {
+    return this.props.is_cascaded;
+  }
+
+  set is_cascaded(isCascaded: number) {
+    this.props.is_cascaded = isCascaded;
   }
 
   private constructor(props: ManuscriptProps, id?: UniqueEntityID) {
