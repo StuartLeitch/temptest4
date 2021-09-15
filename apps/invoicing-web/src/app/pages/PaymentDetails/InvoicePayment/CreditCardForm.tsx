@@ -139,10 +139,6 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
       }
     }
 
-    if (obj && ('liabilityShiftPossible' in obj) && obj.liabilityShiftPossible === false) {
-      return (<Text type="warning" key='3dsecure_error'>{'Card not eligible for 3D Secure.'}</Text>)
-    }
-
     if (obj && ('liabilityShifted' in obj) && obj.liabilityShifted === false) {
       return (<Text type="warning" key='3dsecure_error'>{'3D Secure authentication failed.'}</Text>)
     }
