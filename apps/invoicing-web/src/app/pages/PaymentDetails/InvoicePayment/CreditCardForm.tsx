@@ -195,6 +195,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
     }).then(function (token) {
       console.log(token)
       if (!token.liabilityShifted) {
+        self.setState({ loading: false });
         self.onError(token);
         return;
       }
@@ -214,6 +215,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
         },
       );
     }).catch(function (err: any) {
+      self.setState({ loading: false });
       self.onError(err);
     });
   }
