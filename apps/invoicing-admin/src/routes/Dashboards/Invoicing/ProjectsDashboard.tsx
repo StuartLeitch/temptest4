@@ -1,9 +1,7 @@
 import _ from 'lodash';
-import React, { useState, useCallback } from 'react';
-import MaskedInput from 'react-text-mask';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useManualQuery } from 'graphql-hooks';
 import { useQueryState } from 'react-router-use-location-state';
-import { useLocalStorage, writeStorage } from '@rehooks/local-storage';
 
 import { ParseUtils, Filters } from '@utils';
 
@@ -35,6 +33,8 @@ const ProjectsDashboard: React.FC = () => {
   const defaultFilters = {
     referenceNumber: '',
     customId: '',
+    isReference: false,
+    isManuscript: false,
   };
   const defaultPagination = {
     page: 1,
@@ -50,19 +50,31 @@ const ProjectsDashboard: React.FC = () => {
     (defaultFilters as any).customId
   );
 
-  const [listState] = useLocalStorage('searchList', { filters:defaultFilters, pagination: defaultPagination});
-  let { filters, pagination } = listState;
-  const queryFilters = {
-    referenceNumber,
-    customId,
-  };
+  let queryParams = new URLSearchParams(window.location.search)
 
-  // * When no query strings provided in the URL
-  if (!_.isEqual(defaultFilters, queryFilters)) {
-    filters = Object.assign({}, defaultFilters, queryFilters);
+  let customIdParam = queryParams.get('customId')
+  let referenceNumberParam = queryParams.get('referenceNumber')
+  let pageParam = queryParams.get('page')
+
+  let queryParamsFilter = {
+    referenceNumber: referenceNumberParam,
+    customId: customIdParam
   }
 
-  const [searchFilters, setSearchFilters] = useState(filters);
+  let queryParamsPagination = {
+    page: !pageParam ? defaultPagination.page : parseInt(pageParam),
+    offset: defaultPagination.offset,
+    limit: defaultPagination.limit,
+  }
+
+  // * When no query strings provided in the URL
+  if (!_.isEqual(defaultFilters, queryParamsFilter)) {
+    queryParamsFilter = Object.assign({}, defaultFilters, queryParamsFilter);
+  }
+
+  const [searchFilters, setSearchFilters] = useState(queryParamsFilter);
+
+  const [value, setValue] = useState("");
 
   const [page, setPage] = useQueryState(
     'page',
@@ -70,7 +82,7 @@ const ProjectsDashboard: React.FC = () => {
   );
 
   if (!_.isEqual(defaultPagination, { page, offset: 0, limit: 10 })) {
-    pagination = Object.assign({}, defaultPagination, {
+    queryParamsPagination = Object.assign({}, defaultPagination, {
       page,
       offset: page > 0 ? page - 1 : 0,
     });
@@ -80,10 +92,19 @@ const ProjectsDashboard: React.FC = () => {
     INVOICES_AND_CREDIT_NOTES_QUERY
   );
 
+  const handleChange = (e) => {
+    const re = /^[0-9\/]+$/;
+    const trimmedInput = e.target.value.trim();
+    if (trimmedInput === '' || re.test(trimmedInput)) {
+       setValue(trimmedInput)
+      }
+  };
+
   const handleSearch = useCallback(async (ev: any) => {
-
+    
     ev.preventDefault();
-
+    
+    
     const searchValue = (document.getElementById('search') as any).value;
     const isSearchByRefNumberChecked = (document.getElementById('searchByReferenceNumber') as any).checked;
     const isSearchByManuscriptIdChecked = (document.getElementById('searchByManuscriptId') as any).checked;
@@ -91,32 +112,58 @@ const ProjectsDashboard: React.FC = () => {
     if (_.isEmpty(searchValue)) return;
 
     if (isSearchByRefNumberChecked) {
-      filters['referenceNumber'] = searchValue;
-      delete filters['customId'];
+      delete queryParamsFilter['customId'];
+      queryParamsFilter['referenceNumber'] = searchValue;
+      setFilter('referenceNumber', searchValue);
+     
     }
 
     if (isSearchByManuscriptIdChecked) {
-      delete filters['referenceNumber'];
-      filters['customId'] = searchValue;
+      delete queryParamsFilter['referenceNumber'];
+      queryParamsFilter['customId'] = searchValue;
+      setFilter('customId', searchValue)
+    
     }
 
-    setSearchFilters(filters);
-
+    setSearchFilters(queryParamsFilter);
     async function fetchData() {
       loading = true;
       const results = await fetchResults({
         variables: {
-          filters: Filters.collect(filters),
-          pagination,
+          filters: Filters.collect(queryParamsFilter),
+          pagination: queryParamsPagination,
         },
       });
       loading = false;
-
       setSearchResults(results.data);
     }
 
     fetchData();
   }, [searchFilters]);
+ 
+  useEffect(() => {
+    async function fetchData() {
+      
+      const customId = queryParams.get('customId')
+      const referenceNumber = queryParams.get('referenceNumber')
+
+
+      const result = await fetchResults({
+        variables: {
+          filters: Filters.collect(queryParamsFilter),
+          pagination: queryParamsPagination,
+        },
+      });
+
+      const searchValue = referenceNumber || customId
+
+      if(searchValue){
+        setSearchResults(result.data)
+        setValue(searchValue)
+      }
+   }
+  fetchData();
+}, [searchFilters]);
 
   return (
     <Container>
@@ -132,21 +179,14 @@ const ProjectsDashboard: React.FC = () => {
           <Form onSubmit={handleSearch}>
             <InputGroup>
               {/*<Input placeholder='Search for...' className='bg-white' id="search" />*/}
-              <MaskedInput
-                mask={() => {
-                  const isSearchByRefNumberChecked = (document.getElementById('searchByReferenceNumber') as any).checked;
-                  if (isSearchByRefNumberChecked) {
-                    return [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]
-                  } else {
-                    return [/\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/];
-                  }
-                }}
+              <Input
+                maxLength={20}
                 className="form-control bg-white"
                 placeholder="Search for..."
-                guide={false}
                 id="search"
+                value = { value }
                 onBlur={() => {}}
-                onChange={() => {}}
+                onChange={handleChange}
               />
               <InputGroupAddon addonType='append'>
                 <Button color='primary' onClick={handleSearch}>
@@ -168,7 +208,7 @@ const ProjectsDashboard: React.FC = () => {
                 name='searchBy'
                 label='Reference Number'
                 inline
-                defaultChecked
+                defaultChecked = {!!referenceNumberParam}
               />
               <CustomInput
                 type='radio'
@@ -176,6 +216,7 @@ const ProjectsDashboard: React.FC = () => {
                 name='searchBy'
                 label='Manuscript Custom ID'
                 inline
+                defaultChecked = {!referenceNumberParam}
               />
             </Col>
           </FormGroup>
@@ -206,7 +247,6 @@ const ProjectsDashboard: React.FC = () => {
                   key={category}
                   component={searchResultsToRender}
                   loading={loading}
-                  state={listState}
                   setPage={setFilter}
                 />
               );
@@ -228,39 +268,21 @@ function setFilter(key: string, value: boolean | string | any[]) {
 
   switch (name) {
     case 'page':
-      setPage(value as string);
-      writeStorage('searchList', {
-        filters,
-        pagination:{
-          ...pagination,
-          page: value,
-          offset: Number(value) - 1,
-        }
-      });
+      setPage(value as string); 
       break;
 
-    case 'customId':
-      setCustomId(value as string);
-      setPage(1);
-      writeStorage('searchList', {
-        filters: { ...filters, customId: value },
-        pagination: {
-          ...pagination,
-          page: 1,
-        }
-      });
-    default:
+    case 'referenceNumber':
       setPage(1);
       setReferenceNumber(value as string);
-      writeStorage('searchList',{ filters: {
-        ...filters,
-        referenceNumber: value,
-      }, pagination: {
-        ...pagination,
-        page: 1,
-      }});
+      setCustomId(null);
       break;
-    }
+
+    default:
+      setPage(1);
+      setCustomId(value as string);
+      setReferenceNumber(null);
+      break;
+  }
   };
 };
 

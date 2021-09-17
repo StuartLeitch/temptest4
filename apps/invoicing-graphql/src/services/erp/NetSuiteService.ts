@@ -114,6 +114,7 @@ export class NetSuiteService implements ErpServiceContract {
         customSegmentId,
         creditAccountId,
         debitAccountId,
+        creditAccountIdForCascaded
       },
     } = data;
 
@@ -122,6 +123,7 @@ export class NetSuiteService implements ErpServiceContract {
       creditAccountId,
       customSegmentId,
       debitAccountId,
+      creditAccountIdForCascaded,
     });
 
     return {
@@ -140,6 +142,7 @@ export class NetSuiteService implements ErpServiceContract {
         customSegmentId,
         creditAccountId,
         debitAccountId,
+        creditAccountIdForCascaded
       },
     } = data;
 
@@ -149,6 +152,7 @@ export class NetSuiteService implements ErpServiceContract {
         creditAccountId,
         customSegmentId,
         debitAccountId,
+        creditAccountIdForCascaded
       }
     );
 
@@ -516,6 +520,7 @@ export class NetSuiteService implements ErpServiceContract {
     creditAccountId: string;
     debitAccountId: string;
     customSegmentId: string;
+    creditAccountIdForCascaded: string;
   }) {
     const {
       connection: { config, oauth, token },
@@ -525,6 +530,7 @@ export class NetSuiteService implements ErpServiceContract {
       manuscript,
       invoiceTotal,
       creditAccountId,
+      creditAccountIdForCascaded,
       debitAccountId,
       customSegmentId,
     } = data;
@@ -557,7 +563,7 @@ export class NetSuiteService implements ErpServiceContract {
           {
             memo: `${invoice.persistentReferenceNumber}`,
             account: {
-              id: creditAccountId,
+              id: manuscript.is_cascaded ?  creditAccountIdForCascaded : creditAccountId,
             },
             credit: invoiceTotal,
           },
@@ -595,6 +601,7 @@ export class NetSuiteService implements ErpServiceContract {
     creditAccountId: string;
     debitAccountId: string;
     customSegmentId: string;
+    creditAccountIdForCascaded?: string
   }) {
     const {
       connection: { config, oauth, token },
@@ -606,6 +613,7 @@ export class NetSuiteService implements ErpServiceContract {
       creditAccountId,
       debitAccountId,
       customSegmentId,
+      creditAccountIdForCascaded
     } = data;
 
     const journalRequestOpts = {
@@ -631,7 +639,7 @@ export class NetSuiteService implements ErpServiceContract {
           {
             memo: `${referenceNumber}`,
             account: {
-              id: creditAccountId,
+              id: manuscript.is_cascaded ?  creditAccountIdForCascaded : creditAccountId,
             },
             debit: invoiceTotal,
           },

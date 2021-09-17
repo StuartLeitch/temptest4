@@ -3,6 +3,7 @@ export enum App {
   graphql = 'invoicing-graphql',
   web = 'invoicing-web',
   reporting = 'reporting-backend',
+  invoicingErpInvoiceRegistration = 'invoicing-erp-invoice-registration',
 }
 
 export enum Tenant {

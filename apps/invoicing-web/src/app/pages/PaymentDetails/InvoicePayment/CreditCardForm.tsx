@@ -189,6 +189,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
         bin: payload.details.bin
       })
     }).then(function (token) {
+      console.log(token)
       if (!token.liabilityShifted) {
         self.setState({ loading: false });
         self.onError(token);
@@ -198,6 +199,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
       self.setState(
         state => ({ ...state, token, error: null }),
         () => {
+          
           // * send nonce and verification data to our server
           const ccPayload = {
             paymentMethodNonce: token.nonce,
