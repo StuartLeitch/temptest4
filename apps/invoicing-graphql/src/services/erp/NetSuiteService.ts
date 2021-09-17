@@ -762,6 +762,7 @@ export class NetSuiteService implements ErpServiceContract {
         new Date(invoice.dateAccepted),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ),
+      "memo": "BAD DEBT",
       "entity": {
         "id": customerId
       },
