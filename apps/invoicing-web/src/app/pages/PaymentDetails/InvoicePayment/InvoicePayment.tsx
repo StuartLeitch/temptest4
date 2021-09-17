@@ -140,6 +140,7 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
     [methods],
   );
 
+
   let body = null;
   if (invoiceStatus === "PENDING") {
     body = (
@@ -223,6 +224,10 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
       title="2. Invoice &amp; Payment"
       expanded={invoiceStatus !== "DRAFT"}
       disabled={invoiceStatus === "DRAFT"}
+      onExpand={() => {
+        // reset any server error
+        error = null;
+      }}
     >
       {body}
     </Expander>

@@ -11,6 +11,7 @@ export interface Props extends SpaceProps, LayoutProps, FlexboxProps {
   disabled?: boolean;
   iconSize?: number;
   onClick?(e: boolean): void;
+  onExpand?(e: boolean): void;
 }
 
 const getComponentState = (
@@ -29,6 +30,7 @@ const Expander: React.FunctionComponent<Props> = ({
   expanded,
   title,
   onClick,
+  onExpand,
   iconSize,
   disabled,
   ...rest
@@ -37,6 +39,7 @@ const Expander: React.FunctionComponent<Props> = ({
     onClick,
     expanded
   );
+
   useEffect(() => {
     setExpandedState(!disabled && expandedState);
   }, [disabled]);
@@ -48,7 +51,14 @@ const Expander: React.FunctionComponent<Props> = ({
         iconSize={iconSize}
         expanded={expandedState}
         disabled={disabled}
-        onClick={() => setExpandedState(!disabled && !expandedState)}
+        onClick={() => {
+          setExpandedState(!disabled && !expandedState);
+
+          // call onExpand if available
+          if (onExpand) {
+            onExpand.call(expandedState);
+          }
+        }}
       />
       {expandedState ? children : null}
     </Root>
