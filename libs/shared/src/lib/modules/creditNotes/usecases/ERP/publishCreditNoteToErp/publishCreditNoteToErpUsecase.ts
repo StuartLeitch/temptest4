@@ -27,6 +27,7 @@ import { ArticleRepoContract } from '../../../../manuscripts/repos';
 import { CatalogRepoContract } from '../../../../journals/repos';
 import { JournalId } from '../../../../journals/domain/JournalId';
 import { PublisherRepoContract } from '../../../../publishers/repos';
+import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
 
 import { GetItemsForInvoiceUsecase } from '../../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetManuscriptByManuscriptIdUsecase } from './../../../../manuscripts/usecases/getManuscriptByManuscriptId';
@@ -49,6 +50,7 @@ export class PublishCreditNoteToErpUsecase
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
     private manuscriptRepo: ArticleRepoContract,
+    private addressRepo: AddressRepoContract,
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract,
     private erpReferenceRepo: ErpReferenceRepoContract,
@@ -186,6 +188,14 @@ export class PublishCreditNoteToErpUsecase
       }
       const payer = maybePayer.value;
 
+      // * Get address
+      const maybeAddress = await this.addressRepo.findById(
+        payer.billingAddressId
+      );
+      if (maybeAddress.isLeft()) {
+        throw new Error(`Invoice ${invoice.id} has no address associated.`);
+      }
+      const address = maybeAddress.value;
 
       // * Get catalog
       const maybeCatalog = await this.catalogRepo.getCatalogItemByJournalId(
@@ -222,6 +232,7 @@ export class PublishCreditNoteToErpUsecase
           creditNote,
           invoice,
           manuscript,
+          billingAddress: address,
           payer,
           publisherCustomValues
         };

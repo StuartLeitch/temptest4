@@ -22,7 +22,7 @@ export class RegisterCreditNotesCron {
     }
 
     const {
-      repos: { creditNote, invoiceItem, invoice, coupon, waiver, erpReference, manuscript, payer, publisher, catalog },
+      repos: { creditNote, invoiceItem, invoice, coupon, waiver, erpReference, manuscript, address, payer, publisher, catalog },
       services: { erp },
     } = context;
 
@@ -33,6 +33,7 @@ export class RegisterCreditNotesCron {
       coupon,
       waiver,
       manuscript,
+      address,
       payer,
       catalog,
       publisher,

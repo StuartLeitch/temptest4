@@ -738,15 +738,25 @@ export class NetSuiteService implements ErpServiceContract {
     payer: any;
     manuscript: any;
     publisherCustomValues?: any;
+    customSegmentId?: any;
+    billingAddress?: any;
   }) {
     const {
       connection: { config, oauth, token },
     } = this;
-    const { invoice, creditNote, publisherCustomValues } = data;
+    const { invoice, creditNote, publisherCustomValues, billingAddress } = data;
 
     const item = invoice.invoiceItems.getItems()[0];
 
     const customerId = await this.getCustomerId(data);
+
+    let taxDetails: ErpTaxDetails = null;
+
+    if (billingAddress.country === 'GB' || billingAddress.country === 'UK') {
+      taxDetails = this.taxDetailsUkStandard;
+    } else {
+      taxDetails = this.taxDetailsUkZero;
+    }
 
     const creditNoteTransformOpts = {
       url: `${config.endpoint}record/v1/creditmemo`,
@@ -754,6 +764,7 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     const creditNotePayload = {
+      "tranId": creditNote.persistentReferenceNumber,
       "tranDate": format(
         new Date(creditNote.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
@@ -762,22 +773,37 @@ export class NetSuiteService implements ErpServiceContract {
         new Date(invoice.dateAccepted),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ),
-      "memo": "BAD DEBT",
+      "memo": "Bad Debt",
       "entity": {
         "id": customerId
+      },
+      [this.customSegmentFieldName]: {
+        id: publisherCustomValues.customSegmentId,
       },
       "item": {
         "items": [
           {
-                "item": publisherCustomValues.badDebtItemId,
-                "amount": item.calculateNetPrice(),
-                "rate": item.price,
-                "description": "Bad Debt Write-Off",
-                "quantity": 1.0,
-                "excludeFromRateRequest": false,
-                "printItems": false
+            "item": publisherCustomValues.badDebtItemId,
+            "amount": item.calculateNetPrice(),
+            "rate": item.price,
+            "description": "Bad Debt Write-Off",
+            "quantity": 1.0,
+            "printItems": false
           }
         ]
+      },
+      "taxDetailsOverride": true,
+      "taxDetails": {
+        "items": [
+          {
+            "taxDetailsReference": taxDetails.taxDetailsReference,
+            "taxCode": taxDetails.taxCode,
+            "taxType": taxDetails.taxType,
+            "taxBasis": item.calculateNetPrice(),
+            "taxAmount": item.calculateVat(),
+            "taxRate": item.vat,
+          },
+        ],
       }
     };
 

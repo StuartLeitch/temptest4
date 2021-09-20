@@ -27,7 +27,8 @@ import { ErpReferenceRepoContract } from '../../../../vendors/repos';
 import { PublishCreditNoteToErpUsecase } from '../publishCreditNoteToErp/publishCreditNoteToErpUsecase';
 
 import { RetryCreditNotesResponse as Response } from './retryCreditNotesResponse';
-import { PayerRepoContract } from '@hindawi/shared';
+import { PayerRepoContract } from '../../../../payers/repos/payerRepo';
+import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
 
 export class RetryCreditNotesUsecase
   extends AccessControlledUsecase<Record<string, unknown>, Context, AccessControlContext>
@@ -40,6 +41,7 @@ export class RetryCreditNotesUsecase
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private manuscriptRepo: ArticleRepoContract,
+    private addressRepo: AddressRepoContract,
     private payerRepo: PayerRepoContract,
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract,
@@ -57,6 +59,7 @@ export class RetryCreditNotesUsecase
       this.waiverRepo,
       this.payerRepo,
       this.manuscriptRepo,
+      this.addressRepo,
       this.catalogRepo,
       this.publisherRepo,
       this.erpReferenceRepo,
