@@ -13,7 +13,6 @@ import {
   Authorize,
 } from '../../../../domain/authorization';
 
-import { EmailService } from '../../../../infrastructure/communication-channels';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 
 import { SanctionedCountryPolicy } from '../../../../domain/reductions/policies/SanctionedCountryPolicy';
@@ -73,7 +72,6 @@ export class ConfirmInvoiceUsecase
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
     private loggerService: LoggerContract,
-    private emailService: EmailService,
     private vatService: VATService
   ) {
     super();
@@ -197,23 +195,18 @@ export class ConfirmInvoiceUsecase
       `Update status for Invoice with id {${payerData?.invoice.id}}`
     );
 
-    // const mappings = {
-    // [InvoiceStatus.ACTIVE] =
-    // }
-
-    const aa = async () => {
-      if (invoice.getInvoiceTotal() === 0) {
-        return await this.markInvoiceAsFinal(invoice);
-      } else if (this.isFromSanctionedCountry(address)) {
-        return await this.markInvoiceAsPending(invoice);
-      } else if (invoice.status !== InvoiceStatus.ACTIVE) {
-        return await this.markInvoiceAsActive(invoice);
-      } else {
-        return right<UnexpectedError, Invoice>(invoice);
-      }
+    const mappings = {
+      [InvoiceStatus.PENDING]: this.markInvoiceAsPending,
+      [InvoiceStatus.ACTIVE]: this.markInvoiceAsActive,
+      [InvoiceStatus.FINAL]: this.markInvoiceAsFinal,
+      ['Default']: async (invoice: Invoice) =>
+        right<UnexpectedError, Invoice>(invoice),
     };
 
-    return (await aa()).map((invoice) => ({
+    const newStatus = this.nextStatus(invoice, address);
+    const maybeInvoice = await mappings[newStatus](invoice);
+
+    return maybeInvoice.map((invoice) => ({
       ...payerData,
       invoice,
     }));

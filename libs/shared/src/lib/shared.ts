@@ -107,6 +107,7 @@ export * from './modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
 export * from './modules/invoices/subscriptions/AfterInvoiceFinalizedEvent';
 export * from './modules/invoices/subscriptions/AfterInvoicePaidEvents';
 export * from './modules/invoices/subscriptions/afterInvoiceConfirmedEvent';
+export * from './modules/invoices/subscriptions/AfterInvoiceMovedToPendingEvent';
 
 // export * from './invoices/usecases/sendInvoice/sendInvoice';
 // export * from './modules/invoices/dtos/InvoiceDTO';
