@@ -737,21 +737,13 @@
             "outputPath": "dist/apps/invoicing-revenue-recognition-registration",
             "main": "apps/invoicing-revenue-recognition-registration/src/main.ts",
             "tsConfig": "apps/invoicing-revenue-recognition-registration/tsconfig.app.json",
-            "assets": [
-              "apps/invoicing-revenue-recognition-registration/src/assets"
-            ]
+            "assets": ["apps/invoicing-revenue-recognition-registration/src/Dockerfile"]
           },
           "configurations": {
             "production": {
               "optimization": true,
               "extractLicenses": true,
-              "inspect": false,
-              "fileReplacements": [
-                {
-                  "replace": "apps/invoicing-revenue-recognition-registration/src/environments/environment.ts",
-                  "with": "apps/invoicing-revenue-recognition-registration/src/environments/environment.prod.ts"
-                }
-              ]
+              "inspect": false
             }
           }
         },
@@ -766,17 +758,35 @@
           "options": {
             "lintFilePatterns": [
               "apps/invoicing-revenue-recognition-registration/**/*.ts"
+            ],
+            "linter": "eslint",
+            "config": "apps/invoicing-revenue-recognition-registration/.eslintrc",
+            "tsConfig": [
+              "apps/invoicing-revenue-recognition-registration/tsconfig.app.json",
+              "apps/invoicing-revenue-recognition-registration/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!apps/invoicing-revenue-recognition-registration/**"
             ]
           }
         },
         "test": {
+          "builder": "./tools/builders:cucumber",
+          "options": {
+            "tsConfig": "apps/invoicing-revenue-recognition-registration/tsconfig.spec.json",
+            "features": "apps/invoicing-revenue-recognition-registration/tests/**/*.feature",
+            "steps": "apps/invoicing-revenue-recognition-registration/tests/**/*.steps.ts",
+            "path": "apps/invoicing-revenue-recognition-registration",
+            "format": "json",
+            "coverage": true
+          }
+        },
+        "jest": {
           "builder": "@nrwl/jest:jest",
-          "outputs": [
-            "coverage/apps/invoicing-revenue-recognition-registration"
-          ],
           "options": {
             "jestConfig": "apps/invoicing-revenue-recognition-registration/jest.config.js",
-            "passWithNoTests": true
+            "tsConfig": "apps/invoicing-revenue-recognition-registration/tsconfig.spec.json"
           }
         }
       }
