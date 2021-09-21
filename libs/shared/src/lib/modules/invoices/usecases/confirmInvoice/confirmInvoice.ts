@@ -42,10 +42,6 @@ import { CreateAddressUsecase } from '../../../addresses/usecases/createAddress/
 import { GetItemsForInvoiceUsecase } from '../getItemsForInvoice/getItemsForInvoice';
 import { ApplyVatToInvoiceUsecase } from '../applyVatToInvoice';
 import {
-  ChangeInvoiceStatusErrors,
-  ChangeInvoiceStatus,
-} from '../changeInvoiceStatus';
-import {
   CreatePayerRequestDTO,
   CreatePayerUsecase,
 } from '../../../payers/usecases/createPayer';
@@ -98,7 +94,6 @@ export class ConfirmInvoiceUsecase
     this.savePayerData = this.savePayerData.bind(this);
     this.createPayer = this.createPayer.bind(this);
     this.checkVatId = this.checkVatId.bind(this);
-    this.sendEmail = this.sendEmail.bind(this);
   }
 
   @Authorize('invoice:confirm')
@@ -116,8 +111,8 @@ export class ConfirmInvoiceUsecase
 
       const maybePayer = await new AsyncEither(payerInput)
         .then(this.savePayerData(context))
-        .then(this.updateInvoiceStatus(context))
         .then(this.assignInvoiceNumber(context))
+        .then(this.updateInvoiceStatus)
         .then(this.applyVatToInvoice(context))
         .map(this.dispatchEvents)
         .map((data) => data.payer)
@@ -153,28 +148,26 @@ export class ConfirmInvoiceUsecase
     ): Promise<
       Either<Errors.InvoiceNumberAssignationError, PayerDataDomain>
     > => {
-      const { invoice } = payerData;
+      const { invoice, address } = payerData;
 
       try {
-        if (
-          invoice.status === InvoiceStatus.ACTIVE ||
-          invoice.status === InvoiceStatus.FINAL
-        ) {
-          const lastInvoiceNumber = await this.invoiceRepo.getCurrentInvoiceNumber();
-          invoice.assignInvoiceNumber(lastInvoiceNumber);
-          const maybeUpdated = await this.invoiceRepo.update(invoice);
-
-          if (maybeUpdated.isLeft()) {
-            return left(
-              new Errors.InvoiceNumberAssignationError(
-                invoice.id.toString(),
-                new Error(maybeUpdated.value.message)
-              )
-            );
-          }
-
-          payerData.invoice = maybeUpdated.value;
+        if (this.isFromSanctionedCountry(address)) {
+          return right(payerData);
         }
+        const lastInvoiceNumber = await this.invoiceRepo.getCurrentInvoiceNumber();
+        invoice.assignInvoiceNumber(lastInvoiceNumber);
+        const maybeUpdated = await this.invoiceRepo.update(invoice);
+
+        if (maybeUpdated.isLeft()) {
+          return left(
+            new Errors.InvoiceNumberAssignationError(
+              invoice.id.toString(),
+              new Error(maybeUpdated.value.message)
+            )
+          );
+        }
+
+        payerData.invoice = maybeUpdated.value;
 
         const aa = await this.getInvoiceItems(
           { invoiceId: invoice.id.toString() },
@@ -196,47 +189,49 @@ export class ConfirmInvoiceUsecase
     };
   }
 
-  private updateInvoiceStatus(context: Context) {
-    return async (
-      payerData: PayerDataDomain
-    ): Promise<
-      Either<
-        | ChangeInvoiceStatusErrors.ChangeStatusError
-        | ChangeInvoiceStatusErrors.InvoiceNotFoundError,
-        PayerDataDomain
-      >
-    > => {
-      const { invoice, address } = payerData;
-      this.loggerService.info(
-        `Update status for Invoice with id {${payerData?.invoice.id}}`
-      );
+  private async updateInvoiceStatus(
+    payerData: PayerDataDomain
+  ): Promise<Either<UnexpectedError, PayerDataDomain>> {
+    const { invoice, address } = payerData;
+    this.loggerService.info(
+      `Update status for Invoice with id {${payerData?.invoice.id}}`
+    );
 
+    // const mappings = {
+    // [InvoiceStatus.ACTIVE] =
+    // }
+
+    const aa = async () => {
       if (invoice.getInvoiceTotal() === 0) {
-        return (await this.markInvoiceAsFinal(invoice, context)).map(
-          (activeInvoice) => ({
-            ...payerData,
-            invoice: activeInvoice,
-          })
-        );
+        return await this.markInvoiceAsFinal(invoice);
       } else if (this.isFromSanctionedCountry(address)) {
-        return (await this.markInvoiceAsPending(invoice, context))
-          .map((pendingInvoice) => this.sendEmail(pendingInvoice))
-          .map((pendingInvoice) => ({
-            ...payerData,
-            invoice: pendingInvoice,
-          }));
+        return await this.markInvoiceAsPending(invoice);
+      } else if (invoice.status !== InvoiceStatus.ACTIVE) {
+        return await this.markInvoiceAsActive(invoice);
       } else {
-        if (invoice.status !== InvoiceStatus.ACTIVE) {
-          return (await this.markInvoiceAsActive(invoice, context)).map(
-            (activeInvoice) => ({
-              ...payerData,
-              invoice: activeInvoice,
-            })
-          );
-        }
+        return right<UnexpectedError, Invoice>(invoice);
       }
-      return right(payerData);
     };
+
+    return (await aa()).map((invoice) => ({
+      ...payerData,
+      invoice,
+    }));
+  }
+
+  private nextStatus(
+    invoice: Invoice,
+    address: Address
+  ): InvoiceStatus | 'Default' {
+    if (invoice.getInvoiceTotal() === 0) {
+      return InvoiceStatus.FINAL;
+    } else if (this.isFromSanctionedCountry(address)) {
+      return InvoiceStatus.PENDING;
+    } else if (invoice.status !== InvoiceStatus.ACTIVE) {
+      return InvoiceStatus.ACTIVE;
+    } else {
+      return 'Default';
+    }
   }
 
   private dispatchEvents(data: PayerDataDomain): PayerDataDomain {
@@ -344,7 +339,6 @@ export class ConfirmInvoiceUsecase
         context
       );
       return maybeDetails.map((items) => {
-        // items.forEach((ii) => payerData.invoice.addInvoiceItem(ii));
         payerData.invoice.addItems(items);
         return payerData;
       });
@@ -406,55 +400,50 @@ export class ConfirmInvoiceUsecase
     }
   }
 
-  private async markInvoiceAsPending(invoice: Invoice, context: Context) {
+  private async markInvoiceAsPending(
+    invoice: Invoice
+  ): Promise<Either<UnexpectedError, Invoice>> {
     this.loggerService.info(
       `Invoice with id {${invoice.id.toString()}} is confirmed with a sanctioned country.`
     );
-    const changeInvoiceStatusUseCase = new ChangeInvoiceStatus(
-      this.invoiceRepo
-    );
-    return await changeInvoiceStatusUseCase.execute(
-      {
-        invoiceId: invoice.id.toString(),
-        status: InvoiceStatus.PENDING,
-      },
-      context
-    );
+
+    invoice.markAsPending(this.senderEmail, this.receiverEmail);
+
+    const maybeUpdated = await this.invoiceRepo.update(invoice);
+
+    if (maybeUpdated.isLeft()) {
+      return left(new UnexpectedError(new Error(maybeUpdated.value.message)));
+    }
+
+    return right(maybeUpdated.value);
   }
 
-  private async markInvoiceAsActive(invoice: Invoice, context: Context) {
+  private async markInvoiceAsActive(
+    invoice: Invoice
+  ): Promise<Either<UnexpectedError, Invoice>> {
     invoice.markAsActive();
 
-    await this.invoiceRepo.update(invoice);
+    const maybeUpdated = await this.invoiceRepo.update(invoice);
 
-    const changeInvoiceStatusUseCase = new ChangeInvoiceStatus(
-      this.invoiceRepo
-    );
-    return changeInvoiceStatusUseCase.execute(
-      {
-        invoiceId: invoice.id.toString(),
-        status: InvoiceStatus.ACTIVE,
-      },
-      context
-    );
+    if (maybeUpdated.isLeft()) {
+      return left(new UnexpectedError(new Error(maybeUpdated.value.message)));
+    }
+
+    return right(maybeUpdated.value);
   }
 
-  private async markInvoiceAsFinal(invoice: Invoice, context: Context) {
-    const changeInvoiceStatusUseCase = new ChangeInvoiceStatus(
-      this.invoiceRepo
-    );
-
+  private async markInvoiceAsFinal(
+    invoice: Invoice
+  ): Promise<Either<UnexpectedError, Invoice>> {
     invoice.markAsFinal();
 
-    await this.invoiceRepo.update(invoice);
+    const maybeUpdated = await this.invoiceRepo.update(invoice);
 
-    return changeInvoiceStatusUseCase.execute(
-      {
-        invoiceId: invoice.id.toString(),
-        status: InvoiceStatus.FINAL,
-      },
-      context
-    );
+    if (maybeUpdated.isLeft()) {
+      return left(new UnexpectedError(new Error(maybeUpdated.value.message)));
+    }
+
+    return right(maybeUpdated.value);
   }
 
   private applyVatToInvoice(context: Context) {
@@ -477,16 +466,5 @@ export class ConfirmInvoiceUsecase
       );
       return maybeAppliedVat.map(() => ({ invoice, address, payer }));
     };
-  }
-
-  private sendEmail(invoice: Invoice) {
-    this.emailService
-      .createInvoicePendingNotification(
-        invoice,
-        this.receiverEmail,
-        this.senderEmail
-      )
-      .sendEmail();
-    return invoice;
   }
 }

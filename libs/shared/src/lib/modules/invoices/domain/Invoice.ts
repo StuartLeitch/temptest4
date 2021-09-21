@@ -17,6 +17,7 @@ import { InvoiceItem } from './InvoiceItem';
 import { InvoiceId } from './InvoiceId';
 
 import { InvoiceDraftDueAmountUpdated } from './events/invoiceDraftDueAmountUpdated';
+import { InvoiceMovedToPendingEvent } from './events/invoiceMovedToPending';
 import { InvoicePaymentAddedEvent } from './events/invoicePaymentAdded';
 import { InvoiceDraftCreated } from './events/invoiceDraftCreated';
 import { InvoiceDraftDeleted } from './events/invoiceDraftDeleted';
@@ -253,6 +254,14 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     const now = new Date();
     this.addDomainEvent(
       new InvoicePaymentAddedEvent(this.invoiceId, paymentId, now)
+    );
+  }
+
+  public markAsPending(sender: string, receiver: string): void {
+    this.props.status = InvoiceStatus.PENDING;
+
+    this.addDomainEvent(
+      new InvoiceMovedToPendingEvent(this, sender, receiver, new Date())
     );
   }
 
