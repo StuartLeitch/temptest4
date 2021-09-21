@@ -30,6 +30,11 @@ import { values as gswDemoInvoicingWebValues } from 'apps/invoicing-web/chart/gs
 import { values as gswDemoInvoicingAdminValues } from 'apps/invoicing-admin/chart/gsw/demo';
 import { values as gswDemoInvoicingErpInvoiceRegistrationValues } from 'apps/invoicing-erp-invoice-registration/chart/gsw/demo';
 
+import { values as preproductionInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/hindawi/preproduction';
+import { values as preproductionInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/preproduction';
+import { values as preproductionInvoicingAdminValues } from 'apps/invoicing-admin/chart/hindawi/preproduction';
+import { values as preproductionInvoicingErpInvoiceRegistrationValues } from 'apps/invoicing-erp-invoice-registration/chart/hindawi/preproduction';
+
 import { values as gswProdInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/gsw/prod';
 import { values as gswProdInvoicingWebValues } from 'apps/invoicing-web/chart/gsw/prod';
 import { values as gswProdInvoicingAdminValues } from 'apps/invoicing-admin/chart/gsw/prod';
@@ -54,6 +59,12 @@ const masterConfig: {
       [App.admin]: hindawiProdInvoicingAdminValues,
       [App.reporting]: hindawiProdReportingValues,
       [App.web]: hindawiProdInvoicingWebValues,
+    },
+    preproduction: {
+      [App.invoicingErpInvoiceRegistration]: preproductionInvoicingErpInvoiceRegistrationValues,
+      [App.graphql]: preproductionInvoicingGraphqlValues,
+      [App.admin]: preproductionInvoicingAdminValues,
+      [App.web]: preproductionInvoicingWebValues,
     },
     demo: {
       [App.invoicingErpInvoiceRegistration]: demoInvoicingErpInvoiceRegistrationValues,
