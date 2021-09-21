@@ -17,6 +17,7 @@ function makeAppEnum(app: string): App | null {
     case App.web:
     case App.reporting:
     case App.invoicingErpInvoiceRegistration:
+    case App.invoicingRevenueRecognitionRegistration:
       return app as App;
 
     default:

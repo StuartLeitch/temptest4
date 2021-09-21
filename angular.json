@@ -723,6 +723,63 @@
           }
         }
       }
+    },
+    "invoicing-revenue-recognition-registration": {
+      "root": "apps/invoicing-revenue-recognition-registration",
+      "sourceRoot": "apps/invoicing-revenue-recognition-registration/src",
+      "projectType": "application",
+      "prefix": "invoicing-revenue-recognition-registration",
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/invoicing-revenue-recognition-registration",
+            "main": "apps/invoicing-revenue-recognition-registration/src/main.ts",
+            "tsConfig": "apps/invoicing-revenue-recognition-registration/tsconfig.app.json",
+            "assets": [
+              "apps/invoicing-revenue-recognition-registration/src/assets"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/invoicing-revenue-recognition-registration/src/environments/environment.ts",
+                  "with": "apps/invoicing-revenue-recognition-registration/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "invoicing-revenue-recognition-registration:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/invoicing-revenue-recognition-registration/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/apps/invoicing-revenue-recognition-registration"
+          ],
+          "options": {
+            "jestConfig": "apps/invoicing-revenue-recognition-registration/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
     }
   },
   "cli": {
