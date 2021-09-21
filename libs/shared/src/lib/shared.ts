@@ -2,6 +2,9 @@
 export * from './core/domain/UniqueEntityID';
 export * from './infrastructure/Repo';
 
+export * from './core/logic/AppError';
+export * from './core/logic/Either';
+
 // * Export Shared Subdomain
 export * from './domain/Amount';
 export * from './domain/File';

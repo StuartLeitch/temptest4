@@ -19,6 +19,14 @@ export const queueServiceLoader: MicroframeworkLoader = async (
       Object.keys(eventHandlers).forEach((eventHandler: string) => {
         const { handler, event } = eventHandlers[eventHandler];
 
+        // * set local handler
+        if (event === 'ERPPaymentRegistration') {
+          queue.__LOCAL__ = {
+            event,
+            handler: handler.bind(context)
+          };
+        }
+
         queue.registerEventHandler({
           event,
           handler: handler(context),
@@ -26,6 +34,12 @@ export const queueServiceLoader: MicroframeworkLoader = async (
 
       });
       queue.start();
+
+      // * call handler programmatically
+      await queue.__LOCAL__.handler(context)({
+        paymentId: '9b0641ba-dd40-4754-b815-713420f59e79'
+      });
+
     }
   }
 };
