@@ -1,4 +1,5 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
+import { Consumer } from 'sqs-consumer';
 
 import {
   ExchangeRateService,
@@ -17,7 +18,7 @@ export interface Services {
   logger: LoggerContract;
   vatService: VATService;
   exchangeRateService: ExchangeRateService;
-  qq: null;
+  qq: Consumer;
   erp: {
     netsuite: NetSuiteService;
   };

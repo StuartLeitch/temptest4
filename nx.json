@@ -35,6 +35,7 @@
     "sisif-test": { "tags": [] },
     "invoicing-infrastructure": { "tags": [] },
     "invoicing-erp-invoice-registration": { "tags": [] },
-    "env-utils": { "tags": [] }
+    "env-utils": { "tags": [] },
+    "queue-utils": { "tags": [] }
   }
 }

@@ -33,6 +33,7 @@ export const env = {
     database: getOsEnv('DB_DATABASE'),
   },
   aws: {
+    enabled: toBool(getOsEnv('AWS_ENABLED')),
     sqs: {
       sqsAccessKey: getOsEnv('AWS_SQS_ACCESS_KEY'),
       sqsSecretKey: getOsEnv('AWS_SQS_SECRET_KEY'),

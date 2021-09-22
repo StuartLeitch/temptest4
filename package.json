@@ -146,7 +146,7 @@
     "set-interval-async": "^1.0.33",
     "shallow-equal-object": "1.1.1",
     "soap": "0.33.0",
-    "sqs-consumer": "5.4.0",
+    "sqs-consumer": "^5.4.0",
     "state-list": "1.0.1",
     "stream": "0.0.2",
     "stream-to-promise": "3.0.0",
