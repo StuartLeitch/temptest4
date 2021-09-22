@@ -2,14 +2,8 @@ import { Consumer } from 'sqs-consumer';
 import { SQS } from 'aws-sdk';
 import { get } from 'lodash';
 
-import { Event } from './event';
-
-export type Handler = (data: unknown) => Promise<void>;
-
-export interface QueueConsumer {
-  registerHandler(event: string, handler: Handler): void;
-  start(): Promise<void>;
-}
+import { QueueConsumer, Handler } from './consumer';
+import { Event } from '../event';
 
 export class SqsQueueConsumer implements QueueConsumer {
   private sqsConsumer: Consumer;
@@ -19,11 +13,11 @@ export class SqsQueueConsumer implements QueueConsumer {
   } = {};
 
   constructor(
-    private readonly region: string,
-    private readonly accessKeyId: string,
     private readonly secretAccessKey: string,
+    private readonly accessKeyId: string,
+    private readonly queueName: string,
     private readonly endpoint: string,
-    private readonly queueName: string
+    private readonly region: string
   ) {
     this.sqs = new SQS({
       secretAccessKey: this.secretAccessKey,
