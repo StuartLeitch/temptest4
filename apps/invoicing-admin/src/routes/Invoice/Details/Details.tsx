@@ -56,8 +56,6 @@ const Details: React.FC = (props) => {
   if (error || typeof data === undefined)
     return <div>Something Bad Happened</div>;
 
-    console.log(data)
-
   const { invoiceWithAuthorization:invoice, getPaymentMethods } = data;
   const { status, id: invoiceId, transaction } = invoice;
 
@@ -85,54 +83,9 @@ const Details: React.FC = (props) => {
     statusClassName = 'success';
   }
 
-  const queryState = JSON.parse(localStorage.getItem('invoicesList'));
-  const { filters, pagination } = queryState;
-
-  const {
-    invoiceStatus,
-    transactionStatus,
-    journalId,
-    referenceNumber,
-    customId,
-  } = filters;
-  const { page } = pagination;
-
-  // * build the query string out of query state
-  let queryString = '';
-  if (Object.keys(Object.assign({}, queryState, pagination)).length) {
-    queryString += '?';
-    queryString += invoiceStatus.reduce(
-      (qs, is) => (qs += `invoiceStatus=${is}&`),
-      ''
-    );
-    queryString += transactionStatus.reduce(
-      (qs, ts) => (qs += `transactionStatus=${ts}&`),
-      ''
-    );
-    queryString += journalId.reduce((qs, ji) => (qs += `journalId=${ji}&`), '');
-
-    if (referenceNumber) {
-      queryString += `referenceNumber=${referenceNumber}&`;
-    }
-
-    if (customId) {
-      queryString += `customId=${customId}&`;
-    }
-
-    if (page) {
-      queryString += `page=${page}&`;
-    }
-  }
-
   return (
     <>
       <Container fluid={true}>
-        <Link
-          to={`/invoices/list${queryString}`}
-          className='text-decoration-none d-block mb-4 mt-0'
-        >
-          <i className='fas fa-angle-left mr-2' /> Back to invoices list
-        </Link>
         <HeaderMain
           title={`Invoice #${invoice.referenceNumber ?? '---'}`}
           className='mb-1 mt-0'

@@ -3,4 +3,5 @@ export interface PublisherCustomValues {
   creditAccountId: string;
   debitAccountId: string;
   itemId: string;
+  creditAccountIdForCascaded: string;
 }

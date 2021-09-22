@@ -19,6 +19,7 @@ interface ArticleProps {
   datePublished?: Date;
   preprintValue?: string;
   journalTitle?: string;
+  is_cascaded?: number;
 }
 
 export class Article extends AggregateRoot<ArticleProps> {
@@ -120,6 +121,14 @@ export class Article extends AggregateRoot<ArticleProps> {
 
   set preprintValue(preprintValue: string) {
     this.props.preprintValue = preprintValue;
+  }
+
+  get is_cascaded(): number {
+    return this.props.is_cascaded;
+  }
+
+  set is_cascaded(isCascaded: number) {
+    this.props.is_cascaded = isCascaded;
   }
 
   private constructor(props: ArticleProps, id?: UniqueEntityID) {
