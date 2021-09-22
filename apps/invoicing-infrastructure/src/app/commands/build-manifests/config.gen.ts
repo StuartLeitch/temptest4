@@ -39,6 +39,7 @@ import { values as preproductionInvoicingGraphqlValues } from 'apps/invoicing-gr
 import { values as preproductionInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/preproduction';
 import { values as preproductionInvoicingAdminValues } from 'apps/invoicing-admin/chart/hindawi/preproduction';
 import { values as preproductionInvoicingErpInvoiceRegistrationValues } from 'apps/invoicing-erp-invoice-registration/chart/hindawi/preproduction';
+import { values as preproductionInvoicingRevenueRecognitionRegistrationValues } from 'apps/invoicing-revenue-recognition-registration/chart/hindawi/preproduction';
 
 import { values as gswProdInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/gsw/prod';
 import { values as gswProdInvoicingWebValues } from 'apps/invoicing-web/chart/gsw/prod';
@@ -70,6 +71,7 @@ const masterConfig: {
     },
     preproduction: {
       [App.invoicingErpInvoiceRegistration]: preproductionInvoicingErpInvoiceRegistrationValues,
+      [App.invoicingRevenueRecognitionRegistration]: preproductionInvoicingRevenueRecognitionRegistrationValues,
       [App.graphql]: preproductionInvoicingGraphqlValues,
       [App.admin]: preproductionInvoicingAdminValues,
       [App.web]: preproductionInvoicingWebValues,
