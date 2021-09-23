@@ -303,6 +303,7 @@ export * from './domain/PaymentClientToken';
 
 export * from './core/domain/CorrelationID';
 export * from './core/logic/UseCaseError';
+export * from './core/logic/AppError';
 
 // ? Should we export this
 export * from './modules/waivers/repos/implementations/knexWaiverRepo';
