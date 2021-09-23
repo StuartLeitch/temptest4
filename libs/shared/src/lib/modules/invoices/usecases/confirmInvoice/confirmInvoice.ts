@@ -47,8 +47,8 @@ import {
 
 // * Usecase specific
 
-import { ConfirmInvoiceResponse as Response } from './confirmInvoiceResponse';
 import type { ConfirmInvoiceDTO as DTO, PayerInput } from './confirmInvoiceDTO';
+import { ConfirmInvoiceResponse as Response } from './confirmInvoiceResponse';
 import * as Errors from './confirmInvoiceErrors';
 
 interface PayerDataDomain {

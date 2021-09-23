@@ -61,3 +61,9 @@ Feature: Confirm invoice
     When The Payer "John-one" from "RO" confirms the invoice with the ID "multiple-confirmations"
     And The Payer "John-two" from "RO" confirms the invoice with the ID "multiple-confirmations"
     And The response is error "InvoiceAlreadyConfirmedError"
+
+  @ValidateConfirmInvoice
+  Scenario: Invoice is confirmd from sanctioned country and has 100% discount
+    Given There is a fully discounted Invoice with the ID "sanctioned-country-reduction-invoice"
+    When The Payer "Fidel" from "CU" confirms the invoice with the ID "sanctioned-country-reduction-invoice"
+    Then The invoice "sanctioned-country-reduction-invoice" is successfully updated to status "FINAL"
