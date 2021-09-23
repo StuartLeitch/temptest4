@@ -7,5 +7,4 @@ module.exports = {
   moduleFileExtensions: ['ts', 'js', 'html'],
   passWithNoTests: true,
   coverageReporters: ['lcov', 'json'],
-  projects: '<rootDir>/apps/invoicing-revenue-recognition-registration',
 };
