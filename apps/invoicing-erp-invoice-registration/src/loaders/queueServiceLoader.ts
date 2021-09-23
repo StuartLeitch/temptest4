@@ -16,12 +16,7 @@ export const queueServiceLoader: MicroframeworkLoader = async (
 
     const queue = context?.services?.qq;
 
-    const sqs: any = new SQS({
-      region: env.aws.sqs.sqsRegion,
-      accessKeyId: env.aws.sqs.sqsAccessKey,
-      secretAccessKey: env.aws.sqs.sqsSecretKey,
-      endpoint: env.aws.sqs.endpoint,
-    });
+    const sqs: any = new SQS();
 
     let { QueueUrl } = await sqs
       .getQueueUrl({ QueueName: env.aws.sqs.queueName })
@@ -38,5 +33,7 @@ export const queueServiceLoader: MicroframeworkLoader = async (
     sqsConsumer.on('error', console.error);
 
     sqsConsumer.on('processing_error', console.error);
+
+    sqsConsumer.start();
   }
 };

@@ -3,6 +3,7 @@ import { bootstrapMicroframework } from 'microframework-w3tec';
 
 import { env } from './env';
 import { LoggerBuilder } from '@hindawi/shared';
+import * as AWS from 'aws-sdk';
 
 /**
  * EXPRESS TYPESCRIPT BOILERPLATE
@@ -37,6 +38,14 @@ async function main() {
     );
     log.info('Context state object initiated ✔️');
     loaders.push(contextLoader);
+  }
+
+  if (env.loaders.queueServiceEnabled) {
+    const { queueServiceLoader } = await import(
+      /* webpackChunkName: "queueServiceLoader" */ './loaders/queueServiceLoader'
+    );
+    log.info('Queue Service initiated ✔️');
+    loaders.push(queueServiceLoader);
   }
 
   // if (env.loaders.erpEnabled) {

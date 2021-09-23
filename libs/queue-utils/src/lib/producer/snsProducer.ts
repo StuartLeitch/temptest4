@@ -1,4 +1,5 @@
 import { v4 as uuidV4 } from 'uuid';
+import * as AWS from 'aws-sdk';
 import { SNS } from 'aws-sdk';
 
 import { Producer } from './producer';
@@ -8,22 +9,21 @@ export class SnsProducer implements Producer {
   private sns: SNS;
 
   constructor(
-    private readonly secretAccessKey: string,
-    private readonly accessKeyId: string,
     private readonly topicName: string,
-    private readonly endpoint: string,
-    private readonly region: string,
     private readonly eventNamespace: string,
     private readonly publisherName: string,
     private readonly serviceName: string,
-    private readonly defaultMessageAttributes: Object = {}
+    private readonly defaultMessageAttributes: Object = {},
+    private readonly awsProfile?: string
   ) {
-    this.sns = new SNS({
-      secretAccessKey: this.secretAccessKey,
-      accessKeyId: this.accessKeyId,
-      endpoint: this.endpoint,
-      region: this.region,
-    });
+    if (this.awsProfile) {
+      const credentials = new AWS.SharedIniFileCredentials({
+        profile: this.awsProfile,
+      });
+      AWS.config.credentials = credentials;
+    }
+
+    this.sns = new SNS();
   }
 
   async start() {

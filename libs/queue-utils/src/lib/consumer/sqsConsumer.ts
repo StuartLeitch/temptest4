@@ -1,4 +1,5 @@
 import { Consumer } from 'sqs-consumer';
+import * as AWS from 'aws-sdk';
 import { SQS } from 'aws-sdk';
 import { get } from 'lodash';
 
@@ -13,18 +14,17 @@ export class SqsQueueConsumer implements QueueConsumer {
   } = {};
 
   constructor(
-    private readonly secretAccessKey: string,
-    private readonly accessKeyId: string,
     private readonly queueName: string,
-    private readonly endpoint: string,
-    private readonly region: string
+    private readonly awsProfile?: string
   ) {
-    this.sqs = new SQS({
-      secretAccessKey: this.secretAccessKey,
-      accessKeyId: this.accessKeyId,
-      endpoint: this.endpoint,
-      region: this.region,
-    });
+    if (this.awsProfile) {
+      const credentials = new AWS.SharedIniFileCredentials({
+        profile: this.awsProfile,
+      });
+      AWS.config.credentials = credentials;
+    }
+
+    this.sqs = new SQS();
   }
 
   registerHandler(event: string, handler: Handler) {

@@ -35,11 +35,7 @@ export const env = {
   aws: {
     enabled: toBool(getOsEnv('AWS_ENABLED')),
     sqs: {
-      sqsAccessKey: getOsEnv('AWS_SQS_ACCESS_KEY'),
-      sqsSecretKey: getOsEnv('AWS_SQS_SECRET_KEY'),
       queueName: getOsEnv('AWS_SQS_QUEUE_NAME'),
-      endpoint: getOsEnv('AWS_SQS_ENDPOINT'),
-      sqsRegion: getOsEnv('AWS_SQS_REGION'),
     },
   },
   netSuite: {
