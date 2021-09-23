@@ -51,7 +51,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
 
       self.setupForm();
     }).catch(function (err) {
-       console.log('component error:', err);
+       console.error('component error:', err);
     });
   }
 
@@ -117,9 +117,6 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
   }
 
   renderError(title: string, obj: any) {
-
-    console.info('BrainTree Server error: ', this.props.serverError);
-    console.info(obj);
 
     if (!obj && !this.props.serverError) {
       return null;
@@ -189,7 +186,6 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
         bin: payload.details.bin
       })
     }).then(function (token) {
-      console.log(token)
       if (!token.liabilityShifted) {
         self.setState({ loading: false });
         self.onError(token);
@@ -199,7 +195,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
       self.setState(
         state => ({ ...state, token, error: null }),
         () => {
-          
+
           // * send nonce and verification data to our server
           const ccPayload = {
             paymentMethodNonce: token.nonce,
