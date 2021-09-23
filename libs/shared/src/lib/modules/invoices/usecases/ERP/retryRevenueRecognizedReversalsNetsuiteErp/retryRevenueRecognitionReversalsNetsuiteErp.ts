@@ -16,6 +16,7 @@ import { InvoiceRepoContract } from '../../../repos/invoiceRepo';
 import { CatalogRepoContract } from '../../../../journals/repos';
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
+import { CreditNoteRepoContract } from '../../../../creditNotes/repos/creditNoteRepo';
 
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
 import { ErpRevRecResponse } from '../../../../../domain/services/ErpService';
@@ -39,6 +40,7 @@ export class RetryRevenueRecognitionReversalsNetsuiteErpUsecase
     private manuscriptRepo: ArticleRepoContract,
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract,
+    private creditNoteRepo: CreditNoteRepoContract,
     private erpReferenceRepo: ErpReferenceRepoContract,
     private netsuiteService: ErpServiceContract,
     private loggerService: LoggerContract
@@ -53,6 +55,7 @@ export class RetryRevenueRecognitionReversalsNetsuiteErpUsecase
       this.manuscriptRepo,
       this.catalogRepo,
       this.publisherRepo,
+      this.creditNoteRepo,
       this.erpReferenceRepo,
       this.netsuiteService,
       this.loggerService
