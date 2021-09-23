@@ -149,7 +149,7 @@ export class ConfirmInvoiceUsecase
       const { invoice, address } = payerData;
 
       try {
-        if (this.isFromSanctionedCountry(address)) {
+        if (this.isFromSanctionedCountry(address) && invoice.invoiceTotal > 0) {
           return right(payerData);
         }
         const lastInvoiceNumber = await this.invoiceRepo.getCurrentInvoiceNumber();
