@@ -95,7 +95,6 @@ export * from './modules/invoices/usecases/publishEvents/publishInvoiceCreated/p
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceDraftDeleted/publishInvoiceDraftDeleted';
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceDraftCreated/publishInvoiceDraftCreated';
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceDraftDueAmountUpdated/publishInvoiceDraftDueAmountUpdated';
-export * from './modules/invoices/usecases/publishEvents/publishInvoiceCredited/publishInvoiceCredited';
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceFinalized/publishInvoiceFinalized';
 export * from './modules/invoices/usecases/publishEvents/publishInvoicePaid/publishInvoicePaid';
 export * from './modules/invoices/usecases/ERP/publishInvoiceToErp/publishInvoiceToErp';

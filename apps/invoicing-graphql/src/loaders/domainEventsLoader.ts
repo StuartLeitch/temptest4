@@ -6,10 +6,10 @@ import {
 } from 'microframework-w3tec';
 
 import { PublishInvoiceDraftDueAmountUpdatedUseCase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftDueAmountUpdated';
-import { PublishInvoiceCreditedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCredited/publishInvoiceCredited';
 import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
 import { PublishInvoiceDraftCreatedUseCase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftCreated';
 import { PublishInvoiceDraftDeletedUseCase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftDeleted';
+import { PublishCreditNoteCreatedUsecase } from '../../../../libs/shared/src/lib/modules/creditNotes/usecases/publishEvents/publishCreditNoteCreated';
 import { PublishInvoiceConfirmedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceConfirmed';
 import { PublishInvoiceFinalizedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceFinalized';
 import { PublishInvoicePaidUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoicePaid';
@@ -68,7 +68,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
     );
     const publishInvoiceConfirmed = new PublishInvoiceConfirmedUsecase(queue);
     const publishInvoiceFinalized = new PublishInvoiceFinalizedUsecase(queue);
-    const publishInvoiceCredited = new PublishInvoiceCreditedUsecase(queue);
+    const publishInvoiceCredited = new PublishCreditNoteCreatedUsecase(queue);
     const publishInvoicePaid = new PublishInvoicePaidUsecase(queue);
 
     // * Registering Invoice Events
