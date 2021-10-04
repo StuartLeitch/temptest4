@@ -112,7 +112,6 @@ async function main() {
     loaders.push(sisifLoader);
   }
 
-
   await bootstrapMicroframework({
     /**
      * Loader is a place where you can configure all your modules during microframework
