@@ -24,7 +24,7 @@ import {
 
 import { PhenomSqsServiceContract } from '../queue_service/phenom-queue-service';
 
-import { BraintreeService, NetSuiteService, PayPalService } from '../services';
+import { BraintreeService, NetSuiteService, PayPalService, ErpRegister } from '../services';
 
 import { env } from '../env';
 
@@ -43,6 +43,7 @@ export interface Services {
   erp: {
     netsuite: NetSuiteService;
   };
+  erpRegister: ErpRegister;
 }
 
 function buildPaymentStrategyFactory(
@@ -140,5 +141,6 @@ export async function buildServices(
     qq: env.loaders.queueServiceEnabled
       ? await setupQueueService(loggerBuilder)
       : null,
+    erpRegister: new ErpRegister()
   };
 }

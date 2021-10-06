@@ -127,6 +127,7 @@ export const env = {
     sqs: {
       queueName: getOsEnv('AWS_SQS_QUEUE_NAME'),
       endpoint: getOsEnv('AWS_SQS_ENDPOINT'),
+      erpRegistrationQueue: getOsEnv('AWS_ERP_REGISTRATION_QUEUE'),
     },
     s3: {
       endpoint: getOsEnvOptional('AWS_S3_ENDPOINT'),
