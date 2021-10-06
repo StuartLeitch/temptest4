@@ -48,13 +48,13 @@ async function main() {
     loaders.push(queueServiceLoader);
   }
 
-  // if (env.loaders.erpEnabled) {
-  //   const { erpLoader } = await import(
-  //     /* webpackChunkName: "erpLoader" */ './loaders/erpLoader'
-  //   );
-  //   log.info('ERP integration initiated ✔️');
-  //   loaders.push(erpLoader);
-  // }
+  if (env.loaders.erpEnabled) {
+    const { erpLoader } = await import(
+      /* webpackChunkName: "erpLoader" */ './loaders/erpLoader'
+    );
+    log.info('ERP integration initiated ✔️');
+    loaders.push(erpLoader);
+  }
 
   await bootstrapMicroframework({
     /**

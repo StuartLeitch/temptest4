@@ -670,7 +670,14 @@
             "outputPath": "dist/apps/invoicing-erp-invoice-registration",
             "main": "apps/invoicing-erp-invoice-registration/src/main.ts",
             "tsConfig": "apps/invoicing-erp-invoice-registration/tsconfig.app.json",
-            "assets": ["apps/invoicing-erp-invoice-registration/src/Dockerfile"]
+            "assets": [
+              "apps/invoicing-erp-invoice-registration/src/Dockerfile",
+              {
+                "glob": "**/*.xml",
+                "input": "libs/shared/src/lib/domain/services/exrates",
+                "output": "exrates"
+              }
+            ]
           },
           "configurations": {
             "production": {

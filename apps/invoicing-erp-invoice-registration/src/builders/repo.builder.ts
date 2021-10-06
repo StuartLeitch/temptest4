@@ -2,6 +2,8 @@
 
 import Knex from 'knex';
 
+// type Knex = typeof Knex;
+
 import {
   KnexSentNotificationsRepo,
   KnexPausedReminderRepo,

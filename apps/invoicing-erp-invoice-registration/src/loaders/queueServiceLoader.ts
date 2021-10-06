@@ -1,5 +1,5 @@
 import { Consumer } from 'sqs-consumer';
-import { SQS } from 'aws-sdk';
+import AWS from 'aws-sdk';
 import {
   MicroframeworkSettings,
   MicroframeworkLoader,
@@ -7,6 +7,7 @@ import {
 
 import { env } from '../env';
 import { Context } from '../builders';
+import * as eventHandlers from '../queue_service/handlers';
 
 export const queueServiceLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
@@ -14,25 +15,33 @@ export const queueServiceLoader: MicroframeworkLoader = async (
   if (settings && env.aws.enabled) {
     const context: Context = settings.getData('context');
 
-    const queue = context?.services?.qq;
+    // Configure the region
+    AWS.config.update({
+      region: env.aws.sqs.region,
+      accessKeyId: env.aws.sqs.accessKey,
+      secretAccessKey: env.aws.sqs.secretAccessKey
+    });
 
-    const sqs: any = new SQS();
-
-    let { QueueUrl } = await sqs
-      .getQueueUrl({ QueueName: env.aws.sqs.queueName })
-      .promise();
+    const sqs: any = new AWS.SQS();
 
     const sqsConsumer = Consumer.create({
       sqs,
-      queueUrl: QueueUrl,
+      queueUrl: env.aws.sqs.queueName,
       handleMessage: async (message) => {
-        console.log(message);
+        eventHandlers.ERPInvoiceRegistration.handler(context)(message);
       },
     });
 
-    sqsConsumer.on('error', console.error);
+    sqsConsumer.on('error', (err) => {
+      console.error(err.message);
+      process.exit(1);
+    });
 
-    sqsConsumer.on('processing_error', console.error);
+    sqsConsumer.on('processing_error', (err) => {
+      console.error(err.message)
+    });
+
+    console.log(`SQS service is running for ${env.aws.sqs.queueName}`);
 
     sqsConsumer.start();
   }
