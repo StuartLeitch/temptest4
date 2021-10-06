@@ -21,13 +21,5 @@ export const knexLoader: MicroframeworkLoader = async (
   if (settings) {
     settings.setData('connection', knex);
     settings.onShutdown(() => knex.destroy());
-
-    const res = await knex.raw(
-      "select count(*) from invoices where status = 'ACTIVE'"
-    );
-    console.log(
-      `result for query: "select count(*) from invoices where status = 'ACTIVE'"`,
-      res.rows
-    );
   }
 };

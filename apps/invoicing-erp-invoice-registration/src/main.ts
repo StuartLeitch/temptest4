@@ -3,7 +3,6 @@ import { bootstrapMicroframework } from 'microframework-w3tec';
 
 import { env } from './env';
 import { LoggerBuilder } from '@hindawi/shared';
-import * as AWS from 'aws-sdk';
 
 /**
  * EXPRESS TYPESCRIPT BOILERPLATE
