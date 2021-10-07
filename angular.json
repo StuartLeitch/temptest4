@@ -670,7 +670,14 @@
             "outputPath": "dist/apps/invoicing-erp-invoice-registration",
             "main": "apps/invoicing-erp-invoice-registration/src/main.ts",
             "tsConfig": "apps/invoicing-erp-invoice-registration/tsconfig.app.json",
-            "assets": ["apps/invoicing-erp-invoice-registration/src/Dockerfile"]
+            "assets": [
+              "apps/invoicing-erp-invoice-registration/src/Dockerfile",
+              {
+                "glob": "**/*.xml",
+                "input": "libs/shared/src/lib/domain/services/exrates",
+                "output": "exrates"
+              }
+            ]
           },
           "configurations": {
             "production": {
@@ -720,6 +727,48 @@
           "options": {
             "jestConfig": "apps/invoicing-erp-invoice-registration/jest.config.js",
             "tsConfig": "apps/invoicing-erp-invoice-registration/tsconfig.spec.json"
+          }
+        }
+      }
+    },
+    "env-utils": {
+      "root": "libs/env-utils",
+      "sourceRoot": "libs/env-utils/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/env-utils/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/env-utils"],
+          "options": {
+            "jestConfig": "libs/env-utils/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "queue-utils": {
+      "root": "libs/queue-utils",
+      "sourceRoot": "libs/queue-utils/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/queue-utils/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/queue-utils"],
+          "options": {
+            "jestConfig": "libs/queue-utils/jest.config.js",
+            "passWithNoTests": true
           }
         }
       }

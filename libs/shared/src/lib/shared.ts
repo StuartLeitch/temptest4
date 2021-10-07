@@ -1,6 +1,8 @@
 // * Export Core Subdomain
 export * from './core/domain/UniqueEntityID';
+export * from './core/logic/AppError';
 export * from './infrastructure/Repo';
+
 
 // * Export Shared Subdomain
 export * from './domain/Amount';
