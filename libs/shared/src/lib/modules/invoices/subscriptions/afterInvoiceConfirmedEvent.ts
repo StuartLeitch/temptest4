@@ -42,7 +42,8 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
     private loggerService: LoggerContract,
     private creditControlReminderDelay: number,
     private paymentReminderDelay: number,
-    private jobQueue: string
+    private jobQueue: string,
+    private erpRegister: any
   ) {
     this.setupSubscriptions();
   }
@@ -137,6 +138,11 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
       if (publishResult.isLeft()) {
         throw publishResult.value;
       }
+
+
+      // * Register this invoice ERP
+      const erpRegistrationRequest = JSON.stringify({ invoiceId: invoice.invoiceId.toString() });
+      await this.erpRegister.publish(erpRegistrationRequest);
 
       this.loggerService.info(
         `[AfterInvoiceActivated]: Successfully executed onPublishInvoiceActivated use case AfterInvoiceActivated`

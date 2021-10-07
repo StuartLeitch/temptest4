@@ -34,7 +34,8 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
     private publishInvoiceFinalized:
       | PublishInvoiceFinalizedUsecase
       | NoOpUseCase,
-    private loggerService: LoggerContract
+    private loggerService: LoggerContract,
+    private erpRegister: any,
   ) {
     this.setupSubscriptions();
   }
@@ -151,6 +152,10 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
       if (publishResult.isLeft()) {
         throw publishResult.value;
       }
+
+      // * Register this invoice ERP
+      const erpRegistrationRequest = JSON.stringify({ invoiceId: invoice.invoiceId.toString() });
+      await this.erpRegister.publish(erpRegistrationRequest);
 
       this.loggerService.info(
         `[AfterInvoiceFinalized]: Successfully executed onPublishInvoiceFinalized use case AfterInvoiceFinalized`

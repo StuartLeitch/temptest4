@@ -32,9 +32,11 @@ export class ErpRegister {
   }
 
   async publish(data) {
-    await this.producer.send({
+    const req = {
       'id' : uuidv4(),
       'body': data
-    });
+    }
+
+    await this.producer.send(req);
   }
 }

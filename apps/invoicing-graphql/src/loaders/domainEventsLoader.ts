@@ -51,6 +51,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         schedulingService,
         emailService,
         qq: queue,
+        erpRegister
       },
     } = context;
 
@@ -126,7 +127,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       loggerService,
       env.scheduler.creditControlReminderDelay,
       env.scheduler.paymentReminderDelay,
-      env.scheduler.emailRemindersQueue
+      env.scheduler.emailRemindersQueue,
+      erpRegister
     );
 
     // tslint:disable-next-line: no-unused-expression
@@ -140,7 +142,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       waiver,
       payer,
       publishInvoiceFinalized,
-      loggerService
+      loggerService,
+      erpRegister
     );
 
     // tslint:disable-next-line: no-unused-expression
