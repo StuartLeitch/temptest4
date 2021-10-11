@@ -254,7 +254,6 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
           this.waiverRepo,
           this.payerRepo,
           this.loggerService,
-          this.emailService,
           this.vatService
         );
 

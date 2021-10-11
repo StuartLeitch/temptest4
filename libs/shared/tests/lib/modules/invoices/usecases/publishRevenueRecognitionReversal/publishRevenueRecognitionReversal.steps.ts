@@ -22,8 +22,10 @@ import {
   AddressMap,
   ArticleMap,
   CatalogMap,
+  CreditNoteMap,
   Invoice,
   InvoiceItemMap,
+  MockCreditNoteRepo,
   PayerMap,
   PayerType,
   Roles,
@@ -45,6 +47,7 @@ let mockManuscriptRepo: MockArticleRepo;
 let mockCatalogRepo: MockCatalogRepo;
 let mockNetsuiteService: MockErpService;
 let mockPublisherRepo: MockPublisherRepo;
+let mockCreditNoteRepo: MockCreditNoteRepo;
 let mockErpReferenceRepo: MockErpReferenceRepo;
 let mockLogger: MockLogger;
 
@@ -70,6 +73,7 @@ Before({ tags: '@ValidatePublishRevRecReversalToErp' }, function () {
   mockCatalogRepo = new MockCatalogRepo();
   mockErpReferenceRepo = new MockErpReferenceRepo();
   mockPublisherRepo = new MockPublisherRepo();
+  mockCreditNoteRepo = new MockCreditNoteRepo();
   mockNetsuiteService = new MockErpService();
   mockLogger = new MockLogger();
   mockInvoiceRepo = new MockInvoiceRepo(null, null, mockErpReferenceRepo);
@@ -86,6 +90,7 @@ Before({ tags: '@ValidatePublishRevRecReversalToErp' }, function () {
     mockManuscriptRepo,
     mockCatalogRepo,
     mockPublisherRepo,
+    mockCreditNoteRepo,
     mockErpReferenceRepo,
     mockNetsuiteService,
     mockLogger
@@ -203,6 +208,19 @@ Given(/A regular invoice/, async function () {
   }
 
   const payer = maybePayer.value;
+
+  const maybeCreditNote = CreditNoteMap.toDomain({
+    invoiceId: invoice.invoiceId.id.toValue(),
+    dateCreated: new Date(),
+    vat: 20,
+    price: -2000
+  });
+
+  if (maybeCreditNote.isLeft()) {
+    throw maybeCreditNote.value;
+  }
+
+  mockCreditNoteRepo.addMockItem(maybeCreditNote.value);
 
   mockPayerRepo.addMockItem(payer);
   mockAddressRepo.addMockItem(address);

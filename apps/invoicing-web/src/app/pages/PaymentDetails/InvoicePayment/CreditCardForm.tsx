@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import PaymentIcon from "./PaymentIcon";
 import { Flex, Label, Button, Text, th } from "@hindawi/react-components";
-import { Braintree, HostedField } from "react-braintree-fields";
+// import { Braintree, HostedField } from "react-braintree-fields";
 
 interface Props {
   handleSubmit: any;
@@ -17,16 +17,15 @@ interface Props {
 }
 
 class CreditCardForm extends React.PureComponent<Props, {}> {
-  numberField: React.RefObject<unknown>;
   braintree: React.RefObject<unknown>;
+  emailField: React.RefObject<unknown>;
+  hf: any;
+  threeDS: any;
 
   constructor(props: any) {
     super(props);
 
-    this.numberField = React.createRef();
-    this.braintree = React.createRef();
-
-    ["onError", "getToken", "onAuthorizationSuccess"].forEach(
+    ["start", "setupComponents", "setupForm", "enablePayNow", "onSubmit"].forEach(
       prop => (this[prop] = this[prop].bind(this)),
     );
   }
@@ -34,54 +33,117 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
   state = {
     isBraintreeReady: false,
     numberFocused: false,
-    error: null
+    error: null,
+    loading: false
   };
+
+   componentDidMount() {
+    this.start();
+  }
+
+  start() {
+    var self = this;
+    const {ccToken } = this.props;
+
+    return this.setupComponents(ccToken).then(function(instances) {
+      self.hf = instances[0];
+      self.threeDS = instances[1];
+
+      self.setupForm();
+    }).catch(function (err) {
+       console.error('component error:', err);
+    });
+  }
+
+  setupComponents (clientToken) {
+    const braintree = (window as any).braintree;
+    return Promise.all([
+      (braintree as any).hostedFields.create({
+        authorization: clientToken,
+        styles: {
+          '::placeholder': {
+            'color': 'rgb(181, 181, 181)',
+            'opacity': '1' /* Firefox */
+          },
+          input: {
+            'font-size': '14px',
+            'font-family': 'monospace',
+            'letter-spacing': "2px",
+            'word-spacing': "4px",
+            'width': "100%",
+            'color': "rgb(91, 91, 91)",
+          },
+          '.number': {
+            'font-family': 'monospace',
+            'color': "rgb(91, 91, 91)",
+          },
+          '.valid': {
+            'color': 'green'
+          }
+        },
+        fields: {
+          number: {
+            selector: '#hf-number',
+            placeholder: '•••• •••• •••• ••••'
+          },
+          cvv: {
+            selector: '#hf-cvv',
+            placeholder: '•••'
+          },
+          expirationDate: {
+            selector: '#hf-date',
+            placeholder: 'MM/YYYY'
+          }
+        }
+      }),
+      (braintree as any).threeDSecure.create({
+        authorization: clientToken,
+        version: 2
+      })
+    ]);
+  }
+
+  setupForm() {
+    this.enablePayNow();
+  }
+
+  enablePayNow() {
+    // console.info('enable Pay Now');
+    this.setState({ isBraintreeReady: true });
+  }
 
   onError(error: any) {
     this.setState({ error });
   }
 
-  getToken() {
-    (this as any)
-      .tokenize()
-      .then((token: any) => {
-        this.setState(
-          state => ({ ...state, token, error: null }),
-          () => {
-            const ccPayload = {
-              paymentMethodNonce: token.nonce,
-              paymentMethodId: this.props.paymentMethodId,
-              payerId: this.props.payerId,
-              amount: this.props.total,
-            };
-            this.props.handleSubmit(ccPayload);
-          },
-        );
-      })
-      .catch(error => this.setState({ token: null, error }));
-  }
-
-  renderResult(title: string, obj: any) {
-    if (!obj) {
-      return null;
-    }
-    return (
-      <div>
-        <b>{title}:</b>
-        <pre>{JSON.stringify(obj, null, 4)}</pre>
-      </div>
-    );
-  }
-
   renderError(title: string, obj: any) {
+
     if (!obj && !this.props.serverError) {
       return null;
     }
 
+    if (this.props.serverError && !this.state.error) {
+      return (<Text type="warning" key='3dsecure_error'>{'Your credit card was declined by the supplier.'}</Text>)
+    }
+
+    if (obj && ('name' in obj) && obj.name === 'BraintreeError') {
+      if (obj.details?.originalError?.code) {
+        return (<Text type="warning" key='3dsecure_error'>{'3D Secure authentication failed.'}</Text>)
+      }
+
+      if (obj.details?.originalError?.details?.originalError?.error) {
+        return (<Text type="warning" key='braintree_error'>{obj.details.originalError.details.originalError.error.message}</Text>)
+      }
+    }
+
+    if (obj && ('liabilityShifted' in obj) && obj.liabilityShifted === false) {
+      return (<Text type="warning" key='3dsecure_error'>{'3D Secure authentication failed.'}</Text>)
+    }
+
     if (obj && obj.code && obj.code === 'HOSTED_FIELDS_FIELDS_EMPTY') {
-      return (
-        <Text type="warning">{'All fields are empty'}</Text>
-        );
+       return (
+         <Text type="warning" key='all_fields_empty'>{'All fields are empty'}</Text>
+      );
     } else if (obj && obj.code && obj.code === 'HOSTED_FIELDS_FIELDS_INVALID') {
       const map = []
       if (obj.details && 'invalidFields' in obj.details) {
@@ -96,10 +158,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
           if (invalidFieldKey === 'cvv') {
             txt = '\u2022 Please enter a valid CVV'
           }
-          if (invalidFieldKey === 'postalCode') {
-            txt = '\u2022 Please enter a valid postal code'
-          }
-          acc.push(<Text type="warning">{txt}</Text>)
+          acc.push(<Text type="warning" key={`${invalidFieldKey}`}>{txt}</Text>)
           return acc;
         }, []);
 
@@ -107,28 +166,56 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
           <Text key={'msg'} type="warning">{'Some payment input fields are invalid: '}</Text>
         ] as any).concat(invalids)
       }
-    } else if (this.props.serverError && !obj && !obj) {
-      let errorText = this.props.serverError;
-      // Eliminate duplicated text, as this is how it's being returned from Braintree
-      if (this.props.serverError.indexOf('Postal code can only contain letters, numbers, spaces, and hyphens') > -1) {
-        errorText = 'Postal code can only contain letters, numbers, spaces and hyphens.';
-      }
-
-      return (
-        <Text type="warning">{errorText}</Text>
-      );
     }
   }
 
-  onAuthorizationSuccess() {
-    this.setState({ isBraintreeReady: true });
-    // (this.numberField.current as any).focus();
+  onSubmit() {
+    var self = this;
+
+    this.setState({ loading: true });
+
+    this.hf.tokenize().then(function (payload) {
+
+      return self.threeDS.verifyCard({
+        onLookupComplete: function (data, next) {
+          self.setState({ loading: false });
+          next();
+        },
+        amount: self.props.total,
+        nonce: payload.nonce,
+        bin: payload.details.bin
+      })
+    }).then(function (token) {
+      if (!token.liabilityShifted) {
+        self.setState({ loading: false });
+        self.onError(token);
+        return;
+      }
+
+      self.setState(
+        state => ({ ...state, token, error: null }),
+        () => {
+
+          // * send nonce and verification data to our server
+          const ccPayload = {
+            paymentMethodNonce: token.nonce,
+            paymentMethodId: self.props.paymentMethodId,
+            payerId: self.props.payerId,
+            amount: self.props.total,
+          };
+          self.props.handleSubmit(ccPayload);
+        },
+      );
+    }).catch(function (err: any) {
+      self.setState({ loading: false });
+      self.onError(err);
+    });
   }
 
   render() {
     return (
       <Flex vertical>
-        <Flex justifyContent="flex-start">
+        <Flex justifyContent="flex-start" mb={2}>
           <Label>Credit Card Details</Label>
           <PaymentIcon id="visa" style={{ margin: 3, width: 36 }} />
           <PaymentIcon id="maestro" style={{ margin: 3, width: 36 }} />
@@ -136,79 +223,47 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
           <PaymentIcon id="discover" style={{ margin: 3, width: 36 }} />
         </Flex>
 
-        <Braintree
-          ref={this.braintree}
-          authorization={this.props.ccToken}
-          onAuthorizationSuccess={this.onAuthorizationSuccess}
-          onError={this.onError}
-          // onCardTypeChange={this.onCardTypeChange}
-          getTokenRef={(t: any) => ((this as any).tokenize = t)}
-          styles={{
-            input: {
-              "font-size": "14px",
-              "font-family": "courier, monospace",
-              "letter-spacing": "2px",
-              "word-spacing": "4px",
-              width: "100%",
-              color: "rgb(161, 161, 161)",
-            },
-            "#credit-card-number": {
-              "text-align": "left",
-              "margin-bottom": "10px",
-            },
-            ":focus": {
-              color: "rgb(51, 51, 51)",
-            },
-          }}
-        >
+
           <CardContainer
-            mt={2}
-            mb={2}
             className={this.state.isBraintreeReady ? "" : "disabled"}
           >
-            <Flex vertical mr={4}>
-              <Label required htmlFor="cardNumber">
-                Card Number
-              </Label>
-              <HostedField
-                placeholder={
-                  "\u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022"
-                }
-                type="number"
-                ref={this.numberField}
-              />
-            </Flex>
-            <Flex vertical mr={4}>
-              <Label required htmlFor="expirationDate">
-                Expiration Date
-              </Label>
-              <HostedField placeholder={"MM/YYYY"} type="expirationDate" />
-            </Flex>
-            <Flex vertical mr={4}>
-              <Label required htmlFor="cvv">
-                CVV
-              </Label>
-              <HostedField placeholder={"\u2022\u2022\u2022"} type="cvv" />
-            </Flex>
-            <Flex vertical mr={4}>
-              <Label required htmlFor="postalCode">
-                Postal Code
-              </Label>
-              <HostedField type="postalCode" />
-            </Flex>
+            <Flex justifyContent="flex-start" mb={0} mt={3}>
+              <FormGroup style={{ marginRight: '16px' }}>
+                <Label required htmlFor="cardNumber">
+                  Card Number
+                </Label>
+                <div
+                  className="form-control"
+                  id="hf-number"
+                />
+              </FormGroup>
 
-            <Button
-              mt={6}
-              mb={2}
-              size="medium"
-              onClick={this.getToken}
-              loading={this.props.loading}
-            >
-              Pay
-            </Button>
+              <FormGroup style={{ marginRight: '16px' }}>
+                <Label required htmlFor="expirationDate">
+                  Expiration Date
+                </Label>
+                <div className="form-control" id="hf-date" />
+              </FormGroup>
+
+              <FormGroup style={{ marginRight: '16px' }}>
+                <Label required htmlFor="cvv">
+                  CVV
+                </Label>
+                <div className="form-control" id="hf-cvv" />
+              </FormGroup>
+
+              <Button
+                mt={0}
+                mb={3}
+                size="medium"
+                onClick={this.onSubmit}
+                loading={this.state.loading || this.props.loading}
+              >
+                Pay
+              </Button>
+            </Flex>
 
           </CardContainer>
-        </Braintree>
 
         {this.renderError('Error', this.state.error)}
       </Flex>
@@ -218,12 +273,11 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
 
 export default CreditCardForm;
 
-const CardContainer = styled(Flex)`
+const CardContainer = styled('div')`
+  width: 100%;
   background-color: ${th("colors.background")};
   border-radius: ${th("gridUnit")};
-  padding: 0 calc(${th("gridUnit")} * 4);
-  padding-top: calc(${th("gridUnit")} * 3);
-  padding-bottom: calc(${th("gridUnit")} * 3);
+  padding: 0 16px;
 
   &.disabled {
     pointer-events: none;
@@ -240,12 +294,54 @@ const CardContainer = styled(Flex)`
     padding: calc(4px * 2);
     height: 32px;
     border: 1px solid rgb(201, 201, 201);
-    padding: 0 1rem;
+    padding: 0 0rem;
   }
   .braintree-hosted-field.braintree-hosted-field-focused {
     border-color: rgb(51, 51, 51);
   }
   .braintree-hosted-field.error {
     border-color: rgb(254, 186, 172);
+  }
+
+  button {
+    height: 33px;
+    margin-top: 18px;
+  }
+`;
+
+const FormGroup = styled('div')`
+  margin-bottom: 15px;
+
+  .label {
+    display: inline-block;
+    max-width: 100%;
+    margin-bottom: 5px;
+    font-weight: 700;
+  }
+
+  .form-control {
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+  }
+
+  #hf-cvv {
+    width: 104px;
+  }
+  #hf-date {
+    width: 124px;
   }
 `;

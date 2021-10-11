@@ -11,6 +11,8 @@ import { EventUtils } from '../../../../../utils/EventUtils';
 //* Authorization Logic
 import { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
 
+import { InvoiceStatus } from '../../../../invoices/domain/Invoice';
+
 import { SQSPublishServiceContract } from '../../../../../domain/services/SQSPublishService';
 import {
   calculateLastPaymentDate,
@@ -24,7 +26,7 @@ import { PublishCreditNoteCreatedResponse as Response } from './publishCreditNot
 import { PublishCreditNoteCreatedDTO as DTO } from './publishCreditNoteCreatedDTO';
 import * as Errors from './publishCreditNoteCreatedErrors';
 
-const CREDIT_NOTE_CREATED = 'CreditNoteCreated';
+const CREDIT_NOTE_CREATED = 'InvoiceCreditNoteCreated';
 
 export class PublishCreditNoteCreatedUsecase
   implements UseCase<DTO, Promise<Response>, Context> {
@@ -57,14 +59,14 @@ export class PublishCreditNoteCreatedUsecase
       transactionId: invoice.transactionId.toString(),
       erpReference: erpReference?.value ?? null,
       invoiceId: creditNote.invoiceId.id.toString(),
-      invoiceStatus: invoice.status,
+      invoiceStatus: InvoiceStatus.FINAL,
       isCreditNote: true,
 
       lastPaymentDate: calculateLastPaymentDate(payments)?.toISOString(),
-      invoiceFinalizedDate: invoice?.dateMovedToFinal?.toISOString(),
+      invoiceFinalizedDate: creditNote.dateIssued.toISOString(),
       manuscriptAcceptedDate: invoice?.dateAccepted?.toISOString(),
-      invoiceCreatedDate: invoice?.dateCreated.toISOString(),
-      invoiceIssuedDate: invoice?.dateIssued?.toISOString(),
+      invoiceCreatedDate: creditNote.dateCreated.toISOString(),
+      invoiceIssuedDate: creditNote.dateIssued.toISOString(),
       // * Temporary commented until CN events decision
       // reason: creditNote.creationReason,
 

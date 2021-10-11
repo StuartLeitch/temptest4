@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Given, When, Then, Before } from '@cucumber/cucumber';
+import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 import { spy } from 'sinon';
 
 import { ConfirmInvoiceUsecase } from '../../../../../../src/lib/modules/invoices/usecases/confirmInvoice/confirmInvoice';
@@ -27,6 +27,7 @@ import {
   TransactionMap,
   TransactionId,
   TransactionStatus,
+  AfterInvoiceMovedToPending,
 } from '../../../../../../src/lib/shared';
 import { ConfirmInvoiceResponse } from '../../../../../../src/lib/modules/invoices/usecases/confirmInvoice/confirmInvoiceResponse';
 
@@ -42,9 +43,9 @@ let mockPayerRepo: MockPayerRepo;
 
 let mockLogger: MockLogger;
 let mockEmailService: any;
+let afterInvoiceMovedToPendingSubscription: AfterInvoiceMovedToPending;
 
 const mockVatService: VATService = new VATService();
-// let response: ChangeInvoiceStatusResponse;
 
 let useCase: ConfirmInvoiceUsecase;
 let response: ConfirmInvoiceResponse;
@@ -84,9 +85,17 @@ Before({ tags: '@ValidateConfirmInvoice' }, function () {
     mockWaiverRepo,
     mockPayerRepo,
     mockLogger,
-    mockEmailService,
     mockVatService
   );
+
+  afterInvoiceMovedToPendingSubscription = new AfterInvoiceMovedToPending(
+    mockLogger,
+    mockEmailService
+  );
+});
+
+After({ tags: '@ValidateConfirmInvoice' }, function () {
+  afterInvoiceMovedToPendingSubscription = null;
 });
 
 Given(
@@ -318,6 +327,7 @@ Then(
 
 Then(
   /^The Invoice for "([\w-]+)" is sent by email$/,
+
   async function (invoiceId: string) {
     expect(
       mockEmailService.createInvoicePendingNotification.callCount

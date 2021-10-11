@@ -1,6 +1,8 @@
 // * Export Core Subdomain
 export * from './core/domain/UniqueEntityID';
+export * from './core/logic/AppError';
 export * from './infrastructure/Repo';
+
 
 // * Export Shared Subdomain
 export * from './domain/Amount';
@@ -95,7 +97,6 @@ export * from './modules/invoices/usecases/publishEvents/publishInvoiceCreated/p
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceDraftDeleted/publishInvoiceDraftDeleted';
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceDraftCreated/publishInvoiceDraftCreated';
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceDraftDueAmountUpdated/publishInvoiceDraftDueAmountUpdated';
-export * from './modules/invoices/usecases/publishEvents/publishInvoiceCredited/publishInvoiceCredited';
 export * from './modules/invoices/usecases/publishEvents/publishInvoiceFinalized/publishInvoiceFinalized';
 export * from './modules/invoices/usecases/publishEvents/publishInvoicePaid/publishInvoicePaid';
 export * from './modules/invoices/usecases/ERP/publishInvoiceToErp/publishInvoiceToErp';
@@ -107,6 +108,7 @@ export * from './modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
 export * from './modules/invoices/subscriptions/AfterInvoiceFinalizedEvent';
 export * from './modules/invoices/subscriptions/AfterInvoicePaidEvents';
 export * from './modules/invoices/subscriptions/afterInvoiceConfirmedEvent';
+export * from './modules/invoices/subscriptions/AfterInvoiceMovedToPendingEvent';
 
 // export * from './invoices/usecases/sendInvoice/sendInvoice';
 // export * from './modules/invoices/dtos/InvoiceDTO';

@@ -1,13 +1,11 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
-import { UniqueEntityID } from '../../../core/domain/UniqueEntityID';
 import { NoOpUseCase } from './../../../core/domain/NoOpUseCase';
 import { Roles } from '../../../domain/authorization';
 
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
 
 import { InvoiceFinalizedEvent as InvoiceFinalized } from '../domain/events/invoiceFinalized';
-import { InvoiceId } from './../domain/InvoiceId';
 
 import { PaymentMethodRepoContract } from '../../payments/repos/paymentMethodRepo';
 import { AddressRepoContract } from '../../addresses/repos/addressRepo';
@@ -36,7 +34,8 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
     private publishInvoiceFinalized:
       | PublishInvoiceFinalizedUsecase
       | NoOpUseCase,
-    private loggerService: LoggerContract
+    private loggerService: LoggerContract,
+    private erpRegister: any,
   ) {
     this.setupSubscriptions();
   }
@@ -153,6 +152,10 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
       if (publishResult.isLeft()) {
         throw publishResult.value;
       }
+
+      // * Register this invoice ERP
+      const erpRegistrationRequest = JSON.stringify({ invoiceId: invoice.invoiceId.toString() });
+      await this.erpRegister.publish(erpRegistrationRequest);
 
       this.loggerService.info(
         `[AfterInvoiceFinalized]: Successfully executed onPublishInvoiceFinalized use case AfterInvoiceFinalized`

@@ -19,11 +19,16 @@ import { InvoiceRepoContract } from '../../../../invoices/repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../../../../invoices/repos/invoiceItemRepo';
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
+import { ArticleRepoContract } from '../../../../manuscripts/repos/articleRepo';
+import { CatalogRepoContract } from '../../../../journals/repos/catalogRepo';
+import { PublisherRepoContract } from '../../../../publishers/repos/publisherRepo';
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
 import { ErpReferenceRepoContract } from '../../../../vendors/repos';
 import { PublishCreditNoteToErpUsecase } from '../publishCreditNoteToErp/publishCreditNoteToErpUsecase';
 
 import { RetryCreditNotesResponse as Response } from './retryCreditNotesResponse';
+import { PayerRepoContract } from '../../../../payers/repos/payerRepo';
+import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
 
 export class RetryCreditNotesUsecase
   extends AccessControlledUsecase<Record<string, unknown>, Context, AccessControlContext>
@@ -35,6 +40,11 @@ export class RetryCreditNotesUsecase
     private invoiceItemRepo: InvoiceItemRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
+    private manuscriptRepo: ArticleRepoContract,
+    private addressRepo: AddressRepoContract,
+    private payerRepo: PayerRepoContract,
+    private catalogRepo: CatalogRepoContract,
+    private publisherRepo: PublisherRepoContract,
     private erpReferenceRepo: ErpReferenceRepoContract,
     private erpService: ErpServiceContract,
     private loggerService: LoggerContract
@@ -47,6 +57,11 @@ export class RetryCreditNotesUsecase
       this.invoiceItemRepo,
       this.couponRepo,
       this.waiverRepo,
+      this.payerRepo,
+      this.manuscriptRepo,
+      this.addressRepo,
+      this.catalogRepo,
+      this.publisherRepo,
       this.erpReferenceRepo,
       this.erpService,
       this.loggerService

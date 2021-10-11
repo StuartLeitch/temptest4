@@ -32,7 +32,7 @@ export const schedulerLoader: MicroframeworkLoader = async (
     } = env.app;
 
     const netSuiteJobQueue = [
-      RegisterInvoicesCron,
+      // RegisterInvoicesCron,
       RegisterRevenueRecognitionsCron,
       RegisterCreditNotesCron,
       RegisterPaymentsCron,

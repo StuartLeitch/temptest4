@@ -1,32 +1,28 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
-import { NoOpUseCase } from '../../../core/domain/NoOpUseCase';
-
-import {
-  Roles,
-  UsecaseAuthorizationContext,
-} from '../../../domain/authorization';
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
+import { NoOpUseCase } from '../../../core/domain/NoOpUseCase';
+import { UnexpectedError } from '../../../core/logic/AppError';
+import { Roles } from '../../../domain/authorization';
+import { left } from '../../../core/logic/Either';
 
 import { CreditNoteCreated as CreditNoteCreatedEvent } from '../domain/events/CreditNoteCreated';
-import { CreditNoteRepoContract } from '../repos/creditNoteRepo';
+
 import { PaymentMethodRepoContract } from '../../payments/repos/paymentMethodRepo';
+import { InvoiceItemRepoContract } from '../../invoices/repos/invoiceItemRepo';
 import { ArticleRepoContract } from '../../manuscripts/repos/articleRepo';
 import { AddressRepoContract } from '../../addresses/repos/addressRepo';
 import { PaymentRepoContract } from '../../payments/repos/paymentRepo';
-import { InvoiceItemRepoContract } from '../../invoices/repos/invoiceItemRepo';
-import { PayerRepoContract } from '../../payers/repos/payerRepo';
 import { InvoiceRepoContract } from '../../invoices/repos/invoiceRepo';
+import { CreditNoteRepoContract } from '../repos/creditNoteRepo';
+import { PayerRepoContract } from '../../payers/repos/payerRepo';
 import { CouponRepoContract } from '../../coupons/repos';
 import { WaiverRepoContract } from '../../waivers/repos';
 
-import { PublishInvoiceCreditedUsecase } from '../../invoices/usecases/publishEvents/publishInvoiceCredited';
-// import { PublishRevenueRecognitionReversalUsecase } from '../../invoices/usecases/ERP/publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
+import { PublishCreditNoteCreatedUsecase } from '../usecases/publishEvents/publishCreditNoteCreated';
+import { GetItemsForInvoiceUsecase } from '../../invoices/usecases/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../../invoices/usecases/getInvoiceDetails';
-import { GetItemsForInvoiceUsecase } from '../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
-import { left } from '../../../core/logic/Either';
-import { UnexpectedError } from '../../../core/logic/AppError';
 
 export class AfterCreditNoteCreatedEvent
   implements HandleContract<CreditNoteCreatedEvent> {
@@ -42,9 +38,8 @@ export class AfterCreditNoteCreatedEvent
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
     private publishCreditNoteCreated:
-      | PublishInvoiceCreditedUsecase
+      | PublishCreditNoteCreatedUsecase
       | NoOpUseCase,
-    // private publishRevenueRecognitionReversal: PublishRevenueRecognitionReversalUsecase,
     private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();

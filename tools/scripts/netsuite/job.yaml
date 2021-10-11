@@ -9,14 +9,14 @@ spec:
     metadata:       
       name: kubejob       
       labels:         
-        jobgroup: netsuite     
+        jobgroup: netsuite
     spec:       
       containers:       
       - name: netsuite-terminator          
-        image: 916437579680.dkr.ecr.eu-west-1.amazonaws.com/belzebuth-playground:netsuite-pacifier-0.4.0         
+        image: 916437579680.dkr.ecr.eu-west-1.amazonaws.com/belzebuth-playground:netsuite-pacifier-0.7.0         
         env:
         - name: RECORD_TYPE
-          value: "customerpayment"
+          value: "creditmemo"
         - name: BATCH_SIZE
           value: "200"
         - name: DELAY
