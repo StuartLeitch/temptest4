@@ -50,9 +50,32 @@ export const ERPInvoiceRegistration: EventHandler<any> = {
       let invoice: Invoice;
 
       try {
+        const _InvoiceId = InvoiceId.create(new UniqueEntityID(invoiceId));
+
+        // * Get ERP reference
+        const maybeErpReferences = await erpReferenceRepo.getErpReferencesByInvoiceId(_InvoiceId);
+
+        if (maybeErpReferences.isLeft()) {
+          throw new Error(maybeErpReferences.value.message);
+        }
+
+        const erpReference = maybeErpReferences.value.getItems().filter(
+          (er) => er.vendor === 'netsuite' && er.attribute === 'confirmation'
+          )
+          .find(Boolean);
+
+        // * If exists, do not try to register again!
+        if (erpReference) {
+          logger.warn({
+            message: `Invoice ${invoiceId} already registered!`,
+          });
+
+          return;
+        }
+
         // * Get invoice details
         const maybeInvoice = await invoiceRepo.getInvoiceById(
-          InvoiceId.create(new UniqueEntityID(invoiceId))
+          _InvoiceId
         );
 
         if (maybeInvoice.isLeft()) {
