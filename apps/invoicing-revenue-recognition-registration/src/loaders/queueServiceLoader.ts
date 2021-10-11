@@ -1,3 +1,5 @@
+import { Consumer } from 'sqs-consumer';
+import AWS from 'aws-sdk';
 import {
   MicroframeworkSettings,
   MicroframeworkLoader,
@@ -13,29 +15,36 @@ export const queueServiceLoader: MicroframeworkLoader = async (
   if (settings && env.aws.enabled) {
     const context: Context = settings.getData('context');
 
-    const queue = context?.services?.qq;
+    // Configure the region
+    AWS.config.update({
+      region: env.aws.sqs.region,
+      accessKeyId: env.aws.sqs.accessKey,
+      secretAccessKey: env.aws.sqs.secretAccessKey,
+    });
 
-    if (queue) {
-      Object.keys(eventHandlers).forEach((eventHandler: string) => {
-        const { handler, event } = eventHandlers[eventHandler];
+    const sqs: any = new AWS.SQS();
 
-        if (event === 'ERPRevenueRecognitionRegistration') {
-          queue._LOCAL_ = {
-            event,
-            handler: handler.bind(context),
-          };
-        }
+    const sqsConsumer = Consumer.create({
+      sqs,
+      queueUrl: env.aws.sqs.queueName,
+      handleMessage: async (message) => {
+        eventHandlers.ERPRevenueRecognitionRegistration.handler(context)(
+          message
+        );
+      },
+    });
 
-        queue.registerEventHandler({
-          event,
-          handler: handler(context),
-        });
-      });
-      queue.start();
+    sqsConsumer.on('error', (err) => {
+      console.error(err.message);
+      process.exit(1);
+    });
 
-      await queue._LOCAL_.handler(context)({
-        invoiceId: '3acf2fb0-285c-4eec-b78e-29739759e22a',
-      });
-    }
+    sqsConsumer.on('processing_error', (err) => {
+      console.error(err.message);
+    });
+
+    console.log(`SQS service is running for ${env.aws.sqs.queueName}`);
+
+    sqsConsumer.start();
   }
 };
