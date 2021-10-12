@@ -153,7 +153,7 @@ export const ERPInvoiceRegistration: EventHandler<any> = {
             throw new Error(nonInvoiceableErpReference.value.message);
           }
 
-          await this.erpReferenceRepo.save(nonInvoiceableErpReference.value);
+          await erpReferenceRepo.save(nonInvoiceableErpReference.value);
 
           logger.info(
             `PublishInvoiceToERP Flag invoice ${invoice.invoiceId.id.toString()} as NON_INVOICEABLE`,
