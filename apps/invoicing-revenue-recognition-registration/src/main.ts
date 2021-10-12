@@ -1,11 +1,5 @@
-// console.log('Hello World from erp payment registration microservice!');
-
 import 'reflect-metadata';
 import { bootstrapMicroframework } from 'microframework-w3tec';
-
-import { banner } from './lib/banner';
-// import { Logger } from './lib/logger';
-// import './lib/logger/LoggerAspect';
 
 import { env } from './env';
 import { LoggerBuilder } from '@hindawi/shared';
@@ -45,12 +39,12 @@ async function main() {
     loaders.push(contextLoader);
   }
 
-  if (env.loaders.expressEnabled) {
-    const { expressLoader } = await import(
-      /* webpackChunkName: "expressLoader" */ './loaders/expressLoader'
+  if (env.loaders.queueServiceEnabled) {
+    const { queueServiceLoader } = await import(
+      /* webpackChunkName: "queueServiceLoader" */ './loaders/queueServiceLoader'
     );
-    log.info('Express Server initiated ✔️');
-    loaders.push(expressLoader);
+    log.info('Queue Service initiated ✔️');
+    loaders.push(queueServiceLoader);
   }
 
   if (env.loaders.erpEnabled) {
@@ -61,26 +55,16 @@ async function main() {
     loaders.push(erpLoader);
   }
 
-  if (env.loaders.queueServiceEnabled) {
-    const { queueServiceLoader } = await import(
-      /* webpackChunkName: "queueServiceLoader" */ './loaders/queueServiceLoader'
-    );
-    log.info('Queue Service initiated ✔️');
-    loaders.push(queueServiceLoader);
-  }
-
   await bootstrapMicroframework({
     /**
      * Loader is a place where you can configure all your modules during microframework
      * bootstrap process. All loaders are executed one by one in a sequential order.
      */
     loaders,
-  })
-    .then(() => banner(log))
-    .catch((error) => {
-      log.error('Application crashed', error);
-      process.exit(1);
-    });
+  }).catch((error) => {
+    log.error('Application crashed', error);
+    process.exit(1);
+  });
 }
 
 main();
