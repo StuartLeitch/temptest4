@@ -42,7 +42,7 @@ export const ERPInvoiceRegistration: EventHandler<any> = {
           }
         },
       } = context;
-      const { invoiceId } = JSON.parse(data.Body);
+      const { invoiceId } = data;
 
       logger.setScope(`ERP invoice registration event: ${ERP_INVOICE_REGISTRATION}`);
       logger.info(`Register invoice `, invoiceId);

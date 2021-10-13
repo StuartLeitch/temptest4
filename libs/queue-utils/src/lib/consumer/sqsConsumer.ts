@@ -36,27 +36,30 @@ export class SqsQueueConsumer implements QueueConsumer {
   }
 
   async start() {
-    let { QueueUrl } = await this.sqs
-      .getQueueUrl({ QueueName: this.queueName })
-      .promise();
+    const self = this;
 
     this.sqsConsumer = Consumer.create({
-      sqs: this.sqs,
-      queueUrl: QueueUrl,
-      handleMessage: this.processMessage,
+      sqs: this.sqs as any,
+      queueUrl: this.queueName,
+      handleMessage: this.processMessage.bind(self),
     });
 
-    this.sqsConsumer.on('error', console.error);
+    this.sqsConsumer.on('error', (err) => {
+      console.error(err.message);
+      process.exit(1);
+    });
 
-    this.sqsConsumer.on('processing_error', console.error);
+    this.sqsConsumer.on('processing_error', (err) => {
+      console.error(err.message)
+    });
+
 
     this.sqsConsumer.start();
   }
 
   private async processMessage(message: SQS.Message) {
     const body = JSON.parse(get(message, 'Body'));
-
-    await this.handleEvent(JSON.parse(get(body, 'Message')));
+    await this.handleEvent(body);
   }
 
   private extractActionName(eventName: string): string {
