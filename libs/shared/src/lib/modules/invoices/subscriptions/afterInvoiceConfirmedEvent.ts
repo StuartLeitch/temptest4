@@ -141,7 +141,12 @@ export class AfterInvoiceConfirmed implements HandleContract<InvoiceConfirmed> {
 
 
       // * Register this invoice ERP
-      const erpRegistrationRequest = JSON.stringify({ invoiceId: invoice.invoiceId.toString() });
+      const erpRegistrationRequest = JSON.stringify({
+        "event": "InvoiceRegistration",
+        "data": {
+          "invoiceId": invoice.invoiceId.toString()
+        }
+      });
       await this.erpRegister.publish(erpRegistrationRequest);
 
       this.loggerService.info(
