@@ -41,8 +41,8 @@ export const ERPRevenueRecognitionRegistration: EventHandler<any> = {
           erp: { netsuite },
         },
       } = context;
-      console.info(data.Body);
-      const invoiceId = data.Body;
+
+      const { invoiceId } = data;
 
       logger.setScope(
         `ERP payment registration event: ${ERP_REVENUE_RECOGNITION_REGISTRATION}`
