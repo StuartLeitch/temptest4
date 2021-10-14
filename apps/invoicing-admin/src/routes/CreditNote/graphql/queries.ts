@@ -101,7 +101,7 @@ export const CREDIT_NOTE_QUERY = `
     reduction
     type_id
   }
-  fragment articleFragment on Article {
+  fragment articleFragment on InvoicingArticle {
     id
     title
     created

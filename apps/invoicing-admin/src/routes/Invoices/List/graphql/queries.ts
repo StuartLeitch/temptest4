@@ -67,7 +67,7 @@ fragment waiverFragment on Waiver {
   reduction
   type_id
 }
-fragment articleFragment on Article {
+fragment articleFragment on InvoicingArticle {
   id
   title
   created
@@ -160,7 +160,7 @@ fragment waiverFragment on Waiver {
   reduction
   type_id
 }
-fragment articleFragment on Article {
+fragment articleFragment on InvoicingArticle {
   id
   title
   created
