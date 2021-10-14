@@ -106,6 +106,8 @@ Test:
 
 .validate-schema: &script_validate
   image: $BUILD_IMAGE
+  needs:
+    Install Dependencies
   only:
     refs:
       - merge_requests
