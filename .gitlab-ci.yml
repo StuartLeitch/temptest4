@@ -106,17 +106,14 @@ Test:
 
 .validate-schema: &script_validate
   image: $BUILD_IMAGE
-  needs:
-    Install Dependencies
-  only:
-    refs:
-      - merge_requests
+  needs: 
+    - Install Dependencies
   stage: test
   tags:
     - "cluster:hindawi-dev"
   variables:
     GIT_STRATEGY: none
-    SCHEMA_REGISTRY_URL: $QA_SCHEMA_REGISTRY_URL
+    SCHEMA_REGISTRY_URL: ''
     SERVICE: ''
     FILE_PATH: ''
     PROPERTY: ''
@@ -133,6 +130,7 @@ Validate Schema:qa:
   variables:
     SERVICE: 'invoicing-graphql'
     FILE_PATH: './src/graphql/schema/schema.graphql'
+    SCHEMA_REGISTRY_URL: $QA_SCHEMA_REGISTRY_URL
 
 Build:
   tags:
