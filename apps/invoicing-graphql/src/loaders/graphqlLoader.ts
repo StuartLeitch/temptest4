@@ -38,23 +38,24 @@ export const graphqlLoader: MicroframeworkLoader = (
     );
     expressApp.set('trust proxy', true);
 
-    // const { keycloak } = configureKeycloak(
-    //   expressApp,
-    //   memoryStore,
-    //   env.graphql.route
-    // );
+    const { keycloak } = configureKeycloak(
+      expressApp,
+      memoryStore,
+      env.graphql.route
+    );
 
-    const authMiddleware = auth();
-    expressApp.use(authMiddleware);
+    // const authMiddleware = auth();
+    // expressApp.use(authMiddleware);
 
     const graphqlServer = new ApolloServer({
-      typeDefs: [/* KeycloakTypeDefs, */ typeDefs], // 1. Add the Keycloak Type Defs
-      // schemaDirectives: KeycloakSchemaDirectives, // 2. Add the KeycloakSchemaDirectives
+      typeDefs: [KeycloakTypeDefs,  typeDefs], // 1. Add the Keycloak Type Defs
+      schemaDirectives: KeycloakSchemaDirectives, // 2. Add the KeycloakSchemaDirectives
       resolvers,
       context: ({ req }) => {
+        // console.info(req);
         return {
           ...context,
-          // keycloakAuth: new KeycloakContext({ req } as any, keycloak), // 3. add the KeycloakContext to `kAuth`
+          keycloakAuth: new KeycloakContext({ req } as any, keycloak), // 3. add the KeycloakContext to `kAuth`
           // auth: requiresAuth()
         };
       },
