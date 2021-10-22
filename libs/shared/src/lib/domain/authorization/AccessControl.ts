@@ -289,7 +289,7 @@ accessControl
   .action('read');
 
 accessControl
-  .grant(Roles.FINANCIAL_ADMIN)
+  .grant(Roles.FINANCIAL_CONTROLLER)
   .inherits(Roles.FINANCIAL_BASIC)
   .resource('invoice')
   .action('create')
@@ -328,7 +328,7 @@ accessControl
   .action('create');
 
 accessControl
-  .grant(Roles.FINANCIAL_CONTROLLER)
+  .grant(Roles.FINANCIAL_ADMIN)
   .inherits(Roles.FINANCIAL_BASIC)
   .resource('invoice')
   .action('update')
@@ -344,6 +344,11 @@ accessControl
   // * Allow credit note creation
   .resource('creditNote')
   .action('create')
+  // * Allow toggle reminders
+  .resource('reminder')
+  .action('toggle')
+  .action('send')
+  .action('add')
   // * Allow payment registration
   .resource('payment')
   .action('register')
