@@ -72,8 +72,7 @@ export function formatPayer(
 export function formatCosts(
   invoiceItems: InvoiceItem[],
   payments: Payment[],
-  invoice: Invoice,
-  creditNote?: CreditNote
+  invoice: Invoice
 ): PhenomCosts {
   const apcItems = invoiceItems.filter((item) => item.type === 'APC');
   const totalPrice = apcItems.reduce((acc, item) => acc + item.price, 0);
@@ -90,16 +89,37 @@ export function formatCosts(
     .reduce((acc, payment) => acc + payment.amount.value, 0);
   const dueAmount = totalPrice - totalDiscount + vatAmount - paid;
 
-  const creditNoteExists =
-    invoice.invoiceId.id.toString() === creditNote?.invoiceId.id.toString();
-
   return {
-    dueAmount: creditNoteExists ? 0 : dueAmount,
     netAmount: totalPrice - totalDiscount + vatAmount,
     netApc: totalPrice - totalDiscount,
     grossApc: totalPrice,
     paidAmount: paid,
     totalDiscount,
+    dueAmount,
+    vatAmount,
+  };
+}
+
+export function formatCreditNoteCosts(
+  invoiceItems: InvoiceItem[],
+  creditNote: CreditNote
+) {
+  const vatAmount = (creditNote.price * creditNote.vat) / 100;
+
+  const apcItems = invoiceItems.filter((item) => item.type === 'APC');
+  const totalInvoicePrice = apcItems.reduce((acc, item) => acc + item.price, 0);
+  const totalInvoiceDiscount = apcItems.reduce(
+    (acc, item) => acc + item.calculateDiscount(),
+    0
+  );
+
+  return {
+    totalDiscount: -1 * totalInvoiceDiscount,
+    netAmount: creditNote.price + vatAmount,
+    grossApc: -1 * totalInvoicePrice,
+    netApc: creditNote.price,
+    paidAmount: 0,
+    dueAmount: 0,
     vatAmount,
   };
 }
