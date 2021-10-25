@@ -92,8 +92,6 @@ export class PublishCreditNoteCreatedUsecase
       reason: creditNote.creationReason,
     };
 
-    console.log(data);
-
     try {
       await this.publishService.publishMessage({
         timestamp: messageTimestamp?.toISOString(),
