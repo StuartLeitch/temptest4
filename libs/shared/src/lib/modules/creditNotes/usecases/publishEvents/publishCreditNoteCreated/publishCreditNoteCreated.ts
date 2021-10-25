@@ -48,9 +48,17 @@ export class PublishCreditNoteCreatedUsecase
     } = request;
 
     const creditNoteItems = invoiceItems.map((item) => {
-      const price = { price: -1 * item.price };
+      const itemProps = Object.assign({}, item.props);
 
-      return Object.assign({}, item, price) as InvoiceItem;
+      itemProps.price = itemProps.price * -1;
+
+      const maybeItem = InvoiceItem.create(itemProps, item.id);
+
+      if (maybeItem.isLeft()) {
+        return null;
+      }
+
+      return maybeItem.value;
     });
 
     const erpReference = creditNote.erpReference;
@@ -83,6 +91,8 @@ export class PublishCreditNoteCreatedUsecase
 
       reason: creditNote.creationReason,
     };
+
+    console.log(data);
 
     try {
       await this.publishService.publishMessage({
