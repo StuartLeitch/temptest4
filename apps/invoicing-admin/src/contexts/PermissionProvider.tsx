@@ -51,7 +51,8 @@ const PERMISSIONS = {
     'create.credit-note',
     'list.coupons',
     'apply.coupon',
-    'add.payment'
+    'add.payment',
+    'stop.reminders'
   ],
   MARKETING: ['list.invoices','list.coupons', 'list.credit-notes', 'create.coupon', 'apply.coupon', 'edit.coupon'],
   FINANCIAL_SUPPORT: ['list.invoices', 'list.coupons','list.credit-notes', 'apply.coupon'],
