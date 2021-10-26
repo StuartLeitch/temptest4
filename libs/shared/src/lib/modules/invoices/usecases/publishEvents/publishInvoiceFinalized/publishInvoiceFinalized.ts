@@ -10,7 +10,6 @@ import { EventUtils } from '../../../../../utils/EventUtils';
 import { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
 
 import { SQSPublishServiceContract } from '../../../../../domain/services/SQSPublishService';
-import { Invoice } from '../../../domain/Invoice';
 
 import {
   calculateLastPaymentDate,
@@ -72,7 +71,7 @@ export class PublishInvoiceFinalizedUsecase
       invoiceCreatedDate: invoice?.dateCreated?.toISOString(),
       invoiceIssuedDate: invoice?.dateIssued?.toISOString(),
 
-      costs: formatCosts(invoiceItems, payments, invoice),
+      costs: formatCosts(invoiceItems, payments),
       invoiceItems: formatInvoiceItems(invoiceItems, manuscript.customId),
       payer: payer ? formatPayer(payer, billingAddress) : null,
       payments: payments ? formatPayments(payments, paymentMethods) : null,

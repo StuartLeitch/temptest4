@@ -1,4 +1,5 @@
 import {
+  InvoiceItemType as PhenomInvoiceItemType,
   InvoiceItem as PhenomInvoiceItem,
   CouponApplicableInvoiceItemType,
   InvoicePayment as PhenomPayment,
@@ -11,15 +12,14 @@ import {
 
 import { Name } from '../../../../domain/Name';
 
+import { PaymentStatus, Payment } from '../../../payments/domain/Payment';
 import { PaymentMethod } from '../../../payments/domain/PaymentMethod';
+import { CreditNote } from '../../../creditNotes/domain/CreditNote';
 import { Address } from '../../../addresses/domain/Address';
-import { Payment, PaymentStatus } from '../../../payments/domain/Payment';
 import { Coupon } from '../../../coupons/domain/Coupon';
 import { Waiver } from '../../../waivers/domain/Waiver';
 import { InvoiceItem } from '../../domain/InvoiceItem';
 import { Payer } from '../../../payers/domain/Payer';
-import { Invoice } from '../../domain/Invoice';
-import { CreditNote } from '../../../creditNotes/domain/CreditNote';
 
 export function formatCoupons(coupons: Coupon[]): PhenomCoupon[] {
   if (!coupons) return undefined;
@@ -71,8 +71,7 @@ export function formatPayer(
 
 export function formatCosts(
   invoiceItems: InvoiceItem[],
-  payments: Payment[],
-  invoice: Invoice
+  payments: Payment[]
 ): PhenomCosts {
   const apcItems = invoiceItems.filter((item) => item.type === 'APC');
   const totalPrice = apcItems.reduce((acc, item) => acc + item.price, 0);
@@ -101,26 +100,25 @@ export function formatCosts(
 }
 
 export function formatCreditNoteCosts(
-  invoiceItems: InvoiceItem[],
+  creditNoteItems: InvoiceItem[],
   creditNote: CreditNote
-) {
-  const vatAmount = (creditNote.price * creditNote.vat) / 100;
+): PhenomCosts {
+  const apcItems = creditNoteItems.filter((item) => item.type === 'APC');
+  const grossApc = -1 * apcItems.reduce((acc, item) => acc + item.price, 0);
+  const totalDiscount =
+    -1 * apcItems.reduce((acc, item) => acc + item.calculateDiscount(), 0);
+  const netApc = creditNote.price - totalDiscount;
 
-  const apcItems = invoiceItems.filter((item) => item.type === 'APC');
-  const totalInvoicePrice = apcItems.reduce((acc, item) => acc + item.price, 0);
-  const totalInvoiceDiscount = apcItems.reduce(
-    (acc, item) => acc + item.calculateDiscount(),
-    0
-  );
+  const vatAmount = (netApc * creditNote.vat) / 100;
 
   return {
-    totalDiscount: -1 * totalInvoiceDiscount,
-    netAmount: creditNote.price + vatAmount,
-    grossApc: -1 * totalInvoicePrice,
-    netApc: creditNote.price,
+    netAmount: creditNote.price - totalDiscount + vatAmount,
     paidAmount: 0,
+    totalDiscount,
     dueAmount: 0,
     vatAmount,
+    grossApc,
+    netApc,
   };
 }
 
@@ -132,7 +130,7 @@ export function formatInvoiceItems(
     id: invoiceItem.id.toString(),
     manuscriptCustomId,
     manuscriptId: invoiceItem.manuscriptId.id.toString(),
-    type: invoiceItem.type as any,
+    type: invoiceItem.type as PhenomInvoiceItemType,
     price: invoiceItem.price,
     vatPercentage: invoiceItem.vat,
     coupons: formatCoupons(invoiceItem.assignedCoupons.coupons),
