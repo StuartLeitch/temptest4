@@ -8,7 +8,7 @@ import { generateCreditNoteCompensatoryEvents } from './generateCreditNoteCompen
 import { generateInvoiceCompensatoryEvents } from './generateInvoiceCompensatoryEvents';
 import { creditNote } from './creditNote';
 import { reminders } from './reminders';
-import { journals } from './journals';
+import { invoicingJournals } from './journals';
 import { payments } from './payments';
 import { invoice } from './invoice';
 import { coupon } from './coupon';
@@ -21,7 +21,7 @@ export const resolvers: Resolvers<Context> = merge(
   invoice,
   coupon,
   payments,
-  journals,
+  invoicingJournals,
   generateInvoiceCompensatoryEvents,
   reminders,
   generateInvoiceDraftCompensatoryEvents,

@@ -34,7 +34,7 @@ export const payerFragment = gql`
 `;
 
 export const articleFragment = gql`
-  fragment articleFragment on Article {
+  fragment articleFragment on InvoicingArticle {
     id
     title
     created

@@ -104,6 +104,34 @@ Test:
     paths:
       - reports
 
+.validate-schema: &script_validate
+  image: $BUILD_IMAGE
+  needs: 
+    - Install Dependencies
+  stage: test
+  tags:
+    - "cluster:hindawi-dev"
+  variables:
+    GIT_STRATEGY: none
+    SCHEMA_REGISTRY_URL: ''
+    SERVICE: ''
+    FILE_PATH: ''
+    PROPERTY: ''
+  script:
+    - yarn global add @phenom.pub/schema-registry-cli
+    - cd $HOME/apps/$SERVICE
+    - schema-registry-cli validate --path $FILE_PATH --property $PROPERTY --service $SERVICE --service-version $CI_COMMIT_SHORT_SHA
+
+Validate Schema:qa: 
+  <<: *script_validate
+  only:
+    changes:
+      - 'apps/invoicing-graphql/**/*'
+  variables:
+    SERVICE: 'invoicing-graphql'
+    FILE_PATH: './src/graphql/schema/schema.graphql'
+    SCHEMA_REGISTRY_URL: $QA_SCHEMA_REGISTRY_URL
+
 Build:
   tags:
     - 'cluster:hindawi-dev'
