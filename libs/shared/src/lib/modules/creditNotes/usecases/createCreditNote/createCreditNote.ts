@@ -14,7 +14,6 @@ import {
 } from '../../../../domain/authorization';
 
 import { NotificationPause } from '../../../notifications/domain/NotificationPause';
-import { Transaction } from '../../../transactions/domain/Transaction';
 import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import {
@@ -29,7 +28,6 @@ import { CreditNoteMap } from '../../mappers/CreditNoteMap';
 
 import { PausedReminderRepoContract } from '../../../notifications/repos/PausedReminderRepo';
 import { CreditNoteRepoContract } from '../../repos/creditNoteRepo';
-import { TransactionRepoContract } from '../../../transactions/repos';
 import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 import {
@@ -37,8 +35,8 @@ import {
   InvoiceRepoContract,
 } from '../../../invoices/repos';
 
-import type { CreateCreditNoteRequestDTO as DTO } from './createCreditNoteDTO';
 import { CreateCreditNoteResponse as Response } from './createCreditNoteResponse';
+import type { CreateCreditNoteRequestDTO as DTO } from './createCreditNoteDTO';
 import * as Errors from './createCreditNoteErrors';
 
 export class CreateCreditNoteUsecase
@@ -121,17 +119,13 @@ export class CreateCreditNoteUsecase
         return left(new Errors.InvoiceItemsNotFound(request.invoiceId));
       }
 
-      console.log('*****************************************************');
-      console.log(JSON.stringify(items));
-      console.log('*****************************************************');
-
       invoice.addItems(items);
 
       const creditNoteProps = {
         id: new UniqueEntityID(),
         creationReason: request.reason,
         vat: invoice.getInvoicePercentage(),
-        price: invoice.invoiceNetTotal * -1,
+        price: invoice.netTotalBeforeDiscount * -1,
         persistentReferenceNumber: `CN-${invoice.persistentReferenceNumber}`,
         dateCreated: new Date(),
         dateIssued: new Date(),

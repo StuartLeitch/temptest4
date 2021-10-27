@@ -337,9 +337,15 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   }
 
   public getInvoiceNetTotalBeforeDiscount(): number {
-    return twoDigitPrecision(
-      this.getInvoiceNetTotal() + this.getInvoiceDiscountTotal()
-    );
+    if (this.invoiceItems.length === 0) {
+      throw new Error(
+        `Invoice with id {${this.id.toString()}} does not have any invoice items attached and it was tried to calculate invoice total`
+      );
+    }
+
+    const total = this.invoiceItems.reduce((acc, item) => acc + item.price, 0);
+
+    return twoDigitPrecision(total);
   }
 
   public getInvoiceVatTotal(): number {
