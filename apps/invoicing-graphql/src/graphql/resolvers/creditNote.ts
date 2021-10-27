@@ -189,13 +189,12 @@ export const creditNote: Resolvers<Context> = {
 
       const {
         repos: {
+          pausedReminder: pausedReminderRepo,
+          invoiceItem: invoiceItemRepo,
           creditNote: creditNoteRepo,
           invoice: invoiceRepo,
-          invoiceItem: invoiceItemRepo,
-          transaction: transactionRepo,
           coupon: couponRepo,
           waiver: waiverRepo,
-          pausedReminder: pausedReminderRepo,
         },
       } = context;
 
@@ -209,7 +208,6 @@ export const creditNote: Resolvers<Context> = {
         creditNoteRepo,
         invoiceRepo,
         invoiceItemRepo,
-        transactionRepo,
         couponRepo,
         waiverRepo,
         pausedReminderRepo

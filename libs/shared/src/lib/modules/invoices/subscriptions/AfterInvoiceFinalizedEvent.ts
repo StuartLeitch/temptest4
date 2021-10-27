@@ -57,6 +57,9 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
     try {
       // TODO move this to usecase
       let invoiceItems = invoice.invoiceItems.currentItems;
+      console.log('--------------------------------------------------');
+      console.log(JSON.stringify(invoiceItems));
+      console.log('--------------------------------------------------');
 
       if (invoiceItems.length === 0) {
         const getItemsUsecase = new GetItemsForInvoiceUsecase(
@@ -81,7 +84,7 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
       }
 
       let payer: Payer;
-      let maybePayer = await this.payerRepo.getPayerByInvoiceId(
+      const maybePayer = await this.payerRepo.getPayerByInvoiceId(
         invoice.invoiceId
       );
       if (maybePayer.isLeft()) {

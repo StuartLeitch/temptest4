@@ -40,7 +40,7 @@ function twoDigitPrecision(n: number): number {
   return Number.parseFloat(n.toFixed(2));
 }
 
-interface InvoiceProps {
+export interface InvoiceProps {
   status: InvoiceStatus;
   invoiceNumber?: number;
   transactionId: TransactionId;
@@ -369,7 +369,6 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   public assignInvoiceNumber(
     lastInvoiceNumber: number
   ): Either<GuardFailure, void> {
-    const now = new Date();
     const maybeNextInvoiceNumber = InvoiceNumber.create({
       value: lastInvoiceNumber,
     });
@@ -384,7 +383,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     return right(null);
   }
 
-  computeReferenceNumber() {
+  computeReferenceNumber(): string {
     let referenceNumberPadded = null;
     let referenceYear = null;
 
