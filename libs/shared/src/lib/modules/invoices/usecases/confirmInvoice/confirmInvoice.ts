@@ -109,9 +109,9 @@ export class ConfirmInvoiceUsecase
 
       const maybePayer = await new AsyncEither(payerInput)
         .then(this.savePayerData(context))
+        .then(this.applyVatToInvoice(context))
         .then(this.assignInvoiceNumber(context))
         .then(this.updateInvoiceStatus)
-        .then(this.applyVatToInvoice(context))
         .map(this.dispatchEvents)
         .map((data) => data.payer)
         .execute();
@@ -457,7 +457,11 @@ export class ConfirmInvoiceUsecase
         },
         context
       );
-      return maybeAppliedVat.map(() => ({ invoice, address, payer }));
+      return maybeAppliedVat.map(() => ({
+        invoice,
+        address,
+        payer,
+      }));
     };
   }
 }
