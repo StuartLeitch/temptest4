@@ -20,8 +20,8 @@ export const env = {
     process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'qa',
   app: {
     name: getOsEnv('SERVICE_NAME'),
-    version: (pkg as any).version,
-    description: (pkg as any).description,
+    version: pkg.version,
+    description: pkg.description,
     schema: getOsEnv('APP_SCHEMA'),
     host: getOsEnv('APP_HOST'),
     port: normalizePort(process.env.PORT || getOsEnv('APP_PORT')),

@@ -94,7 +94,6 @@ async function setupQueueService(loggerBuilder: LoggerBuilder) {
     eventNamespace: env.app.eventNamespace,
     publisherName: env.app.publisherName,
     serviceName: env.app.name,
-    defaultMessageAttributes: env.app.defaultMessageAttributes,
   };
 
   let queue: PhenomSqsServiceContract;
