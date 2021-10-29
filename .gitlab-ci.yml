@@ -1,22 +1,22 @@
-stages:
-  - build
-  - test
-
-build-code-job:
+build-job:
   stage: build
   script:
-    - echo "Ceva"
-    - ruby -v
-    - rake
+    - echo "Hello, $GITLAB_USER_LOGIN!"
 
-test-code-job1:
+test-job1:
   stage: test
   script:
-    - echo "If the files are built successfully, test some files with one command:"
-    - rake test1
+    - echo "This job tests something"
 
-test-code-job2:
+test-job2:
   stage: test
   script:
-    - echo "If the files are built successfully, test other files with a different command:"
-    - rake test2
+    - echo "This job tests something, but takes more time than test-job1."
+    - echo "After the echo commands complete, it runs the sleep command for 20 seconds"
+    - echo "which simulates a test that runs 20 seconds longer than test-job1"
+    - sleep 20
+
+deploy-prod:
+  stage: deploy
+  script:
+    - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
