@@ -1,0 +1,27 @@
+build-job:
+  stage: build
+  script:
+    - echo "Hello, $GITLAB_USER_LOGIN!"
+  tags:
+    - 'cluster:hindawi-dev'
+
+test-job1:
+  stage: test
+  script: 
+    - echo "Hello, $GITLAB_USER_LOGIN!"
+  tags:
+    - 'cluster:hindawi-dev'
+
+build-job:
+  stage: ping
+  script:
+    - ping google.com
+  tags:
+    - 'cluster:hindawi-dev'
+
+deploy-prod:
+  stage: deploy
+  script:
+    - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
+  tags:
+    - 'cluster:hindawi-dev'
