@@ -8,7 +8,7 @@ build-job:
 test-job1:
   stage: test
   script:
-    - echo "This job tests something"
+    - ping google.com
   tags:
     - 'cluster:hindawi-dev'
 
