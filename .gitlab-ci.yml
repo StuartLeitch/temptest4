@@ -12,7 +12,7 @@ test-job1:
   tags:
     - 'cluster:hindawi-dev'
 
-build-job:
+ping:
   stage: test
   script:
     - ping google.com
