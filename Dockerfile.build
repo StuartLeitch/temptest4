@@ -1,7 +1,7 @@
 FROM node:14-alpine as build
 
 RUN apk update && apk upgrade && \
-  apk add --no-cache bash git openssh g++ make python2
+  apk add --no-cache bash git openssh g++ make py3-pip
 
 ENV HOME "/home/app"
 
@@ -13,7 +13,7 @@ COPY package.json yarn.lock ./
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 # Install any needed packages specified in package.json
-RUN yarn install --frozen-lockfile --network-timeout 100000
+RUN  yarn cache clean && yarn install --frozen-lockfile --network-timeout 100000
 
 # Copying the rest of the code to the working directory
 COPY ./ ./
