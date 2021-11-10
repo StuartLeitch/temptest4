@@ -4532,6 +4532,11 @@
     yargs "15.4.1"
     yargs-parser "20.0.0"
 
+"@olian/typescript-helpers@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@olian/typescript-helpers/-/typescript-helpers-2.3.0.tgz#02556b358812aa317361056191073f6586acad5f"
+  integrity sha512-dM8+K04V3ZhRt/FadIIidXT3MykFjSetmZzV940nYY6iCUeGF2LSxJNwK3JQD06N9F1JjDPLXtIIYxffEJEcHw==
+
 "@owczar/dashboard-style--airframe@0.1.23":
   version "0.1.23"
   resolved "https://registry.yarnpkg.com/@owczar/dashboard-style--airframe/-/dashboard-style--airframe-0.1.23.tgz#c477469748a62a97ad2f8feeeda14a93ce50e394"
@@ -6229,6 +6234,11 @@
   version "11.15.54"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-11.15.54.tgz#59ed60e7b0d56905a654292e8d73275034eb6283"
   integrity sha512-1RWYiq+5UfozGsU6MwJyFX6BtktcT10XRjvcAQmskCtMcW3tPske88lM/nHv7BQG1w9KBXI1zPGuu5PnNCX14g==
+
+"@types/node@^14.17.22":
+  version "14.17.33"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.17.33.tgz#011ee28e38dc7aee1be032ceadf6332a0ab15b12"
+  integrity sha512-noEeJ06zbn3lOh4gqe2v7NMGS33jrulfNqYFDjjEbhpDEHR5VTxgYNQSBqBlJIsBJW3uEYDgD6kvMnrrhGzq8g==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
@@ -8838,6 +8848,16 @@ becke-ch--regex--s0-0-v1--base--pl--lib@^1.2.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/becke-ch--regex--s0-0-v1--base--pl--lib/-/becke-ch--regex--s0-0-v1--base--pl--lib-1.4.0.tgz#429ceebbfa5f7e936e78d73fbdc7da7162b20e20"
   integrity sha1-Qpzuu/pffpNueNc/vcfacWKyDiA=
+
+better-logging@^4.5.1:
+  version "4.5.1"
+  resolved "https://registry.yarnpkg.com/better-logging/-/better-logging-4.5.1.tgz#8fe428efe244cf8a8436445ff93b91afbaadf52a"
+  integrity sha512-BwfWgAHB83G3GEpjYGKWYN1nKlJbCj8L80b6bHx5kjtpNmOm6VQsAu1+h3Z1X70l2keBktaNl13P4TRTfVapOA==
+  dependencies:
+    "@olian/typescript-helpers" "^2.3.0"
+    "@types/node" "^14.17.22"
+    chalk "^4.1.0"
+    fast-safe-stringify "^2.0.7"
 
 better-opn@^2.0.0:
   version "2.1.1"
