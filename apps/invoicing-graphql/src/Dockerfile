@@ -1,9 +1,10 @@
-FROM node:14-alpine as build
+FROM node:16-alpine3.12 as build
+
 ENV HOME "/home/app"
 WORKDIR ${HOME}
 
 RUN apk update && apk upgrade && \
-    apk add --no-cache bash git openssh g++ make python \
+    apk add --no-cache bash git openssh g++ make python3 \
     chromium \
     nss \
     freetype \
