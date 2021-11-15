@@ -1,16 +1,21 @@
-FROM node:16-alpine3.12 as build
+FROM node:16-alpine as build
 
 ENV HOME "/home/app"
 WORKDIR ${HOME}
 
-RUN apk update && apk upgrade && \
-  apk add --no-cache bash git openssh g++ make python3 \
+RUN apk add --no-cache \
+  bash \
+  ca-certificates \
   chromium \
-  nss \
   freetype \
   freetype-dev \
+  g++ \
+  git \
   harfbuzz \
-  ca-certificates \
+  make \
+  nss \
+  openssh \
+  python3 \
   ttf-freefont
 
 # Copy package.json to the working directory

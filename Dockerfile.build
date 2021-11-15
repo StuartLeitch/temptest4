@@ -1,6 +1,12 @@
-FROM node:16-alpine3.12 as build
+FROM node:16-alpine as build
 
-RUN apk add --no-cache bash git openssh g++ make python3
+RUN apk add --no-cache \
+  bash \
+  g++ \
+  git \
+  make \
+  openssh \
+  python3
 
 ENV HOME "/home/app"
 

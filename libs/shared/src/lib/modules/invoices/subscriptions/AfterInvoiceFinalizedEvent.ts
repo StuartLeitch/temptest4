@@ -81,7 +81,7 @@ export class AfterInvoiceFinalized implements HandleContract<InvoiceFinalized> {
       }
 
       let payer: Payer;
-      let maybePayer = await this.payerRepo.getPayerByInvoiceId(
+      const maybePayer = await this.payerRepo.getPayerByInvoiceId(
         invoice.invoiceId
       );
       if (maybePayer.isLeft()) {

@@ -11,14 +11,13 @@ import { EventUtils } from '../../../../../utils/EventUtils';
 //* Authorization Logic
 import { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
 
+import { InvoiceItem } from '../../../../invoices/domain/InvoiceItem';
 import { InvoiceStatus } from '../../../../invoices/domain/Invoice';
 
 import { SQSPublishServiceContract } from '../../../../../domain/services/SQSPublishService';
 import {
-  calculateLastPaymentDate,
+  formatCreditNoteCosts,
   formatInvoiceItems,
-  formatPayments,
-  formatCosts,
   formatPayer,
 } from '../../../../invoices/usecases/publishEvents/eventFormatters';
 
@@ -39,16 +38,28 @@ export class PublishCreditNoteCreatedUsecase
     }
 
     const {
-      payer,
-      invoice,
-      payments,
-      manuscript,
-      creditNote,
-      invoiceItems,
-      paymentMethods,
-      billingAddress,
       messageTimestamp,
+      billingAddress,
+      invoiceItems,
+      creditNote,
+      manuscript,
+      invoice,
+      payer,
     } = request;
+
+    const creditNoteItems = invoiceItems.map((item) => {
+      const itemProps = Object.assign({}, item.props);
+
+      itemProps.price = itemProps.price * -1;
+
+      const maybeItem = InvoiceItem.create(itemProps, item.id);
+
+      if (maybeItem.isLeft()) {
+        return null;
+      }
+
+      return maybeItem.value;
+    });
 
     const erpReference = creditNote.erpReference;
     const data: CreditNoteCreatedEvent = {
@@ -58,27 +69,27 @@ export class PublishCreditNoteCreatedUsecase
       referenceNumber: creditNote.persistentReferenceNumber,
       transactionId: invoice.transactionId.toString(),
       erpReference: erpReference?.value ?? null,
-      invoiceId: creditNote.invoiceId.id.toString(),
+      invoiceId: creditNote.id.toString(),
       invoiceStatus: InvoiceStatus.FINAL,
       isCreditNote: true,
 
-      lastPaymentDate: calculateLastPaymentDate(payments)?.toISOString(),
-      invoiceFinalizedDate: creditNote.dateIssued.toISOString(),
+      lastPaymentDate: null,
+      invoiceFinalizedDate: creditNote?.dateIssued?.toISOString(),
       manuscriptAcceptedDate: invoice?.dateAccepted?.toISOString(),
-      invoiceCreatedDate: creditNote.dateCreated.toISOString(),
-      invoiceIssuedDate: creditNote.dateIssued.toISOString(),
-      // * Temporary commented until CN events decision
-      // reason: creditNote.creationReason,
+      invoiceCreatedDate: creditNote?.dateCreated?.toISOString(),
+      invoiceIssuedDate: creditNote?.dateIssued?.toISOString(),
 
-      costs: formatCosts(invoiceItems, payments, invoice, creditNote),
+      costs: formatCreditNoteCosts(invoiceItems, creditNote),
 
-      invoiceItems: formatInvoiceItems(invoiceItems, manuscript.customId),
+      invoiceItems: formatInvoiceItems(creditNoteItems, manuscript.customId),
 
       payer: formatPayer(payer, billingAddress),
 
-      payments: formatPayments(payments, paymentMethods),
+      payments: [],
 
       preprintValue: manuscript.preprintValue,
+
+      reason: creditNote.creationReason,
     };
 
     try {
