@@ -16,6 +16,8 @@ function makeAppEnum(app: string): App | null {
     case App.graphql:
     case App.web:
     case App.reporting:
+    case App.importManuscriptBackend:
+    case App.importManuscriptValidation:
     case App.invoicingErpInvoiceRegistration:
       return app as App;
 
