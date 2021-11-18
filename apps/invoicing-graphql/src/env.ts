@@ -10,7 +10,7 @@ import {
   toFloat,
   toBool,
   toObject,
-} from './lib/env';
+} from '@hindawi/env-utils';
 
 export const env = {
   node: process.env.NODE_ENV || 'development',

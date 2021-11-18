@@ -73,6 +73,12 @@
     },
     "sisif-test": {
       "tags": []
+    },
+    "env-utils": {
+      "tags": []
+    },
+    "queue-utils": {
+      "tags": []
     }
   }
 }

@@ -8181,10 +8181,10 @@ aws-sdk@2.745.0:
     uuid "3.3.2"
     xml2js "0.4.19"
 
-aws-sdk@^2.443.0, aws-sdk@^2.699.0:
-  version "2.990.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.990.0.tgz#7ff0bbc5fe487b02feb831e192bc6610b3272424"
-  integrity sha512-VeXibY45QqI8vuT2YOK3PyV3ZvXQUUY6Lz8XZjuKW4JDVgU1PK6OY8w9QccOEwE2Y0dlM/K05cgvRWeJH8AeLg==
+aws-sdk@^2.699.0:
+  version "2.820.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.820.0.tgz#03933a444fed71b86d4726e63ad80af9aba07a96"
+  integrity sha512-OwGHxprG4KX5QC+vc77Xl7RCkJdwwKYPB7Gw3odNlMfdljedw7ICBylsMSBEwi/YjwaPryKPevHdOJAHbTKvQg==
   dependencies:
     buffer "4.9.2"
     events "1.1.1"
@@ -26897,15 +26897,7 @@ sqlite3@5.0.0:
   optionalDependencies:
     node-gyp "3.x"
 
-sqs-consumer@5.4.0:
-  version "5.4.0"
-  resolved "https://registry.yarnpkg.com/sqs-consumer/-/sqs-consumer-5.4.0.tgz#bac47e50e2f7f86aade5b83baab16dd59ef6d45b"
-  integrity sha512-Wcv7tEMvAqDNEEglCYlOZKufKxRsFPp2J5znYbAvcgB66u64QyXrF5TBb2g4kVn2QKAt5UBoT/GB/gsPLoY3eA==
-  dependencies:
-    aws-sdk "^2.443.0"
-    debug "^4.1.1"
-
-sqs-consumer@^5.4.0:
+sqs-consumer@^5.4.0, sqs-consumer@^5.6.0:
   version "5.6.0"
   resolved "https://registry.yarnpkg.com/sqs-consumer/-/sqs-consumer-5.6.0.tgz#a77c75fecb9ca3d108556d87a07f799ea58b594c"
   integrity sha512-p+K3UV8GwF1//Nfq7swbm/Un137IwxewzxapfTyyEVpdmzPKEDYrAzuGJvP87YWVSWzbkvxQ0By0vhamouGdxg==
