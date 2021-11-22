@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { LogoThemed } from './../LogoThemed/LogoThemed';
+// import { LogoThemed } from './../LogoThemed/LogoThemed';
 
 const HeaderAuth = props => (
   <div className='mb-4'>
@@ -10,7 +10,7 @@ const HeaderAuth = props => (
           props.icon ? (
               <i className={ `fas fa-fw fa-times fa-3x ${ props.iconClassName }` }></i>
           ) : (
-              <LogoThemed checkBackground />
+              null
           )
       }
         </div>

@@ -45,9 +45,10 @@ export const graphqlLoader: MicroframeworkLoader = (
       schemaDirectives: KeycloakSchemaDirectives, // 2. Add the KeycloakSchemaDirectives
       resolvers,
       context: ({ req }) => {
+        const keycloakAuth = new KeycloakContext({ req } as any, keycloak);
         return {
           ...context,
-          keycloakAuth: new KeycloakContext({ req } as any, keycloak), // 3. add the KeycloakContext to `kAuth`
+          keycloakAuth, // 3. add the KeycloakContext to `kAuth`
         };
       },
       playground: env.graphql.editor,

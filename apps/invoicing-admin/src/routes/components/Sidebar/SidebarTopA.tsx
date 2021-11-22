@@ -11,6 +11,7 @@ import {
   DropdownItem,
 } from '../../../components';
 import { useAuth } from '../../../contexts/Auth';
+import { avatarZero } from '../../../utilities';
 
 const SidebarTopA = () => {
   const auth = useAuth();
@@ -18,7 +19,7 @@ const SidebarTopA = () => {
   if (!auth) {
     return null;
   }
-  const { picture, name, profile, username, roles } = auth.data;
+  const { picture = avatarZero(), name, profile, username, roles } = auth.data;
 
   return (
     <React.Fragment>
@@ -28,7 +29,7 @@ const SidebarTopA = () => {
           <Link to='/' className='d-block'>
             <Sidebar.HideSlim>
               <Avatar.Image
-                size='lg'
+                size='md'
                 src={picture}
                 addOns={[
                   <AvatarAddOn.Icon
