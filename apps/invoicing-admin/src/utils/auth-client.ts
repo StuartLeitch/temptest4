@@ -23,7 +23,11 @@ class _AuthClient {
 
   public async login() {
     const { kc } = this;
-    return kc.login({ idpHint: config.authIdpHint });
+    if (config.authIdpHint) {
+      return kc.login({ idpHint: config.authIdpHint });
+    }
+
+    return kc.login();
   }
 
   public async logout() {
