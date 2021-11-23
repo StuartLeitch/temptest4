@@ -8,8 +8,6 @@ export interface AuditLogProps {
   entity: string;
   action: string;
   timestamp: Date;
-  oldValue: string;
-  currentValue: string;
 }
 
 export class AuditLog extends Entity<AuditLogProps> {
@@ -31,14 +29,6 @@ export class AuditLog extends Entity<AuditLogProps> {
 
   get timestamp(): Date {
     return this.props.timestamp;
-  }
-
-  get oldValue(): string {
-    return this.props.oldValue;
-  }
-
-  get currentValue(): string {
-    return this.props.currentValue;
   }
 
   private constructor(props: AuditLogProps, id?: UniqueEntityID) {

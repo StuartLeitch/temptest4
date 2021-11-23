@@ -2,22 +2,22 @@ import React from 'react';
 import format from 'date-fns/format';
 import { Link } from 'react-router-dom';
 
-import  { formatDateWithMinutes } from '../../../utils/date';
-import { Table, Badge } from '../../../components';
+// import  { formatDateWithMinutes } from '../../../utils/date';
+import { Table/*, Badge */} from '../../../components';
 import { AuditLogType } from '../types';
 
-const COUPON_STATUS = {
-  ACTIVE: (
-    <Badge pill color='primary'>
-      Active
-    </Badge>
-  ),
-  INACTIVE: (
-    <Badge pill color='danger'>
-      Inactive
-    </Badge>
-  ),
-};
+// const COUPON_STATUS = {
+//   ACTIVE: (
+//     <Badge pill color='primary'>
+//       Active
+//     </Badge>
+//   ),
+//   INACTIVE: (
+//     <Badge pill color='danger'>
+//       Inactive
+//     </Badge>
+//   ),
+// };
 
 const AuditLogsList: React.FC<AuditLogsListProps> = ({ logs }) => {
   return (
@@ -44,12 +44,8 @@ const AuditLogsList: React.FC<AuditLogsListProps> = ({ logs }) => {
             return (
               <tr key={index}>
                 <td className='align-middle bt-0 font-weight-bold'>
-                  <Link
-                    to={`/dashboards/audit_logs/diff/${id}`}
-                    className='text-decoration-none'
-                  >
                     <span className='bg-twitter text-white pl-2 pr-2'>{timestamp && format(new Date(timestamp), 'dd MMM yyyy HH:mm')}</span>
-                  </Link></td>
+                </td>
                 <td className='align-middle bt-0 font-weight-bold'>{userAccount}</td>
                 <td className='align-middle bt-0'>
                   {action}

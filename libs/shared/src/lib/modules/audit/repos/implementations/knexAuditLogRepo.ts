@@ -16,7 +16,7 @@ export class KnexAuditLogRepo
 
   async getRecentAuditLogs(args?: any): Promise<Either<GuardFailure | RepoError, AuditLogPaginated>> {
     const { pagination } = args;
-    const { db } = this;
+    const { db, logger } = this;
 
     const getModel = () =>
       db(TABLES.AUDIT_LOGS);
@@ -27,20 +27,24 @@ export class KnexAuditLogRepo
 
     const offset = pagination.offset * pagination.limit;
 
-    const rawLogs: Array<any> = await getModel()
-      .orderBy(`${TABLES.AUDIT_LOGS}.timestamp`, 'desc')
-      .offset(offset < totalCount[0].count ? offset : 0)
-      .limit(pagination.limit)
-      .select([`${TABLES.AUDIT_LOGS}.*`]);
+    const sql = getModel()
+    .orderBy(`${TABLES.AUDIT_LOGS}.timestamp`, 'desc')
+    .offset(offset < totalCount[0].count ? offset : 0)
+    .limit(pagination.limit)
+    .select([`${TABLES.AUDIT_LOGS}.*`]);
+
+    logger.debug('select', {
+      sql: sql.toString(),
+    });
+
+    const rawLogs: Array<any> = await sql;
 
     const logs = rawLogs.map(l => ({
       id: l.id,
       userAccount: l.user_account,
       timestamp: l.timestamp,
       action: l.action,
-      entity: l.entity,
-      oldValue: l.old_value,
-      currentValue: l.current_value,
+      entity: l.entity
     }) as any);
 
     return right({
@@ -63,8 +67,6 @@ export class KnexAuditLogRepo
       timestamp: rawLog.timestamp,
       action: rawLog.action,
       entity: rawLog.entity,
-      oldValue: rawLog.old_value,
-      currentValue: rawLog.current_value
     };
 
     return right(auditLog);
@@ -81,8 +83,6 @@ export class KnexAuditLogRepo
       user_account: auditLog.userAccount,
       entity: auditLog.entity,
       action: auditLog.action,
-      old_value: auditLog.oldValue,
-      current_value: auditLog.currentValue,
     }
 
     await db(TABLES.AUDIT_LOGS).insert(newAuditLog);

@@ -61,6 +61,7 @@ const AuditLogsContainer: React.FC = () => {
   }, [fetchData, page, fetchLogs]);
 
   const Content = ({ loading, error, data }) => {
+
     if (loading) return <Loading />;
 
     if (error) return <Error error={error} />;

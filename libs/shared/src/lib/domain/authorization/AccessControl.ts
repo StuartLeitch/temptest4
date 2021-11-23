@@ -133,6 +133,8 @@ accessControl
   .resource('journal')
   .action('read')
   .resource('journals')
+  .action('read')
+  .resource('logs')
   .action('read');
 
 accessControl

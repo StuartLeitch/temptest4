@@ -46,12 +46,14 @@ export const audit: Resolvers<Context> = {
     async auditlogs(parent, args, context) {
       const contextRoles = getAuthRoles(context);
 
+
       const { repos } = context;
 
       const usecase = new GetRecentLogsUsecase(repos.audit);
       const usecaseContext = {
-         roles: contextRoles,
+        roles: contextRoles,
       };
+
       const result = await usecase.execute(args, usecaseContext);
 
       handleForbiddenUsecase(result);
