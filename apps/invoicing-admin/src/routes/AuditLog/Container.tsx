@@ -1,8 +1,6 @@
 import React from 'react';
 import { useQuery } from 'graphql-hooks';
 import { useParams } from 'react-router-dom';
-import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer';
-
 import { AUDIT_LOG_QUERY } from './graphql';
 
 import {
@@ -34,18 +32,10 @@ const AuditLogContainer: React.FC = () => {
     if (error) return <Error error={error} />;
 
     if (data) {
-      const oldData = JSON.stringify(JSON.parse(data.auditlog.oldValue), null, '\t')
-      const newData = JSON.stringify(JSON.parse(data.auditlog.currentValue), null, '\t');
-
       return (
         <>
           <Card className='mb-0'>
-            <ReactDiffViewer
-              oldValue={oldData}
-              newValue={newData}
-              compareMethod={DiffMethod.WORDS}
-              splitView={true}
-            />
+            Individual log
           </Card>
         </>
       );

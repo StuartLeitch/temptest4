@@ -69,10 +69,10 @@ const AuditLogsContainer: React.FC = () => {
       return (
         <>
           <Card className='mb-0'>
-            <List logs={data.auditlogs.logs} />
+            <List logs={data.auditlogs?.logs} />
             <CardFooter className='d-flex justify-content-center pb-0'>
               <ListPagination
-                totalRecords={data.auditlogs.totalCount}
+                totalRecords={data.auditlogs?.totalCount}
                 pageNeighbours={1}
                 onPageChanged={onPageChange}
                 pageLimit={defaultPaginationSettings.limit}
