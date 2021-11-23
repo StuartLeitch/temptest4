@@ -1,29 +1,29 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
 import {
-  MicroframeworkLoader,
   MicroframeworkSettings,
+  MicroframeworkLoader,
 } from 'microframework-w3tec';
 
-import { PublishCreditNoteCreatedUsecase } from '../../../../libs/shared/src/lib/modules/creditNotes/usecases/publishEvents/publishCreditNoteCreated/publishCreditNoteCreated';
-import { PublishInvoiceCreditedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCredited/publishInvoiceCredited';
-import { PublishInvoiceDraftCreatedUseCase } from 'libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftCreated';
-import { PublishInvoiceDraftDeletedUseCase } from 'libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftDeleted';
-import { PublishInvoiceDraftDueAmountUpdatedUseCase } from 'libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftDueAmountUpdated';
+import { PublishInvoiceDraftDueAmountUpdatedUseCase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftDueAmountUpdated';
 import { PublishInvoiceCreatedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceCreated/publishInvoiceCreated';
+import { PublishInvoiceDraftCreatedUseCase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftCreated';
+import { PublishInvoiceDraftDeletedUseCase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceDraftDeleted';
+import { PublishCreditNoteCreatedUsecase } from '../../../../libs/shared/src/lib/modules/creditNotes/usecases/publishEvents/publishCreditNoteCreated';
 import { PublishInvoiceConfirmedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceConfirmed';
 import { PublishInvoiceFinalizedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceFinalized';
 import { PublishInvoicePaidUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoicePaid';
 
-import { AfterCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/creditNotes/subscriptions/AfterCreditNoteCreatedEvent';
 import { AfterInvoiceDraftDueAmountUpdatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDueAmountUpdateEvent';
-import { AfterInvoiceDraftDeletedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDraftDeletedEvent';
 import { AfterInvoiceDraftCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDraftCreatedEvent';
+import { AfterInvoiceDraftDeletedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDraftDeletedEvent';
+import { AfterCreditNoteCreatedEvent } from '../../../../libs/shared/src/lib/modules/creditNotes/subscriptions/AfterCreditNoteCreatedEvent';
+import { AfterInvoiceMovedToPending } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceMovedToPendingEvent';
 import { AfterInvoiceCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
 import { AfterInvoiceConfirmed } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/afterInvoiceConfirmedEvent';
 import { AfterInvoiceFinalized } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceFinalizedEvent';
-import { AfterInvoicePaidEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoicePaidEvents';
 import { AfterPaymentCompleted } from './../../../../libs/shared/src/lib/modules/payments/subscriptions/after-payment-completed';
+import { AfterInvoicePaidEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoicePaidEvents';
 
 import { Context } from '../builders';
 import { env } from '../env';
@@ -46,10 +46,13 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         waiver,
         payer,
       },
-      services: { logger: loggerService, schedulingService, qq: queue, erp },
+      services: {
+        logger: loggerService,
+        schedulingService,
+        emailService,
+        qq: queue,
+      },
     } = context;
-
-    const publishCreditNoteCreated = new PublishCreditNoteCreatedUsecase(queue);
 
     const publishInvoiceDraftCreated = new PublishInvoiceDraftCreatedUseCase(
       queue
@@ -65,7 +68,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
     );
     const publishInvoiceConfirmed = new PublishInvoiceConfirmedUsecase(queue);
     const publishInvoiceFinalized = new PublishInvoiceFinalizedUsecase(queue);
-    const publishInvoiceCredited = new PublishInvoiceCreditedUsecase(queue);
+    const publishInvoiceCredited = new PublishCreditNoteCreatedUsecase(queue);
     const publishInvoicePaid = new PublishInvoicePaidUsecase(queue);
 
     // * Registering Invoice Events
@@ -174,5 +177,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       publishInvoiceCredited,
       loggerService
     );
+
+    new AfterInvoiceMovedToPending(loggerService, emailService);
   }
 };

@@ -10,4 +10,5 @@ export interface CreateManuscriptDTO {
   authorFirstName: string;
   created: Date;
   preprintValue: string;
+  is_cascaded: number;
 }

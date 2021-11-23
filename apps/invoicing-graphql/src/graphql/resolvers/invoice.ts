@@ -607,7 +607,7 @@ export const invoice: Resolvers<Context> = {
       return maybeWaivers.value.map(WaiverMap.toPersistence);
     },
   },
-  Article: {
+  InvoicingArticle: {
     async journalTitle(parent, args, context) {
       const catalogItem = await context.repos.catalog.getCatalogItemByJournalId(
         JournalId.create(new UniqueEntityID(parent.journalId))

@@ -190,7 +190,6 @@ export class ApplyCouponToInvoiceUsecase
           waiverRepo,
           payerRepo,
           loggerService,
-          emailService,
           vatService
         );
 

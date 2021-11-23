@@ -1,11 +1,5 @@
-import {
-  AbstractEventView,
-  EventViewContract,
-} from './contracts/EventViewContract';
-import {
-  REPORTING_TABLES,
-  CHECKER_TEAM_EVENTS,
-} from 'libs/shared/src/lib/modules/reporting/constants';
+import { AbstractEventView, EventViewContract } from './contracts/EventViewContract';
+import { CHECKER_TEAM_EVENTS, REPORTING_TABLES } from 'libs/shared/src/lib/modules/reporting/constants';
 
 const checkerTeamEvents = CHECKER_TEAM_EVENTS.map((e) => `'${e}'`);
 
@@ -19,7 +13,7 @@ AS SELECT
     ce."type" AS event,
     checker_team_view.id as team_id,
     checker_team_view.name as team_name,
-    checker_team_view.type as team_type	
+    checker_team_view.type as team_type
   FROM
     ${REPORTING_TABLES.CHECKER} ce,
     jsonb_to_record(ce.payload) AS checker_team_view (

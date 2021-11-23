@@ -9,7 +9,7 @@ spec:
     metadata:       
       name: kubejob       
       labels:         
-        jobgroup: netsuite     
+        jobgroup: netsuite
     spec:       
       containers:       
       - name: netsuite-terminator          

@@ -1,9 +1,14 @@
 {
   "npmScope": "steakhouse",
-  "affected": { "defaultBase": "develop" },
+  "affected": {
+    "defaultBase": "develop"
+  },
   "implicitDependencies": {
     "workspace.json": "*",
-    "package.json": { "dependencies": "*", "devDependencies": "*" },
+    "package.json": {
+      "dependencies": "*",
+      "devDependencies": "*"
+    },
     "tsconfig.base.json": "*",
     "tslint.json": "*",
     ".eslintrc.json": "*",
@@ -21,18 +26,59 @@
     }
   },
   "projects": {
-    "invoicing-graphql": { "tags": [] },
-    "shared": { "tags": [] },
-    "react-components": { "tags": [] },
-    "invoicing-web": { "tags": [] },
-    "invoicing-web-e2e": { "tags": [] },
-    "invoicing-admin": { "tags": [] },
-    "invoicing-admin-e2e": { "tags": [] },
-    "reporting-backend": { "tags": [] },
-    "eve": { "tags": [] },
-    "reporting-pull-historic-events": { "tags": [] },
-    "sisif": { "tags": [] },
-    "sisif-test": { "tags": [] },
-    "invoicing-infrastructure": { "tags": [] }
+    "eve": {
+      "tags": []
+    },
+    "import-manuscript-backend": {
+      "tags": []
+    },
+    "import-manuscript-validation": {
+      "tags": []
+    },
+    "invoicing-admin": {
+      "tags": []
+    },
+    "invoicing-admin-e2e": {
+      "tags": []
+    },
+    "invoicing-erp-invoice-registration": {
+      "tags": []
+    },
+    "invoicing-graphql": {
+      "tags": []
+    },
+    "invoicing-infrastructure": {
+      "tags": []
+    },
+    "invoicing-web": {
+      "tags": []
+    },
+    "invoicing-web-e2e": {
+      "tags": []
+    },
+    "react-components": {
+      "tags": []
+    },
+    "reporting-backend": {
+      "tags": []
+    },
+    "reporting-pull-historic-events": {
+      "tags": []
+    },
+    "shared": {
+      "tags": []
+    },
+    "sisif": {
+      "tags": []
+    },
+    "sisif-test": {
+      "tags": []
+    },
+    "env-utils": {
+      "tags": []
+    },
+    "queue-utils": {
+      "tags": []
+    }
   }
 }

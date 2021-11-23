@@ -5,12 +5,12 @@ import { useQuery } from 'graphql-hooks';
 
 const JOURNALS_QUERY = `
 query fetchJournals {
-  journals {
+  invoicingJournals {
     ...journalFragment
   }
 }
 
-fragment journalFragment on Journal {
+fragment journalFragment on InvoicingJournal {
   journalId
   journalTitle
 }
@@ -25,11 +25,11 @@ export const JournalsSelections: React.FC<JournalSelectionsProps> = props => {
       clearButton
       multiple
       id='journalsSelections'
-      selected={data?.journals.filter((j: any) =>
+      selected={data?.invoicingJournals.filter((j: any) =>
         props.selected.includes(j.journalId)
       )}
       labelKey='journalTitle'
-      options={data?.journals ?? []}
+      options={data?.invoicingJournals ?? []}
       placeholder='Enter a journal title&hellip;'
     />
   );

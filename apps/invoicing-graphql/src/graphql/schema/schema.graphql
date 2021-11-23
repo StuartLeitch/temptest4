@@ -1,10 +1,10 @@
 scalar Date
 scalar ReferenceNumber
 scalar ID
-scalar Name
+scalar InvoicingName
 
 directive @model(id: ID) on OBJECT
-directive @filter(key: Name) on FIELD_DEFINITION
+directive @filter(key: InvoicingName) on FIELD_DEFINITION
 
 type Error {
   error: String
@@ -26,7 +26,7 @@ enum CreditNoteReason {
   OTHER
 }
 
-type Article @model(id: "articles") {
+type InvoicingArticle @model(id: "articles") {
   id: String
   journalId: ID @filter
   journalTitle: String
@@ -77,7 +77,7 @@ type InvoiceItem @model(id: "invoice_items") {
   rate: Float
   vat: Float
   vatnote: String
-  article: Article
+  article: InvoicingArticle
   dateCreated: Date
   coupons: [Coupon]
   waivers: [Waiver]
@@ -152,7 +152,7 @@ input PayerInput {
   address: AddressInput
 }
 
-type Journal {
+type InvoicingJournal {
   journalId: ID
   journalTitle: String
   # ... (TODO: add missing fields here)
@@ -298,12 +298,12 @@ type SentReminder {
   when: Date
 }
 
-input ArticleFilters {
+input InvoicingArticleFilters {
   journalId: [ID]
   customId: [ID]
 }
 input InvoiceItemFilters {
-  article: ArticleFilters
+  article: InvoicingArticleFilters
 }
 input InvoiceFilters {
   reason: [CreditNoteReason]
@@ -369,7 +369,7 @@ type Query {
   coupon(couponCode: String!): Coupon
   coupons(pagination: Pagination): PaginatedCoupons
   invoiceIdByManuscriptCustomId(customId: ID): InvoiceId
-  journals: [Journal]
+  invoicingJournals: [InvoicingJournal]
   echo(value: String): String
   remindersStatus(invoiceId: ID!): RemindersStatus
   remindersSent(invoiceId: ID!): [SentReminder]

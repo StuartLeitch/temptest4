@@ -250,7 +250,6 @@ export class EpicOnArticlePublishedUsecase
           this.waiverRepo,
           this.payerRepo,
           this.loggerService,
-          this.emailService,
           this.vatService
         );
 

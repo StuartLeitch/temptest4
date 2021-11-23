@@ -79,7 +79,6 @@ Before({ tags: '@ValidateRetryRevRec' }, function () {
     mockCreditNoteRepo,
     mockInvoiceRepo,
     mockInvoiceItemRepo,
-    mockTransactionRepo,
     mockCouponRepo,
     mockWaiverRepo,
     null

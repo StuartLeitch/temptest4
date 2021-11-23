@@ -17,6 +17,7 @@ import { InvoiceItem } from './InvoiceItem';
 import { InvoiceId } from './InvoiceId';
 
 import { InvoiceDraftDueAmountUpdated } from './events/invoiceDraftDueAmountUpdated';
+import { InvoiceMovedToPendingEvent } from './events/invoiceMovedToPending';
 import { InvoicePaymentAddedEvent } from './events/invoicePaymentAdded';
 import { InvoiceDraftCreated } from './events/invoiceDraftCreated';
 import { InvoiceDraftDeleted } from './events/invoiceDraftDeleted';
@@ -39,7 +40,7 @@ function twoDigitPrecision(n: number): number {
   return Number.parseFloat(n.toFixed(2));
 }
 
-interface InvoiceProps {
+export interface InvoiceProps {
   status: InvoiceStatus;
   invoiceNumber?: number;
   transactionId: TransactionId;
@@ -256,6 +257,14 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     );
   }
 
+  public markAsPending(sender: string, receiver: string): void {
+    this.props.status = InvoiceStatus.PENDING;
+
+    this.addDomainEvent(
+      new InvoiceMovedToPendingEvent(this, sender, receiver, new Date())
+    );
+  }
+
   public markAsFinal(): void {
     const now = new Date();
     this.props.dateMovedToFinal = now;
@@ -328,9 +337,15 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   }
 
   public getInvoiceNetTotalBeforeDiscount(): number {
-    return twoDigitPrecision(
-      this.getInvoiceNetTotal() + this.getInvoiceDiscountTotal()
-    );
+    if (this.invoiceItems.length === 0) {
+      throw new Error(
+        `Invoice with id {${this.id.toString()}} does not have any invoice items attached and it was tried to calculate invoice total`
+      );
+    }
+
+    const total = this.invoiceItems.reduce((acc, item) => acc + item.price, 0);
+
+    return twoDigitPrecision(total);
   }
 
   public getInvoiceVatTotal(): number {
@@ -360,7 +375,6 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
   public assignInvoiceNumber(
     lastInvoiceNumber: number
   ): Either<GuardFailure, void> {
-    const now = new Date();
     const maybeNextInvoiceNumber = InvoiceNumber.create({
       value: lastInvoiceNumber,
     });
@@ -375,7 +389,7 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
     return right(null);
   }
 
-  computeReferenceNumber() {
+  computeReferenceNumber(): string {
     let referenceNumberPadded = null;
     let referenceYear = null;
 

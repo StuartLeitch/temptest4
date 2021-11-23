@@ -2,8 +2,7 @@
 
 .env
 /dev/data
-/apps/invoicing-graphql/src/environments/*
-/apps/reporting-backend/src/environments/*
+**/environments/*
 /tools/scripts/netsuite/node_modules
 /tools/scripts/netsuite/data/*
 
@@ -62,3 +61,4 @@ env-config.js
 tools/scripts/aws/sqs/dlq/failedEvents.json
 tools/scripts/aws/sqs/dlq/delete-message-batch.json
 *.nx-tmp
+/apps/import-manuscript-backend/src/environments/

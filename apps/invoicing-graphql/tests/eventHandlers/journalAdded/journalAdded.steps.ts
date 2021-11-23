@@ -26,6 +26,7 @@ const defaultPublisher = {
     itemId: '',
     creditAccountId: '',
     debitAccountId: '',
+    creditAccountIdForCascaded: '',
   },
   dateCreated: null,
   dateUpdated: null,

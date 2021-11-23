@@ -43,10 +43,6 @@ import {
   PublishInvoiceConfirmedDTO,
 } from '../publishEvents/publishInvoiceConfirmed';
 import {
-  PublishInvoiceCreditedUsecase,
-  PublishInvoiceCreditedDTO,
-} from '../publishEvents/publishInvoiceCredited';
-import {
   PublishInvoiceFinalizedUsecase,
   PublishInvoiceFinalizedDTO,
 } from '../publishEvents/publishInvoiceFinalized';
@@ -67,7 +63,6 @@ import * as Errors from './generateInvoiceCompensatoryEventsErrors';
 import {
   InvoiceConfirmedData,
   InvoiceFinalizedData,
-  InvoiceCreditedData,
   InvoiceCreatedData,
   WithBillingAddress,
   InvoicePayedData,

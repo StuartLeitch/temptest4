@@ -7,9 +7,9 @@ import { Resolvers } from '../schema';
 
 import { handleForbiddenUsecase, getAuthRoles } from './utils';
 
-export const journals: Resolvers<Context> = {
+export const invoicingJournals: Resolvers<Context> = {
   Query: {
-    async journals(parent, args, context) {
+    async invoicingJournals(parent, args, context) {
       const roles = getAuthRoles(context);
 
       const { repos } = context;

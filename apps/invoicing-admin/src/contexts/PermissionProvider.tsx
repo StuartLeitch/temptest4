@@ -34,7 +34,7 @@ const PERMISSIONS = {
     'add.payment',
     'stop.reminders'
   ],
-  FINANCIAL_ADMIN: [
+  FINANCIAL_CONTROLLER: [
     'list.invoices',
     'list.credit-notes',
     'create.credit-note',
@@ -45,13 +45,14 @@ const PERMISSIONS = {
     'add.payment',
     'stop.reminders'
   ],
-  FINANCIAL_CONTROLLER: [
+  FINANCIAL_ADMIN: [
     'list.invoices',
     'list.credit-notes',
     'create.credit-note',
     'list.coupons',
     'apply.coupon',
-    'add.payment'
+    'add.payment',
+    'stop.reminders'
   ],
   MARKETING: ['list.invoices','list.coupons', 'list.credit-notes', 'create.coupon', 'apply.coupon', 'edit.coupon'],
   FINANCIAL_SUPPORT: ['list.invoices', 'list.coupons','list.credit-notes', 'apply.coupon'],
@@ -67,11 +68,9 @@ const PermissionProvider: React.FunctionComponent<{}> = ({children}) => {
     const isAllowedTo = async (permission: Permission): Promise<boolean> => {
       let permissions = [];
 
-      const roles = data.roles ?? []
-
       permissions = [...new Set(data.roles.reduce((permissions, role) => {
         const assignedRole = role.toUpperCase();
-        let permissionsByRole = PERMISSIONS[assignedRole];
+        const permissionsByRole = PERMISSIONS[assignedRole];
 
         return permissions.concat(permissionsByRole);
         }, []))];

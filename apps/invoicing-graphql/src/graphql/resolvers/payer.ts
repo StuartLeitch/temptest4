@@ -31,7 +31,6 @@ export const payer: Resolvers<Context> = {
         repos.waiver,
         repos.payer,
         loggerService,
-        emailService,
         vatService
       );
 

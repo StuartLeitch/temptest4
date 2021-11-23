@@ -24,7 +24,7 @@ export const queueServiceLoader: MicroframeworkLoader = async (
           handler: handler(context),
         });
       });
-      queue.start(); 
+      queue.start();
     }
   }
 };
