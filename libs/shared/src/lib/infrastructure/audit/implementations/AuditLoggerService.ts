@@ -6,14 +6,15 @@ import { AuditLoggerServiceContract } from "../AuditLoggerService";
 
 /**
  * ------------------------------------------------
- * This is the main AuditLogger Object.
+ * This is the main AuditLogger Service class.
  * ------------------------------------------------
  */
-export class AuditLoggerService implements AuditLoggerServiceContract{
+export class AuditLoggerService implements AuditLoggerServiceContract {
 
-  constructor(private auditLogRepo, private readonly userData: any) {
-    // * do nothing yet
-  }
+  constructor(
+    private readonly auditLogRepo,
+    private readonly userData: any
+  ) {}
 
   public log(args: any): void {
     const log = AuditLog.create({

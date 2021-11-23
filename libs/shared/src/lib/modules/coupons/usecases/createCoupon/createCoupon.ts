@@ -97,9 +97,7 @@ export class CreateCouponUsecase
       this.auditLoggerService.log({
         action: 'added new',
         entity: 'coupon',
-        oldValue: null,
         timestamp: new Date(),
-        currentValue: CouponMap.toPersistence(result.value)
       });
 
 

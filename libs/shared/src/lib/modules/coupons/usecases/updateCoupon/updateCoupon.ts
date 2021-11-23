@@ -93,9 +93,7 @@ export class UpdateCouponUsecase
         this.auditLoggerService.log({
           action: 'has edited',
           entity: 'coupon',
-          oldValue: this.couponOldValue,
           timestamp: new Date(),
-          currentValue: this.couponCurrentValue,
         });
 
         return right(savedCoupon.value);

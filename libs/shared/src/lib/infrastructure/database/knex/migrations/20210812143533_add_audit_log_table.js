@@ -6,8 +6,6 @@ module.exports.up = async function(knex) {
       table.string('entity', 40);
       table.string('action', 40);
       table.datetime('timestamp', { precision: 2, useTz: false });
-      table.text('old_value');
-      table.text('current_value');
     });
 };
 

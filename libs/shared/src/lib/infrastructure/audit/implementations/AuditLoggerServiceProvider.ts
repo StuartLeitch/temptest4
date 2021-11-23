@@ -1,4 +1,4 @@
-import { AuditLogRepoContract } from '../../../modules/audit/repos/auditLogRepo';
+// import { AuditLogRepoContract } from '../../../modules/audit/repos/auditLogRepo';
 import { AuditLoggerService } from './AuditLoggerService';
 
 export class AuditLoggerServiceProvider {
