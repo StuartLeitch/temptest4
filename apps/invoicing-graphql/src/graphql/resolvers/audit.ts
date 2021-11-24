@@ -1,44 +1,13 @@
 import {
-  GetInvoiceIdByManuscriptCustomIdUsecase,
-  GetInvoiceIdByManuscriptCustomIdDTO,
-  GetTransactionByInvoiceIdUsecase,
-  GetCreditNoteByInvoiceIdUsecase,
-  GetPaymentsByInvoiceIdUsecase,
-  ApplyCouponToInvoiceUsecase,
-  GetPaymentMethodByIdUsecase,
-  GetItemsForInvoiceUsecase,
-  GetArticleDetailsUsecase,
-  GetInvoiceDetailsUsecase,
-  GetRecentInvoicesUsecase,
-  CreateCreditNoteUsecase,
-  GetInvoiceDetailsDTO,
   GetRecentLogsUsecase,
-  GetLogByIdUsecase,
-  GetVATNoteUsecase,
-  PaymentMethodMap,
-  InvoiceItemMap,
-  TransactionMap,
-  UniqueEntityID,
-  InvoiceItemId,
-  ArticleMap,
-  InvoiceMap,
-  PaymentMap,
-  CouponMap,
-  InvoiceId,
-  JournalId,
-  WaiverMap,
-  PayerMap,
-  Roles,
   AuditLogMap
 } from '@hindawi/shared';
 
-import { InvoiceStatus, PayerType, Resolvers, Invoice } from '../schema';
+import { Resolvers } from '../schema';
 import { Context } from '../../builders';
-import { env } from '../../env';
 
 import {
   handleForbiddenUsecase,
-  getOptionalAuthRoles,
   getAuthRoles,
 } from './utils';
 

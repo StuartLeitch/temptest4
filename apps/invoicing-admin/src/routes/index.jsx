@@ -13,7 +13,6 @@ import CreditNoteDetails from './CreditNote/CreditNote';
 import CouponsList from './Coupons';
 import { CouponDetails, CouponCreate } from './Coupon';
 import AuditLogs from './AuditLogs';
-import AuditLog from './AuditLog';
 
 import SplitInvoice from './Invoice/SplitInvoice';
 

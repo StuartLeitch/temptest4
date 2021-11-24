@@ -48,41 +48,17 @@ export class KnexAuditLogRepo
     });
   }
 
-  async getLogById(logId: string): Promise<Either<GuardFailure | RepoError, any>> {
-    const { db } = this;
-
-    const rawLog = await db(TABLES.AUDIT_LOGS)
-      .select()
-      .where('id', logId.toString())
-      .first();
-
-    const auditLog = {
-      id: rawLog.id,
-      userAccount: rawLog.user_account,
-      timestamp: rawLog.timestamp,
-      action: rawLog.action,
-      entity: rawLog.entity,
-    };
-
-    return right(auditLog);
-  }
-
   async save(
     auditLog: AuditLog
   ): Promise<Either<GuardFailure | RepoError, AuditLog>> {
     const { db } = this;
 
-    const newAuditLog = {
-      id: auditLog.id.toString(),
-      timestamp: auditLog.timestamp.toISOString(),
-      user_account: auditLog.userAccount,
-      entity: auditLog.entity,
-      action: auditLog.action,
-    }
+    const newAuditLog = AuditLogMap.toPersistence(auditLog);
 
     await db(TABLES.AUDIT_LOGS).insert(newAuditLog);
 
     return right(auditLog);
+
   }
 
   async exists(
