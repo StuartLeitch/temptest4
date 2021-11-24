@@ -5,6 +5,7 @@
 **/environments/*
 /tools/scripts/netsuite/node_modules
 /tools/scripts/netsuite/data/*
+/tools/scripts/netsuite/job.yaml
 
 # compiled output
 dist/
