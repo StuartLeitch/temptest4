@@ -94,9 +94,6 @@ export const RoutedContent = () => {
       <PrivateRoute path='/dashboards/audit_logs' exact>
         <AuditLogs />
       </PrivateRoute>
-      <PrivateRoute path='/dashboards/audit_logs/diff/:id' exact>
-        <AuditLog />
-      </PrivateRoute>
 
       {/*    404    */}
       <Redirect to='/pages/error-404' />

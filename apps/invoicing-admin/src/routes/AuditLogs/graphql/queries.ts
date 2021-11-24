@@ -5,8 +5,6 @@ export const LOG_FRAGMENT = `
     entity
     action
     timestamp
-    oldValue
-    currentValue
   }
 `;
 

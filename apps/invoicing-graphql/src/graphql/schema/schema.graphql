@@ -232,8 +232,6 @@ type Log {
   entity: String
   action: String
   timestamp: Date
-  oldValue: String
-  currentValue: String
 }
 
 type CouponCode {

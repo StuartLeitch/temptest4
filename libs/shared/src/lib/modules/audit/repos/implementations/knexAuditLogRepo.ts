@@ -1,4 +1,4 @@
-import { Either, right, left } from '../../../../core/logic/Either';
+import { Either, right, flatten } from '../../../../core/logic/Either';
 import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
@@ -9,6 +9,7 @@ import { AuditLog } from '../../domain/AuditLog'
 import { AuditLogPaginated } from '../../domain/AuditLogPaginated';
 
 import { AuditLogRepoContract } from '../auditLogRepo';
+import { AuditLogMap } from '../../mappers/AuditLogMap';
 
 export class KnexAuditLogRepo
   extends AbstractBaseDBRepo<Knex, AuditLog>
@@ -39,17 +40,11 @@ export class KnexAuditLogRepo
 
     const rawLogs: Array<any> = await sql;
 
-    const logs = rawLogs.map(l => ({
-      id: l.id,
-      userAccount: l.user_account,
-      timestamp: l.timestamp,
-      action: l.action,
-      entity: l.entity
-    }) as any);
-
-    return right({
-      totalCount: `${totalCount[0]['count']}`,
-      auditLogs: logs
+    return (flatten(rawLogs.map(AuditLogMap.toDomain)) as any).map(logs => {
+      return ({
+        totalCount: `${totalCount[0]['count']}`,
+        auditLogs: logs
+      });
     });
   }
 

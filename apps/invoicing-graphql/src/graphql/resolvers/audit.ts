@@ -29,6 +29,7 @@ import {
   WaiverMap,
   PayerMap,
   Roles,
+  AuditLogMap
 } from '@hindawi/shared';
 
 import { InvoiceStatus, PayerType, Resolvers, Invoice } from '../schema';
@@ -45,7 +46,6 @@ export const audit: Resolvers<Context> = {
   Query: {
     async auditlogs(parent, args, context) {
       const contextRoles = getAuthRoles(context);
-
 
       const { repos } = context;
 
@@ -66,30 +66,8 @@ export const audit: Resolvers<Context> = {
 
       return {
         totalCount: logsList.totalCount,
-        logs: logsList.auditLogs
+        logs: logsList.auditLogs.map(AuditLogMap.toPersistence),
       };
-    },
-
-    async auditlog(parent, args, context) {
-      const contextRoles = getAuthRoles(context);
-
-      const { repos } = context;
-
-      const usecase = new GetLogByIdUsecase(repos.audit);
-      const usecaseContext = {
-         roles: contextRoles,
-      };
-      const result = await usecase.execute({ id: args.logId }, usecaseContext);
-
-      handleForbiddenUsecase(result);
-
-      if (result.isLeft()) {
-        return undefined;
-      }
-
-      const log = result.value;
-
-      return log;
     }
   }
 };
