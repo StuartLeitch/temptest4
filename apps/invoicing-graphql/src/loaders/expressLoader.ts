@@ -10,8 +10,12 @@ import {
 import {
   PayPalProcessFinishedUsecase,
   GetInvoicePdfUsecase,
+  GetRecentLogsUsecase,
   Roles,
+  left,
+  AuditLogMap
 } from '@hindawi/shared';
+import { Parser } from 'json2csv';
 
 import { Context } from '../builders';
 import {
@@ -141,6 +145,54 @@ export const expressLoader: MicroframeworkLoader = (
       }
 
       res.send();
+    });
+
+    app.get('/api/logs', async (req, res) => {
+      const {
+        repos,
+        services: { logger },
+      } = context;
+      const authContext = { roles: [Roles.ADMIN] };
+
+      const usecase = new GetRecentLogsUsecase(repos.audit);
+
+      const fields = [
+        'id',
+        'userAccount',
+        'timestamp',
+        'entity',
+        'action',
+      ];
+      const opts = { fields };
+      const csvConverter = new Parser(opts);
+
+      const listResponse = await usecase.execute(
+        {
+          pagination: { offset: 0, limit: 10 },
+          filters: {
+            startDate: req.query.startDate ?? null,
+            endDate: req.query.endDate ?? null,
+            limit: req.query.limit ?? 1
+          },
+        },
+        authContext
+      );
+
+      if (listResponse.isLeft()) {
+        return left(listResponse.value);
+      }
+
+      const logs = listResponse.value.auditLogs.map(AuditLogMap.toPersistence);
+
+      const jsonData = JSON.parse(JSON.stringify(logs));
+      const csv = csvConverter.parse(jsonData);
+
+      res.setHeader(
+        'Content-disposition',
+        'attachment; filename=logs.csv'
+      );
+      res.set('Content-Type', 'text/csv');
+      res.status(200).send(csv);
     });
 
     // Run application to listen on given port

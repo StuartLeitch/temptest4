@@ -92,6 +92,7 @@
     "is-eu-member": "1.0.5",
     "jsforce": "1.9.3",
     "json-graphql-server": "2.1.3",
+    "json2csv": "^5.0.6",
     "jsonwebtoken": "8.5.1",
     "jsvat": "2.4.0",
     "keycloak-connect": "^10.0.0",

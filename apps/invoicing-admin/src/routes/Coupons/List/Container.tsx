@@ -91,26 +91,26 @@ const CouponsContainer: React.FC = () => {
   return (
     <React.Fragment>
       <Restricted to='list.coupons' fallback={<NotAuthorized />}>
-      <Container fluid={true}>
-        <HeaderMain title='Coupons' className='mb-5 mt-4' />
-        <Col lg={12} className='d-flex mb-3 mr-0 pr-0'>
-          <Restricted to='create.coupon'>
-            <ButtonToolbar className='ml-auto'>
-              <Link to={`/coupons/create`}>
-                <Button color='twitter' className='mr-2'>
-                  <i className='fas fa-plus mr-2'></i>
-                  Create Coupon
-                </Button>
-              </Link>
-            </ButtonToolbar>
-          </Restricted>
-        </Col>
-        <Row>
-          <Col lg={12} className="mb-5">
-            <Content {...{ loading, error, data }} />
+        <Container fluid={true}>
+          <HeaderMain title='Coupons' className='mb-5 mt-4' />
+          <Col lg={12} className='d-flex mb-3 mr-0 pr-0'>
+            <Restricted to='create.coupon'>
+              <ButtonToolbar className='ml-auto'>
+                <Link to={`/coupons/create`}>
+                  <Button color='twitter' className='mr-2'>
+                    <i className='fas fa-plus mr-2'></i>
+                    Create Coupon
+                  </Button>
+                </Link>
+              </ButtonToolbar>
+            </Restricted>
           </Col>
-        </Row>
-      </Container>
+          <Row>
+            <Col lg={12} className="mb-5">
+              <Content {...{ loading, error, data }} />
+            </Col>
+          </Row>
+        </Container>
       </Restricted>
     </React.Fragment>
   );

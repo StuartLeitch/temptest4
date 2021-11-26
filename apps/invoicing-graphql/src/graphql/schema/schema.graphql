@@ -311,6 +311,11 @@ input InvoiceFilters {
   invoiceItem: InvoiceItemFilters
 }
 
+input LogsFilters {
+  startDate: Date
+  endDate: Date
+}
+
 input Pagination {
   page: Int
   offset: Int
@@ -371,7 +376,7 @@ type Query {
   echo(value: String): String
   remindersStatus(invoiceId: ID!): RemindersStatus
   remindersSent(invoiceId: ID!): [SentReminder]
-  auditlogs(pagination: Pagination): PaginatedLogs
+  auditlogs(pagination: Pagination, filters: LogsFilters): PaginatedLogs
   auditlog(logId: ID): Log
 }
 

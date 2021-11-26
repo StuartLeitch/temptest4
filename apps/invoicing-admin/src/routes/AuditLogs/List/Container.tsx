@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { useManualQuery } from 'graphql-hooks';
 import { useQueryState } from 'react-router-use-location-state';
 import DatePicker, { setDefaultLocale } from 'react-datepicker';
@@ -24,6 +24,7 @@ import { Loading } from '../../components';
 import { AddonInput } from './components';
 
 import List from './List';
+import _ from 'lodash';
 
 setDefaultLocale('en');
 
@@ -39,8 +40,11 @@ const AuditLogsContainer: React.FC = () => {
     defaultPaginationSettings.page
   );
 
+  const [startDate, setStartDate] = useState(moment().subtract(5, 'days').toDate());
+  const [endDate, setEndDate] = useState(moment().toDate());
+
   const fetchData = useCallback(
-    async (currentPage) => {
+    async (currentPage, startDate, endDate) => {
       await fetchLogs({
         variables: {
           pagination: {
@@ -48,6 +52,10 @@ const AuditLogsContainer: React.FC = () => {
             page: currentPage,
             offset: currentPage - 1,
           },
+          filters: {
+            startDate,
+            endDate
+          }
         },
       });
     },
@@ -57,16 +65,40 @@ const AuditLogsContainer: React.FC = () => {
   const onPageChange = (paginationData: { currentPage: number }) => {
     const { currentPage } = paginationData;
 
-    fetchData(currentPage);
+    fetchData(currentPage, startDate, endDate);
     setPageInUrl(currentPage);
   };
 
   useEffect(() => {
-    fetchData(page);
-  }, [fetchData, page, fetchLogs]);
+    fetchData(page, startDate, endDate);
+  }, []);
+
+  const handleChangeStart = (startDate) => {
+    setStartDate(startDate);
+    fetchData(page, startDate, endDate);
+  }
+  const handleChangeEnd = (endDate) => {
+    setEndDate(endDate);
+  }
+
+  const downloadCSV = () => {
+
+    // * build the query string out of query state
+    let queryString = '?limit=0&';
+    queryString += `startDate=${moment(startDate).format('yyyy-MM-D')}&`;
+    queryString += `endDate=${moment(endDate).format('yyyy-MM-D')}&`;
+
+    const url = `${(window as any)._env_.API_ROOT}/logs${queryString}`;
+
+    const a = document.createElement("a");
+    a.setAttribute("download", url);
+    a.setAttribute("href", url);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
 
   const Content = ({ loading, error, data }) => {
-
     if (loading) return <Loading />;
 
     if (error) return <Error error={error} />;
@@ -74,25 +106,7 @@ const AuditLogsContainer: React.FC = () => {
     if (data)
       return (
         <>
-            <DatePicker
-              className="ml-2"
-              // customInput={ <AddonInput /> }
-              selected={/* this.state.endDate */null}
-              selectsEnd
-              startDate={/* this.state.startDate */null}
-              endDate={/* this.state.endDate */null}
-              onChange={/* this.handleChangeEnd */() => void 0}
-            />
-            <DatePicker
-              className="ml-2"
-              // customInput={ <AddonInput /> }
-              selected={/* this.state.endDate */null}
-              selectsEnd
-              startDate={/* this.state.startDate */null}
-              endDate={/* this.state.endDate */null}
-              onChange={/* this.handleChangeEnd */() => void 0}
-            />
-          <Card className='mb-0'>
+          <Card className='mb-0 mt-5'>
             <List logs={data.auditlogs?.logs} />
             <CardFooter className='d-flex justify-content-center pb-0'>
               <ListPagination
@@ -114,6 +128,37 @@ const AuditLogsContainer: React.FC = () => {
     <React.Fragment>
       <Container fluid={true}>
         <HeaderMain title='Audit Logs' className='mb-5 mt-4' />
+        <Col lg={12} className='d-flex mb-3 mr-0 pr-0 px-0 my-sm-0'>
+          <ButtonToolbar className='ml-auto'>
+            <DatePicker
+              className="ml-2 mr-0"
+              customInput={ <AddonInput /> }
+              dateFormat="dd/MM/yyyy"
+              selected={startDate}
+              selectsEnd
+              startDate={startDate}
+              endDate={endDate}
+              onChange={handleChangeStart}
+            />
+            <DatePicker
+              className="ml-2 mr-2"
+              customInput={ <AddonInput /> }
+              dateFormat="dd/MM/yyyy"
+              selected={endDate}
+              selectsEnd
+              startDate={startDate}
+              endDate={endDate}
+              onChange={handleChangeEnd}
+            />
+            <Button
+              color='twitter'
+              className='mr-0'
+              onClick={downloadCSV}>
+              <i className='fas fa-download mr-2'></i>
+              Download CSV
+            </Button>
+          </ButtonToolbar>
+        </Col>
         <Row>
           <Col lg={12} className="mb-5">
             <Content {...{ loading, error, data }} />

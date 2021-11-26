@@ -228,8 +228,11 @@ export type Log = {
   entity?: Maybe<Scalars['String']>;
   action?: Maybe<Scalars['String']>;
   timestamp?: Maybe<Scalars['Date']>;
-  oldValue?: Maybe<Scalars['String']>;
-  currentValue?: Maybe<Scalars['String']>;
+};
+
+export type LogsFilters = {
+  startDate?: Maybe<Scalars['Date']>;
+  endDate?: Maybe<Scalars['Date']>;
 };
 
 export type MigrateApc = {
@@ -558,6 +561,7 @@ export type QueryRemindersSentArgs = {
 
 export type QueryAuditlogsArgs = {
   pagination?: Maybe<Pagination>;
+  filters?: Maybe<LogsFilters>;
 };
 
 
@@ -711,6 +715,7 @@ export type ResolversTypes = {
   InvoicingJournal: ResolverTypeWrapper<InvoicingJournal>;
   InvoicingName: ResolverTypeWrapper<Scalars['InvoicingName']>;
   Log: ResolverTypeWrapper<Log>;
+  LogsFilters: LogsFilters;
   MigrateAPC: MigrateApc;
   MigratePayer: MigratePayer;
   MigratePayerAddress: MigratePayerAddress;
@@ -766,6 +771,7 @@ export type ResolversParentTypes = {
   InvoicingJournal: InvoicingJournal;
   InvoicingName: Scalars['InvoicingName'];
   Log: Log;
+  LogsFilters: LogsFilters;
   MigrateAPC: MigrateApc;
   MigratePayer: MigratePayer;
   MigratePayerAddress: MigratePayerAddress;
@@ -952,8 +958,6 @@ export type LogResolvers<ContextType = any, ParentType extends ResolversParentTy
   entity?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   action?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   timestamp?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
-  oldValue?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  currentValue?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

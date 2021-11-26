@@ -10,15 +10,15 @@ import {
 // eslint-disable-next-line react/display-name
 const AddonInputFR = React.forwardRef((props: any, ref) => (
     <InputGroup className={props.className}>
-        <InputGroupAddon addonType="prepend">
-            <i className="fa fa-calendar-o"></i>
-        </InputGroupAddon>
-        <Input
-            onClick={ props.onClick }
-            onChange={ props.onChange }
-            value={ props.value }
-            ref={ ref }
-        />
+      <InputGroupAddon addonType="prepend">
+        <i className="fas fa-o fa-calendar"></i>
+      </InputGroupAddon>
+      <Input
+        onClick={ props.onClick }
+        onChange={ props.onChange }
+        value={ props.value }
+        ref={ ref }
+      />
     </InputGroup>
 ));
 

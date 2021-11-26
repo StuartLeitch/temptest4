@@ -11,9 +11,11 @@ export const LOG_FRAGMENT = `
 export const AUDIT_LOGS_QUERY = `
   query auditLogs(
     $pagination: Pagination
+    $filters: LogsFilters
   ) {
     auditlogs(
       pagination: $pagination
+      filters: $filters
     ) {
       totalCount
       logs {

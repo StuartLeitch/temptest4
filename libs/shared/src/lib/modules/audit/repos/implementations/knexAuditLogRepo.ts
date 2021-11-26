@@ -11,12 +11,14 @@ import { AuditLogPaginated } from '../../domain/AuditLogPaginated';
 import { AuditLogRepoContract } from '../auditLogRepo';
 import { AuditLogMap } from '../../mappers/AuditLogMap';
 
+import moment from 'moment';
+
 export class KnexAuditLogRepo
   extends AbstractBaseDBRepo<Knex, AuditLog>
   implements AuditLogRepoContract {
 
   async getRecentAuditLogs(args?: any): Promise<Either<GuardFailure | RepoError, AuditLogPaginated>> {
-    const { pagination } = args;
+    const { pagination, filters } = args;
     const { db, logger } = this;
 
     const getModel = () =>
@@ -28,11 +30,25 @@ export class KnexAuditLogRepo
 
     const offset = pagination.offset * pagination.limit;
 
-    const sql = getModel()
-    .orderBy(`${TABLES.AUDIT_LOGS}.timestamp`, 'desc')
-    .offset(offset < totalCount[0].count ? offset : 0)
-    .limit(pagination.limit)
-    .select([`${TABLES.AUDIT_LOGS}.*`]);
+    let endDate = new Date();
+    let startDate = new Date();
+    startDate.setDate(startDate.getDate() - 5);
+
+    if (filters) {
+      startDate = filters.startDate;
+      endDate = filters.endDate;
+    }
+
+    let sql = getModel()
+      .orderBy(`${TABLES.AUDIT_LOGS}.timestamp`, 'desc')
+      .whereBetween('timestamp', [startDate, endDate])
+      .select([`${TABLES.AUDIT_LOGS}.*`]);
+
+    if (!('limit' in filters)) {
+      sql = sql
+        .offset(offset < totalCount[0].count ? offset : 0)
+        .limit(pagination.limit);
+    }
 
     logger.debug('select', {
       sql: sql.toString(),
