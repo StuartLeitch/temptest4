@@ -133,6 +133,8 @@ accessControl
   .resource('journal')
   .action('read')
   .resource('journals')
+  .action('read')
+  .resource('logs')
   .action('read');
 
 accessControl
@@ -180,7 +182,9 @@ accessControl
   .resource('waiver')
   .action('read')
   .resource('VAT')
-  .action('validate');
+  .action('validate')
+  .resource('logs')
+  .action('read');
 
 accessControl
   .grant(Roles.SERVICE)
@@ -206,6 +210,8 @@ accessControl
   .resource('paymentMethod')
   .action('read')
   .resource('paymentMethods')
+  .action('read')
+  .resource('logs')
   .action('read');
 
 accessControl
@@ -286,6 +292,8 @@ accessControl
   .resource('address')
   .action('read')
   .resource('waiver')
+  .action('read')
+  .resource('logs')
   .action('read');
 
 accessControl
@@ -325,7 +333,9 @@ accessControl
   .action('send')
   .action('add')
   .resource('manuscript')
-  .action('create');
+  .action('create')
+  .resource('logs')
+  .action('read');
 
 accessControl
   .grant(Roles.FINANCIAL_ADMIN)
@@ -354,7 +364,9 @@ accessControl
   .action('register')
   .where(paymentIsBankTransfer)
   .action('create')
-  .action('update');
+  .action('update')
+  .resource('logs')
+  .action('read');
 
 accessControl
   .grant(Roles.FINANCIAL_SUPPORT)
@@ -370,7 +382,9 @@ accessControl
   .resource('coupon')
   // * Allow coupon apply
   .action('apply')
-  .action('generateCode');
+  .action('generateCode')
+  .resource('logs')
+  .action('read');
 
 accessControl
   .grant(Roles.MARKETING)
@@ -390,6 +404,8 @@ accessControl
   .action('apply')
   // * Allow coupon edit
   .action('update')
-  .action('generateCode');
+  .action('generateCode')
+  .resource('logs')
+  .action('read');
 
 export { accessControl };

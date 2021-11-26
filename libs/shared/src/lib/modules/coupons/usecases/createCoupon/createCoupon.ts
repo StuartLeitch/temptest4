@@ -28,13 +28,18 @@ import {
   CouponType,
   Coupon,
 } from '../../domain/Coupon';
+import { CouponMap } from '../../mappers/CouponMap';
 
 import { sanityChecksRequestParameters } from './utils';
+import { AuditLoggerServiceContract } from '../../../../infrastructure/audit';
 
 export class CreateCouponUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
-  constructor(private couponRepo: CouponRepoContract) {
+  constructor(
+    private couponRepo: CouponRepoContract,
+    private auditLoggerService: AuditLoggerServiceContract
+  ) {
     super();
     this.createCoupon = this.createCoupon.bind(this);
     this.saveCoupon = this.saveCoupon.bind(this);
@@ -87,6 +92,15 @@ export class CreateCouponUsecase
           new Errors.CouponNotSavedError(new Error(result.value.message))
         );
       }
+
+      // * Save information as audit log
+      this.auditLoggerService.log({
+        action: 'added new',
+        entity: 'coupon',
+        timestamp: new Date(),
+      });
+
+
       return right(result.value);
     } catch (err) {
       return left(new Errors.CouponNotSavedError(err));

@@ -19,6 +19,7 @@ import {
   KnexWaiverRepo,
   KnexPayerRepo,
   KnexErpReferenceRepo,
+  KnexAuditLogRepo,
   KnexCreditNoteRepo,
   LoggerBuilder,
 } from '@hindawi/shared';
@@ -41,6 +42,7 @@ export interface Repos {
   sentNotifications: KnexSentNotificationsRepo;
   pausedReminder: KnexPausedReminderRepo;
   erpReference: KnexErpReferenceRepo;
+  audit: KnexAuditLogRepo;
 }
 
 export function buildRepos(db: Knex, loggerBuilder: LoggerBuilder): Repos {
@@ -82,5 +84,6 @@ export function buildRepos(db: Knex, loggerBuilder: LoggerBuilder): Repos {
     ),
     pausedReminder: new KnexPausedReminderRepo(db, loggerBuilder.getLogger()),
     erpReference: new KnexErpReferenceRepo(db, loggerBuilder.getLogger()),
+    audit: new KnexAuditLogRepo(db, loggerBuilder.getLogger()),
   };
 }
