@@ -162,6 +162,8 @@ export const expressLoader: MicroframeworkLoader = (
         'timestamp',
         'entity',
         'action',
+        'itemReference',
+        'target'
       ];
       const opts = { fields };
       const csvConverter = new Parser(opts);

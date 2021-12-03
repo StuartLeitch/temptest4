@@ -232,6 +232,8 @@ type Log {
   entity: String
   action: String
   timestamp: Date
+  item_reference: String
+  target: String
 }
 
 type CouponCode {

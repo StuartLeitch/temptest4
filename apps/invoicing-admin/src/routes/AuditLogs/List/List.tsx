@@ -29,16 +29,19 @@ const AuditLogsList: React.FC<AuditLogsListProps> = ({ logs }) => {
             <th className='align-middle bt-0'>User Account</th>
             <th className='align-middle bt-0'>Action</th>
             <th className='align-middle bt-0'>Entity</th>
+            <th className='align-middle bt-0'>Item Reference</th>
+            <th className='align-middle bt-0'>Target</th>
           </tr>
         </thead>
         <tbody>
           {logs && logs.map((log, index) => {
             const {
-              id,
               userAccount,
               action,
               entity,
-              timestamp
+              timestamp,
+              item_reference,
+              target
             } = log;
 
             return (
@@ -51,6 +54,8 @@ const AuditLogsList: React.FC<AuditLogsListProps> = ({ logs }) => {
                   {action}
                 </td>
                 <td className='align-middle bt-0'>{entity}</td>
+                <td className='align-middle bt-0'>{item_reference}</td>
+                <td className='align-middle bt-0'>{target}</td>
               </tr>
             );
           })}

@@ -5,6 +5,6 @@ export interface AuditLogType {
   action: string;
   entity: string;
   timestamp: Date;
-  oldValue: string;
-  currentValue: string;
+  item_reference: string;
+  target: string;
 }

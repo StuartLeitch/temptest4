@@ -8,6 +8,8 @@ export interface AuditLogProps {
   entity: string;
   action: string;
   timestamp: Date;
+  item_reference: string;
+  target: string;
 }
 
 export class AuditLog extends Entity<AuditLogProps> {
@@ -29,6 +31,14 @@ export class AuditLog extends Entity<AuditLogProps> {
 
   get timestamp(): Date {
     return this.props.timestamp;
+  }
+
+  get item_reference(): string {
+    return this.props.item_reference;
+  }
+
+  get target(): string {
+    return this.props.target;
   }
 
   private constructor(props: AuditLogProps, id?: UniqueEntityID) {

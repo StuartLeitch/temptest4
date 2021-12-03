@@ -5,6 +5,8 @@ export const LOG_FRAGMENT = `
     entity
     action
     timestamp
+    item_reference
+    target
   }
 `;
 

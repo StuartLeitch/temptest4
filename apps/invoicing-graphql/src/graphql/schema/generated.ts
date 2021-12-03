@@ -228,6 +228,8 @@ export type Log = {
   entity?: Maybe<Scalars['String']>;
   action?: Maybe<Scalars['String']>;
   timestamp?: Maybe<Scalars['Date']>;
+  item_reference?: Maybe<Scalars['String']>;
+  target?: Maybe<Scalars['String']>;
 };
 
 export type LogsFilters = {
@@ -959,6 +961,8 @@ export type LogResolvers<ContextType = any, ParentType extends ResolversParentTy
   entity?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   action?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   timestamp?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
+  item_reference?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  target?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

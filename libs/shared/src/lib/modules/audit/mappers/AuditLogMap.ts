@@ -12,7 +12,9 @@ export class AuditLogMap extends Mapper<AuditLog> {
         userAccount: raw.userAccount,
         timestamp: raw.timestamp,
         action: raw.action,
-        entity: raw.entity
+        entity: raw.entity,
+        item_reference: raw.item_reference,
+        target: raw.target,
       },
       new UniqueEntityID(raw.id)
     );
@@ -25,6 +27,8 @@ export class AuditLogMap extends Mapper<AuditLog> {
       timestamp: auditLog.timestamp.toISOString(),
       action: auditLog.action,
       entity: auditLog.entity,
+      item_reference: auditLog.item_reference,
+      target: auditLog.target,
     };
   }
 }
