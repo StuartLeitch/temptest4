@@ -172,7 +172,7 @@ export const expressLoader: MicroframeworkLoader = (
           filters: {
             startDate: req.query.startDate ?? null,
             endDate: req.query.endDate ?? null,
-            limit: req.query.limit ?? 1
+            download: req.query.download ?? 1
           },
         },
         authContext

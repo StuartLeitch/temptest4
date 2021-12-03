@@ -84,7 +84,7 @@ const AuditLogsContainer: React.FC = () => {
   const downloadCSV = () => {
 
     // * build the query string out of query state
-    let queryString = '?limit=0&';
+    let queryString = '?download=1&';
     queryString += `startDate=${moment(startDate).format('yyyy-MM-D')}&`;
     queryString += `endDate=${moment(endDate).format('yyyy-MM-D')}&`;
 

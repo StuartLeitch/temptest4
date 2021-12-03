@@ -314,6 +314,7 @@ input InvoiceFilters {
 input LogsFilters {
   startDate: Date
   endDate: Date
+  limit: Int
 }
 
 input Pagination {

@@ -12,6 +12,7 @@ import { AuditLogRepoContract } from '../auditLogRepo';
 import { AuditLogMap } from '../../mappers/AuditLogMap';
 
 import moment from 'moment';
+import { ConsoleTransportOptions } from 'winston/lib/winston/transports';
 
 export class KnexAuditLogRepo
   extends AbstractBaseDBRepo<Knex, AuditLog>
@@ -24,10 +25,6 @@ export class KnexAuditLogRepo
     const getModel = () =>
       db(TABLES.AUDIT_LOGS);
 
-    const totalCount = await getModel().count(
-      `${TABLES.AUDIT_LOGS}.id`
-    );
-
     const offset = pagination.offset * pagination.limit;
 
     let endDate = new Date();
@@ -39,14 +36,18 @@ export class KnexAuditLogRepo
       endDate = filters.endDate;
     }
 
+    const totalCount = await getModel().count(
+      `${TABLES.AUDIT_LOGS}.id`
+    ).whereBetween('timestamp', [startDate, endDate]).first();
+
     let sql = getModel()
-      .orderBy(`${TABLES.AUDIT_LOGS}.timestamp`, 'desc')
       .whereBetween('timestamp', [startDate, endDate])
+      .orderBy(`${TABLES.AUDIT_LOGS}.timestamp`, 'desc')
       .select([`${TABLES.AUDIT_LOGS}.*`]);
 
-    if (!('limit' in filters)) {
+    if (!('download' in filters)) {
       sql = sql
-        .offset(offset < totalCount[0].count ? offset : 0)
+        .offset(offset < totalCount.count ? offset : 0)
         .limit(pagination.limit);
     }
 
@@ -58,7 +59,7 @@ export class KnexAuditLogRepo
 
     return (flatten(rawLogs.map(AuditLogMap.toDomain)) as any).map(logs => {
       return ({
-        totalCount: `${totalCount[0]['count']}`,
+        totalCount: totalCount.count,
         auditLogs: logs
       });
     });

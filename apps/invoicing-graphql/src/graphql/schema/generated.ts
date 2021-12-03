@@ -233,6 +233,7 @@ export type Log = {
 export type LogsFilters = {
   startDate?: Maybe<Scalars['Date']>;
   endDate?: Maybe<Scalars['Date']>;
+  limit?: Maybe<Scalars['Int']>;
 };
 
 export type MigrateApc = {
