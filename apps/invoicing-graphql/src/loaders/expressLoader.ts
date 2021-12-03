@@ -24,6 +24,7 @@ import {
 } from '../services/paypal/types/webhooks';
 
 import { env } from '../env';
+import moment from 'moment';
 
 function extractCaptureId(data: PayPalPaymentCapture): string {
   const orderLink = data.links.find(
@@ -172,8 +173,8 @@ export const expressLoader: MicroframeworkLoader = (
         {
           pagination: { offset: 0, limit: 10 },
           filters: {
-            startDate: req.query.startDate ?? null,
-            endDate: req.query.endDate ?? null,
+            startDate: moment(String(req.query.startDate)).subtract(1, 'days').format('YYYY-MM-D') ?? null,
+            endDate: moment(String(req.query.endDate)).add(1, 'days').format('YYYY-MM-D') ?? null,
             download: req.query.download ?? 1
           },
         },

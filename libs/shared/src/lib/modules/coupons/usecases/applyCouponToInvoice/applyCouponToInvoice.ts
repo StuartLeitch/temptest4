@@ -18,6 +18,7 @@ import {
 import { EmailService } from '../../../../infrastructure/communication-channels';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { VATService } from '../../../../domain/services/VATService';
+import { AuditLoggerServiceContract } from '../../../../infrastructure/audit/AuditLoggerService';
 
 import { TransactionStatus } from '../../../transactions/domain/Transaction';
 import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
@@ -67,7 +68,8 @@ export class ApplyCouponToInvoiceUsecase
     private waiverRepo: WaiverRepoContract,
     private emailService: EmailService,
     private vatService: VATService,
-    private loggerService: LoggerContract
+    private loggerService: LoggerContract,
+    private auditLoggerService: AuditLoggerServiceContract
   ) {
     super();
   }
@@ -82,9 +84,10 @@ export class ApplyCouponToInvoiceUsecase
       payerRepo,
       couponRepo,
       waiverRepo,
-      emailService,
+      // emailService,
       vatService,
       loggerService,
+      // auditLoggerService
     } = this;
     const {
       sanctionedCountryNotificationReceiver,
@@ -257,6 +260,16 @@ export class ApplyCouponToInvoiceUsecase
           }
         }
       }
+
+      // * Save the audit log
+      this.auditLoggerService.log({
+        action: 'has applied',
+        entity: 'coupon',
+        item_reference: coupon.code.props.value,
+        target: `Invoice #{invoice.id.toString()}`,
+        timestamp: new Date(),
+      });
+
       invoice.generateInvoiceDraftAmountUpdatedEvent();
       DomainEvents.dispatchEventsForAggregate(invoice.id);
 

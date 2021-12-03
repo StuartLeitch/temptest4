@@ -649,6 +649,7 @@ export const invoice: Resolvers<Context> = {
   Mutation: {
     async applyCoupon(parent, args, context) {
       const roles = getOptionalAuthRoles(context);
+      const userData = (context.keycloakAuth.accessToken as any)?.content;
 
       const {
         repos: {
@@ -661,7 +662,8 @@ export const invoice: Resolvers<Context> = {
           payer: payerRepo,
           waiver: waiverRepo,
         },
-        services: { emailService, vatService, logger: loggerService },
+        services: { emailService, vatService, logger: loggerService,  },
+        auditLoggerServiceProvider
       } = context;
       const {
         sanctionedCountryNotificationReceiver,
@@ -672,6 +674,7 @@ export const invoice: Resolvers<Context> = {
         roles,
       };
 
+      const auditLoggerService = auditLoggerServiceProvider(userData);
       const applyCouponUsecase = new ApplyCouponToInvoiceUsecase(
         invoiceRepo,
         invoiceItemRepo,
@@ -683,7 +686,8 @@ export const invoice: Resolvers<Context> = {
         waiverRepo,
         emailService,
         vatService,
-        loggerService
+        loggerService,
+        auditLoggerService
       );
 
       const result = await applyCouponUsecase.execute(
