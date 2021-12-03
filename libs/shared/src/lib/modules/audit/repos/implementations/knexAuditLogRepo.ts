@@ -11,9 +11,6 @@ import { AuditLogPaginated } from '../../domain/AuditLogPaginated';
 import { AuditLogRepoContract } from '../auditLogRepo';
 import { AuditLogMap } from '../../mappers/AuditLogMap';
 
-import moment from 'moment';
-import { ConsoleTransportOptions } from 'winston/lib/winston/transports';
-
 export class KnexAuditLogRepo
   extends AbstractBaseDBRepo<Knex, AuditLog>
   implements AuditLogRepoContract {
