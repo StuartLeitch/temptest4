@@ -97,6 +97,8 @@ export class CreateCouponUsecase
       this.auditLoggerService.log({
         action: 'added new',
         entity: 'coupon',
+        item_reference: result.value.code.props.value,
+        target: null,
         timestamp: new Date(),
       });
 

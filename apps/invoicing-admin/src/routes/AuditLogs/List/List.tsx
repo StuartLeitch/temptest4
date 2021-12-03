@@ -47,14 +47,16 @@ const AuditLogsList: React.FC<AuditLogsListProps> = ({ logs }) => {
             return (
               <tr key={index}>
                 <td className='align-middle bt-0 font-weight-bold'>
-                    <span className='bg-twitter text-white pl-2 pr-2'>{timestamp && format(new Date(timestamp), 'dd MMM yyyy HH:mm')}</span>
+                    <span className='bg-facebook text-white pl-2 pr-2'>{timestamp && format(new Date(timestamp), 'dd MMM yyyy HH:mm')}</span>
                 </td>
                 <td className='align-middle bt-0 font-weight-bold'>{userAccount}</td>
                 <td className='align-middle bt-0'>
                   {action}
                 </td>
                 <td className='align-middle bt-0'>{entity}</td>
-                <td className='align-middle bt-0'>{item_reference}</td>
+                <td className='align-middle bt-0 font-weight-bold'>
+                  <span className='bg-skype text-white pl-2 pr-2'>{item_reference}</span>
+                </td>
                 <td className='align-middle bt-0'>{target}</td>
               </tr>
             );
