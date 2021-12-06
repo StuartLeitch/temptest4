@@ -186,6 +186,7 @@ export const creditNote: Resolvers<Context> = {
   Mutation: {
     async createCreditNote(parent, args, context) {
       const contextRoles = getAuthRoles(context);
+      const userData = (context.keycloakAuth.accessToken as any)?.content;
 
       const {
         repos: {
@@ -196,6 +197,7 @@ export const creditNote: Resolvers<Context> = {
           coupon: couponRepo,
           waiver: waiverRepo,
         },
+        auditLoggerServiceProvider
       } = context;
 
       const request: CreateCreditNoteRequestDTO = {
@@ -204,13 +206,15 @@ export const creditNote: Resolvers<Context> = {
         reason: args.reason,
       };
 
+      const auditLoggerService = auditLoggerServiceProvider(userData);
       const usecase = new CreateCreditNoteUsecase(
         creditNoteRepo,
         invoiceRepo,
         invoiceItemRepo,
         couponRepo,
         waiverRepo,
-        pausedReminderRepo
+        pausedReminderRepo,
+        auditLoggerService
       );
       const usecaseContext = { roles: contextRoles };
 

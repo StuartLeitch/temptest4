@@ -79,6 +79,7 @@ export const payments: Resolvers<Context> = {
       const {
         repos: {
           payment: paymentRepo,
+          paymentMethod: paymentMethodRepo,
           invoice: invoiceRepo,
           invoiceItem: invoiceItemRepo,
           manuscript: manuscriptRepo,
@@ -95,11 +96,13 @@ export const payments: Resolvers<Context> = {
         invoiceItemRepo,
         manuscriptRepo,
         paymentRepo,
+        paymentMethodRepo,
         invoiceRepo,
         couponRepo,
         waiverRepo,
         payerRepo,
-        logger
+        logger,
+        null
       );
       const usecaseContext = {
         paymentType: PaymentTypes.CREDIT_CARD,
@@ -144,6 +147,7 @@ export const payments: Resolvers<Context> = {
       const {
         repos: {
           payment: paymentRepo,
+          paymentMethod: paymentMethodRepo,
           invoice: invoiceRepo,
           invoiceItem: invoiceItemRepo,
           manuscript: manuscriptRepo,
@@ -159,11 +163,13 @@ export const payments: Resolvers<Context> = {
         invoiceItemRepo,
         manuscriptRepo,
         paymentRepo,
+        paymentMethodRepo,
         invoiceRepo,
         couponRepo,
         waiverRepo,
         payerRepo,
-        logger
+        logger,
+        null
       );
 
       const result = await usecase.execute(
@@ -223,17 +229,21 @@ export const payments: Resolvers<Context> = {
 
     async bankTransferPayment(parent, args, context) {
       const roles = getAuthRoles(context);
+      const userData = (context.keycloakAuth.accessToken as any)?.content;
+
       const {
         repos: {
           invoiceItem: invoiceItemRepo,
           manuscript: manuscriptRepo,
           invoice: invoiceRepo,
           payment: paymentRepo,
+          paymentMethod: paymentMethodRepo,
           coupon: couponRepo,
           waiver: waiverRepo,
           payer: payerRepo,
         },
         services: { paymentStrategyFactory, logger },
+        auditLoggerServiceProvider
       } = context;
       const {
         markInvoiceAsPaid,
@@ -267,16 +277,21 @@ export const payments: Resolvers<Context> = {
       }
 
       const usecaseContext = { roles, paymentType: PaymentTypes.BANK_TRANSFER };
+
+      const auditLoggerService = auditLoggerServiceProvider(userData);
+
       const usecase = new RecordPaymentUsecase(
         paymentStrategyFactory,
         invoiceItemRepo,
         manuscriptRepo,
         paymentRepo,
+        paymentMethodRepo,
         invoiceRepo,
         couponRepo,
         waiverRepo,
         payerRepo,
-        logger
+        logger,
+        auditLoggerService
       );
 
       const result = await usecase.execute(

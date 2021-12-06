@@ -36,6 +36,7 @@ export interface PaymentProps {
   amount: Amount;
   foreignPaymentId?: ExternalOrderId;
   paymentMethodId?: PaymentMethodId;
+  paymentType?: string;
   paymentProof?: ExternalOrderId;
   datePaid?: Date;
 }
@@ -116,7 +117,7 @@ export class Payment extends AggregateRoot<PaymentProps> {
     this.props.datePaid = new Date();
   }
 
-  public markAsCompleted(isFinal: boolean = true): void {
+  public markAsCompleted(isFinal = true): void {
     this.status = PaymentStatus.COMPLETED;
     this.props.datePaid = new Date();
     this.addCompletedEvent(isFinal);
@@ -127,7 +128,7 @@ export class Payment extends AggregateRoot<PaymentProps> {
     this.props.datePaid = new Date();
   }
 
-  public addCompletedEvent(isFinal: boolean = true): void {
+  public addCompletedEvent(isFinal = true): void {
     if (this.status === PaymentStatus.COMPLETED) {
       this.addDomainEvent(new PaymentCompleted(cloneDeep(this), isFinal));
     }

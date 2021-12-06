@@ -266,7 +266,7 @@ export class ApplyCouponToInvoiceUsecase
         action: 'has applied',
         entity: 'coupon',
         item_reference: coupon.code.props.value,
-        target: `Invoice #{invoice.id.toString()}`,
+        target: `Invoice #${invoice.id.toString()}`,
         timestamp: new Date(),
       });
 

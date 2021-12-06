@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 // * Core Domain
 import { flattenEither, AsyncEither } from '../../../../core/logic/AsyncEither';
 import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { AuditLoggerServiceContract } from '../../../../infrastructure/audit/AuditLoggerService';
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { Either, right, left } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
@@ -38,6 +40,8 @@ import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/g
 import { GetPayerDetailsByInvoiceIdUsecase } from '../../../payers/usecases/getPayerDetailsByInvoiceId';
 import { GetPaymentsByInvoiceIdUsecase } from '../getPaymentsByInvoiceId';
 import { CreatePaymentUsecase } from '../createPayment';
+import { GetPaymentMethodByIdUsecase } from '../getPaymentMethodById';
+import { PaymentMethodRepoContract } from '../../repos';
 
 import {
   WithExistingPayments,
@@ -66,11 +70,13 @@ export class RecordPaymentUsecase
     private invoiceItemRepo: InvoiceItemRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private paymentRepo: PaymentRepoContract,
+    private paymentMethodRepo: PaymentMethodRepoContract,
     private invoiceRepo: InvoiceRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
-    private logger: LoggerContract
+    private logger: LoggerContract,
+    private auditLoggerService: AuditLoggerServiceContract
   ) {
     super();
     this.attachExistingPayments = this.attachExistingPayments.bind(this);
@@ -356,8 +362,12 @@ export class RecordPaymentUsecase
   }
 
   private savePayment(context: Context) {
+
+    const _self = this;
+
     return async <T extends WithPaymentDetails>(request: T) => {
       const usecaseSave = new CreatePaymentUsecase(this.paymentRepo);
+      const getPaymentMethodById = new GetPaymentMethodByIdUsecase(this.paymentMethodRepo);
       const { paymentDetails, datePaid, invoice, amount, payer } = request;
 
       const dto = {
@@ -388,6 +398,8 @@ export class RecordPaymentUsecase
         .map((payment) => ({ ...request, payment }))
         .execute();
 
+      const maybePaymentMethod = await getPaymentMethodById.execute({ paymentMethodId: dto.paymentMethodId} , context);
+
       const maybeUpdatePayment = await maybeWithPayment
         .advanceOrEnd(async (data) => {
           if (data.existingPayment) {
@@ -409,6 +421,22 @@ export class RecordPaymentUsecase
 
       return flattenEither([maybeCreateNewPayment, maybeUpdatePayment]).map(
         ([saveValue, updateValue]) => {
+
+          // * Save the payment in audit log
+          if (maybePaymentMethod.isRight) {
+            // ! Should only log for Bank Transfers
+            if ((maybePaymentMethod.value as any).name === 'Bank Transfer') {
+              _self.auditLoggerService.log({
+                action: 'has added',
+                entity: 'payment',
+                item_reference: saveValue.payment.foreignPaymentId.value.id.toString(),
+                target: `Invoice #${request.invoice.id.toString()}`,
+                timestamp: new Date(),
+              });
+            }
+          }
+
+
           if (saveValue.payment) {
             return saveValue;
           }

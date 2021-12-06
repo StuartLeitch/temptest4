@@ -13,6 +13,7 @@ import {
   Authorize,
 } from '../../../../domain/authorization';
 
+import { AuditLoggerServiceContract } from '../../../../infrastructure/audit/AuditLoggerService';
 import { NotificationPause } from '../../../notifications/domain/NotificationPause';
 import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
@@ -43,12 +44,13 @@ export class CreateCreditNoteUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
-    private creditNoteRepo: CreditNoteRepoContract,
-    private invoiceRepo: InvoiceRepoContract,
-    private invoiceItemRepo: InvoiceItemRepoContract,
-    private couponRepo: CouponRepoContract,
-    private waiverRepo: WaiverRepoContract,
-    private pausedReminderRepo: PausedReminderRepoContract
+    private readonly creditNoteRepo: CreditNoteRepoContract,
+    private readonly invoiceRepo: InvoiceRepoContract,
+    private readonly invoiceItemRepo: InvoiceItemRepoContract,
+    private readonly couponRepo: CouponRepoContract,
+    private readonly waiverRepo: WaiverRepoContract,
+    private readonly pausedReminderRepo: PausedReminderRepoContract,
+    private readonly auditLoggerService: AuditLoggerServiceContract,
   ) {
     super();
   }
@@ -143,6 +145,15 @@ export class CreateCreditNoteUsecase
 
       creditNote.invoiceId = invoice.invoiceId;
       await this.creditNoteRepo.save(creditNote);
+
+      // * Save the audit log
+      this.auditLoggerService.log({
+        action: 'has created',
+        entity: 'credit note',
+        item_reference: creditNote.id.toString(),
+        target: `Invoice #${invoice.invoiceId.id.toString()}`,
+        timestamp: new Date(),
+      });
 
       if (request.createDraft) {
         const invoiceProps = {
