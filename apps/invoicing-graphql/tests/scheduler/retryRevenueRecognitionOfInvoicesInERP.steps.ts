@@ -82,7 +82,7 @@ Before({ tags: '@ValidateRetryRevRec' }, function () {
     mockCouponRepo,
     mockWaiverRepo,
     null,
-    null
+    { log: () => void 0 }
   );
 });
 
