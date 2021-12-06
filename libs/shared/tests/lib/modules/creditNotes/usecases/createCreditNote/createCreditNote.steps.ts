@@ -79,7 +79,8 @@ Before({ tags: '@ValidateCreateCreditNoteUsecase' }, async () => {
     mockInvoiceItemRepo,
     mockCouponRepo,
     mockWaiverRepo,
-    mockPausedReminderRepo
+    mockPausedReminderRepo,
+    { log: () => void 0 }
   );
 });
 

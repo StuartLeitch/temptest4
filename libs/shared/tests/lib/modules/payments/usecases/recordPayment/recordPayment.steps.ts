@@ -50,6 +50,7 @@ Before({ tags: '@ValidateRecordPayment' }, async function () {
   const {
     repos: {
       payment: paymentRepo,
+      paymentMethod: paymentMethodRepo,
       invoice: invoiceRepo,
       invoiceItem: invoiceItemRepo,
       manuscript: manuscriptRepo,
@@ -65,11 +66,13 @@ Before({ tags: '@ValidateRecordPayment' }, async function () {
     invoiceItemRepo,
     manuscriptRepo,
     paymentRepo,
+    paymentMethodRepo,
     invoiceRepo,
     couponRepo,
     waiverRepo,
     payerRepo,
-    logger
+    logger,
+    { log: () => void 0 }
   );
 
   const maybeInvoice = InvoiceMap.toDomain({

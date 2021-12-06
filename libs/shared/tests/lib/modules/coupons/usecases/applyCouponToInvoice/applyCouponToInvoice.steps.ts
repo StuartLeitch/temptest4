@@ -91,9 +91,9 @@ let mockPublisherRepo: MockPublisherRepo = null;
 let emailService: EmailService = null;
 let mockLogger: MockLogger = null;
 let mockVatService: any = null;
-let mailingDisabled: boolean = null;
-let fePath: string = null;
-let tenantName: string = null;
+const mailingDisabled: boolean = null;
+const fePath: string = null;
+const tenantName: string = null;
 
 let usecase: ApplyCouponToInvoiceUsecase = null;
 let response: ApplyCouponToInvoiceResponse = null;
@@ -137,7 +137,8 @@ Before({ tags: '@ValidateApplyCoupon' }, () => {
     mockWaiverRepo,
     emailService,
     mockVatService,
-    mockLogger
+    mockLogger,
+    { log: () => void 0 }
   );
 });
 
