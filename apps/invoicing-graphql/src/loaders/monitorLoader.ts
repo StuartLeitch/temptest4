@@ -1,5 +1,5 @@
 import basicAuth from 'express-basic-auth';
-// import monitor from 'express-status-monitor';
+import monitor from 'express-status-monitor';
 import {
   MicroframeworkLoader,
   MicroframeworkSettings
@@ -13,18 +13,18 @@ export const monitorLoader: MicroframeworkLoader = (
   if (settings && env.monitor.enabled) {
     const expressApp = settings.getData('express_app');
 
-    // expressApp.use(monitor());
-    // expressApp.get(
-    //   env.monitor.route,
-    //   env.monitor.username
-    //     ? basicAuth({
-    //         users: {
-    //           [`${env.monitor.username}`]: env.monitor.password
-    //         },
-    //         challenge: true
-    //       })
-    //     : (req: any, res: any, next: any) => next(),
-    //   monitor().pageRoute
-    // );
+    expressApp.use(monitor());
+    expressApp.get(
+      env.monitor.route,
+      env.monitor.username
+        ? basicAuth({
+            users: {
+              [`${env.monitor.username}`]: env.monitor.password
+            },
+            challenge: true
+          })
+        : (req: any, res: any, next: any) => next(),
+      monitor().pageRoute
+    );
   }
 };

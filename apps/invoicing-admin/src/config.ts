@@ -13,7 +13,6 @@ class Config {
   authServerUrl: string;
   authServerRealm: string;
   authServerClientId: string;
-  authIdpHint: string;
 
   // * Site Config ===========================================================
   siteTitle: string;
@@ -33,7 +32,6 @@ class Config {
     this.authServerUrl = globalConfig.AUTH_SERVER_URL;
     this.authServerRealm = globalConfig.AUTH_SERVER_REALM;
     this.authServerClientId = globalConfig.AUTH_SERVER_CLIENT_ID;
-    this.authIdpHint = globalConfig.AUTH_IDP_HINT;
 
     this.siteTitle = 'Invoicing Admin';
     this.siteDescription = 'Invoicing Admin Dashboard';
