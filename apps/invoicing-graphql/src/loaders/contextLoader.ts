@@ -4,7 +4,7 @@ import {
   MicroframeworkLoader,
 } from 'microframework-w3tec';
 
-import { LoggerBuilder } from '@hindawi/shared';
+import { LoggerBuilder, AuditLoggerServiceProvider } from '@hindawi/shared';
 
 import { buildServices, buildRepos, Context } from '../builders';
 import { env } from '../env';
@@ -21,11 +21,13 @@ export const contextLoader: MicroframeworkLoader = async (
 
     const repos = buildRepos(db, loggerBuilder);
     const services = await buildServices(repos, loggerBuilder);
+    const auditLoggerServiceProvider = AuditLoggerServiceProvider.provide(repos.audit);
 
     const context: Context = {
       services,
       repos,
       loggerBuilder,
+      auditLoggerServiceProvider,
       keycloakAuth: null,
     };
 

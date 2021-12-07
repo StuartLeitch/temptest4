@@ -17,10 +17,11 @@ const context: UsecaseAuthorizationContext = {
 let mockCouponRepo: MockCouponRepo = null;
 let usecase: CreateCouponUsecase = null;
 let response: CreateCouponResponse = null;
+let mockAuditLogger = { log: () => null };
 
 Before({ tags: '@ValidateCreateCoupon' }, () => {
   mockCouponRepo = new MockCouponRepo();
-  usecase = new CreateCouponUsecase(mockCouponRepo);
+  usecase = new CreateCouponUsecase(mockCouponRepo, mockAuditLogger);
 });
 
 After({ tags: '@ValidateCreateCoupon' }, () => {

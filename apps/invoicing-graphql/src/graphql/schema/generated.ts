@@ -221,6 +221,17 @@ export type InvoicingJournal = {
 };
 
 
+export type Log = {
+  __typename?: 'Log';
+  id?: Maybe<Scalars['ID']>;
+  userAccount?: Maybe<Scalars['String']>;
+  entity?: Maybe<Scalars['String']>;
+  action?: Maybe<Scalars['String']>;
+  timestamp?: Maybe<Scalars['Date']>;
+  oldValue?: Maybe<Scalars['String']>;
+  currentValue?: Maybe<Scalars['String']>;
+};
+
 export type MigrateApc = {
   invoiceReference?: Maybe<Scalars['String']>;
   paymentAmount?: Maybe<Scalars['Float']>;
@@ -372,6 +383,12 @@ export type PaginatedInvoices = {
   invoices?: Maybe<Array<Maybe<Invoice>>>;
 };
 
+export type PaginatedLogs = {
+  __typename?: 'PaginatedLogs';
+  totalCount?: Maybe<Scalars['Int']>;
+  logs?: Maybe<Array<Maybe<Log>>>;
+};
+
 export type Pagination = {
   page?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
@@ -458,6 +475,8 @@ export type Query = {
   echo?: Maybe<Scalars['String']>;
   remindersStatus?: Maybe<RemindersStatus>;
   remindersSent?: Maybe<Array<Maybe<SentReminder>>>;
+  auditlogs?: Maybe<PaginatedLogs>;
+  auditlog?: Maybe<Log>;
 };
 
 
@@ -534,6 +553,16 @@ export type QueryRemindersStatusArgs = {
 
 export type QueryRemindersSentArgs = {
   invoiceId: Scalars['ID'];
+};
+
+
+export type QueryAuditlogsArgs = {
+  pagination?: Maybe<Pagination>;
+};
+
+
+export type QueryAuditlogArgs = {
+  logId?: Maybe<Scalars['ID']>;
 };
 
 
@@ -681,6 +710,7 @@ export type ResolversTypes = {
   InvoicingArticleFilters: InvoicingArticleFilters;
   InvoicingJournal: ResolverTypeWrapper<InvoicingJournal>;
   InvoicingName: ResolverTypeWrapper<Scalars['InvoicingName']>;
+  Log: ResolverTypeWrapper<Log>;
   MigrateAPC: MigrateApc;
   MigratePayer: MigratePayer;
   MigratePayerAddress: MigratePayerAddress;
@@ -689,6 +719,7 @@ export type ResolversTypes = {
   PaginatedCoupons: ResolverTypeWrapper<PaginatedCoupons>;
   PaginatedCreditNotes: ResolverTypeWrapper<PaginatedCreditNotes>;
   PaginatedInvoices: ResolverTypeWrapper<PaginatedInvoices>;
+  PaginatedLogs: ResolverTypeWrapper<PaginatedLogs>;
   Pagination: Pagination;
   PayPalOrderId: ResolverTypeWrapper<PayPalOrderId>;
   Payer: ResolverTypeWrapper<Payer>;
@@ -734,6 +765,7 @@ export type ResolversParentTypes = {
   InvoicingArticleFilters: InvoicingArticleFilters;
   InvoicingJournal: InvoicingJournal;
   InvoicingName: Scalars['InvoicingName'];
+  Log: Log;
   MigrateAPC: MigrateApc;
   MigratePayer: MigratePayer;
   MigratePayerAddress: MigratePayerAddress;
@@ -742,6 +774,7 @@ export type ResolversParentTypes = {
   PaginatedCoupons: PaginatedCoupons;
   PaginatedCreditNotes: PaginatedCreditNotes;
   PaginatedInvoices: PaginatedInvoices;
+  PaginatedLogs: PaginatedLogs;
   Pagination: Pagination;
   PayPalOrderId: PayPalOrderId;
   Payer: Payer;
@@ -913,6 +946,17 @@ export interface InvoicingNameScalarConfig extends GraphQLScalarTypeConfig<Resol
   name: 'InvoicingName';
 }
 
+export type LogResolvers<ContextType = any, ParentType extends ResolversParentTypes['Log'] = ResolversParentTypes['Log']> = {
+  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  userAccount?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  entity?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  action?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  timestamp?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
+  oldValue?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  currentValue?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   confirmInvoice?: Resolver<ResolversTypes['Payer'], ParentType, ContextType, RequireFields<MutationConfirmInvoiceArgs, 'payer'>>;
   applyCoupon?: Resolver<Maybe<ResolversTypes['Coupon']>, ParentType, ContextType, RequireFields<MutationApplyCouponArgs, never>>;
@@ -945,6 +989,12 @@ export type PaginatedCreditNotesResolvers<ContextType = any, ParentType extends 
 export type PaginatedInvoicesResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaginatedInvoices'] = ResolversParentTypes['PaginatedInvoices']> = {
   totalCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   invoices?: Resolver<Maybe<Array<Maybe<ResolversTypes['Invoice']>>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type PaginatedLogsResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaginatedLogs'] = ResolversParentTypes['PaginatedLogs']> = {
+  totalCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  logs?: Resolver<Maybe<Array<Maybe<ResolversTypes['Log']>>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -1004,6 +1054,8 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   echo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType, RequireFields<QueryEchoArgs, never>>;
   remindersStatus?: Resolver<Maybe<ResolversTypes['RemindersStatus']>, ParentType, ContextType, RequireFields<QueryRemindersStatusArgs, 'invoiceId'>>;
   remindersSent?: Resolver<Maybe<Array<Maybe<ResolversTypes['SentReminder']>>>, ParentType, ContextType, RequireFields<QueryRemindersSentArgs, 'invoiceId'>>;
+  auditlogs?: Resolver<Maybe<ResolversTypes['PaginatedLogs']>, ParentType, ContextType, RequireFields<QueryAuditlogsArgs, never>>;
+  auditlog?: Resolver<Maybe<ResolversTypes['Log']>, ParentType, ContextType, RequireFields<QueryAuditlogArgs, never>>;
 };
 
 export interface ReferenceNumberScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['ReferenceNumber'], any> {
@@ -1052,10 +1104,12 @@ export type Resolvers<ContextType = any> = {
   InvoicingArticle?: InvoicingArticleResolvers<ContextType>;
   InvoicingJournal?: InvoicingJournalResolvers<ContextType>;
   InvoicingName?: GraphQLScalarType;
+  Log?: LogResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   PaginatedCoupons?: PaginatedCouponsResolvers<ContextType>;
   PaginatedCreditNotes?: PaginatedCreditNotesResolvers<ContextType>;
   PaginatedInvoices?: PaginatedInvoicesResolvers<ContextType>;
+  PaginatedLogs?: PaginatedLogsResolvers<ContextType>;
   PayPalOrderId?: PayPalOrderIdResolvers<ContextType>;
   Payer?: PayerResolvers<ContextType>;
   Payment?: PaymentResolvers<ContextType>;

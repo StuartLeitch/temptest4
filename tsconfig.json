@@ -1,8 +1,6 @@
 {
   "compileOnSave": false,
   "ts-node": {
-    // these options are overrides used only by ts-node
-    // same as our --compilerOptions flag and our TS_NODE_COMPILER_OPTIONS environment variable
     "compilerOptions": {
       "esModuleInterop": true,
       "moduleResolution": "node",
@@ -40,7 +38,9 @@
       ],
       "@hindawi/domain": ["libs/shared/src/lib/domain/index.ts"],
       "@utils": ["libs/shared/src/lib/utils/index.ts"],
-      "@hindawi/sisif": ["libs/sisif/src/index.ts"]
+      "@hindawi/sisif": ["libs/sisif/src/index.ts"],
+      "@hindawi/env-utils": ["libs/env-utils/src/index.ts"],
+      "@hindawi/queue-utils": ["libs/queue-utils/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "dist", "coverage", "report"]

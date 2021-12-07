@@ -40,10 +40,11 @@ let coupon: Coupon = null;
 let mockCouponRepo: MockCouponRepo = null;
 let usecase: UpdateCouponUsecase = null;
 let response: UpdateCouponResponse = null;
+let mockAuditLogger = { log: () => null };
 
 Before({ tags: '@ValidateUpdateCoupon' }, () => {
   mockCouponRepo = new MockCouponRepo();
-  usecase = new UpdateCouponUsecase(mockCouponRepo);
+  usecase = new UpdateCouponUsecase(mockCouponRepo, mockAuditLogger);
 });
 
 After({ tags: '@ValidateUpdateCoupon' }, () => {
