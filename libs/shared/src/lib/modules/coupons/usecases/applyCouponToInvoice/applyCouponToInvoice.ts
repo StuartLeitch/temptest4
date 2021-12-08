@@ -263,9 +263,9 @@ export class ApplyCouponToInvoiceUsecase
 
       // * Save the audit log
       this.auditLoggerService.log({
-        action: 'has applied',
+        action: 'applied',
         entity: 'coupon',
-        item_reference: coupon.code.props.value,
+        item_reference: coupon.couponId.toString(),
         target: `Invoice #${invoice.id.toString()}`,
         timestamp: new Date(),
       });

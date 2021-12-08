@@ -158,12 +158,11 @@ export const expressLoader: MicroframeworkLoader = (
       const usecase = new GetRecentLogsUsecase(repos.audit);
 
       const fields = [
-        'id',
         'userAccount',
         'timestamp',
         'entity',
         'action',
-        'itemReference',
+        'item_reference',
         'target'
       ];
       const opts = { fields };

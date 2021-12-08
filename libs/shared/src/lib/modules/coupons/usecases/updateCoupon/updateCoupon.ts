@@ -91,9 +91,9 @@ export class UpdateCouponUsecase
         // * Save the audit log
         this.couponCurrentValue = CouponMap.toPersistence(savedCoupon.value);
         this.auditLoggerService.log({
-          action: 'has edited',
+          action: 'edited',
           entity: 'coupon',
-          item_reference: savedCoupon.value.code.props.value,
+          item_reference: savedCoupon.value.couponId.toString(),
           target: null,
           timestamp: new Date(),
         });
