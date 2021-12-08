@@ -53,6 +53,7 @@ class _AuthClient {
       onLoad: 'check-sso',
       // onLoad: "login-required",
       promiseType: 'native',
+      checkLoginIframe: false
       // silentCheckSsoRedirectUri: window.location.origin + "/silent-check-sso.html",
       // pkceMethod: "S256",
     };
