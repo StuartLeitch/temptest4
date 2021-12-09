@@ -40,7 +40,7 @@ const AuditLogsList: React.FC<AuditLogsListProps> = ({ logs }) => {
                 </td>
                 <td className='align-middle bt-0'>{entity}</td>
                 <td className='align-middle bt-0 font-weight-bold'>
-                  <span className='bg-linkedin text-white pl-2 pr-2'>{item_reference}</span>
+                  <span className='text-linkedin pl-0 pr-2'>{item_reference}</span>
                 </td>
                 <td className='align-middle bt-0'>{target}</td>
               </tr>

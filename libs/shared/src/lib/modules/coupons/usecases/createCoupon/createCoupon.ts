@@ -95,10 +95,10 @@ export class CreateCouponUsecase
 
       // * Save information as audit log
       this.auditLoggerService.log({
-        action: 'created new',
+        action: 'created',
         entity: 'coupon',
         item_reference: result.value.couponId.toString(),
-        target: null,
+        target: `Coupon #${result.value.couponId.toString()}`,
         timestamp: new Date(),
       });
 

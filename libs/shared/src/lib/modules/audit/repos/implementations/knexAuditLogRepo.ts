@@ -11,6 +11,8 @@ import { AuditLogPaginated } from '../../domain/AuditLogPaginated';
 import { AuditLogRepoContract } from '../auditLogRepo';
 import { AuditLogMap } from '../../mappers/AuditLogMap';
 
+import moment from 'moment';
+
 export class KnexAuditLogRepo
   extends AbstractBaseDBRepo<Knex, AuditLog>
   implements AuditLogRepoContract {
@@ -24,13 +26,12 @@ export class KnexAuditLogRepo
 
     const offset = pagination.offset * pagination.limit;
 
-    let endDate = new Date();
-    let startDate = new Date();
-    startDate.setDate(startDate.getDate() - 5);
+    let endDate = moment(new Date()).add(1, 'days').format('YYYY-MM-D');
+    let startDate = moment(new Date()).subtract(5, 'days').format('YYYY-MM-D');
 
     if (filters) {
-      startDate = filters.startDate;
-      endDate = filters.endDate;
+      startDate = moment(filters.startDate).format('YYYY-MM-D');
+      endDate = moment(filters.endDate).add(1, 'days').format('YYYY-MM-D');
     }
 
     const totalCount = await getModel().count(

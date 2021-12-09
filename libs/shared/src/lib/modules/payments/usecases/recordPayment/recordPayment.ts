@@ -427,9 +427,9 @@ export class RecordPaymentUsecase
             // ! Should only log for Bank Transfers
             if ((maybePaymentMethod.value as any).name === 'Bank Transfer') {
               _self.auditLoggerService.log({
-                action: 'has added',
+                action: 'added',
                 entity: 'payment',
-                item_reference: saveValue.payment.foreignPaymentId.value.id.toString(),
+                item_reference: saveValue.payment.id.toString(),
                 target: `Invoice #${request.invoice.id.toString()}`,
                 timestamp: new Date(),
               });

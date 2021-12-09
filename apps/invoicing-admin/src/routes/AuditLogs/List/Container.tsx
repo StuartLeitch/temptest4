@@ -79,6 +79,7 @@ const AuditLogsContainer: React.FC = () => {
   }
   const handleChangeEnd = (endDate) => {
     setEndDate(endDate);
+    fetchData(page, startDate, endDate);
   }
 
   const downloadCSV = () => {
@@ -130,6 +131,7 @@ const AuditLogsContainer: React.FC = () => {
         <HeaderMain title='Audit Logs' className='mb-5 mt-4' />
         <Col lg={12} className='d-flex mb-3 mr-0 pr-0 px-0 my-sm-0'>
           <ButtonToolbar className='ml-auto'>
+            <span className="pl-1 pr-0 mr-1 mt-2 font-weight-bold">From</span>
             <DatePicker
               className="ml-2 mr-0"
               customInput={ <AddonInput /> }
@@ -140,6 +142,7 @@ const AuditLogsContainer: React.FC = () => {
               endDate={endDate}
               onChange={handleChangeStart}
             />
+            <span className="pl-2 pr-0 mr-0 mt-2 font-weight-bold">To</span>
             <DatePicker
               className="ml-2 mr-2"
               customInput={ <AddonInput /> }
@@ -149,6 +152,7 @@ const AuditLogsContainer: React.FC = () => {
               startDate={startDate}
               endDate={endDate}
               onChange={handleChangeEnd}
+              maxDate={new Date()}
             />
             <Button
               color='twitter'

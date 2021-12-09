@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import {
     InputGroup,
     InputGroupAddon,
-    Input
+    Input,
+    Button
 } from '../../../../components';
 
 // eslint-disable-next-line react/display-name
@@ -13,12 +14,12 @@ const AddonInputFR = React.forwardRef((props: any, ref) => (
       <InputGroupAddon addonType="prepend">
         <i className="fas fa-o fa-calendar"></i>
       </InputGroupAddon>
-      <Input
+      <Button
+        style={{ backgroundColor: '#eee', color: '#5D636D', border: '1px solid #DEE2E6', borderRadius: '0.25rem'}}
         onClick={ props.onClick }
         onChange={ props.onChange }
-        value={ props.value }
         ref={ ref }
-      />
+      >{ props.value }</Button>
     </InputGroup>
 ));
 

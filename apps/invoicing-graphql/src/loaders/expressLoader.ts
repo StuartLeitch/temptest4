@@ -172,7 +172,7 @@ export const expressLoader: MicroframeworkLoader = (
         {
           pagination: { offset: 0, limit: 10 },
           filters: {
-            startDate: moment(String(req.query.startDate)).subtract(1, 'days').format('YYYY-MM-D') ?? null,
+            startDate: moment(String(req.query.startDate)).format('YYYY-MM-D') ?? null,
             endDate: moment(String(req.query.endDate)).add(1, 'days').format('YYYY-MM-D') ?? null,
             download: req.query.download ?? 1
           },
