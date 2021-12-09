@@ -148,7 +148,7 @@ export class CreateCreditNoteUsecase
 
       // * Save the audit log
       this.auditLoggerService.log({
-        action: 'has created',
+        action: 'created',
         entity: 'credit note',
         item_reference: creditNote.id.toString(),
         target: `Invoice #${invoice.invoiceId.id.toString()}`,

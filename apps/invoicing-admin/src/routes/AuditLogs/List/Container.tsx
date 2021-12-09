@@ -141,6 +141,7 @@ const AuditLogsContainer: React.FC = () => {
               startDate={startDate}
               endDate={endDate}
               onChange={handleChangeStart}
+              maxDate={new Date()}
             />
             <span className="pl-2 pr-0 mr-0 mt-2 font-weight-bold">To</span>
             <DatePicker

@@ -94,7 +94,7 @@ export class UpdateCouponUsecase
           action: 'edited',
           entity: 'coupon',
           item_reference: savedCoupon.value.couponId.toString(),
-          target: null,
+          target: `Coupon #${savedCoupon.value.couponId.toString()}`,
           timestamp: new Date(),
         });
 

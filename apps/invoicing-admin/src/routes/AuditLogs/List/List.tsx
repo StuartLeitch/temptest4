@@ -1,6 +1,6 @@
 import React from 'react';
 
-import  { formatDate } from '../../../utils/date';
+import  { formatDateWithMinutes } from '../../../utils/date';
 import { Table/*, Badge */} from '../../../components';
 import { AuditLogType } from '../types';
 
@@ -32,8 +32,8 @@ const AuditLogsList: React.FC<AuditLogsListProps> = ({ logs }) => {
             return (
               <tr key={index}>
                 <td className='align-middle bt-0 font-weight-bold'>{userAccount}</td>
-                <td className='align-middle bt-0 font-weight-bold'>
-                  {timestamp && formatDate(new Date(timestamp))}
+                <td className='align-middle bt-0'>
+                  {timestamp && formatDateWithMinutes(new Date(timestamp))}
                 </td>
                 <td className='align-middle bt-0'>
                   {action}
