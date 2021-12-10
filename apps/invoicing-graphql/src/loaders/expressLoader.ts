@@ -161,8 +161,8 @@ export const expressLoader: MicroframeworkLoader = (
         'id',
         'userAccount',
         'timestamp',
-        'entity',
         'action',
+        'entity',
         'item_reference',
         'target'
       ];
