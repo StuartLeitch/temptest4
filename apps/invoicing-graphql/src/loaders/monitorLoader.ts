@@ -1,4 +1,4 @@
-import basicAuth from 'express-basic-auth';
+// import basicAuth from 'express-basic-auth';
 // import monitor from 'express-status-monitor';
 import {
   MicroframeworkLoader,
@@ -11,7 +11,7 @@ export const monitorLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined
 ) => {
   if (settings && env.monitor.enabled) {
-    const expressApp = settings.getData('express_app');
+    // const expressApp = settings.getData('express_app');
 
     // expressApp.use(monitor());
     // expressApp.get(
