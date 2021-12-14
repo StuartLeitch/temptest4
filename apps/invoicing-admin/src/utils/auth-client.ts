@@ -23,7 +23,11 @@ class _AuthClient {
 
   public async login() {
     const { kc } = this;
-    return kc.login();
+    if (config.authIdpHint) {
+      return kc.login({ idpHint: config.authIdpHint });
+    } else {
+      return kc.login();
+    }
   }
 
   public async logout() {
@@ -53,7 +57,7 @@ class _AuthClient {
       onLoad: 'check-sso',
       // onLoad: "login-required",
       promiseType: 'native',
-      checkLoginIframe: false
+      checkLoginIframe: false,
       // silentCheckSsoRedirectUri: window.location.origin + "/silent-check-sso.html",
       // pkceMethod: "S256",
     };

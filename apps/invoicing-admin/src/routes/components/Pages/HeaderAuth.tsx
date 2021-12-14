@@ -10,7 +10,7 @@ const HeaderAuth = props => (
           props.icon ? (
               <i className={ `fas fa-fw fa-times fa-3x ${ props.iconClassName }` }></i>
           ) : (
-              <LogoThemed checkBackground />
+            null
           )
       }
         </div>

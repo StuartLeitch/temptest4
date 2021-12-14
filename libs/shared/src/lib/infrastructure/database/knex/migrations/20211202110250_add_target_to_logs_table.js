@@ -12,4 +12,4 @@ module.exports.down = function(knex) {
     table.dropColumn('item_reference');
     table.dropColumn('target');
   });
-}
+};

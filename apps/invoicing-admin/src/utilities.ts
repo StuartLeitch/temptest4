@@ -11,3 +11,7 @@ export function randomArray(arr) {
 export function randomAvatar() {
   return randomArray(allAvatars);
 }
+
+export function avatarZero() {
+  return allAvatars[50];
+}
