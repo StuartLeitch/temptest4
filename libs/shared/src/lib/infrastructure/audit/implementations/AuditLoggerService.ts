@@ -17,11 +17,13 @@ export class AuditLoggerService implements AuditLoggerServiceContract {
   ) {}
 
   public log(args: any): void {
-    const log = AuditLog.create({
-      userAccount: this.userData.email,
-      ...args
-    }).value;
+    if (this.userData) {
+      const log = AuditLog.create({
+        userAccount: this.userData.email,
+        ...args
+      }).value;
 
-    this.auditLogRepo.save(log);
+      this.auditLogRepo.save(log);
+    }
   }
 }
