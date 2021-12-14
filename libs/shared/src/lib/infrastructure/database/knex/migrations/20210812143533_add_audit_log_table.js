@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+
 module.exports.up = async function(knex) {
   return knex.schema
     .createTable('audit_logs', function(table) {
