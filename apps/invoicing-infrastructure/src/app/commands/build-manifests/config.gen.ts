@@ -59,6 +59,15 @@ import { values as hindawiProdInvoicingErpInvoiceRegistrationValues } from 'apps
 import { values as hindawiProdImportManuscriptBackend } from 'apps/import-manuscript-backend/chart/hindawi/prod';
 import { values as hindawiProdImportManuscriptValidation } from 'apps/import-manuscript-validation/chart/hindawi/prod';
 
+import { values as automationInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/hindawi/automation';
+import { values as automationInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/automation';
+import { values as automationInvoicingAdminValues } from 'apps/invoicing-admin/chart/hindawi/automation';
+import { values as automationReportingBackendValues } from 'apps/reporting-backend/chart/hindawi/automation';
+//TODO create secrets
+import { values as automationInvoicingErpInvoiceRegistrationValues } from 'apps/invoicing-erp-invoice-registration/chart/hindawi/automation';
+import { values as automationImportManuscriptBackend } from 'apps/import-manuscript-backend/chart/hindawi/automation';
+import { values as automationImportManuscriptValidation } from 'apps/import-manuscript-validation/chart/hindawi/automation';
+
 const masterConfig: {
   [tenant: string]: {
     [env: string]: { [app: string]: WithAwsSecretsServiceProps };
@@ -107,6 +116,15 @@ const masterConfig: {
       [App.importManuscriptBackend]: qaImportManuscriptBackend,
       [App.importManuscriptValidation]: qaImportManuscriptValidation,
 
+    },
+    automation:{
+      [App.invoicingErpInvoiceRegistration]: automationInvoicingErpInvoiceRegistrationValues,
+      [App.reporting]: automationReportingBackendValues,
+      [App.graphql]: automationInvoicingGraphqlValues,
+      [App.admin]: automationInvoicingAdminValues,
+      [App.web]: automationInvoicingWebValues,
+      [App.importManuscriptBackend]: automationImportManuscriptBackend,
+      [App.importManuscriptValidation]: automationImportManuscriptValidation,
     },
     dev: {
       [App.invoicingErpInvoiceRegistration]: devInvoicingErpInvoiceRegistrationValues,
