@@ -7,7 +7,7 @@ import { defaultValues } from '../../default';
 
 const values: WithAwsSecretsServiceProps = {
   ...defaultValues,
-  secretNames: ['automation/review/import-manuscript'],
+  secretNames: ['automation/review/import-manuscript-backend'],
   serviceProps: {
     ...defaultValues.serviceProps,
     ingressOptions: {
