@@ -62,7 +62,6 @@ import { values as hindawiProdImportManuscriptValidation } from 'apps/import-man
 import { values as automationInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/hindawi/automation';
 import { values as automationInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/automation';
 import { values as automationInvoicingAdminValues } from 'apps/invoicing-admin/chart/hindawi/automation';
-import { values as automationReportingBackendValues } from 'apps/reporting-backend/chart/hindawi/automation';
 import { values as automationInvoicingErpInvoiceRegistrationValues } from 'apps/invoicing-erp-invoice-registration/chart/hindawi/automation';
 import { values as automationImportManuscriptBackend } from 'apps/import-manuscript-backend/chart/hindawi/automation';
 import { values as automationImportManuscriptValidation } from 'apps/import-manuscript-validation/chart/hindawi/automation';
@@ -118,7 +117,6 @@ const masterConfig: {
     },
     automation:{
       [App.invoicingErpInvoiceRegistration]: automationInvoicingErpInvoiceRegistrationValues,
-      [App.reporting]: automationReportingBackendValues,
       [App.graphql]: automationInvoicingGraphqlValues,
       [App.admin]: automationInvoicingAdminValues,
       [App.web]: automationInvoicingWebValues,
