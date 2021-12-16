@@ -18,4 +18,5 @@ export enum Environment {
   demo = 'demo',
   prod = 'prod',
   qa = 'qa',
+  automation = "automation"
 }
