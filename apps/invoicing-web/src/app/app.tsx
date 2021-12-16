@@ -15,6 +15,8 @@ export const App = () => {
 
     const favicon: any = document.getElementById("favicon");
     favicon.href = config.faviconUrl;
+    const favicon2: any = document.getElementById("favicon2");
+    favicon2.href = config.faviconUrl;
   });
 
   return (
