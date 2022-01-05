@@ -70,44 +70,83 @@ const imperativeValidation = (formFns, showModal) => () => {
 const validateFn = (values: any) => {
   const errors: any = {};
 
-  if (!values.name) {
+  // console.log('VALUES = ');
+  // console.info(values);
+
+  if (values.name) {
+    if (!(values.name.trim())) {
+      errors.name = "Blank value is forbidden.";
+    }
+  } else {
     errors.name = "Required";
   }
 
-  if (!values.email) {
+  if (values.email) {
+    if (!(values.email.trim())) {
+      errors.email = "Blank value is forbidden.";
+    }
+  } else {
     errors.email = "Required";
   }
-  if (!values.address.country) {
+
+  if (values.address.country) {
+    if (!(values.address.country.trim())) {
+      set(errors, "address.country", "Blank value is forbidden.");
+    }
+
+    if (values.address.country === "US") {
+      if (values.address.state) {
+        if (!(values.address.state.trim())) {
+          set(errors, "address.state", "Blank value is forbidden.");
+        }
+      } else {
+        set(errors, "address.state", "Required");
+      }
+
+      if (values.address.postalCode) {
+        if (!(values.address.postalCode.trim())) {
+          set(errors, "address.postalCode", "Blank value is forbidden.");
+        }
+      } else {
+        set(errors, "address.postalCode", "Required");
+      }
+
+      if (!/^\d{5}$/.test(values.address.postalCode)) {
+        set(
+          errors,
+          "address.postalCode",
+          "Invalid postal code format, use 5 numbers",
+        );
+      }
+    }
+  } else {
     set(errors, "address.country", "Required");
   }
 
-  if (values.address.country === "US") {
-    if (!values.address.state) {
-      set(errors, "address.state", "Required");
+  if (values.address.city) {
+    if (!(values.address.city.trim())) {
+      set(errors, "address.city", "Blank value is forbidden.");
     }
-
-    if (!values.address.postalCode) {
-      set(errors, "address.postalCode", "Required");
-    }
-
-    if (!/^\d{5}$/.test(values.address.postalCode)) {
-      set(
-        errors,
-        "address.postalCode",
-        "Invalid postal code format, use 5 numbers",
-      );
-    }
-  }
-
-  if (!values.address.city) {
+  } else {
     set(errors, "address.city", "Required");
   }
-  if (!values.address.addressLine1) {
+
+  if (values.address.addressLine1) {
+    if (!(values.address.addressLine1.trim())) {
+      set(errors, "address.addressLine1", "Blank value is forbidden.");
+    }
+  } else {
     set(errors, "address.addressLine1", "Required");
   }
 
-  if (values.type === PAYMENT_TYPES.institution && !values.organization) {
-    errors.organization = "Required";
+  if (values.type === PAYMENT_TYPES.institution) {
+    if (values.organization) {
+      if (!(values.organization.trim())) {
+        errors.organization = "Blank value is forbidden.";
+      }
+    } else {
+      errors.organization = "Required";
+    }
   }
 
   return errors;
