@@ -70,9 +70,6 @@ const imperativeValidation = (formFns, showModal) => () => {
 const validateFn = (values: any) => {
   const errors: any = {};
 
-  // console.log('VALUES = ');
-  // console.info(values);
-
   if (values.name) {
     if (!(values.name.trim())) {
       errors.name = "Blank value is forbidden.";
