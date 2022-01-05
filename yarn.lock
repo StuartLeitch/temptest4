@@ -4304,7 +4304,6 @@
   integrity sha512-cTY/9+rloQepwVx0CsKm9+//4H6qJA7QNzPv5WrGoO1iRV8vKqpMg8E3v+Gn2JCfpv9tqsMAd1C//hxVbcGRSQ==
   dependencies:
     animejs "^3.0.1"
-    faker "git+https://github.com/Marak/faker.js.git"
     highcharts "^7.1.2"
     url-join "^4.0.0"
 
@@ -13614,10 +13613,6 @@ extsprintf@^1.2.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/extsprintf/-/extsprintf-1.4.0.tgz#e2689f8f356fad62cca65a3a91c5df5f9551692f"
   integrity sha1-4mifjzVvrWLMplo6kcXfX5VRaS8=
-
-"faker@git+https://github.com/Marak/faker.js.git":
-  version "5.5.3"
-  resolved "git+https://github.com/Marak/faker.js.git#17d56481e3afeabffe9c08c7d932f5e31749f594"
 
 fast-deep-equal@^2.0.1:
   version "2.0.1"
