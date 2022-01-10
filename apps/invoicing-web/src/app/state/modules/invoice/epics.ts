@@ -30,15 +30,20 @@ const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
     switchMap((action) =>
       graphqlAdapter.send(queries.getInvoice, { id: action.payload }),
     ),
-    map((r) => {
+    withLatestFrom(state$.pipe(map(invoice))),
+
+    mergeMap(([r, stateInvoice]) => {
       const invoice = r.data.invoice;
       const { article, ...invoiceItem } = invoice.invoiceItem;
 
-      return getInvoice.success({
-        ...invoice,
-        invoiceItem,
-        article,
-      });
+      return from([
+        modalActions.hideModal(),
+        getInvoice.success({
+          ...invoice,
+          invoiceItem,
+          article,
+        })
+      ]);
     }),
     catchError((err) => of(getInvoice.failure(err.message))),
   );

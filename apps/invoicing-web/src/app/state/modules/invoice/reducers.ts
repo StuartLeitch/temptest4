@@ -22,7 +22,9 @@ const initialState: Invoice = {
 };
 
 const invoice = createReducer(initialState)
-  .handleAction(getInvoice.success, (_, action) => action.payload)
+  .handleAction(getInvoice.success, (state, action) => {
+    return action.payload;
+  })
   .handleAction(updatePayerAsync.success, (state, action) => ({
     ...state,
     payer: action.payload,
