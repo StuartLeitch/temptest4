@@ -32,6 +32,7 @@ const CountryField = ({ value, onChange, name, status }) => {
     <Relative>
       <Root status={status}>
         <CountryInput
+          id={name}
           value={countryInput}
           onBlur={toggleMenu}
           onFocus={toggleMenu}
