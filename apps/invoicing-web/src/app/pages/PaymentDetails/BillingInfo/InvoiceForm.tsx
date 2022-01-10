@@ -74,6 +74,11 @@ const validateFn = (values: any) => {
     if (!(values.name.trim())) {
       errors.name = "Blank value is forbidden.";
     }
+
+    if (!(/^[a-zA-Z0-9 _-]+$/g.test(values.name))) {
+      errors.name = 'Special characters are not permitted';
+    }
+
   } else {
     errors.name = "Required";
   }
@@ -141,6 +146,11 @@ const validateFn = (values: any) => {
       if (!(values.organization.trim())) {
         errors.organization = "Blank value is forbidden.";
       }
+
+      if (!(/^[a-zA-Z0-9 _-]+$/g.test(values.organization))) {
+        errors.organization = 'Special characters are not permitted';
+      }
+
     } else {
       errors.organization = "Required";
     }

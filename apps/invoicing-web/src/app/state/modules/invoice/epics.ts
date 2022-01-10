@@ -31,7 +31,6 @@ const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
       graphqlAdapter.send(queries.getInvoice, { id: action.payload }),
     ),
     withLatestFrom(state$.pipe(map(invoice))),
-
     mergeMap(([r, stateInvoice]) => {
       const invoice = r.data.invoice;
       const { article, ...invoiceItem } = invoice.invoiceItem;
