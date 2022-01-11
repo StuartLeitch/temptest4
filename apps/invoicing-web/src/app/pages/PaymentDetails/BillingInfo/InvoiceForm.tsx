@@ -75,8 +75,8 @@ const validateFn = (values: any) => {
       errors.name = "Blank value is forbidden.";
     }
 
-    if (!(/^[a-zA-Z0-9 _-]+$/g.test(values.name))) {
-      errors.name = 'Special characters are not permitted';
+    if (/^[!@#$%^&*()+=_\[\]{};:\\|,.<>\/?]*$/.test(values.name)) {
+      errors.name = 'Special characters only are not permitted';
     }
 
   } else {
@@ -147,8 +147,8 @@ const validateFn = (values: any) => {
         errors.organization = "Blank value is forbidden.";
       }
 
-      if (!(/^[a-zA-Z0-9 _-]+$/g.test(values.organization))) {
-        errors.organization = 'Special characters are not permitted';
+      if (/^[!@#$%^&*()+=_\[\]{};:\\|,.<>\/?]*$/.test(values.organization)) {
+        errors.organization = 'Special characters only are not permitted';
       }
 
     } else {
