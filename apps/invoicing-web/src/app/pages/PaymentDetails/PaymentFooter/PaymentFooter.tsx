@@ -29,6 +29,10 @@ const Root = styled.div`
       margin-right: 0;
     }
   }
+
+  span {
+    color: ${th("colors.textPrimary")};
+  }
 `;
 
 const PaymentFooter: React.FC<Props> = (props) => {
