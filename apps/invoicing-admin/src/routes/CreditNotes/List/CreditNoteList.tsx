@@ -75,7 +75,7 @@ const RecentCreditNotesList: React.FC<RecentCreditNotesListProps> = (props) => {
               pageNeighbours={5}
               onPageChanged={onPageChanged}
               pageLimit={pagination.limit}
-              currentPage={pagination.page}
+              currentPage={page}
             />
           </CardFooter>
         </Card>
