@@ -80,6 +80,6 @@ export class BuildManifestsCommand implements Command {
       await HindawiServiceChart.withAwsSecrets(rootConstruct, app, appProps);
     }
     rootConstruct.synth();
-    console.log(`Successfuly built: ${env.apps}`);
+    console.log(`Successfully built: ${env.apps}`);
   }
 }
