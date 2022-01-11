@@ -82,6 +82,7 @@
     "express-status-monitor": "1.3.3",
     "fibers": "5.0.0",
     "formik": "2.1.5",
+    "faker": "5.5.3",
     "graphql": "15.3.0",
     "graphql-hooks": "4.5.0",
     "graphql-import-node": "0.0.4",
