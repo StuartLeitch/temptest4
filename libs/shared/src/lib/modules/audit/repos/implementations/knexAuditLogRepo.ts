@@ -5,7 +5,7 @@ import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRep
 import { RepoError } from '../../../../infrastructure/RepoError';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 
-import { AuditLog } from '../../domain/AuditLog'
+import { AuditLog } from '../../domain/AuditLog';
 import { AuditLogPaginated } from '../../domain/AuditLogPaginated';
 
 import { AuditLogRepoContract } from '../auditLogRepo';
@@ -16,27 +16,28 @@ import moment from 'moment';
 export class KnexAuditLogRepo
   extends AbstractBaseDBRepo<Knex, AuditLog>
   implements AuditLogRepoContract {
-
-  async getRecentAuditLogs(args?: any): Promise<Either<GuardFailure | RepoError, AuditLogPaginated>> {
+  async getRecentAuditLogs(
+    args?: any
+  ): Promise<Either<GuardFailure | RepoError, AuditLogPaginated>> {
     const { pagination, filters } = args;
     const { db, logger } = this;
 
-    const getModel = () =>
-      db(TABLES.AUDIT_LOGS);
+    const getModel = () => db(TABLES.AUDIT_LOGS);
 
     const offset = pagination.offset * pagination.limit;
 
-    let endDate = moment(new Date()).add(1, 'days').format('YYYY-MM-D');
-    let startDate = moment(new Date()).subtract(5, 'days').format('YYYY-MM-D');
+    let endDate = moment(new Date()).add(1, 'days').format('YYYY-MM-DD');
+    let startDate = moment(new Date()).subtract(5, 'days').format('YYYY-MM-DD');
 
     if (filters) {
-      startDate = moment(filters.startDate).format('YYYY-MM-D');
-      endDate = moment(filters.endDate).add(1, 'days').format('YYYY-MM-D');
+      startDate = moment(filters.startDate).format('YYYY-MM-DD');
+      endDate = moment(filters.endDate).add(1, 'days').format('YYYY-MM-DD');
     }
 
-    const totalCount = await getModel().count(
-      `${TABLES.AUDIT_LOGS}.id`
-    ).whereBetween('timestamp', [startDate, endDate]).first();
+    const totalCount = await getModel()
+      .count(`${TABLES.AUDIT_LOGS}.id`)
+      .whereBetween('timestamp', [startDate, endDate])
+      .first();
 
     let sql = getModel()
       .whereBetween('timestamp', [startDate, endDate])
@@ -55,11 +56,11 @@ export class KnexAuditLogRepo
 
     const rawLogs: Array<any> = await sql;
 
-    return (flatten(rawLogs.map(AuditLogMap.toDomain)) as any).map(logs => {
-      return ({
+    return (flatten(rawLogs.map(AuditLogMap.toDomain)) as any).map((logs) => {
+      return {
         totalCount: totalCount.count,
-        auditLogs: logs
-      });
+        auditLogs: logs,
+      };
     });
   }
 
@@ -73,7 +74,6 @@ export class KnexAuditLogRepo
     await db(TABLES.AUDIT_LOGS).insert(newAuditLog);
 
     return right(auditLog);
-
   }
 
   async exists(
