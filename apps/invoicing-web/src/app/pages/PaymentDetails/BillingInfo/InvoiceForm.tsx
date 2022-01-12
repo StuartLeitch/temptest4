@@ -87,6 +87,11 @@ const validateFn = (values: any) => {
     if (!(values.email.trim())) {
       errors.email = "Blank value is forbidden.";
     }
+
+    if (/^[!@#$%^&*()+=_\[\]{};:\\|,.<>\/?]*$/.test(values.email)) {
+      errors.email = 'Special characters only are not permitted';
+    }
+
   } else {
     errors.email = "Required";
   }
