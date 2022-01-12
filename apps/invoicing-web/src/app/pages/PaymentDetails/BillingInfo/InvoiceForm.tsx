@@ -67,6 +67,10 @@ const imperativeValidation = (formFns, showModal) => () => {
   });
 };
 
+const emailRegex = new RegExp(
+  /^(([^<>()\[\]\\.,;:\s@"“”]+(\.[^<>()\[\]\\.,;:\s@"“”]+)*))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i
+);
+
 const validateFn = (values: any) => {
   const errors: any = {};
 
@@ -88,8 +92,8 @@ const validateFn = (values: any) => {
       errors.email = "Blank value is forbidden.";
     }
 
-    if (/^[!@#$%^&*()+=_\[\]{};:\\|,.<>\/?]*$/.test(values.email)) {
-      errors.email = 'Special characters only are not permitted';
+    if(!emailRegex.test(values.email)) {
+      errors.email = "Invalid email address";
     }
 
   } else {
