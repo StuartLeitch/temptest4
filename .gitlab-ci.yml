@@ -103,7 +103,7 @@ Test:
     paths:
       - reports
 
-bridge:
+Bridge to Phenom-Automation:
   stage: test
   trigger:
     project: razvan.ariciuc/phenom-automation
