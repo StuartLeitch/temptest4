@@ -4,7 +4,6 @@ image:
 stages:
   - setup
   - test
-  - bridge
   - reports
   - build
   - package
@@ -60,22 +59,22 @@ variables:
   AFFECTED_ARGS: '--base=remotes/origin/develop'
   AFFECTED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend'
 
-Install Dependencies:
-  tags:
-    - 'cluster:hindawi-dev'
-  interruptible: true
-  allow_failure: false
-  stage: setup
-  before_script:
-    - apk add --no-cache py3-pip
-    - pip3 install --no-cache-dir  awscli
-  services:
-    - name: docker:20.10.10-dind
-      command: ['--tls=false']
-  image: docker:20.10.10
-  script:
-    - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
-    - ./tools/scripts/dockerize-builder.sh
+# Install Dependencies:
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   interruptible: true
+#   allow_failure: false
+#   stage: setup
+#   before_script:
+#     - apk add --no-cache py3-pip
+#     - pip3 install --no-cache-dir  awscli
+#   services:
+#     - name: docker:20.10.10-dind
+#       command: ['--tls=false']
+#   image: docker:20.10.10
+#   script:
+#     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
+#     - ./tools/scripts/dockerize-builder.sh
 
 Test:
   tags:
@@ -103,10 +102,16 @@ Test:
   artifacts:
     paths:
       - reports
+  trigger:
+    project: razvan.ariciuc/phenom-automation
+    branch: main
+    strategy: depend
+
 bridge:
   stage: test
   trigger:
     project: razvan.ariciuc/phenom-automation
+    branch: main
     strategy: depend
 
 .validate-schema: &script_validate
