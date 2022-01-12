@@ -102,10 +102,6 @@ Test:
   artifacts:
     paths:
       - reports
-  trigger:
-    project: razvan.ariciuc/phenom-automation
-    branch: main
-    strategy: depend
 
 bridge:
   stage: test
