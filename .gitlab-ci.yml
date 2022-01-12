@@ -4,6 +4,7 @@ image:
 stages:
   - setup
   - test
+  - bridge
   - reports
   - build
   - package
@@ -70,7 +71,7 @@ Install Dependencies:
     - pip3 install --no-cache-dir  awscli
   services:
     - name: docker:20.10.10-dind
-      command: ["--tls=false"]
+      command: ['--tls=false']
   image: docker:20.10.10
   script:
     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
@@ -102,14 +103,19 @@ Test:
   artifacts:
     paths:
       - reports
+bridge:
+  stage: test
+  trigger:
+    project: razvan.ariciuc/phenom-automation
+    strategy: depend
 
 .validate-schema: &script_validate
   image: $BUILD_IMAGE
-  needs: 
+  needs:
     - Install Dependencies
   stage: test
   tags:
-    - "cluster:hindawi-dev"
+    - 'cluster:hindawi-dev'
   variables:
     GIT_STRATEGY: none
     SCHEMA_REGISTRY_URL: ''
@@ -121,7 +127,7 @@ Test:
     - cd $HOME/apps/$SERVICE
     - schema-registry-cli validate --path $FILE_PATH --property $PROPERTY --service $SERVICE --service-version $CI_COMMIT_SHORT_SHA
 
-Validate Schema:qa: 
+Validate Schema:qa:
   <<: *script_validate
   only:
     changes:
@@ -177,7 +183,7 @@ Package Images:dev:
     - pip3 install --no-cache-dir awscli
   services:
     - name: docker:20.10.10-dind
-      command: ["--tls=false"]
+      command: ['--tls=false']
   script:
     - $(aws ecr get-login --no-include-email --region "${AWS_DEFAULT_REGION}")
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
@@ -253,7 +259,7 @@ Deploy:hindawi-demo:
 
 Deploy:hindawi-demo-sales:
   tags:
-    - "cluster:hindawi-dev"
+    - 'cluster:hindawi-dev'
   stage: deploy
   dependencies:
     - Package Images:dev
