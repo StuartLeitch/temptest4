@@ -62,7 +62,7 @@ const imperativeValidation = (formFns, showModal) => () => {
     if (isEmpty(errorFields)) {
       showModal();
     } else {
-      formFns.setTouched(errorFields);
+     formFns.setTouched(errorFields);
     }
   });
 };
