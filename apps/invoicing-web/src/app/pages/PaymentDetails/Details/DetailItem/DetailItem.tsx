@@ -18,7 +18,9 @@ const DetailItem: React.FC<Props> = ({ label, link, text }) => {
       </Flex>
       <Flex flex={2} justifyContent="flex-start">
         {link ? (
-          <ActionLink type="action">{text}</ActionLink>
+          <ActionLink type="action">
+            <a href={text}>{text}</a>
+          </ActionLink>
         ) : (
           <Text>{text}</Text>
         )}
