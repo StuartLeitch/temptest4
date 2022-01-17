@@ -36,6 +36,7 @@ const StateField = ({ value, onChange, name, status }) => {
     <Relative>
       <Root status={status}>
         <StateInput
+          id={name}
           value={stateInput}
           onBlur={toggleMenu}
           onFocus={toggleMenu}
