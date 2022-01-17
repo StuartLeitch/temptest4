@@ -68,7 +68,7 @@ const imperativeValidation = (formFns, showModal) => () => {
 };
 
 const emailRegex = new RegExp(
-  /^(([^<>()\[\]\\.,;:\s@"“”]+(\.[^<>()\[\]\\.,;:\s@"“”]+)*))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i
+  /^(([^<>()\[\]\\.,;:\s@"“”]+(\.[^<>()\[\]\\.,;:\s@"“”]+)*))@(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})$/i
 );
 
 const validateFn = (values: any) => {
@@ -87,17 +87,16 @@ const validateFn = (values: any) => {
     errors.name = "Required";
   }
 
-  if (values.email) {
-    if (!(values.email.trim())) {
-      errors.email = "Blank value is forbidden.";
-    }
+  if(!emailRegex.test(values.email)) {
+    errors.email = "Invalid email address";
+  }
 
-    if(!emailRegex.test(values.email)) {
-      errors.email = "Invalid email address";
-    }
-
-  } else {
+  if (!values.email) {
     errors.email = "Required";
+  }
+
+  if (!values.address.country) {
+    set(errors, "address.country", "Required");
   }
 
   if (values.address.country) {

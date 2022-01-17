@@ -33,9 +33,19 @@
     "storybook": "cd libs/react-components && start-storybook -p 6006",
     "codegen:graphql": "graphql-codegen --config apps/invoicing-graphql/codegen.yml"
   },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/@digitalroute/cz-conventional-changelog-for-jira",
+      "jiraMode": true,
+      "jiraPrefix": "PPBK",
+      "maxHeaderWidth": 72,
+      "jiraAppend": " |"
+    }
+  },
   "private": true,
   "dependencies": {
     "@cucumber/cucumber": "^7.0.0-rc.0",
+    "@digitalroute/cz-conventional-changelog-for-jira": "^7.0.0",
     "@fortawesome/fontawesome-free": "5.14.0",
     "@hindawi/phenom-charts": "0.2.0",
     "@hindawi/phenom-events": "^1.17.1",
@@ -66,6 +76,7 @@
     "cli-progress": "^3.8.2",
     "cls-hooked": "4.2.2",
     "color": "3.1.2",
+    "commitizen": "^4.2.4",
     "config": "3.3.1",
     "core-js": "3.6.5",
     "country-list": "2.2.0",
