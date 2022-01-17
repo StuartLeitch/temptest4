@@ -24,7 +24,7 @@ export class AuditLogMap extends Mapper<AuditLog> {
     return {
       id: auditLog.id.toString(),
       userAccount: auditLog.userAccount,
-      timestamp: auditLog.timestamp.toISOString(),
+      timestamp: new Date(auditLog.timestamp).toISOString(),
       action: auditLog.action,
       entity: auditLog.entity,
       item_reference: auditLog.item_reference,
