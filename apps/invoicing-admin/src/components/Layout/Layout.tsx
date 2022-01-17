@@ -246,9 +246,9 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
           </title>
           <link rel='canonical' href={config.siteCanonicalUrl} />
           <meta name='description' content={this.state.pageDescription} />
-          {_.map(favIcons, (favIcon, index) => (
+          {/* {_.map(favIcons, (favIcon, index) => (
             <link {...favIcon} key={index} />
-          ))}
+          ))} */}
         </Helmet>
         <ThemeClass>
           {(themeClass) => (
