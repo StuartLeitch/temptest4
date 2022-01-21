@@ -60,152 +60,152 @@ variables:
   AFFECTED_ARGS: '--base=remotes/origin/develop'
   AFFECTED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend'
 
-Install Dependencies:
-  tags:
-    - 'cluster:hindawi-dev'
-  interruptible: true
-  allow_failure: false
-  stage: setup
-  before_script:
-    - apk add --no-cache py3-pip
-    - pip3 install --no-cache-dir  awscli
-  services:
-    - name: docker:20.10.10-dind
-      command: ['--tls=false']
-  image: docker:20.10.10
-  script:
-    - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
-    - ./tools/scripts/dockerize-builder.sh
+# Install Dependencies:
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   interruptible: true
+#   allow_failure: false
+#   stage: setup
+#   before_script:
+#     - apk add --no-cache py3-pip
+#     - pip3 install --no-cache-dir  awscli
+#   services:
+#     - name: docker:20.10.10-dind
+#       command: ['--tls=false']
+#   image: docker:20.10.10
+#   script:
+#     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
+#     - ./tools/scripts/dockerize-builder.sh
 
-Test:
-  tags:
-    - 'cluster:hindawi-dev'
-  interruptible: true
-  allow_failure: false
-  stage: test
-  before_script:
-    - echo $CI_COMMIT_BRANCH
-    - echo $CI_COMMIT_REF_NAME
-    - cd $HOME/reports
-    - mkdir -p coverage
-    - mkdir -p cucumber
-  script:
-    - cd $HOME
-    - git fetch
-    - |
-      if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
-        AFFECTED_COMMAND="yarn run nx run-many --target=test --projects=$AFFECTED_APPS --configuration=production --parallel"
-      else
-       AFFECTED_COMMAND="yarn run affected:test $AFFECTED_ARGS --parallel --configuration=production"
-      fi
-    - eval $AFFECTED_COMMAND
-    - cp -r -a reports $CI_PROJECT_DIR
-  artifacts:
-    paths:
-      - reports
+# Test:
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   interruptible: true
+#   allow_failure: false
+#   stage: test
+#   before_script:
+#     - echo $CI_COMMIT_BRANCH
+#     - echo $CI_COMMIT_REF_NAME
+#     - cd $HOME/reports
+#     - mkdir -p coverage
+#     - mkdir -p cucumber
+#   script:
+#     - cd $HOME
+#     - git fetch
+#     - |
+#       if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
+#         AFFECTED_COMMAND="yarn run nx run-many --target=test --projects=$AFFECTED_APPS --configuration=production --parallel"
+#       else
+#        AFFECTED_COMMAND="yarn run affected:test $AFFECTED_ARGS --parallel --configuration=production"
+#       fi
+#     - eval $AFFECTED_COMMAND
+#     - cp -r -a reports $CI_PROJECT_DIR
+#   artifacts:
+#     paths:
+#       - reports
 
-.validate-schema: &script_validate
-  image: $BUILD_IMAGE
-  needs:
-    - Install Dependencies
-  stage: test
-  tags:
-    - 'cluster:hindawi-dev'
-  variables:
-    GIT_STRATEGY: none
-    SCHEMA_REGISTRY_URL: ''
-    SERVICE: ''
-    FILE_PATH: ''
-    PROPERTY: ''
-  script:
-    - yarn global add @phenom.pub/schema-registry-cli
-    - cd $HOME/apps/$SERVICE
-    - schema-registry-cli validate --path $FILE_PATH --property $PROPERTY --service $SERVICE --service-version $CI_COMMIT_SHORT_SHA
+# .validate-schema: &script_validate
+#   image: $BUILD_IMAGE
+#   needs:
+#     - Install Dependencies
+#   stage: test
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   variables:
+#     GIT_STRATEGY: none
+#     SCHEMA_REGISTRY_URL: ''
+#     SERVICE: ''
+#     FILE_PATH: ''
+#     PROPERTY: ''
+#   script:
+#     - yarn global add @phenom.pub/schema-registry-cli
+#     - cd $HOME/apps/$SERVICE
+#     - schema-registry-cli validate --path $FILE_PATH --property $PROPERTY --service $SERVICE --service-version $CI_COMMIT_SHORT_SHA
 
-Validate Schema:qa:
-  <<: *script_validate
-  only:
-    changes:
-      - 'apps/invoicing-graphql/**/*'
-  variables:
-    SERVICE: 'invoicing-graphql'
-    FILE_PATH: './src/graphql/schema/schema.graphql'
-    SCHEMA_REGISTRY_URL: $QA_SCHEMA_REGISTRY_URL
+# Validate Schema:qa:
+#   <<: *script_validate
+#   only:
+#     changes:
+#       - 'apps/invoicing-graphql/**/*'
+#   variables:
+#     SERVICE: 'invoicing-graphql'
+#     FILE_PATH: './src/graphql/schema/schema.graphql'
+#     SCHEMA_REGISTRY_URL: $QA_SCHEMA_REGISTRY_URL
 
-Build:
-  tags:
-    - 'cluster:hindawi-dev'
-  interruptible: true
-  stage: build
-  script:
-    - cd $HOME
-    - git fetch
-    - |
-      if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
-        AFFECTED_COMMAND="yarn run nx run-many --target=build --projects=$AFFECTED_APPS --configuration=production --parallel --maxParallel=2"
-      else
-       AFFECTED_COMMAND="yarn run affected:build $AFFECTED_ARGS --parallel --configuration=production --maxParallel=2"
-      fi
-    - eval $AFFECTED_COMMAND
-    # artifacts can't be uploaded outside $CI_PROJECT_DIR
-    - mkdir -p $CI_PROJECT_DIR/.ci_status
-    - |
-      if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
-        AFFECTED_COMMAND="echo "${AFFECTED_APPS//,/ }" > $CI_PROJECT_DIR/.ci_status/affected_apps"
-      else
-       AFFECTED_COMMAND="yarn run affected:apps $AFFECTED_ARGS --plain 2>&1 | sed -e "s/sisif-test//" | sed -e "s/reporting-pull-historic-events//" | tail -2 | head -n 1 > $CI_PROJECT_DIR/.ci_status/affected_apps"
-      fi
-    - eval $AFFECTED_COMMAND
-    - mkdir -p dist
-    - cp -r dist $CI_PROJECT_DIR
-  artifacts:
-    paths:
-      - .ci_status
-      - dist
+# Build:
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   interruptible: true
+#   stage: build
+#   script:
+#     - cd $HOME
+#     - git fetch
+#     - |
+#       if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
+#         AFFECTED_COMMAND="yarn run nx run-many --target=build --projects=$AFFECTED_APPS --configuration=production --parallel --maxParallel=2"
+#       else
+#        AFFECTED_COMMAND="yarn run affected:build $AFFECTED_ARGS --parallel --configuration=production --maxParallel=2"
+#       fi
+#     - eval $AFFECTED_COMMAND
+#     # artifacts can't be uploaded outside $CI_PROJECT_DIR
+#     - mkdir -p $CI_PROJECT_DIR/.ci_status
+#     - |
+#       if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
+#         AFFECTED_COMMAND="echo "${AFFECTED_APPS//,/ }" > $CI_PROJECT_DIR/.ci_status/affected_apps"
+#       else
+#        AFFECTED_COMMAND="yarn run affected:apps $AFFECTED_ARGS --plain 2>&1 | sed -e "s/sisif-test//" | sed -e "s/reporting-pull-historic-events//" | tail -2 | head -n 1 > $CI_PROJECT_DIR/.ci_status/affected_apps"
+#       fi
+#     - eval $AFFECTED_COMMAND
+#     - mkdir -p dist
+#     - cp -r dist $CI_PROJECT_DIR
+#   artifacts:
+#     paths:
+#       - .ci_status
+#       - dist
 
-Package Images:dev:
-  tags:
-    - 'cluster:hindawi-dev'
-  interruptible: true
-  stage: package
-  image: docker:20.10.10
-  variables:
-    AWS_ACCESS_KEY_ID: $AWS_DEV_ACCESS_KEY_ID
-    AWS_SECRET_ACCESS_KEY: $AWS_DEV_SECRET_ACCESS_KEY
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-  before_script:
-    - apk add --no-cache py3-pip
-    - pip3 install --no-cache-dir awscli
-  services:
-    - name: docker:20.10.10-dind
-      command: ['--tls=false']
-  script:
-    - $(aws ecr get-login --no-include-email --region "${AWS_DEFAULT_REGION}")
-    - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
-    - ./tools/scripts/dockerize-apps.sh
-  dependencies:
-    - Build
-  artifacts:
-    paths:
-      - .ci_status
-      - dist
+# Package Images:dev:
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   interruptible: true
+#   stage: package
+#   image: docker:20.10.10
+#   variables:
+#     AWS_ACCESS_KEY_ID: $AWS_DEV_ACCESS_KEY_ID
+#     AWS_SECRET_ACCESS_KEY: $AWS_DEV_SECRET_ACCESS_KEY
+#     AWS_REGISTRY: $AWS_DEV_REGISTRY
+#   before_script:
+#     - apk add --no-cache py3-pip
+#     - pip3 install --no-cache-dir awscli
+#   services:
+#     - name: docker:20.10.10-dind
+#       command: ['--tls=false']
+#   script:
+#     - $(aws ecr get-login --no-include-email --region "${AWS_DEFAULT_REGION}")
+#     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
+#     - ./tools/scripts/dockerize-apps.sh
+#   dependencies:
+#     - Build
+#   artifacts:
+#     paths:
+#       - .ci_status
+#       - dist
 
-.deploy_base: &script_deploy
-  when: manual
-  before_script:
-    - apk add --no-cache curl python3 py3-pip
-    - pip3 install --upgrade awscli
-    - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-    - chmod +x ./kubectl
-    - mv ./kubectl /usr/local/bin
-  script:
-    - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
-    - cd $HOME
-    - ./tools/scripts/deploy-ci.sh
-    - cp -r dist-k8s $CI_PROJECT_DIR
-  artifacts:
-    paths:
-      - dist-k8s
+# .deploy_base: &script_deploy
+#   when: manual
+#   before_script:
+#     - apk add --no-cache curl python3 py3-pip
+#     - pip3 install --upgrade awscli
+#     - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+#     - chmod +x ./kubectl
+#     - mv ./kubectl /usr/local/bin
+#   script:
+#     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
+#     - cd $HOME
+#     - ./tools/scripts/deploy-ci.sh
+#     - cp -r dist-k8s $CI_PROJECT_DIR
+#   artifacts:
+#     paths:
+#       - dist-k8s
 
 Store Branch Name:
   stage: acceptance
@@ -229,155 +229,154 @@ Trigger to Phenom-Automation:
   needs:
     - job: Store Branch Name
       artifacts: true
+# Deploy:dev:
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   stage: deploy
+#   dependencies:
+#     - Package Images:dev
+#   <<: *script_deploy
+#   variables:
+#     TENANT: hindawi
+#     NODE_ENV: dev
+#     NAMESPACE: dev
+#     CLUSTER: hindawi-dev
+#     AWS_REGISTRY: $AWS_DEV_REGISTRY
+#     COMMAND: build-manifests
 
-Deploy:dev:
-  tags:
-    - 'cluster:hindawi-dev'
-  stage: deploy
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: hindawi
-    NODE_ENV: dev
-    NAMESPACE: dev
-    CLUSTER: hindawi-dev
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
+# Deploy:qa:
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   stage: deploy
+#   dependencies:
+#     - Package Images:dev
+#   <<: *script_deploy
+#   variables:
+#     TENANT: hindawi
+#     NODE_ENV: qa
+#     NAMESPACE: qa
+#     CLUSTER: hindawi-dev
+#     AWS_REGISTRY: $AWS_DEV_REGISTRY
+#     COMMAND: build-manifests
 
-Deploy:qa:
-  tags:
-    - 'cluster:hindawi-dev'
-  stage: deploy
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: hindawi
-    NODE_ENV: qa
-    NAMESPACE: qa
-    CLUSTER: hindawi-dev
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
+# Deploy:automation:
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   stage: deploy
+#   dependencies:
+#     - Package Images:dev
+#   <<: *script_deploy
+#   variables:
+#     TENANT: hindawi
+#     NODE_ENV: automation
+#     NAMESPACE: automation
+#     CLUSTER: hindawi-dev
+#     AWS_REGISTRY: $AWS_DEV_REGISTRY
+#     COMMAND: build-manifests
 
-Deploy:automation:
-  tags:
-    - 'cluster:hindawi-dev'
-  stage: deploy
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: hindawi
-    NODE_ENV: automation
-    NAMESPACE: automation
-    CLUSTER: hindawi-dev
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
+# Deploy:hindawi-demo:
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   stage: deploy
+#   dependencies:
+#     - Package Images:dev
+#   <<: *script_deploy
+#   variables:
+#     TENANT: hindawi
+#     NODE_ENV: demo
+#     NAMESPACE: demo
+#     CLUSTER: hindawi-dev
+#     AWS_REGISTRY: $AWS_DEV_REGISTRY
+#     COMMAND: build-manifests
 
-Deploy:hindawi-demo:
-  tags:
-    - 'cluster:hindawi-dev'
-  stage: deploy
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: hindawi
-    NODE_ENV: demo
-    NAMESPACE: demo
-    CLUSTER: hindawi-dev
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
+# Deploy:hindawi-demo-sales:
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   stage: deploy
+#   dependencies:
+#     - Package Images:dev
+#   <<: *script_deploy
+#   variables:
+#     TENANT: hindawi
+#     NODE_ENV: demo-sales
+#     NAMESPACE: demo-sales
+#     CLUSTER: hindawi-dev
+#     AWS_REGISTRY: $AWS_DEV_REGISTRY
+#     COMMAND: build-manifests
 
-Deploy:hindawi-demo-sales:
-  tags:
-    - 'cluster:hindawi-dev'
-  stage: deploy
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: hindawi
-    NODE_ENV: demo-sales
-    NAMESPACE: demo-sales
-    CLUSTER: hindawi-dev
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
+# Deploy:gsw-demo:
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   stage: deploy
+#   dependencies:
+#     - Package Images:dev
+#   <<: *script_deploy
+#   variables:
+#     TENANT: gsw
+#     NODE_ENV: demo
+#     NAMESPACE: demo-gsw
+#     CLUSTER: hindawi-dev
+#     AWS_REGISTRY: $AWS_DEV_REGISTRY
+#     COMMAND: build-manifests
 
-Deploy:gsw-demo:
-  tags:
-    - 'cluster:hindawi-dev'
-  stage: deploy
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: gsw
-    NODE_ENV: demo
-    NAMESPACE: demo-gsw
-    CLUSTER: hindawi-dev
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
+# Deploy:gsw-prod:
+#   tags:
+#     - 'cluster:hindawi-prod'
+#   stage: deploy-prod
+#   dependencies:
+#     - Package Images:dev
+#   <<: *script_deploy
+#   variables:
+#     TENANT: gsw
+#     NODE_ENV: prod
+#     NAMESPACE: gsw-prod
+#     CLUSTER: hindawi-prod
+#     AWS_REGISTRY: $AWS_DEV_REGISTRY
+#     COMMAND: build-manifests
 
-Deploy:gsw-prod:
-  tags:
-    - 'cluster:hindawi-prod'
-  stage: deploy-prod
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: gsw
-    NODE_ENV: prod
-    NAMESPACE: gsw-prod
-    CLUSTER: hindawi-prod
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
+# Deploy:preproduction:
+#   tags:
+#     - 'cluster:hindawi-prod'
+#   stage: deploy
+#   dependencies:
+#     - Package Images:dev
+#   <<: *script_deploy
+#   variables:
+#     TENANT: hindawi
+#     NODE_ENV: preproduction
+#     NAMESPACE: preproduction
+#     CLUSTER: hindawi-prod
+#     AWS_REGISTRY: $AWS_DEV_REGISTRY
+#     COMMAND: build-manifests
 
-Deploy:preproduction:
-  tags:
-    - 'cluster:hindawi-prod'
-  stage: deploy
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: hindawi
-    NODE_ENV: preproduction
-    NAMESPACE: preproduction
-    CLUSTER: hindawi-prod
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
+# Deploy:hindawi-prod:
+#   tags:
+#     - 'cluster:hindawi-prod'
+#   stage: deploy-prod
+#   dependencies:
+#     - Package Images:dev
+#   <<: *script_deploy
+#   variables:
+#     TENANT: hindawi
+#     NODE_ENV: prod
+#     NAMESPACE: prod-hindawi
+#     CLUSTER: hindawi-prod
+#     AWS_REGISTRY: $AWS_DEV_REGISTRY
+#     COMMAND: build-manifests
 
-Deploy:hindawi-prod:
-  tags:
-    - 'cluster:hindawi-prod'
-  stage: deploy-prod
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: hindawi
-    NODE_ENV: prod
-    NAMESPACE: prod-hindawi
-    CLUSTER: hindawi-prod
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
-
-pages:
-  tags:
-    - 'cluster:hindawi-dev'
-  interruptible: true
-  stage: reports
-  script:
-    - cp -r -a reports/* $HOME/reports/
-    - cd $HOME
-    - yarn run ci:coverage
-    - cp -r -a $HOME/reports/* $CI_PROJECT_DIR/public/
-  coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
-  needs: [Test]
-  artifacts:
-    paths:
-      - public
-      - reports
+# pages:
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   interruptible: true
+#   stage: reports
+#   script:
+#     - cp -r -a reports/* $HOME/reports/
+#     - cd $HOME
+#     - yarn run ci:coverage
+#     - cp -r -a $HOME/reports/* $CI_PROJECT_DIR/public/
+#   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
+#   needs: [Test]
+#   artifacts:
+#     paths:
+#       - public
+#       - reports
