@@ -8,6 +8,7 @@ stages:
   - build
   - package
   - deploy
+  - deploy-to-automation-env
   - acceptance
   - deploy-prod
 
@@ -210,9 +211,11 @@ variables:
 Update Environment:
   tags:
     - 'cluster:hindawi-dev'
-  stage: acceptance
+  stage: deploy-to-automation-env
+  dependencies:
+     - Package Images:dev
   script:
-   - echo 'triggering deploy'
+   - echo 'triggering deploy ${CI_COMMIT_REF_NAME}'
 
 Trigger to Phenom-Automation:
   stage: acceptance
