@@ -69,7 +69,7 @@ export const invoice: Resolvers<Context> = {
       // There is a TSLint error for when try to use a shadowed variable!
       const invoiceDetails = result.value;
 
-      let assocInvoice = null;
+      const assocInvoice = null;
       // * this is a credit note, let's ask for the reference number of the associated invoice
       const maybePayments = await repos.payment.getPaymentsByInvoiceId(
         invoiceDetails.invoiceId
@@ -137,7 +137,7 @@ export const invoice: Resolvers<Context> = {
       // There is a TSLint error for when try to use a shadowed variable!
       const invoiceDetails = result.value;
 
-      let assocInvoice = null;
+      const assocInvoice = null;
 
       const maybePayments = await repos.payment.getPaymentsByInvoiceId(
         invoiceDetails.invoiceId
@@ -332,9 +332,9 @@ export const invoice: Resolvers<Context> = {
       const {
         repos: { payer: payerRepo },
       } = context;
-      let invoiceId = InvoiceId.create(new UniqueEntityID(parent.invoiceId));
+      const invoiceId = InvoiceId.create(new UniqueEntityID(parent.invoiceId));
 
-      let maybePayer = await payerRepo.getPayerByInvoiceId(invoiceId);
+      const maybePayer = await payerRepo.getPayerByInvoiceId(invoiceId);
 
       if (maybePayer.isLeft()) {
         return null;

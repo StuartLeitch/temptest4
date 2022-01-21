@@ -9,6 +9,7 @@ import {
   getInvoiceVat,
   getInvoices,
   applyCouponAction,
+  resetPayerError
 } from "./actions";
 
 const initialState: Invoice = {
@@ -22,11 +23,18 @@ const initialState: Invoice = {
 };
 
 const invoice = createReducer(initialState)
-  .handleAction(getInvoice.success, (_, action) => action.payload)
-  .handleAction(updatePayerAsync.success, (state, action) => ({
-    ...state,
-    payer: action.payload,
-  }))
+  .handleAction(getInvoice.success, (state, action) => {
+    return action.payload;
+  })
+  .handleAction(updatePayerAsync.success, (state, action) => {
+    return ({
+      ...state,
+      payer: action.payload,
+    })
+  })
+  // .handleAction(resetPayerError, (state, action) => {
+  //   return state;
+  // })
   .handleAction(applyCouponAction.success, (state, action) => {
     const { reduction } = action.payload;
 

@@ -62,52 +62,106 @@ const imperativeValidation = (formFns, showModal) => () => {
     if (isEmpty(errorFields)) {
       showModal();
     } else {
-      formFns.setTouched(errorFields);
+     formFns.setTouched(errorFields);
     }
   });
 };
 
+const emailRegex = new RegExp(
+  /^(([^<>()\[\]\\.,;:\s@"“”]+(\.[^<>()\[\]\\.,;:\s@"“”]+)*))@(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})$/i
+);
+
 const validateFn = (values: any) => {
   const errors: any = {};
 
-  if (!values.name) {
+  if (values.name) {
+    if (!(values.name.trim())) {
+      errors.name = "Blank value is forbidden.";
+    }
+
+    if (/^[!@#$%^&*()+=_\[\]{};:\\|,.<>\/?]*$/.test(values.name)) {
+      errors.name = 'Special characters only are not permitted';
+    }
+
+  } else {
     errors.name = "Required";
+  }
+
+  if(!emailRegex.test(values.email)) {
+    errors.email = "Invalid email address";
   }
 
   if (!values.email) {
     errors.email = "Required";
   }
+
   if (!values.address.country) {
     set(errors, "address.country", "Required");
   }
 
-  if (values.address.country === "US") {
-    if (!values.address.state) {
-      set(errors, "address.state", "Required");
+  if (values.address.country) {
+    if (!(values.address.country.trim())) {
+      set(errors, "address.country", "Blank value is forbidden.");
     }
 
-    if (!values.address.postalCode) {
-      set(errors, "address.postalCode", "Required");
-    }
+    if (values.address.country === "US") {
+      if (values.address.state) {
+        if (!(values.address.state.trim())) {
+          set(errors, "address.state", "Blank value is forbidden.");
+        }
+      } else {
+        set(errors, "address.state", "Required");
+      }
 
-    if (!/^\d{5}$/.test(values.address.postalCode)) {
-      set(
-        errors,
-        "address.postalCode",
-        "Invalid postal code format, use 5 numbers",
-      );
+      if (values.address.postalCode) {
+        if (!(values.address.postalCode.trim())) {
+          set(errors, "address.postalCode", "Blank value is forbidden.");
+        }
+      } else {
+        set(errors, "address.postalCode", "Required");
+      }
+
+      if (!/^\d{5}$/.test(values.address.postalCode)) {
+        set(
+          errors,
+          "address.postalCode",
+          "Invalid postal code format, use 5 numbers",
+        );
+      }
     }
+  } else {
+    set(errors, "address.country", "Required");
   }
 
-  if (!values.address.city) {
+  if (values.address.city) {
+    if (!(values.address.city.trim())) {
+      set(errors, "address.city", "Blank value is forbidden.");
+    }
+  } else {
     set(errors, "address.city", "Required");
   }
-  if (!values.address.addressLine1) {
+
+  if (values.address.addressLine1) {
+    if (!(values.address.addressLine1.trim())) {
+      set(errors, "address.addressLine1", "Blank value is forbidden.");
+    }
+  } else {
     set(errors, "address.addressLine1", "Required");
   }
 
-  if (values.type === PAYMENT_TYPES.institution && !values.organization) {
-    errors.organization = "Required";
+  if (values.type === PAYMENT_TYPES.institution) {
+    if (values.organization) {
+      if (!(values.organization.trim())) {
+        errors.organization = "Blank value is forbidden.";
+      }
+
+      if (/^[!@#$%^&*()+=_\[\]{};:\\|,.<>\/?]*$/.test(values.organization)) {
+        errors.organization = 'Special characters only are not permitted';
+      }
+
+    } else {
+      errors.organization = "Required";
+    }
   }
 
   return errors;

@@ -8,7 +8,7 @@ export class PayerNotFoundError extends UseCaseError {
 
 export class NotAbleToCreatePayerError extends UseCaseError {
   constructor(invoiceId: string) {
-    super(`Couldn't creaate a payer for invoice with id {${invoiceId}}.`);
+    super(`Couldn't create a payer for invoice with id {${invoiceId}}.`);
   }
 }
 

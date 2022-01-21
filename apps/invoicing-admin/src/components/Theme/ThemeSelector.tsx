@@ -7,20 +7,23 @@ import { Card, CardBody, Button, FormGroup, CustomInput } from 'reactstrap';
 import './../../styles/components/theme-selector.scss';
 import { Consumer } from './ThemeContext';
 
-class ThemeSelector extends React.Component<ThemeSelectorProps, ThemeSelectorState> {
+class ThemeSelector extends React.Component<
+  ThemeSelectorProps,
+  ThemeSelectorState
+> {
   static propTypes = {
     style: PropTypes.string.isRequired,
     color: PropTypes.string.isRequired,
     styleOptions: PropTypes.array,
     styleDisabled: PropTypes.bool,
     colorOptions: PropTypes.array,
-    onChangeTheme: PropTypes.func
+    onChangeTheme: PropTypes.func,
   };
   static defaultProps = {
     styleOptions: [
       { name: 'Light', value: 'light' },
       { name: 'Dark', value: 'dark' },
-      { name: 'Color', value: 'color' }
+      { name: 'Color', value: 'color' },
     ],
     colorOptions: [
       { name: 'Primary', value: 'primary' },
@@ -31,8 +34,8 @@ class ThemeSelector extends React.Component<ThemeSelectorProps, ThemeSelectorSta
       { name: 'Indigo', value: 'indigo' },
       { name: 'Purple', value: 'purple' },
       { name: 'Pink', value: 'pink' },
-      { name: 'Yellow', value: 'yellow' }
-    ]
+      { name: 'Yellow', value: 'yellow' },
+    ],
   };
 
   constructor(props) {
@@ -41,20 +44,20 @@ class ThemeSelector extends React.Component<ThemeSelectorProps, ThemeSelectorSta
     this.state = {
       isActive: false,
       initialStyle: '',
-      initialColor: ''
+      initialColor: '',
     };
   }
 
   componentDidMount() {
     this.setState({
       initialColor: this.props.color,
-      initialStyle: this.props.style
+      initialStyle: this.props.style,
     });
   }
 
   render() {
     const rootClass = classNames('theme-config', {
-      'theme-config--active': this.state.isActive
+      'theme-config--active': this.state.isActive,
     });
 
     return (
@@ -82,10 +85,10 @@ class ThemeSelector extends React.Component<ThemeSelectorProps, ThemeSelectorSta
                   id={`sidebarStyle--${option.value}`}
                   value={option.value}
                   checked={this.props.color === option.value}
-                  onChange={ev => {
+                  onChange={(ev) => {
                     if (ev.target.checked) {
                       this.props.onChangeTheme({
-                        color: option.value
+                        color: option.value,
                       });
                     }
                   }}
@@ -111,10 +114,10 @@ class ThemeSelector extends React.Component<ThemeSelectorProps, ThemeSelectorSta
                   value={option.value}
                   disabled={this.props.styleDisabled}
                   checked={this.props.style === option.value}
-                  onChange={ev => {
+                  onChange={(ev) => {
                     if (ev.target.checked) {
                       this.props.onChangeTheme({
-                        style: option.value
+                        style: option.value,
                       });
                     }
                   }}
@@ -130,7 +133,7 @@ class ThemeSelector extends React.Component<ThemeSelectorProps, ThemeSelectorSta
                 onClick={() => {
                   this.props.onChangeTheme({
                     color: this.state.initialColor,
-                    style: this.state.initialStyle
+                    style: this.state.initialStyle,
                   });
                 }}
               >
@@ -144,16 +147,16 @@ class ThemeSelector extends React.Component<ThemeSelectorProps, ThemeSelectorSta
   }
 }
 
-const ContextThemeSelector = props => (
+const ContextThemeSelector = (props) => (
   <Consumer>
-    {themeState => <ThemeSelector {...themeState} {...props} />}
+    {(themeState) => <ThemeSelector {...themeState} {...props} />}
   </Consumer>
 );
 
 interface Option {
   name: string;
   value: string;
-};
+}
 
 interface ThemeSelectorProps {
   style: string;
@@ -161,13 +164,13 @@ interface ThemeSelectorProps {
   styleOptions?: Option[];
   styleDisabled?: boolean;
   colorOptions?: Option[];
-  onChangeTheme?(key: { [key in "color" | "style"]?: string }): void;
-};
+  onChangeTheme?(key: { [key in 'color' | 'style']?: string }): void;
+}
 
 interface ThemeSelectorState {
   isActive: boolean;
   initialStyle: string;
   initialColor: string;
-};
+}
 
 export { ContextThemeSelector as ThemeSelector };

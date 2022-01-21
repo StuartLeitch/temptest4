@@ -21,6 +21,7 @@ import {
   updatePayerAsync,
   getInvoiceVat,
   applyCouponAction,
+  resetPayerError
 } from "./actions";
 
 const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
@@ -30,15 +31,20 @@ const fetchInvoiceEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
     switchMap((action) =>
       graphqlAdapter.send(queries.getInvoice, { id: action.payload }),
     ),
-    map((r) => {
+    withLatestFrom(state$.pipe(map(invoice))),
+    mergeMap(([r, stateInvoice]) => {
       const invoice = r.data.invoice;
       const { article, ...invoiceItem } = invoice.invoiceItem;
 
-      return getInvoice.success({
-        ...invoice,
-        invoiceItem,
-        article,
-      });
+      return from([
+        modalActions.hideModal(),
+        updatePayerAsync.success(r.data.updateInvoicePayer),
+        getInvoice.success({
+          ...invoice,
+          invoiceItem,
+          article,
+        })
+      ]);
     }),
     catchError((err) => of(getInvoice.failure(err.message))),
   );
@@ -94,11 +100,11 @@ const applyCouponEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
       ).pipe(
         withLatestFrom(state$.pipe(map(invoice)), state$.pipe(map(reductions))),
         mergeMap(([r, invoice, reductions]) => {
-          let returnPipe: any[] = [
+          const returnPipe: any[] = [
             applyCouponAction.success(r.data.applyCoupon),
           ];
 
-          let totalReduction: number =
+          const totalReduction: number =
             reductions.reduce((acc, curr) => acc + curr.reduction, 0) +
             r.data.applyCoupon.reduction;
 

@@ -1,4 +1,4 @@
-import { createAsyncAction } from "typesafe-actions";
+import { createAsyncAction, createAction } from "typesafe-actions";
 
 import {
   Invoice,
@@ -39,3 +39,7 @@ export const applyCouponAction = createAsyncAction(
   "invoice/APPLY_COUPON_SUCCESS",
   "invoice/APPLY_COUPON_ERROR",
 )<ApplyCouponDTO, Coupon, string>();
+
+export const resetPayerError = createAction(
+  "payer/RESET_ERROR",
+)();
