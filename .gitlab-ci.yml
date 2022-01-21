@@ -8,6 +8,7 @@ stages:
   - build
   - package
   - deploy
+  - acceptance-test
   - deploy-prod
 
 include:
@@ -102,13 +103,6 @@ Test:
   artifacts:
     paths:
       - reports
-
-Bridge to Phenom-Automation:
-  stage: test
-  trigger:
-    project: razvan.ariciuc/phenom-automation
-    branch: main
-    strategy: depend
 
 .validate-schema: &script_validate
   image: $BUILD_IMAGE
@@ -212,6 +206,13 @@ Package Images:dev:
   artifacts:
     paths:
       - dist-k8s
+
+Trigger to Phenom-Automation:
+  stage: acceptance-test
+  trigger:
+    project: razvan.ariciuc/phenom-automation
+    branch: main
+    strategy: depend
 
 Deploy:dev:
   tags:
