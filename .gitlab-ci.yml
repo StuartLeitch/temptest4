@@ -208,6 +208,8 @@ variables:
 #       - dist-k8s
 
 Store Branch Name:
+  tags:
+    - 'cluster:hindawi-dev'
   stage: acceptance
   script:
     - echo $CI_COMMIT_REF_NAME >> branch.env
