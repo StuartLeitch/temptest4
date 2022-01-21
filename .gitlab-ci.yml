@@ -207,12 +207,28 @@ Package Images:dev:
     paths:
       - dist-k8s
 
+Store Branch Name:
+  stage: acceptance-test
+  script:
+    - echo $CI_COMMIT_REF_NAME >> branch.env
+    - echo "Storing branch name '${CI_COMMIT_REF_NAME}' in branch.env"
+  artifacts:
+    paths:
+      - profile
+    reports:
+      dotenv: branch.env
+
 Trigger to Phenom-Automation:
   stage: acceptance-test
+  variables:
+    BRANCH_NAME: '${CI_COMMIT_REF_NAME}'
   trigger:
     project: razvan.ariciuc/phenom-automation
     branch: main
     strategy: depend
+  needs:
+    - job: Store Branch Name
+      artifacts: true
 
 Deploy:dev:
   tags:
