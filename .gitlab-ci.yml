@@ -207,31 +207,20 @@ variables:
 #     paths:
 #       - dist-k8s
 
-Store Branch Name:
+Update Environment:
   tags:
     - 'cluster:hindawi-dev'
   stage: acceptance
   script:
-    - echo $CI_COMMIT_REF_NAME >> branch.env
-    - echo "Storing branch name '${CI_COMMIT_REF_NAME}' in branch.env"
-  when: always
-  artifacts:
-    paths:
-      - profile
-    reports:
-      dotenv: branch.env
+   - echo 'triggering deploy'
 
 Trigger to Phenom-Automation:
   stage: acceptance
-  variables:
-    BRANCH_NAME: '${CI_COMMIT_REF_NAME}'
   trigger:
     project: razvan.ariciuc/phenom-automation
     branch: main
     strategy: depend
-  needs:
-    - job: Store Branch Name
-      artifacts: true
+
 # Deploy:dev:
 #   tags:
 #     - 'cluster:hindawi-dev'
