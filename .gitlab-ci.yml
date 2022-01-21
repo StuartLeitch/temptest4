@@ -11,35 +11,35 @@ stages:
   - acceptance
   - deploy-prod
 
-include:
-  - template: License-Scanning.gitlab-ci.yml
-  - template: Dependency-Scanning.gitlab-ci.yml
+# include:
+#   - template: License-Scanning.gitlab-ci.yml
+#   - template: Dependency-Scanning.gitlab-ci.yml
 
-license_scanning:
-  tags:
-    - 'cluster:hindawi-dev'
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop"
-      when: always
+# license_scanning:
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   rules:
+#     - if: $CI_COMMIT_REF_NAME == "develop"
+#       when: always
 
-gemnasium-dependency_scanning:
-  tags:
-    - 'cluster:hindawi-dev'
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop"
-      when: always
+# gemnasium-dependency_scanning:
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   rules:
+#     - if: $CI_COMMIT_REF_NAME == "develop"
+#       when: always
 
-retire-js-dependency_scanning:
-  tags:
-    - 'cluster:hindawi-dev'
+# retire-js-dependency_scanning:
+#   tags:
+#     - 'cluster:hindawi-dev'
 
-gemnasium-maven-dependency_scanning:
-  tags:
-    - 'cluster:hindawi-dev'
+# gemnasium-maven-dependency_scanning:
+#   tags:
+#     - 'cluster:hindawi-dev'
 
-gemnasium-python-dependency_scanning:
-  tags:
-    - 'cluster:hindawi-dev'
+# gemnasium-python-dependency_scanning:
+#   tags:
+#     - 'cluster:hindawi-dev'
 
 variables:
   # https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#docker-in-docker-with-tls-disabled
@@ -55,7 +55,7 @@ variables:
   BT_PUBLIC_KEY: 'test-public-key'
   BT_PRIVATE_KEY: 'test-private-key'
   VAT_VALIDATION_SERVICE_ENDPOINT: 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
-  # AFFECTED_APPS: 'invoicing-graphql'
+  AFFECTED_APPS: 'invoicing-graphql'
   AFFECTED_COMMAND: ''
   AFFECTED_ARGS: '--base=remotes/origin/develop'
   AFFECTED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend'
@@ -212,6 +212,7 @@ Store Branch Name:
   script:
     - echo $CI_COMMIT_REF_NAME >> branch.env
     - echo "Storing branch name '${CI_COMMIT_REF_NAME}' in branch.env"
+  when: always
   artifacts:
     paths:
       - profile
