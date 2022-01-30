@@ -1,3 +1,3 @@
-import ApcList from './List copy';
+import ApcList from './List';
 
 export default ApcList;

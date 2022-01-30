@@ -31,5 +31,12 @@ export const SidebarMiddleNav: React.FC = () => (
     >
       <SidebarMenu.Item title='Logs' to='/dashboards/audit_logs' exact />
     </SidebarMenu.Item>
+
+    <SidebarMenu.Item
+      title='APC'
+      to='/dashboards/apc'
+      exact
+      icon={<i className='fas fa-landmark'></i>}
+    />
   </SidebarMenu>
 );
