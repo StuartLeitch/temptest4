@@ -59,17 +59,22 @@ const ApcList: React.FC<ApcListProps> = ({ apcItems }) => {
               {/* condition to make buttons appear if publisher value changed */}
               <Button
                 color='ghost'
+                style={{ width: '10%', marginLeft: '0.25em' }}
                 onClick={() => console.log('cancel change')}
               >
                 {' '}
                 <i className='fas fa-times-circle mr-2'></i>{' '}
               </Button>
-              <Button color='ghost' onClick={() => console.log('save change')}>
+              <Button
+                style={{ width: '10%', marginLeft: '0.25em' }}
+                color='ghost'
+                onClick={() => console.log('save change')}
+              >
                 <i className='fas fa-check-circle mr-2'></i>
               </Button>
             </td>
 
-            <td className='align-middle bt-0'>
+            <td className='align-middle bt-0' style={{ width: '35%' }}>
               {!isEditMode && (
                 <React.Fragment>
                   <span className='text-green pl-0 pr-2'>APC</span>
@@ -87,11 +92,16 @@ const ApcList: React.FC<ApcListProps> = ({ apcItems }) => {
                     value='APC'
                     style={{ width: '20%', float: 'left' }}
                   />
-                  <Button color='ghost' onClick={() => setIsEditMode(false)}>
+                  <Button
+                    style={{ width: '10%' }}
+                    color='ghost'
+                    onClick={() => setIsEditMode(false)}
+                  >
                     {' '}
                     <i className='fas fa-times-circle mr-2'></i>{' '}
                   </Button>
                   <Button
+                    style={{ width: '10%' }}
                     color='ghost'
                     onClick={() => console.log('save change')}
                   >

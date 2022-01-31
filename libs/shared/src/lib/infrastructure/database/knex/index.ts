@@ -28,6 +28,7 @@ export enum TABLES {
   PAUSED_REMINDERS = 'paused_reminders',
   ERP_REFERENCES = 'erp_references',
   AUDIT_LOGS = 'audit_logs',
+  APC = 'apc',
 }
 
 interface DbOptions {

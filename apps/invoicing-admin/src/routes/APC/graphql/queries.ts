@@ -10,7 +10,7 @@ export const LOG_FRAGMENT = `
   }
 `;
 
-export const AUDIT_LOGS_QUERY = `
+export const APC_QUERY = `
   query auditLogs(
     $pagination: Pagination
     $filters: LogsFilters

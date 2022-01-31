@@ -1,3 +1,3 @@
-import { AUDIT_LOGS_QUERY } from './queries';
+import { APC_QUERY } from './queries';
 
-export { AUDIT_LOGS_QUERY };
+export { APC_QUERY };
