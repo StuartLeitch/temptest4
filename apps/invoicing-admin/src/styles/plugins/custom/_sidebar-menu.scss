@@ -13,9 +13,9 @@
 
 @mixin apply-padding-map($padding-map, $leftOffset) {
   padding-top: map-get($padding-map, top);
-  padding-right: map-get($padding-map, right);
+  // padding-right: map-get($padding-map, right);
   padding-bottom: map-get($padding-map, bottom);
-  padding-left: calc(#{map-get($padding-map, left)} + #{$leftOffset});
+  // padding-left: calc(#{map-get($padding-map, left)} + #{$leftOffset});
 }
 
 .sidebar-menu {
@@ -30,20 +30,24 @@
     }
 
     &__link {
-      display: flex;
+      display: block;
       align-items: center;
+      text-align: center;
 
       @include sidebar-menu-item;
       @include apply-padding-map($sidebar-menu-item-padding, 0px);
 
       > i:first-child {
-        margin-right: 0.5rem;
-        flex: 0 0 auto;
+        margin-right: 0rem;
+        // flex: 0 0 auto;
       }
 
       > span {
         &:not(.badge) {
-          flex: 1 1 auto;
+          // flex: 1 1 auto;
+          display: block;
+          text-align: center;
+          align-items: center;
         }
       }
 
