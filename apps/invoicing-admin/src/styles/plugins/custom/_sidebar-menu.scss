@@ -26,6 +26,21 @@
     &.active:not(.open) {
       > .sidebar-menu__entry__link {
         @include sidebar-menu-item--active;
+
+        background-color: #F5F5F5 !important;
+        color: #333333 !important;
+        /* Neutrals/Grey 30 */
+
+        border: 2px solid #E0E0E0;
+
+        > .sidebar-menu__entry__icon {
+          color: #333 !important;
+        }
+
+        &::before {
+          transform: none !important;
+          box-shadow: none !important;
+        }
       }
     }
 
@@ -55,6 +70,11 @@
         text-decoration: none;
 
         @include sidebar-menu-item--hover;
+      }
+
+      &::before {
+        transform: none !important;
+        box-shadow: none !important;
       }
     }
 
