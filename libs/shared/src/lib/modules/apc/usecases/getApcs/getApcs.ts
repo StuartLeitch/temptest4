@@ -3,7 +3,7 @@ import { UnexpectedError } from '../../../../core/logic/AppError';
 import { right, left } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
 
-import { AuditLogRepoContract } from '../../repos/auditLogRepo';
+import { ApcRepoContract } from '../../repos/apcRepo';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
@@ -20,7 +20,7 @@ import type { GetApcsDTO as DTO } from './getApcsDTO';
 export class GetApcsUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
-  constructor(private apcRepo: AuditLogRepoContract) {
+  constructor(private apcRepo: ApcRepoContract) {
     super();
   }
 
@@ -28,7 +28,7 @@ export class GetApcsUsecase
   public async execute(request: DTO, context?: Context): Promise<Response> {
     // TODO: add proper DDD types to the paginated result
     try {
-      const maybePaginatedResult = await this.apcRepo.getApcs(request);
+      const maybePaginatedResult = await this.apcRepo.getRecentApcs(request);
 
       if (maybePaginatedResult.isLeft()) {
         return left(

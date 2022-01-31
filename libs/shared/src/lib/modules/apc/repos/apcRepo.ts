@@ -5,10 +5,10 @@ import { RepoError } from '../../../infrastructure/RepoError';
 import { Repo } from '../../../infrastructure/Repo';
 
 import { Apc } from '../domain/Apc';
-import { ApcPaginated } from '../domain/AuditLogPaginated';
+import { ApcPaginated } from '../domain/ApcPaginated';
 
-export interface AuditLogRepoContract extends Repo<Apc> {
-  getRecentAuditLogs(
+export interface ApcRepoContract extends Repo<Apc> {
+  getRecentApcs(
     args?: any
   ): Promise<Either<GuardFailure | RepoError, ApcPaginated>>;
   save(apc: Apc): Promise<Either<GuardFailure | RepoError, Apc>>;

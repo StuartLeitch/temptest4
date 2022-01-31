@@ -13,7 +13,7 @@ export class ApcMap extends Mapper<Apc> {
         journalCode: raw.journalCode,
         issn: raw.issn,
         publisher: raw.publisher,
-        apc: raw.apc,
+        price: raw.price,
       },
       new UniqueEntityID(raw.id)
     );
@@ -26,7 +26,7 @@ export class ApcMap extends Mapper<Apc> {
       journalCode: apc.journalCode,
       issn: apc.issn,
       publisher: apc.publisher,
-      apc: apc.apc,
+      price: apc.price,
     };
   }
 }

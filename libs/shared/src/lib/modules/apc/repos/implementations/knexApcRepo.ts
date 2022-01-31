@@ -6,41 +6,31 @@ import { RepoError } from '../../../../infrastructure/RepoError';
 import { Knex, TABLES } from '../../../../infrastructure/database/knex';
 
 import { Apc } from '../../domain/Apc';
-import { ApcPaginated } from '../../domain/AuditLogPaginated';
+import { ApcPaginated } from '../../domain/ApcPaginated';
 
-import { AuditLogRepoContract } from '../apcRepo';
-import { ApcMap } from '../../mappers/AuditLogMap';
+import { ApcRepoContract } from '../apcRepo';
+import { ApcMap } from '../../mappers/ApcMap';
 
 import moment from 'moment';
 
-export class KnexAuditLogRepo
+export class KnexApcRepo
   extends AbstractBaseDBRepo<Knex, Apc>
-  implements AuditLogRepoContract {
-  async getRecentAuditLogs(
+  implements ApcRepoContract {
+  async getRecentApcs(
     args?: any
   ): Promise<Either<GuardFailure | RepoError, ApcPaginated>> {
     const { pagination, filters } = args;
     const { db, logger } = this;
 
-    const getModel = () => db(TABLES.APC);
+    const getModel = () => db(TABLES.CATALOG);
 
     const offset = pagination.offset * pagination.limit;
 
-    // let endDate = moment(new Date()).add(1, 'days').format('YYYY-MM-DD');
-    // let startDate = moment(new Date()).subtract(5, 'days').format('YYYY-MM-DD');
+    const totalCount = await getModel().count(`${TABLES.CATALOG}.id`).first();
 
-    // if (filters) {
-    //   startDate = moment(filters.startDate).format('YYYY-MM-DD');
-    //   endDate = moment(filters.endDate).add(1, 'days').format('YYYY-MM-DD');
-    // }
-
-    const totalCount = await getModel().count(`${TABLES.APC}.id`).first();
-
-    const sql = getModel().select([`${TABLES.APC}.*`]);
-    // let sql = getModel()
-    //   .whereBetween('timestamp', [startDate, endDate])
-    //   .orderBy(`${TABLES.AUDIT_LOGS}.timestamp`, 'desc')
-    //   .select([`${TABLES.AUDIT_LOGS}.*`]);
+    let sql = getModel()
+      .orderBy(`${TABLES.CATALOG}.timestamp`, 'desc')
+      .select([`${TABLES.CATALOG}.*`]);
 
     // if (!('download' in filters)) {
     //   sql = sql
@@ -62,17 +52,19 @@ export class KnexAuditLogRepo
     });
   }
 
-  async save(apc: Apc): Promise<Either<GuardFailure | RepoError, Apc>> {
+  async updatePrice(price: string): Promise<Either<GuardFailure | RepoError, Apc>> {
     const { db } = this;
 
-    const newAuditLog = ApcMap.toPersistence(apc);
+    const updatedApc = ApcMap.toPersistence(apc);
 
-    await db(TABLES.AUDIT_LOGS).insert(newAuditLog);
+    await db(TABLES.CATALOG).update(price, 'price').;
 
     return right(apc);
   }
 
-  async exists(apc: Apc): Promise<Either<GuardFailure | RepoError, boolean>> {
+  async updatePublisher(
+    apc: Apc
+  ): Promise<Either<GuardFailure | RepoError, boolean>> {
     return right(false);
   }
 }

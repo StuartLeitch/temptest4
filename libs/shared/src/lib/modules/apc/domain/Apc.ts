@@ -8,7 +8,7 @@ export interface ApcProps {
   journalCode: string;
   issn: string;
   publisher: string;
-  apc: string;
+  price: string;
 }
 
 export class Apc extends Entity<ApcProps> {
@@ -32,8 +32,8 @@ export class Apc extends Entity<ApcProps> {
     return this.props.publisher;
   }
 
-  get apc(): string {
-    return this.props.apc;
+  get price(): string {
+    return this.props.price;
   }
 
   private constructor(props: ApcProps, id?: UniqueEntityID) {
