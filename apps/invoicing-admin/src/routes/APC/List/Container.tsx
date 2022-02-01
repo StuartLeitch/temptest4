@@ -24,8 +24,8 @@ import _ from 'lodash';
 
 const defaultPaginationSettings = { page: 1, offset: 0, limit: 10 };
 
-const AuditLogsContainer: React.FC = () => {
-  const [fetchLogs, { loading, error, data }] = useManualQuery(APC_QUERY);
+const ApcContainer: React.FC = () => {
+  const [fetchJournals, { loading, error, data }] = useManualQuery(APC_QUERY);
   console.log(data?.invoicingJournals?.catalogItems);
 
   const [page, setPageInUrl] = useQueryState(
@@ -35,7 +35,7 @@ const AuditLogsContainer: React.FC = () => {
 
   const fetchData = useCallback(
     async (currentPage) => {
-      await fetchLogs({
+      await fetchJournals({
         variables: {
           pagination: {
             ...defaultPaginationSettings,
@@ -45,7 +45,7 @@ const AuditLogsContainer: React.FC = () => {
         },
       });
     },
-    [fetchLogs]
+    [fetchJournals]
   );
 
   const onPageChange = (paginationData: { currentPage: number }) => {
@@ -122,4 +122,4 @@ const AuditLogsContainer: React.FC = () => {
   );
 };
 
-export default AuditLogsContainer;
+export default ApcContainer;
