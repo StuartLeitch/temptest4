@@ -4379,7 +4379,7 @@
   integrity sha512-cTY/9+rloQepwVx0CsKm9+//4H6qJA7QNzPv5WrGoO1iRV8vKqpMg8E3v+Gn2JCfpv9tqsMAd1C//hxVbcGRSQ==
   dependencies:
     animejs "^3.0.1"
-    faker "5.5.3"
+    faker "git+https://github.com/Marak/faker.js.git"
     highcharts "^7.1.2"
     url-join "^4.0.0"
 
@@ -6331,6 +6331,11 @@
   version "13.0.0"
   resolved "https://registry.yarnpkg.com/@types/validator/-/validator-13.0.0.tgz#365f1bf936aeaddd0856fc41aa1d6f82d88ee5b3"
   integrity sha512-WAy5txG7aFX8Vw3sloEKp5p/t/Xt8jD3GRD9DacnFv6Vo8ubudAsRTXgxpQwU0mpzY/H8U4db3roDuCMjShBmw==
+
+"@types/verror@1.10.5":
+  version "1.10.5"
+  resolved "https://registry.yarnpkg.com/@types/verror/-/verror-1.10.5.tgz#2a1413aded46e67a1fe2386800e291123ed75eb1"
+  integrity sha512-9UjMCHK5GPgQRoNbqdLIAvAy0EInuiqbW0PBMtVP6B5B2HQJlvoJHM+KodPZMEjOa5VkSc+5LH7xy+cUzQdmHw==
 
 "@types/webpack-env@^1.15.3":
   version "1.16.2"
@@ -28786,6 +28791,15 @@ verror@1.10.0, verror@^1.10.0, verror@^1.9.0:
   version "1.10.0"
   resolved "https://registry.yarnpkg.com/verror/-/verror-1.10.0.tgz#3a105ca17053af55d6e270c1f8288682e18da400"
   integrity sha1-OhBcoXBTr1XW4nDB+CiGguGNpAA=
+  dependencies:
+    assert-plus "^1.0.0"
+    core-util-is "1.0.2"
+    extsprintf "^1.2.0"
+
+verror@1.10.1:
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/verror/-/verror-1.10.1.tgz#4bf09eeccf4563b109ed4b3d458380c972b0cdeb"
+  integrity sha512-veufcmxri4e3XSrT0xwfUR7kguIkaxBeosDg00yDWhk49wdwkSUrvvsm7nc75e1PUyvIeZj6nS8VQRYz2/S4Xg==
   dependencies:
     assert-plus "^1.0.0"
     core-util-is "1.0.2"
