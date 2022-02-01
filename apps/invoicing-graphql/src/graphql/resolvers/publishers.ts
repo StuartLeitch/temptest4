@@ -14,9 +14,8 @@ import { handleForbiddenUsecase, getAuthRoles } from './utils';
 
 export const publisher: Resolvers<Context> = {
   Query: {
-    async getPublisherDetails(parent, args, context): Promise<any> {
+    async getPublisherDetails(parent, args, context) {
       const roles = getAuthRoles(context);
-
       const { repos } = context;
 
       const usecase = new GetPublisherDetailsUsecase(repos.publisher);
@@ -38,8 +37,6 @@ export const publisher: Resolvers<Context> = {
       }
 
       const publishers = result.value;
-
-      console.log(publishers);
 
       return PublisherMap.toPersistence(publishers);
     },

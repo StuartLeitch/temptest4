@@ -14,6 +14,7 @@ import { ApcType } from '../types';
 
 const ApcList: React.FC<ApcListProps> = ({ apcItems }) => {
   const [isEditMode, setIsEditMode] = useState(false);
+
   return (
     <div className='table-responsive-xl'>
       <Table className='mb-0 table-striped' hover>

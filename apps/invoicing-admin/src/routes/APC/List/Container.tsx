@@ -1,8 +1,8 @@
 import React, { useEffect, useCallback, useState } from 'react';
-import { useManualQuery } from 'graphql-hooks';
+import { useManualQuery, useQuery } from 'graphql-hooks';
 import { useQueryState } from 'react-router-use-location-state';
 
-import { APC_QUERY } from '../graphql';
+import { APC_QUERY, APC_PUBLISHER_QUERY } from '../graphql';
 
 import {
   Container,
@@ -12,8 +12,6 @@ import {
   ListPagination,
   CardFooter,
   Card,
-  ButtonToolbar,
-  Button,
 } from '../../../components';
 
 import { HeaderMain } from '../../components/HeaderMain';
@@ -22,11 +20,10 @@ import { Loading } from '../../components';
 import List from './List';
 import _ from 'lodash';
 
-const defaultPaginationSettings = { page: 1, offset: 0, limit: 10 };
+const defaultPaginationSettings = { page: 1, offset: 0, limit: 50 };
 
 const ApcContainer: React.FC = () => {
   const [fetchJournals, { loading, error, data }] = useManualQuery(APC_QUERY);
-  console.log(data?.invoicingJournals?.catalogItems);
 
   const [page, setPageInUrl] = useQueryState(
     'page',
@@ -59,21 +56,6 @@ const ApcContainer: React.FC = () => {
     fetchData(page);
   }, []);
 
-  const downloadCSV = () => {
-    // * build the query string out of query state
-    let queryString = '?download=1&';
-    queryString += `page=${page}&`;
-
-    const url = `${(window as any)._env_.API_ROOT}/apc${queryString}`;
-
-    const a = document.createElement('a');
-    a.setAttribute('download', url);
-    a.setAttribute('href', url);
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
-
   const Content = ({ loading, error, data }) => {
     if (loading) return <Loading />;
 
@@ -104,14 +86,6 @@ const ApcContainer: React.FC = () => {
     <React.Fragment>
       <Container fluid={true}>
         <HeaderMain title='APC' className='mb-5 mt-4' />
-        <Col lg={12} className='d-flex mb-3 mr-0 pr-0 px-0 my-sm-0'>
-          <ButtonToolbar className='ml-auto'>
-            <Button color='twitter' className='mr-0' onClick={downloadCSV}>
-              <i className='fas fa-download mr-2'></i>
-              Download CSV
-            </Button>
-          </ButtonToolbar>
-        </Col>
         <Row>
           <Col lg={12} className='mb-5'>
             <Content {...{ loading, error, data }} />

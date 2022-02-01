@@ -21,21 +21,21 @@ export const invoicingJournals: Resolvers<Context> = {
 
       const usecase = new GetJournalListUsecase(repos.catalog);
 
+      const publisherUsecase = new GetPublisherDetailsUsecase(repos.publisher);
+
       const usecaseContext = {
         roles,
       };
 
-      const result = await usecase.execute(args, usecaseContext);
+      const resultJournals = await usecase.execute(args, usecaseContext);
 
-      handleForbiddenUsecase(result);
+      handleForbiddenUsecase(resultJournals);
 
-      if (result.isLeft()) {
-        throw new Error(result.value.message);
+      if (resultJournals.isLeft()) {
+        throw new Error(resultJournals.value.message);
       }
 
-      const journalList = result.value;
-
-      console.log(journalList);
+      const journalList = resultJournals.value;
 
       return {
         totalCount: journalList.totalCount,

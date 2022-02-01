@@ -26,8 +26,12 @@ query invoicingJournals(
 `;
 
 export const APC_PUBLISHER_QUERY = `
-  query getPublisherDetails($publisherId: ID) {
-    publisher(publisherId: $publisherId) {
+  query getPublisherDetails(
+    $publisherId: ID
+  ) {
+    getPublisherDetails(
+      publisherId: $publisherId
+    ) {
       name
     }
   }
