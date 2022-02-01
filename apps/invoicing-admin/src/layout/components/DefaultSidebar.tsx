@@ -1,13 +1,13 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 
 import { Sidebar, SidebarTrigger } from '../../components';
 
 import { SidebarMiddleNav } from './SidebarMiddleNav';
 
-import { SidebarTopA } from '../../routes/components/Sidebar/SidebarTopA';
+// import { SidebarTopA } from '../../routes/components/Sidebar/SidebarTopA';
 // import { SidebarBottomA } from '../../routes/components/Sidebar/SidebarBottomA';
-import { LogoThemed } from '../../routes/components/LogoThemed/LogoThemed';
+// import { LogoThemed } from '../../routes/components/LogoThemed/LogoThemed';
 
 export const DefaultSidebar: React.FC = () => (
   <Sidebar>

@@ -32,6 +32,13 @@ export const SidebarMiddleNav: React.FC = () => (
     </SidebarMenu.Item>
 
     <SidebarMenu.Item
+      title='APC'
+      to='/dashboards/apc'
+      exact
+      icon={<i className='fas fa-landmark'></i>}
+    />
+
+    <SidebarMenu.Item
       icon={<i className='fas fa-folder-open'></i>}
       title='Audit'
       to='/dashboards/audit_logs'
@@ -39,12 +46,5 @@ export const SidebarMiddleNav: React.FC = () => (
     >
       {/* <SidebarMenu.Item title='Logs' to='/dashboards/audit_logs' exact /> */}
     </SidebarMenu.Item>
-
-    <SidebarMenu.Item
-      title='APC'
-      to='/dashboards/apc'
-      exact
-      icon={<i className='fas fa-landmark'></i>}
-    />
   </SidebarMenu>
 );
