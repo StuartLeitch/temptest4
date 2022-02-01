@@ -18,6 +18,8 @@ import '../styles/main.scss';
 import '../styles/plugins/plugins.scss';
 import './../styles/plugins/plugins.css';
 
+import '@hindawi/phenom-ui/dist/styles.css';
+
 import { RoutedNavbars, RoutedSidebars } from './../routes';
 
 const favIcons = [
@@ -80,11 +82,11 @@ class AppLayout extends React.Component {
             </Layout.Content>
 
             {/* -- Theme Selector (DEMO) ----*/}
-            <PageConfigConsumer>
+            {/* <PageConfigConsumer>
               {({ sidebarHidden, navbarHidden }) => (
                 <ThemeSelector styleDisabled={sidebarHidden && navbarHidden} />
               )}
-            </PageConfigConsumer>
+            </PageConfigConsumer> */}
           </Layout>
           <ToastContainer
             position='top-right'

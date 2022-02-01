@@ -4,7 +4,7 @@
 
 // Sidebar Styling
 // =============================================
-$sidebar-default-width: 250px;
+$sidebar-default-width: 96px;
 $sidebar-slim-width: 60px;
 $sidebar-slim-submenu-width: 250px;
 $sidebar-background: $white;
@@ -25,7 +25,7 @@ $sidebar-menu-highlight-color: $black;
   color: $body-color;
 }
 @mixin sidebar-menu-item--active {
-  background-color: transparent;
+  background-color: #F5F5F5;
   color: $sidebar-menu-highlight-color;
 }
 @mixin sidebar-menu-item--hover {

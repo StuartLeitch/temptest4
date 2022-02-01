@@ -11,6 +11,8 @@ import {
   SidebarTrigger,
 } from '../../components';
 
+import { SidebarTopA } from '../../routes/components/Sidebar/SidebarTopA';
+
 import { LogoThemed } from '../../routes/components/LogoThemed/LogoThemed';
 
 export const DefaultNavbar: React.FC = () => {
@@ -19,16 +21,23 @@ export const DefaultNavbar: React.FC = () => {
 
   return (
     <Navbar light expand='xs' fluid>
+      <Link to='/' className='sidebar__brand'>
+        <LogoThemed checkBackground />
+      </Link>
       <Nav navbar>
-        <NavItem className='mr-3'>
+        {/* <NavItem className='mr-3'>
           <SidebarTrigger id='defaultNavbarSidebarTrigger' />
-        </NavItem>
+        </NavItem> */}
+
+
         <NavItem className='navbar-brand d-lg-none'>
           <Link to='/'>
             <LogoThemed />
           </Link>
         </NavItem>
-        <Breadcrumb tag='nav' listTag='div' className='d-none d-md-block'>
+
+        <SidebarTopA />
+        {/* <Breadcrumb tag='nav' listTag='div' className='d-none d-md-block'>
           <BreadcrumbItem className='navbar-text'>
             <Link to='/'>Home</Link>
           </BreadcrumbItem>
@@ -49,7 +58,7 @@ export const DefaultNavbar: React.FC = () => {
               </BreadcrumbItem>
             );
           })}
-        </Breadcrumb>
+        </Breadcrumb> */}
       </Nav>
     </Navbar>
   );

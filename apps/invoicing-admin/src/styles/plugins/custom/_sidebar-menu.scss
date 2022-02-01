@@ -13,9 +13,9 @@
 
 @mixin apply-padding-map($padding-map, $leftOffset) {
   padding-top: map-get($padding-map, top);
-  padding-right: map-get($padding-map, right);
+  // padding-right: map-get($padding-map, right);
   padding-bottom: map-get($padding-map, bottom);
-  padding-left: calc(#{map-get($padding-map, left)} + #{$leftOffset});
+  // padding-left: calc(#{map-get($padding-map, left)} + #{$leftOffset});
 }
 
 .sidebar-menu {
@@ -26,24 +26,43 @@
     &.active:not(.open) {
       > .sidebar-menu__entry__link {
         @include sidebar-menu-item--active;
+
+        background-color: #F5F5F5 !important;
+        color: #333333 !important;
+        /* Neutrals/Grey 30 */
+
+        border: 2px solid #E0E0E0;
+
+        > .sidebar-menu__entry__icon {
+          color: #333 !important;
+        }
+
+        &::before {
+          transform: none !important;
+          box-shadow: none !important;
+        }
       }
     }
 
     &__link {
-      display: flex;
+      display: block;
       align-items: center;
+      text-align: center;
 
       @include sidebar-menu-item;
       @include apply-padding-map($sidebar-menu-item-padding, 0px);
 
       > i:first-child {
-        margin-right: 0.5rem;
-        flex: 0 0 auto;
+        margin-right: 0rem;
+        // flex: 0 0 auto;
       }
 
       > span {
         &:not(.badge) {
-          flex: 1 1 auto;
+          // flex: 1 1 auto;
+          display: block;
+          text-align: center;
+          align-items: center;
         }
       }
 
@@ -51,6 +70,11 @@
         text-decoration: none;
 
         @include sidebar-menu-item--hover;
+      }
+
+      &::before {
+        transform: none !important;
+        box-shadow: none !important;
       }
     }
 

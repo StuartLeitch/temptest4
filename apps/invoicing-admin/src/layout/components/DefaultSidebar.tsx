@@ -25,18 +25,18 @@ export const DefaultSidebar: React.FC = () => (
     {/* START SIDEBAR-OVERLAY: Close (x) */}
 
     {/* START SIDEBAR: Only for Desktop */}
-    <Sidebar.HideSlim>
+    {/* <Sidebar.HideSlim>
       <Sidebar.Section>
         <Link to='/' className='sidebar__brand'>
           <LogoThemed checkBackground />
         </Link>
       </Sidebar.Section>
-    </Sidebar.HideSlim>
+    </Sidebar.HideSlim> */}
     {/* END SIDEBAR: Only for Desktop */}
 
     {/* START SIDEBAR: Only for Mobile */}
     <Sidebar.MobileFluid>
-      <SidebarTopA />
+      {/* <SidebarTopA /> */}
 
       <Sidebar.Section fluid cover>
         {/* SIDEBAR: Menu */}
