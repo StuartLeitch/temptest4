@@ -6,14 +6,14 @@ import winston from 'winston';
 
 import { LoggerContract } from '@hindawi/shared';
 import { LoggerOptions } from '../Logger';
-
-const { combine, splat, timestamp, colorize, printf } = winston.format;
+import {VError} from "verror";
 
 const COLORS = {
   info: '\x1b[36m',
   error: '\x1b[31m',
   warn: '\x1b[33m',
-  verbose: '\x1b[43m',
+  verbose: '\x1b[34m',
+  debug: '\x1b[34m',
 };
 
 const LOG_ICONS: any = {
@@ -56,10 +56,6 @@ export class Logger implements LoggerContract {
     this.scope = Logger.parsePathToScope(scope);
   }
 
-  public setProtocol(protocol: any): void {
-    this.protocol = protocol;
-  }
-
   constructor(scope?: string, options: LoggerOptions = {}) {
     if (!scope) {
       this.scope = Logger.DEFAULT_SCOPE;
@@ -67,17 +63,10 @@ export class Logger implements LoggerContract {
       this.setScope(scope);
     }
 
-    const { logLevel = 'info', isDevelopment = true } = options;
-
-    const consoleOptions = {
-      handleExceptions: true,
-      level: logLevel,
-      format: null,
-    };
-
-    const customFormat = printf((data) => {
+    const customFormat = winston.format.printf((data) => {
       try {
-        const { message, args, metadata, level } = data;
+        const { message, args, metadata, level, timestamp, label } = data;
+
         const { scope: metascope } = metadata;
         const justLevel = level.replace(
           // eslint-disable-next-line no-control-regex
@@ -86,36 +75,35 @@ export class Logger implements LoggerContract {
         );
 
         const toShowArgs = args.length > 0;
-        const isError = args.length > 0 && args[0] && args[0].name === 'error';
-        return `${LOG_ICONS[justLevel]} ${
-          metascope ? `[${metascope}] ` : ''
-        } ➜ \x1b[37m${message} ${
-          toShowArgs && !isError ? JSON.stringify(args) : ''
+
+        const isError = args.length > 0 && args[0] && Object.prototype.hasOwnProperty.call(args[0], 'error');
+        const logLine = `[${timestamp}] [${justLevel}] ${
+          metascope ? `[${metascope}] `: ''
+        }: ${COLORS[justLevel]}${message} ${
+          toShowArgs && !isError ? JSON.stringify(args): ''
         } ${
           isError
             ? `${COLORS[justLevel]}Error: ${args[0].error}\nStack: ${args[0].stack}\x1b[0m`
             : ''
         }`;
+
+        return logLine;
       } catch (error) {
         console.log(error);
       }
     });
 
-    if (logLevel === 'debug' && isDevelopment) {
-      consoleOptions.format = combine(
-        colorize({ all: true }),
-        splat(),
-        timestamp(),
-        customFormat
-      );
-    }
-
-    const transport: winston.transport = new winston.transports.Console(
-      consoleOptions
-    );
+    const transport: winston.transport = new winston.transports.Console();
 
     const logger = winston.createLogger({
-      transports: [transport],
+      format: winston.format.combine(
+        winston.format.colorize({ all: true }),
+        winston.format.label({ label: 'Maybe the correlation id and user id goes here' }),
+        winston.format.timestamp({format: 'DD-MM-YYYY HH:mm:ss Z', alias:'Date_alias'}),
+        customFormat
+      ),
+      level: options.logLevel,
+      transports: [transport]
     });
 
     this.protocol = logger;
@@ -145,10 +133,13 @@ export class Logger implements LoggerContract {
     if (this.protocol) {
       if (args.length) {
         newArgs = args.map((arg) => {
-          if (arg instanceof Error) {
-            return { ...arg, error: arg.message, stack: arg.stack };
+          if (arg instanceof VError) {
+            return { ...args, error: arg.message, stack: VError.fullStack(arg) };
           }
-          return arg;
+          if (arg instanceof Error) {
+            return { ...args, error: arg.message, stack: arg.stack };
+          }
+          return args;
         });
       }
 
