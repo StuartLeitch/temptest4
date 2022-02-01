@@ -1,7 +1,7 @@
 export interface ApcType {
-  journalName: string;
-  journalCode: string;
+  journalTitle: string;
+  journalId: string;
   issn: string;
-  publisher: string;
-  apc: string;
+  publisherId: string;
+  amount: string;
 }

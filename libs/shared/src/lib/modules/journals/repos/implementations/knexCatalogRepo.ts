@@ -11,6 +11,8 @@ import { CatalogMap } from './../../mappers/CatalogMap';
 import { JournalId } from './../../domain/JournalId';
 
 import { CatalogRepoContract } from './../catalogRepo';
+import { CatalogPaginated } from '../../domain/CatalogPaginated';
+import { applyFilters } from '../../../invoices/repos/implementations/utils';
 
 export class KnexCatalogRepo
   extends AbstractBaseDBRepo<Knex, CatalogItem>
@@ -69,14 +71,39 @@ export class KnexCatalogRepo
     }
   }
 
-  async getCatalogCollection(): Promise<
-    Either<GuardFailure | RepoError, CatalogItem[]>
-  > {
+  async getCatalogCollection(
+    args?: any
+  ): Promise<Either<GuardFailure | RepoError, CatalogPaginated>> {
+    const { pagination, filters } = args;
     const { db } = this;
 
-    const catalogsRows: Array<any> = await db(TABLES.CATALOG);
+    const getModel = () => db(TABLES.CATALOG);
 
-    return flatten(catalogsRows.map(CatalogMap.toDomain));
+    const totalCount = await applyFilters(getModel(), filters).count(
+      `${TABLES.CATALOG}.id`
+    );
+
+    const offset = pagination.offset * pagination.limit;
+
+    const sql = applyFilters(getModel(), filters)
+      .orderBy(`${TABLES.CATALOG}.created`, 'desc')
+      .offset(offset < totalCount[0].count ? offset : 0)
+      .limit(pagination.limit)
+      .select([`${TABLES.CATALOG}.*`]);
+    console.info(sql.toString());
+
+    const catalogsItems: Array<any> = await sql;
+
+    const maybeCatalogItems = flatten(catalogsItems.map(CatalogMap.toDomain));
+
+    if (maybeCatalogItems.isLeft()) {
+      return left(maybeCatalogItems.value);
+    }
+
+    return right({
+      catalogItems: maybeCatalogItems.value,
+      totalCount: totalCount[0]['count'],
+    });
   }
 
   async getCatalogItemByJournalId(

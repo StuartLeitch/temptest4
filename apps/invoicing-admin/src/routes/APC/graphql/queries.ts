@@ -1,30 +1,26 @@
-export const LOG_FRAGMENT = `
-  fragment logFragment on Log {
-    id
-    userAccount
-    entity
-    action
-    timestamp
-    item_reference
-    target
+export const JOURNAL_FRAGMENT = `
+  fragment journalFragment on InvoicingJournal {
+    journalId
+    journalTitle
+    amount
+    issn
+    publisherId
   }
 `;
 
 export const APC_QUERY = `
-  query auditLogs(
-    $pagination: Pagination
-    $filters: LogsFilters
+query invoicingJournals(
+  $pagination: Pagination
+) {
+  invoicingJournals(
+    pagination: $pagination
   ) {
-    auditlogs(
-      pagination: $pagination
-      filters: $filters
-    ) {
-      totalCount
-      logs {
-        ...logFragment
-      }
+    totalCount
+    catalogItems {
+      ...journalFragment
     }
   }
+}
 
-  ${LOG_FRAGMENT}
+  ${JOURNAL_FRAGMENT}
 `;

@@ -1,6 +1,11 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
-import { GetJournalListUsecase, CatalogMap, Roles } from '@hindawi/shared';
+import {
+  GetJournalListUsecase,
+  GetPublisherDetailsUsecase,
+  CatalogMap,
+  Roles,
+} from '@hindawi/shared';
 
 import { Context } from '../../builders';
 import { Resolvers } from '../schema';
@@ -28,9 +33,14 @@ export const invoicingJournals: Resolvers<Context> = {
         throw new Error(result.value.message);
       }
 
-      const journalsList = result.value;
+      const journalList = result.value;
 
-      return journalsList.map(CatalogMap.toPersistence);
+      console.log(journalList);
+
+      return {
+        totalCount: journalList.totalCount,
+        catalogItems: journalList.catalogItems.map(CatalogMap.toPersistence),
+      };
     },
   },
 };

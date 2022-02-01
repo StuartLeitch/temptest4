@@ -155,6 +155,9 @@ input PayerInput {
 type InvoicingJournal {
   journalId: ID
   journalTitle: String
+  amount: String
+  issn: String
+  publisherId: ID
   # ... (TODO: add missing fields here)
 }
 
@@ -275,6 +278,11 @@ type PaginatedLogs {
   logs: [Log]
 }
 
+type PaginatedCatalog {
+  totalCount: Int
+  catalogItems: [InvoicingJournal]
+}
+
 type PaginatedCreditNotes {
   totalCount: Int
   creditNotes: [CreditNote]
@@ -375,7 +383,7 @@ type Query {
   coupon(couponCode: String!): Coupon
   coupons(pagination: Pagination): PaginatedCoupons
   invoiceIdByManuscriptCustomId(customId: ID): InvoiceId
-  invoicingJournals: [InvoicingJournal]
+  invoicingJournals(pagination: Pagination): PaginatedCatalog
   echo(value: String): String
   remindersStatus(invoiceId: ID!): RemindersStatus
   remindersSent(invoiceId: ID!): [SentReminder]

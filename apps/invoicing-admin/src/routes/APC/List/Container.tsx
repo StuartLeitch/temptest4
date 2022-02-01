@@ -26,6 +26,7 @@ const defaultPaginationSettings = { page: 1, offset: 0, limit: 10 };
 
 const AuditLogsContainer: React.FC = () => {
   const [fetchLogs, { loading, error, data }] = useManualQuery(APC_QUERY);
+  console.log(data?.invoicingJournals?.catalogItems);
 
   const [page, setPageInUrl] = useQueryState(
     'page',
@@ -82,10 +83,10 @@ const AuditLogsContainer: React.FC = () => {
       return (
         <>
           <Card className='mb-0 mt-5'>
-            <List apcItems={data.auditlogs?.logs} />
+            <List apcItems={data.invoicingJournals?.catalogItems} />
             <CardFooter className='d-flex justify-content-center pb-0'>
               <ListPagination
-                totalRecords={data.auditlogs?.totalCount}
+                totalRecords={data.invoicingJournals?.totalCount}
                 pageNeighbours={1}
                 onPageChanged={onPageChange}
                 pageLimit={defaultPaginationSettings.limit}

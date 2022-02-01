@@ -27,92 +27,29 @@ const ApcList: React.FC<ApcListProps> = ({ apcItems }) => {
           </tr>
         </thead>
         <tbody>
-          {/* {apcItems &&
+          {apcItems &&
             apcItems.map((apcItem, index) => {
               const {
-                journalName,
-                journalCode,
+                journalTitle,
+                journalId,
                 issn,
-                publisher,
-                apc,
-              } = apcItem; */}
+                publisherId,
+                amount,
+              } = apcItem;
 
-          {/* return ( */}
-          <tr>
-            <td className='align-middle bt-0'>JOURNAL_NAME</td>
-            <td className='align-middle bt-0'>'JOURNAL_CODE'</td>
-            <td className='align-middle bt-0'>'ISSN'</td>
-            <td className='align-middle bt-0'>
-              <UncontrolledButtonDropdown>
-                <DropdownToggle color='secondary' caret>
-                  Hindawi
-                  {/* {publisher}  */}
-                </DropdownToggle>
-                <DropdownMenu>
-                  <DropdownItem onClick={() => console.log('Wiley selected')}>
-                    Wiley
-                  </DropdownItem>{' '}
-                  {/* dynamic population of elements here */}
-                  <DropdownItem>Sage</DropdownItem>
-                </DropdownMenu>
-              </UncontrolledButtonDropdown>
-              {/* condition to make buttons appear if publisher value changed */}
-              <Button
-                color='ghost'
-                style={{ width: '10%', marginLeft: '0.25em' }}
-                onClick={() => console.log('cancel change')}
-              >
-                {' '}
-                <i className='fas fa-times-circle mr-2'></i>{' '}
-              </Button>
-              <Button
-                style={{ width: '10%', marginLeft: '0.25em' }}
-                color='ghost'
-                onClick={() => console.log('save change')}
-              >
-                <i className='fas fa-check-circle mr-2'></i>
-              </Button>
-            </td>
-
-            <td className='align-middle bt-0' style={{ width: '35%' }}>
-              {!isEditMode && (
-                <React.Fragment>
-                  <span className='text-green pl-0 pr-2'>APC</span>
-                  <Button color='ghost' onClick={() => setIsEditMode(true)}>
-                    <i className='fas fa-pencil-alt mr-2'></i>
-                  </Button>
-                </React.Fragment>
-              )}
-              {/* condition to make buttons appear if editMode is true value changed */}
-              {isEditMode && (
-                <React.Fragment>
-                  <Input
-                    size='md'
-                    className='apcInput'
-                    value='APC'
-                    style={{ width: '20%', float: 'left' }}
-                  />
-                  <Button
-                    style={{ width: '10%' }}
-                    color='ghost'
-                    onClick={() => setIsEditMode(false)}
-                  >
-                    {' '}
-                    <i className='fas fa-times-circle mr-2'></i>{' '}
-                  </Button>
-                  <Button
-                    style={{ width: '10%' }}
-                    color='ghost'
-                    onClick={() => console.log('save change')}
-                  >
-                    <i className='fas fa-check-circle mr-2'></i>
-                  </Button>
-                </React.Fragment>
-              )}
-            </td>
-          </tr>
-          {/* );
-            })} */}
+              return (
+                <tr key={index}>
+                  <td className='align-middle bt-0'>{journalTitle}</td>
+                  <td className='align-middle bt-0'>{journalId}</td>
+                  <td className='align-middle bt-0'>{issn}</td>
+                  <td className='align-middle bt-0'>{publisherId}</td>
+                  <td className='align-middle bt-0'>
+                    <span className='text-green pl-0 pr-2'>${amount}</span>
+                    {/* condition to make buttons appear if editMode is true value changed */}
+                  </td>
+                </tr>
+              );
+            })}
         </tbody>
       </Table>
     </div>
