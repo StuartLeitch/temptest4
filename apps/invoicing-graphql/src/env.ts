@@ -209,6 +209,7 @@ export const env = {
     beneficiaryAddressLine2: getOsEnv('BANK_BENEFICIARY_ADDRESS_LINE_2'),
     beneficiaryAddressPostcode: getOsEnv('BANK_BENEFICIARY_ADDRESS_POSTCODE'),
     beneficiaryAddressState: getOsEnv('BANK_BENEFICIARY_ADDRESS_STATE'),
+    accountCurrency: getOsEnv('BANK_ACCOUNT_CURRENCY'),
     iban: getOsEnv('BANK_IBAN'),
     sortCode: getOsEnv('BANK_SORT_CODE'),
     swift: getOsEnv('BANK_SWIFT'),

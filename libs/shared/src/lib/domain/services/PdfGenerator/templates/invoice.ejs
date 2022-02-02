@@ -588,15 +588,19 @@
               <td><%= bankDetails.accountName %></td>
             </tr>
             <tr>
+              <th>Account Type</th>
+              <td><%= bankDetails.accountType %></td>
+            </tr>
+            <tr>
+              <th>Account Number</th>
+              <td><%= bankDetails.accountNumber %></td>
+            </tr>
+            <tr>
               <th>Sort Code</th>
               <td>
                 <%= bankDetails.sortCode.replace(/(\d{2})(\d{2})(\d+)/,
                 '$1-$2-$3') %>
               </td>
-            </tr>
-            <tr>
-              <th>Account Number</th>
-              <td><%= bankDetails.accountNumber %></td>
             </tr>
             <tr>
               <th>SWIFT/BIC Code</th>
@@ -607,9 +611,19 @@
               <td><%= bankDetails.iban %></td>
             </tr>
             <tr>
-              <th>BankAddress</th>
+              <th>Currency</th>
+              <td><%= bankDetails.accountCurrency %></td>
+            </tr>
+            <tr>
+              <th>Bank Address</th>
               <td>
                 <%= bankDetails.bankAddress %>
+              </td>
+            </tr>
+            <tr>
+              <th>Beneficiary Address</th>
+              <td>
+                <%= bankDetails.beneficiaryAddress %>
               </td>
             </tr>
             <tr>

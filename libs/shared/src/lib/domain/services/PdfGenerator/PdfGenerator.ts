@@ -23,6 +23,7 @@ import { Author } from '../../../modules/authors/domain/Author';
 import { Payer } from '../../../modules/payers/domain/Payer';
 
 import { FormatUtils } from '../../../utils/FormatUtils';
+import { env } from 'process';
 
 export interface InvoicePayload {
   invoiceLink: string;
@@ -81,6 +82,7 @@ export class PdfGeneratorService {
         sortCode: process.env.BANK_SORT_CODE,
         swift: process.env.BANK_SWIFT,
         iban: process.env.BANK_IBAN,
+        accountCurrency: env.ACCOUNT_CURRENCY,
         bankAddress: [
           process.env.BANK_ADDRESS_LINE_1,
           process.env.BANK_ADDRESS_LINE_2,
