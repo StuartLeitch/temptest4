@@ -14,6 +14,7 @@ export interface CatalogItemProps {
   journalId: JournalId;
   journalTitle?: string;
   issn?: string;
+  code?: string;
   created?: Date;
   updated?: Date;
   publisherId?: PublisherId;
@@ -64,6 +65,10 @@ export class CatalogItem extends AggregateRoot<CatalogItemProps> {
 
   public get issn(): string {
     return this.props.issn;
+  }
+
+  public get code(): string {
+    return this.props.code;
   }
 
   public get created(): Date {

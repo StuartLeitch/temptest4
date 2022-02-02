@@ -41,6 +41,7 @@ export const JournalUpdatedHandler: EventHandler<JournalUpdated> = {
           amount: data.apc,
           currency: 'USD',
           issn: data.issn,
+          code: data.code,
           type: null,
         },
         usecaseContext

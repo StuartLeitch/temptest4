@@ -46,6 +46,7 @@ export class UpdateCatalogItemToCatalogUseCase
       currency,
       isActive,
       issn,
+      code,
       journalId: rawJournalId,
       journalTitle,
       updated,
@@ -104,6 +105,7 @@ export class UpdateCatalogItemToCatalogUseCase
         currency,
         isActive,
         issn,
+        code,
         journalId: rawJournalId,
         journalTitle,
         publisherId: catalogItem.publisherId
