@@ -85,6 +85,14 @@ export class KnexCatalogRepo
 
     const offset = pagination.offset * pagination.limit;
 
+    const publishers = await db
+      .select('publishers.name AS name')
+      .from('publishers')
+      .leftJoin('catalog', 'catalog.publisherId', '=', 'publishers.id')
+      .orderBy(`${TABLES.CATALOG}.created`, 'desc')
+      .offset(offset < totalCount[0].count ? offset : 0)
+      .limit(pagination.limit);
+
     const sql = applyFilters(getModel(), filters)
       .orderBy(`${TABLES.CATALOG}.created`, 'desc')
       .offset(offset < totalCount[0].count ? offset : 0)
@@ -103,6 +111,7 @@ export class KnexCatalogRepo
     return right({
       catalogItems: maybeCatalogItems.value,
       totalCount: totalCount[0]['count'],
+      publishers: { totalCount: totalCount[0]['count'], publishers },
     });
   }
 

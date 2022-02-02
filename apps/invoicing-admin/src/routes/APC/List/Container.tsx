@@ -65,7 +65,10 @@ const ApcContainer: React.FC = () => {
       return (
         <>
           <Card className='mb-0 mt-5'>
-            <List apcItems={data.invoicingJournals?.catalogItems} />
+            <List
+              apcItems={data.invoicingJournals?.catalogItems}
+              publisherNames={data.invoicingJournals?.publishers}
+            />
             <CardFooter className='d-flex justify-content-center pb-0'>
               <ListPagination
                 totalRecords={data.invoicingJournals?.totalCount}

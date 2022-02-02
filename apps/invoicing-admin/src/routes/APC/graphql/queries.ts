@@ -16,6 +16,11 @@ query invoicingJournals(
     pagination: $pagination
   ) {
     totalCount
+    publishers {
+      publishers {
+        name
+      }
+    }
     catalogItems {
       ...journalFragment
     }

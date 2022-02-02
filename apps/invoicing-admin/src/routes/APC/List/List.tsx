@@ -10,9 +10,9 @@ import {
   UncontrolledButtonDropdown,
   DropdownItem,
 } from '../../../components';
-import { ApcType } from '../types';
+import { ApcType, PublisherType } from '../types';
 
-const ApcList: React.FC<ApcListProps> = ({ apcItems }) => {
+const ApcList: React.FC<ApcListProps> = ({ apcItems, publisherNames }) => {
   const [isEditMode, setIsEditMode] = useState(false);
 
   return (
@@ -58,7 +58,8 @@ const ApcList: React.FC<ApcListProps> = ({ apcItems }) => {
 };
 
 interface ApcListProps {
-  apcItems: ApcType[];
+  apcItems: any;
+  publisherNames: any;
 }
 
 export default ApcList;

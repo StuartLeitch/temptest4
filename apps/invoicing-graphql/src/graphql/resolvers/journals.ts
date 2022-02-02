@@ -1,11 +1,6 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
-import {
-  GetJournalListUsecase,
-  GetPublisherDetailsUsecase,
-  CatalogMap,
-  Roles,
-} from '@hindawi/shared';
+import { GetJournalListUsecase, CatalogMap, Roles } from '@hindawi/shared';
 
 import { Context } from '../../builders';
 import { Resolvers } from '../schema';
@@ -20,8 +15,6 @@ export const invoicingJournals: Resolvers<Context> = {
       const { repos } = context;
 
       const usecase = new GetJournalListUsecase(repos.catalog);
-
-      const publisherUsecase = new GetPublisherDetailsUsecase(repos.publisher);
 
       const usecaseContext = {
         roles,
@@ -40,6 +33,7 @@ export const invoicingJournals: Resolvers<Context> = {
       return {
         totalCount: journalList.totalCount,
         catalogItems: journalList.catalogItems.map(CatalogMap.toPersistence),
+        publishers: journalList.publishers,
       };
     },
   },

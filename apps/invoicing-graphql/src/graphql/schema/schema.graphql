@@ -185,10 +185,7 @@ type Address {
 }
 
 type Publisher {
-  id: String!
   name: String!
-  dateCreated: Date
-  dateUpdated: Date
 }
 
 input CreditCardInput {
@@ -285,9 +282,14 @@ type PaginatedLogs {
   logs: [Log]
 }
 
+type PaginatedPublishers {
+  totalCount: Int
+  publishers: [Publisher]
+}
 type PaginatedCatalog {
   totalCount: Int
   catalogItems: [InvoicingJournal]
+  publishers: PaginatedPublishers
 }
 
 type PaginatedCreditNotes {

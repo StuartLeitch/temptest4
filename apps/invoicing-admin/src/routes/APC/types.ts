@@ -5,3 +5,7 @@ export interface ApcType {
   publisherId: string;
   amount: string;
 }
+
+export interface PublisherType {
+  name: string;
+}

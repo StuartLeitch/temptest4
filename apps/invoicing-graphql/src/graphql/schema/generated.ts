@@ -378,6 +378,7 @@ export type PaginatedCatalog = {
   __typename?: 'PaginatedCatalog';
   totalCount?: Maybe<Scalars['Int']>;
   catalogItems?: Maybe<Array<Maybe<InvoicingJournal>>>;
+  publishers?: Maybe<PaginatedPublishers>;
 };
 
 export type PaginatedCoupons = {
@@ -402,6 +403,12 @@ export type PaginatedLogs = {
   __typename?: 'PaginatedLogs';
   totalCount?: Maybe<Scalars['Int']>;
   logs?: Maybe<Array<Maybe<Log>>>;
+};
+
+export type PaginatedPublishers = {
+  __typename?: 'PaginatedPublishers';
+  totalCount?: Maybe<Scalars['Int']>;
+  publishers?: Maybe<Array<Maybe<Publisher>>>;
 };
 
 export type Pagination = {
@@ -472,10 +479,7 @@ export enum PaymentStatus {
 
 export type Publisher = {
   __typename?: 'Publisher';
-  id: Scalars['String'];
   name: Scalars['String'];
-  dateCreated?: Maybe<Scalars['Date']>;
-  dateUpdated?: Maybe<Scalars['Date']>;
 };
 
 export type Query = {
@@ -757,6 +761,7 @@ export type ResolversTypes = {
   PaginatedCreditNotes: ResolverTypeWrapper<PaginatedCreditNotes>;
   PaginatedInvoices: ResolverTypeWrapper<PaginatedInvoices>;
   PaginatedLogs: ResolverTypeWrapper<PaginatedLogs>;
+  PaginatedPublishers: ResolverTypeWrapper<PaginatedPublishers>;
   Pagination: Pagination;
   PayPalOrderId: ResolverTypeWrapper<PayPalOrderId>;
   Payer: ResolverTypeWrapper<Payer>;
@@ -815,6 +820,7 @@ export type ResolversParentTypes = {
   PaginatedCreditNotes: PaginatedCreditNotes;
   PaginatedInvoices: PaginatedInvoices;
   PaginatedLogs: PaginatedLogs;
+  PaginatedPublishers: PaginatedPublishers;
   Pagination: Pagination;
   PayPalOrderId: PayPalOrderId;
   Payer: Payer;
@@ -1021,6 +1027,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 export type PaginatedCatalogResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaginatedCatalog'] = ResolversParentTypes['PaginatedCatalog']> = {
   totalCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   catalogItems?: Resolver<Maybe<Array<Maybe<ResolversTypes['InvoicingJournal']>>>, ParentType, ContextType>;
+  publishers?: Resolver<Maybe<ResolversTypes['PaginatedPublishers']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -1045,6 +1052,12 @@ export type PaginatedInvoicesResolvers<ContextType = any, ParentType extends Res
 export type PaginatedLogsResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaginatedLogs'] = ResolversParentTypes['PaginatedLogs']> = {
   totalCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   logs?: Resolver<Maybe<Array<Maybe<ResolversTypes['Log']>>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type PaginatedPublishersResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaginatedPublishers'] = ResolversParentTypes['PaginatedPublishers']> = {
+  totalCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  publishers?: Resolver<Maybe<Array<Maybe<ResolversTypes['Publisher']>>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -1086,10 +1099,7 @@ export type PaymentMethodResolvers<ContextType = any, ParentType extends Resolve
 };
 
 export type PublisherResolvers<ContextType = any, ParentType extends ResolversParentTypes['Publisher'] = ResolversParentTypes['Publisher']> = {
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  dateCreated?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
-  dateUpdated?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -1170,6 +1180,7 @@ export type Resolvers<ContextType = any> = {
   PaginatedCreditNotes?: PaginatedCreditNotesResolvers<ContextType>;
   PaginatedInvoices?: PaginatedInvoicesResolvers<ContextType>;
   PaginatedLogs?: PaginatedLogsResolvers<ContextType>;
+  PaginatedPublishers?: PaginatedPublishersResolvers<ContextType>;
   PayPalOrderId?: PayPalOrderIdResolvers<ContextType>;
   Payer?: PayerResolvers<ContextType>;
   Payment?: PaymentResolvers<ContextType>;
