@@ -284,6 +284,11 @@ export class NetSuiteService implements ErpServiceContract {
       return res?.data?.items?.pop();
     } catch (err) {
       this.logger.error(err?.request?.data);
+      this.logger.error({
+        message: 'Failed to fetch customer',
+        response: JSON.stringify(err?.response?.data, null, 2),
+        request: queryCustomerRequestOpts,
+      });
       throw err;
     }
   }
@@ -323,7 +328,7 @@ export class NetSuiteService implements ErpServiceContract {
     } catch (err) {
       this.logger.error({
         message: 'Failed to create customer',
-        response: err?.response?.data,
+        response: JSON.stringify(err?.response?.data, null, 2),
         request: createCustomerPayload,
       });
       return { err, isAuthError: true } as unknown;
@@ -424,7 +429,7 @@ export class NetSuiteService implements ErpServiceContract {
     } catch (err) {
       this.logger.error({
         message: 'Failed to create invoice',
-        response: err?.response?.data,
+        response: JSON.stringify(err?.response?.data, null, 2),
         request: createInvoicePayload,
       });
       throw err;
@@ -512,7 +517,7 @@ export class NetSuiteService implements ErpServiceContract {
     } catch (err) {
       this.logger.error({
         message: 'Failed to create payment',
-        response: err?.response?.data,
+        response: JSON.stringify(err?.response?.data, null, 2),
       });
       throw err;
     }
@@ -594,7 +599,7 @@ export class NetSuiteService implements ErpServiceContract {
     } catch (err) {
       this.logger.error({
         message: 'Failed to create revenue recognition',
-        response: err?.response?.data,
+        response: JSON.stringify(err?.response?.data, null, 2),
         request: createJournalPayload,
       });
       throw err;
@@ -673,7 +678,12 @@ export class NetSuiteService implements ErpServiceContract {
       // await this.patchInvoice({ ...data, journalId });
       return journalId;
     } catch (err) {
-      console.error(err);
+      // console.error(err);
+      this.logger.error({
+        message: 'Failed to revenue recognition reversal',
+        response: JSON.stringify(err?.response?.data, null, 2),
+        requestOptions: journalRequestOpts,
+      });
       return { err } as unknown;
     }
   }
@@ -739,7 +749,7 @@ export class NetSuiteService implements ErpServiceContract {
     } catch (err) {
       this.logger.error({
         message: 'Failed to create credit note',
-        response: err?.response?.data,
+        response: JSON.stringify(err?.response?.data, null, 2),
         requestOptions: creditNoteTransformOpts,
       });
       throw err;
@@ -834,7 +844,7 @@ export class NetSuiteService implements ErpServiceContract {
     } catch (err) {
       this.logger.error({
         message: 'Failed to create credit note',
-        response: err?.response?.data,
+        response: JSON.stringify(err?.response?.data, null, 2),
         requestOptions: creditNoteTransformOpts,
       });
       throw err;
@@ -899,7 +909,7 @@ export class NetSuiteService implements ErpServiceContract {
     } catch (err) {
       this.logger.error({
         message: 'Failed to update credit note',
-        response: err?.response?.data,
+        response: JSON.stringify(err?.response?.data, null, 2),
         request: patchCreditNotePayload,
       });
       throw err;
@@ -974,7 +984,7 @@ export class NetSuiteService implements ErpServiceContract {
     } catch (err) {
       this.logger.error({
         message: `Error checking if invoice is already registered in NetSuite.`,
-        response: err?.response?.data['o:errorDetails'],
+        response: JSON.stringify(err?.response?.data['o:errorDetails'], null, 2),
         error: err,
       });
     }
@@ -1031,7 +1041,7 @@ export class NetSuiteService implements ErpServiceContract {
     } catch (err) {
       this.logger.warn({
         message: `Error checking if customer payment is already registered in NetSuite.`,
-        response: err?.response?.data['o:errorDetails'],
+        response: JSON.stringify(err?.response?.data['o:errorDetails'], null, 2),
       });
     }
   }
@@ -1082,7 +1092,7 @@ export class NetSuiteService implements ErpServiceContract {
     } catch (err) {
       this.logger.error({
         message: 'No Revenue Recognition found.',
-        response: err?.response?.data,
+        response: JSON.stringify(err?.response?.data, null, 2),
       });
       throw new Error(err);
     }
