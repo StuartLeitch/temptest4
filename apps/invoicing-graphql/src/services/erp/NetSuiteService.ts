@@ -438,7 +438,7 @@ export class NetSuiteService implements ErpServiceContract {
     const accountMap = {
       Paypal: '213',
       'Credit Card': '216',
-      'Bank Transfer': '221',
+      'Bank Transfer': '864',
     };
 
     const nsErpReference = invoice
