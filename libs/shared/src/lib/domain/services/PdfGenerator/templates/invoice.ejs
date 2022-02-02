@@ -294,6 +294,7 @@
         float: left;
         width: 60%;
         padding: 1rem;
+        padding-right: 3rem;
         border-right: 0.15 solid;
       }
 
@@ -301,7 +302,7 @@
         font-size: 1.5rem;
         font-weight: normal;
         text-align: left;
-        width: 50%;
+        width: 40%;
         vertical-align: top;
         padding-top: 0.5rem;
       }
@@ -521,12 +522,12 @@
                     formatPriceFn(invoice.invoiceItems.currentItems[i].price) %>
                   </td>
                 </tr>
-                <% } %> <% } %> 
-                  <% let item = invoice.invoiceItems.currentItems[0] %> 
-                  <% let price = invoice.invoiceNetTotal %> 
+                <% } %> <% } %>
+                  <% let item = invoice.invoiceItems.currentItems[0] %>
+                  <% let price = invoice.invoiceNetTotal %>
                   <% let vat = invoice.invoiceVatTotal %>
                   <% let discount = invoice.invoiceDiscountTotal %>
-                  <% let discountPercentage = invoice.invoiceDiscountPercentageTotal %> 
+                  <% let discountPercentage = invoice.invoiceDiscountPercentageTotal %>
                   <% if(discount!== 0) { %>
                 <tr>
                   <th>Discounts (-<%= discountPercentage %>%)</th>

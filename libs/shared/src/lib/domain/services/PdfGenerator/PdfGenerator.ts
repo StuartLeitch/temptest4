@@ -1,12 +1,12 @@
-import puppeteer from 'puppeteer';
-import { Readable } from 'stream';
-import fs from 'fs';
-import path from 'path';
-import { format } from 'date-fns';
-import ejs from 'ejs';
 import countryList from 'country-list';
 import stateList from 'state-list';
+import { format } from 'date-fns';
+import puppeteer from 'puppeteer';
+import { Readable } from 'stream';
 import axios from 'axios';
+import path from 'path';
+import ejs from 'ejs';
+import fs from 'fs';
 
 async function getBase64(url) {
   const response = await axios.get(url, {
@@ -14,10 +14,15 @@ async function getBase64(url) {
   });
   return Buffer.from(response.data, 'binary').toString('base64');
 }
-
-import { Address, Article, Invoice, Author, Payer } from '@hindawi/shared';
-import { FormatUtils } from '../../../utils/FormatUtils';
 import { LoggerContract } from '../../../infrastructure/logging/Logger';
+
+import { Article } from '../../../modules/manuscripts/domain/Article';
+import { Address } from '../../../modules/addresses/domain/Address';
+import { Invoice } from '../../../modules/invoices/domain/Invoice';
+import { Author } from '../../../modules/authors/domain/Author';
+import { Payer } from '../../../modules/payers/domain/Payer';
+
+import { FormatUtils } from '../../../utils/FormatUtils';
 
 export interface InvoicePayload {
   invoiceLink: string;
@@ -53,6 +58,11 @@ export class PdfGeneratorService {
 
     const template = this.getTemplate('invoice');
 
+    const bankCounty =
+      process.env.BANK_ADDRESS_STATE || process.env.BANK_ADDRESS_COUNTY
+        ? [process.env.BANK_ADDRESS_STATE || process.env.BANK_ADDRESS_COUNTY]
+        : [];
+
     const data = {
       formatPriceFn: FormatUtils.formatPrice,
       dateFormatFn: format,
@@ -76,7 +86,7 @@ export class PdfGeneratorService {
           process.env.BANK_ADDRESS_LINE_2,
           process.env.BANK_ADDRESS_LINE_3,
           process.env.BANK_ADDRESS_CITY,
-          process.env.BANK_ADDRESS_STATE || process.env.BANK_ADDRESS_COUNTY,
+          ...bankCounty,
           process.env.BANK_ADDRESS_POSTCODE,
         ].join(', '),
         beneficiaryAddress: [
