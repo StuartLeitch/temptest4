@@ -2,6 +2,7 @@
 
 import {
   GetPublisherDetailsUsecase,
+  GetPublisherDetailsDTO,
   Roles,
   PublisherMap,
 } from '@hindawi/shared';
@@ -11,20 +12,24 @@ import { Resolvers } from '../schema';
 
 import { handleForbiddenUsecase, getAuthRoles } from './utils';
 
-export const invoicingJournals: Resolvers<Context> = {
+export const publisher: Resolvers<Context> = {
   Query: {
-    async getPublishers(parent, args, context) {
+    async getPublisherDetails(parent, args, context): Promise<any> {
       const roles = getAuthRoles(context);
 
       const { repos } = context;
 
       const usecase = new GetPublisherDetailsUsecase(repos.publisher);
 
+      const request: GetPublisherDetailsDTO = {
+        publisherId: args.publisherId,
+      };
+
       const usecaseContext = {
         roles,
       };
 
-      const result = await usecase.execute(args, usecaseContext);
+      const result = await usecase.execute(request, usecaseContext);
 
       handleForbiddenUsecase(result);
 

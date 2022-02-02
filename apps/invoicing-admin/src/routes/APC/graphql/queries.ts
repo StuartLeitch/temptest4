@@ -24,3 +24,11 @@ query invoicingJournals(
 
   ${JOURNAL_FRAGMENT}
 `;
+
+export const APC_PUBLISHER_QUERY = `
+  query getPublisherDetails($publisherId: ID) {
+    publisher(publisherId: $publisherId) {
+      name
+    }
+  }
+`;

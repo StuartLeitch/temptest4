@@ -184,6 +184,13 @@ type Address {
   addressLine1: String
 }
 
+type Publisher {
+  id: String!
+  name: String!
+  dateCreated: Date
+  dateUpdated: Date
+}
+
 input CreditCardInput {
   amount: Float!
   cardNumber: String!
@@ -369,6 +376,7 @@ type Query {
   getCreditNoteByReferenceNumber(referenceNumber: String): CreditNote
   getPaymentMethods: [PaymentMethod]
   getClientToken: ClientToken
+  getPublisherDetails(publisherId: ID): Publisher
   generateCouponCode: CouponCode
   invoice(invoiceId: ID): Invoice
   invoiceWithAuthorization(invoiceId: ID): Invoice
