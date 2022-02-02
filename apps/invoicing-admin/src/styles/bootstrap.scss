@@ -747,3 +747,17 @@ dt {
     color: #4F4F4F !important;
   }
 }
+
+.ant-pagination {
+  .ant-pagination-prev, 
+  .ant-pagination-next {
+    display: none;
+  }
+
+//   .ant-pagination-jump-prev,
+//   .ant-pagination-jump-next,
+//   .ant-pagination-item {
+//     margin-right: 0px !important;
+//     border-radius: 0;
+//   }
+}
