@@ -26,6 +26,7 @@ const BankTransferRow = ({ label, value }: any) => (
   </Flex>
 );
 
+
 const BankTransfer: React.FunctionComponent<Props> = ({
   invoiceReference,
   accountName,
