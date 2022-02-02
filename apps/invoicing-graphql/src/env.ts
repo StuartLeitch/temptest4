@@ -187,6 +187,9 @@ export const env = {
     netsuiteTaxDetailsUkZero: toObject(
       nonEmptyOsEnv('NETSUITE_TAX_DETAILS_UK_ZERO')
     ),
+    netsuitePaymentAccountCodes: toObject(
+      nonEmptyOsEnv('NETSUITE_PAYMENT_ACCOUNT_CODES')
+    ),
   },
   migration: {
     token: getOsEnv('MIGRATION_TOKEN'),

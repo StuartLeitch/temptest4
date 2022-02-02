@@ -32,6 +32,12 @@ import { ConnectionConfig } from './netsuite/ConnectionConfig';
 import { CustomerPayload } from './netsuite/typings';
 import { Connection } from './netsuite/Connection';
 
+export interface PaymentAccountCodes {
+  'Bank Transfer': string;
+  'Credit Card': string;
+  Paypal: string;
+}
+
 export class NetSuiteService implements ErpServiceContract {
   private constructor(
     private connection: Connection,
@@ -41,6 +47,7 @@ export class NetSuiteService implements ErpServiceContract {
     private customUniquePaymentReference: string,
     private taxDetailsUkStandard: ErpTaxDetails,
     private taxDetailsUkZero: ErpTaxDetails,
+    private readonly paymentAccountCodes: PaymentAccountCodes,
     readonly referenceMappings?: Record<string, any>
   ) {}
 
@@ -55,7 +62,8 @@ export class NetSuiteService implements ErpServiceContract {
     customExternalPaymentReference: string,
     customUniquePaymentReference: string,
     taxDetailsUkStandard: ErpTaxDetails,
-    taxDetailsUkZero: ErpTaxDetails
+    taxDetailsUkZero: ErpTaxDetails,
+    paymentAccountCodes: PaymentAccountCodes,
   ): NetSuiteService {
     const { connection: configConnection, referenceMappings } = config;
     const connection = new Connection({
@@ -73,6 +81,7 @@ export class NetSuiteService implements ErpServiceContract {
       customUniquePaymentReference,
       taxDetailsUkStandard,
       taxDetailsUkZero,
+      paymentAccountCodes,
       referenceMappings
     );
 
@@ -114,7 +123,7 @@ export class NetSuiteService implements ErpServiceContract {
         customSegmentId,
         creditAccountId,
         debitAccountId,
-        creditAccountIdForCascaded
+        creditAccountIdForCascaded,
       },
     } = data;
 
@@ -142,7 +151,7 @@ export class NetSuiteService implements ErpServiceContract {
         customSegmentId,
         creditAccountId,
         debitAccountId,
-        creditAccountIdForCascaded
+        creditAccountIdForCascaded,
       },
     } = data;
 
@@ -152,7 +161,7 @@ export class NetSuiteService implements ErpServiceContract {
         creditAccountId,
         customSegmentId,
         debitAccountId,
-        creditAccountIdForCascaded
+        creditAccountIdForCascaded,
       }
     );
 
@@ -167,7 +176,6 @@ export class NetSuiteService implements ErpServiceContract {
   public async registerCreditNote(
     data: ErpInvoiceRequest
   ): Promise<ErpInvoiceResponse> {
-
     const { creditNote } = data;
 
     const creditNoteId = await this.transformCreditNote(data);
@@ -435,12 +443,6 @@ export class NetSuiteService implements ErpServiceContract {
     } = this;
     const { invoice, payment, paymentMethods, total, customerId } = data;
 
-    const accountMap = {
-      Paypal: '213',
-      'Credit Card': '216',
-      'Bank Transfer': '864',
-    };
-
     const nsErpReference = invoice
       .getErpReferences()
       .getItems()
@@ -475,7 +477,7 @@ export class NetSuiteService implements ErpServiceContract {
     const createPaymentPayload = {
       autoApply: true,
       account: {
-        id: accountMap[paymentAccount.name],
+        id: this.paymentAccountCodes[paymentAccount.name],
       },
       tranDate: format(
         new Date(payment.datePaid),
@@ -566,7 +568,9 @@ export class NetSuiteService implements ErpServiceContract {
           {
             memo: `${invoice.persistentReferenceNumber}`,
             account: {
-              id: manuscript.is_cascaded ?  creditAccountIdForCascaded : creditAccountId,
+              id: manuscript.is_cascaded
+                ? creditAccountIdForCascaded
+                : creditAccountId,
             },
             credit: invoiceTotal,
           },
@@ -604,7 +608,7 @@ export class NetSuiteService implements ErpServiceContract {
     creditAccountId: string;
     debitAccountId: string;
     customSegmentId: string;
-    creditAccountIdForCascaded?: string
+    creditAccountIdForCascaded?: string;
   }) {
     const {
       connection: { config, oauth, token },
@@ -616,7 +620,7 @@ export class NetSuiteService implements ErpServiceContract {
       creditAccountId,
       debitAccountId,
       customSegmentId,
-      creditAccountIdForCascaded
+      creditAccountIdForCascaded,
     } = data;
 
     const journalRequestOpts = {
@@ -642,7 +646,9 @@ export class NetSuiteService implements ErpServiceContract {
           {
             memo: `${referenceNumber}`,
             account: {
-              id: manuscript.is_cascaded ?  creditAccountIdForCascaded : creditAccountId,
+              id: manuscript.is_cascaded
+                ? creditAccountIdForCascaded
+                : creditAccountId,
             },
             debit: invoiceTotal,
           },
@@ -772,47 +778,47 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     const creditNotePayload = {
-      "tranId": creditNote.persistentReferenceNumber,
-      "tranDate": format(
+      tranId: creditNote.persistentReferenceNumber,
+      tranDate: format(
         new Date(creditNote.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ), // '2020-07-01T14:09:00Z',
-      "saleseffectivedate": format(
+      saleseffectivedate: format(
         new Date(invoice.dateAccepted),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
       ),
-      "memo": "Bad Debt",
-      "entity": {
-        "id": customerId
+      memo: 'Bad Debt',
+      entity: {
+        id: customerId,
       },
       [this.customSegmentFieldName]: {
         id: publisherCustomValues.customSegmentId,
       },
-      "item": {
-        "items": [
+      item: {
+        items: [
           {
-            "item": publisherCustomValues.badDebtItemId,
-            "amount": item.calculateNetPrice(),
-            "rate": item.price,
-            "description": "Bad Debt Write-Off",
-            "quantity": 1.0,
-            "printItems": false
-          }
-        ]
-      },
-      "taxDetailsOverride": true,
-      "taxDetails": {
-        "items": [
-          {
-            "taxDetailsReference": taxDetails.taxDetailsReference,
-            "taxCode": taxDetails.taxCode,
-            "taxType": taxDetails.taxType,
-            "taxBasis": item.calculateNetPrice(),
-            "taxAmount": item.calculateVat(),
-            "taxRate": item.vat,
+            item: publisherCustomValues.badDebtItemId,
+            amount: item.calculateNetPrice(),
+            rate: item.price,
+            description: 'Bad Debt Write-Off',
+            quantity: 1.0,
+            printItems: false,
           },
         ],
-      }
+      },
+      taxDetailsOverride: true,
+      taxDetails: {
+        items: [
+          {
+            taxDetailsReference: taxDetails.taxDetailsReference,
+            taxCode: taxDetails.taxCode,
+            taxType: taxDetails.taxType,
+            taxBasis: item.calculateNetPrice(),
+            taxAmount: item.calculateVat(),
+            taxRate: item.vat,
+          },
+        ],
+      },
     };
 
     try {
