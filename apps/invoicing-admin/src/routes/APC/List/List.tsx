@@ -1,20 +1,9 @@
 import React, { useState } from 'react';
 
-import {
-  Table,
-  Button,
-  DropdownMenu,
-  DropdownToggle,
-  UncontrolledDropdown,
-  Input,
-  UncontrolledButtonDropdown,
-  DropdownItem,
-} from '../../../components';
+import { Table } from '../../../components';
 import { ApcType, PublisherType } from '../types';
 
-const ApcList: React.FC<ApcListProps> = ({ apcItems, publisherNames }) => {
-  const [isEditMode, setIsEditMode] = useState(false);
-
+const ApcList: React.FC<ApcListProps> = ({ apcItems, publisherItems }) => {
   return (
     <div className='table-responsive-xl'>
       <Table className='mb-0 table-striped' hover>
@@ -29,21 +18,15 @@ const ApcList: React.FC<ApcListProps> = ({ apcItems, publisherNames }) => {
         </thead>
         <tbody>
           {apcItems &&
-            apcItems.map((apcItem, index) => {
-              const {
-                journalTitle,
-                journalId,
-                issn,
-                publisherId,
-                amount,
-              } = apcItem;
+            apcItems.map((apcItem, apcIndex) => {
+              const { journalTitle, issn, amount } = apcItem;
 
               return (
-                <tr key={index}>
+                <tr key={apcIndex}>
                   <td className='align-middle bt-0'>{journalTitle}</td>
-                  <td className='align-middle bt-0'>{journalId}</td>
+                  <td className='align-middle bt-0'>{''}</td>
                   <td className='align-middle bt-0'>{issn}</td>
-                  <td className='align-middle bt-0'>{publisherId}</td>
+                  <td className='align-middle bt-0'> </td>
                   <td className='align-middle bt-0'>
                     <span className='text-green pl-0 pr-2'>${amount}</span>
                     {/* condition to make buttons appear if editMode is true value changed */}
@@ -58,8 +41,8 @@ const ApcList: React.FC<ApcListProps> = ({ apcItems, publisherNames }) => {
 };
 
 interface ApcListProps {
-  apcItems: any;
-  publisherNames: any;
+  apcItems: ApcType[];
+  publisherItems: PublisherType[];
 }
 
 export default ApcList;

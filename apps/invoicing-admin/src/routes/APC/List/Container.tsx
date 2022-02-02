@@ -1,8 +1,8 @@
-import React, { useEffect, useCallback, useState } from 'react';
-import { useManualQuery, useQuery } from 'graphql-hooks';
+import React, { useEffect, useCallback } from 'react';
+import { useManualQuery } from 'graphql-hooks';
 import { useQueryState } from 'react-router-use-location-state';
 
-import { APC_QUERY, APC_PUBLISHER_QUERY } from '../graphql';
+import { APC_QUERY } from '../graphql';
 
 import {
   Container,
@@ -67,7 +67,7 @@ const ApcContainer: React.FC = () => {
           <Card className='mb-0 mt-5'>
             <List
               apcItems={data.invoicingJournals?.catalogItems}
-              publisherNames={data.invoicingJournals?.publishers}
+              publisherItems={data.getPublishers?.publishers}
             />
             <CardFooter className='d-flex justify-content-center pb-0'>
               <ListPagination
