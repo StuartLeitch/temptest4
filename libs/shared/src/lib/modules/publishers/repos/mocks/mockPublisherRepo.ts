@@ -4,6 +4,7 @@ import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
 import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
 
+import { PublisherPaginated } from '../../domain/PublisherPaginated';
 import { PublisherCustomValues } from '../../domain/PublisherCustomValues';
 import { PublisherId } from '../../domain/PublisherId';
 import { Publisher } from '../../domain/Publisher';
@@ -27,6 +28,15 @@ export class MockPublisherRepo
       );
     }
     return right(match);
+  }
+
+  async getPublishersByPublisherId(): Promise<
+    Either<GuardFailure | RepoError, PublisherPaginated>
+  > {
+    return right({
+      publishers: this._items,
+      totalCount: this._items.length,
+    });
   }
 
   async getCustomValuesByPublisherId(

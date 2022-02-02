@@ -135,6 +135,8 @@ accessControl
   .resource('journals')
   .action('read')
   .resource('logs')
+  .action('read')
+  .resource('publishers')
   .action('read');
 
 accessControl

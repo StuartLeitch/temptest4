@@ -3,6 +3,7 @@
 import {
   GetPublisherDetailsUsecase,
   GetPublisherDetailsDTO,
+  GetPublishersByPublisherIdUsecase,
   Roles,
   PublisherMap,
 } from '@hindawi/shared';
@@ -39,6 +40,31 @@ export const publisher: Resolvers<Context> = {
       const publishers = result.value;
 
       return PublisherMap.toPersistence(publishers);
+    },
+
+    async getPublishers(parent, args, context) {
+      const roles = getAuthRoles(context);
+
+      const { repos } = context;
+
+      const usecase = new GetPublishersByPublisherIdUsecase(repos.publisher);
+
+      const usecaseContext = { roles };
+
+      const resultPublisherList = await usecase.execute(args, usecaseContext);
+
+      handleForbiddenUsecase(resultPublisherList);
+
+      if (resultPublisherList.isLeft()) {
+        throw new Error(resultPublisherList.value.message);
+      }
+
+      const publisherList = resultPublisherList.value;
+
+      return {
+        totalCount: publisherList.totalCount,
+        publishers: publisherList.publishers.map(PublisherMap.toPersistence),
+      };
     },
   },
 };

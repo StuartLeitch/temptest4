@@ -289,7 +289,6 @@ type PaginatedPublishers {
 type PaginatedCatalog {
   totalCount: Int
   catalogItems: [InvoicingJournal]
-  publishers: PaginatedPublishers
 }
 
 type PaginatedCreditNotes {
@@ -379,6 +378,7 @@ type Query {
   getPaymentMethods: [PaymentMethod]
   getClientToken: ClientToken
   getPublisherDetails(publisherId: ID): Publisher
+  getPublishers(pagination: Pagination): PaginatedPublishers
   generateCouponCode: CouponCode
   invoice(invoiceId: ID): Invoice
   invoiceWithAuthorization(invoiceId: ID): Invoice

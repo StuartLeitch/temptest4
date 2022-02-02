@@ -5,6 +5,7 @@ import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
 import { RepoError } from '../../../../infrastructure/RepoError';
 
+import { CatalogPaginated } from '../../domain/CatalogPaginated';
 import { CatalogItem } from '../../domain/CatalogItem';
 import { JournalId } from '../../domain/JournalId';
 
@@ -32,9 +33,12 @@ export class MockCatalogRepo
   }
 
   public async getCatalogCollection(): Promise<
-    Either<GuardFailure | RepoError, CatalogItem[]>
+    Either<GuardFailure | RepoError, CatalogPaginated>
   > {
-    return right(this._items);
+    return right({
+      catalogItems: this._items,
+      totalCount: this._items.length,
+    });
   }
 
   public async updateCatalogItem(

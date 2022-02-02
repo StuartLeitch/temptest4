@@ -140,6 +140,7 @@ export * from './modules/publishers/usecases/getPublisherCustomValues';
 export * from './modules/publishers/usecases/getPublisherCustomValuesByName';
 export * from './modules/publishers/usecases/getPublisherDetails';
 export * from './modules/publishers/usecases/getPublisherDetailsByName';
+export * from './modules/publishers/usecases/getPublishersByPublisherId.ts';
 
 // * Export Catalog Subdomain
 export { CatalogItem } from './modules/journals/domain/CatalogItem';

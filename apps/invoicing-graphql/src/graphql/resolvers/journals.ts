@@ -33,7 +33,6 @@ export const invoicingJournals: Resolvers<Context> = {
       return {
         totalCount: journalList.totalCount,
         catalogItems: journalList.catalogItems.map(CatalogMap.toPersistence),
-        publishers: journalList.publishers,
       };
     },
   },
