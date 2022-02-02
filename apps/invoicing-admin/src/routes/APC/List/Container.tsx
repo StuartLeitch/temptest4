@@ -61,20 +61,9 @@ const ApcContainer: React.FC = () => {
     fetchData(page);
   }, []);
 
-  const downloadCSV = () => {
-    // * build the query string out of query state
-    let queryString = '?download=1&';
-    queryString += `page=${page}&`;
+  const journalData = data?.invoicingJournals?.catalogItems;
 
-    const url = `${(window as any)._env_.API_ROOT}/apc${queryString}`;
-
-    const a = document.createElement('a');
-    a.setAttribute('download', url);
-    a.setAttribute('href', url);
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
+  const publisherData = data?.getPublishers?.publishers;
 
   const columns = [
     {
@@ -185,14 +174,14 @@ const ApcContainer: React.FC = () => {
               <i className='fas fa-download mr-2'></i>
               Download CSV
             </Button> */}
-            <Button
+            {/* <Button
               type='primary'
               onClick={downloadCSV}
               icon={<IconDownload />}
               iconRight
             >
               Download CSV
-            </Button>
+            </Button> */}
           </ButtonToolbar>
         </Col>
         <Row>
