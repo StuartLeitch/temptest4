@@ -14,7 +14,6 @@ import {
   CardFooter,
   Card,
   ButtonToolbar,
-  // Button,
 } from '../../../components';
 
 import { HeaderMain } from '../../components/HeaderMain';
@@ -22,7 +21,6 @@ import { Loading } from '../../components';
 
 import { Text, Table, Button, IconDownload } from '@hindawi/phenom-ui';
 
-import List from './List';
 import _ from 'lodash';
 
 const defaultPaginationSettings = { page: 1, offset: 0, limit: 50 };
@@ -61,10 +59,6 @@ const ApcContainer: React.FC = () => {
     fetchData(page);
   }, []);
 
-  const journalData = data?.invoicingJournals?.catalogItems;
-
-  const publisherData = data?.getPublishers?.publishers;
-
   const columns = [
     {
       title: 'Journal Name',
@@ -73,7 +67,7 @@ const ApcContainer: React.FC = () => {
     },
     {
       title: 'Journal Code',
-      dataIndex: 'journalId',
+      dataIndex: '',
       key: 'journalCode',
     },
     {
@@ -83,13 +77,8 @@ const ApcContainer: React.FC = () => {
     },
     {
       title: 'Publisher',
-      dataIndex: 'publisherId',
+      dataIndex: ['publisher', 'name'],
       key: 'publisher',
-      // render: (publishers: React.ReactNode) => (
-      //   <Text type='success' strong>
-      //     {publishers}
-      //   </Text>
-      // ),
     },
     {
       title: 'APC',
@@ -97,7 +86,7 @@ const ApcContainer: React.FC = () => {
       key: 'apc',
       render: (apc: React.ReactNode) => (
         <Text type='success' strong>
-          {apc}
+          ${apc}
         </Text>
       ),
     },
@@ -112,14 +101,11 @@ const ApcContainer: React.FC = () => {
       return (
         <>
           <Card className='mb-0 mt-5'>
-            {/* <List apcItems={data.invoicingJournals?.catalogItems} />
-            <CardFooter className='d-flex justify-content-center pb-0'>
-          </CardFooter> */}
             <Table
               columns={columns}
               dataSource={data.invoicingJournals?.catalogItems}
-              // pagination={false}
               pagination={{
+                pageSize: 50,
                 total: data.invoicingJournals?.totalCount,
                 current: page,
                 onChange: (page, pageSize) =>
@@ -127,36 +113,9 @@ const ApcContainer: React.FC = () => {
                 showLessItems: true,
                 showSizeChanger: false,
                 showQuickJumper: false,
-                // itemRender: (current, type, originalElement) => {
-
-                //   if (type === 'prev') {
-                //     return null;
-                //   }
-
-                //   if (type === 'jump-prev') {
-                //     return '<<';
-                //   }
-
-                //   if (type === 'next') {
-                //     return null;
-                //   }
-
-                //   if (type === 'jump-next') {
-                //     return '>>'
-                //   }
-
-                //   return originalElement;
-                // },
                 position: ['bottomCenter'],
               }}
             />
-            {/* <ListPagination
-              totalRecords={data.invoicingJournals?.totalCount}
-              pageNeighbours={1}
-              onPageChanged={onPageChange}
-              pageLimit={defaultPaginationSettings.limit}
-              currentPage={page}
-            /> */}
           </Card>
         </>
       );

@@ -1,9 +1,15 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
-import { GetJournalListUsecase, CatalogMap, Roles } from '@hindawi/shared';
+import {
+  GetJournalListUsecase,
+  CatalogMap,
+  Roles,
+  GetPublisherDetailsUsecase,
+  PublisherMap,
+} from '@hindawi/shared';
 
 import { Context } from '../../builders';
-import { Resolvers } from '../schema';
+import { Resolvers, InvoicingJournal } from '../schema';
 
 import { handleForbiddenUsecase, getAuthRoles } from './utils';
 
@@ -34,6 +40,34 @@ export const invoicingJournals: Resolvers<Context> = {
         totalCount: journalList.totalCount,
         catalogItems: journalList.catalogItems.map(CatalogMap.toPersistence),
       };
+    },
+  },
+  InvoicingJournal: {
+    async publisher(parent: InvoicingJournal, args, context) {
+      const roles = getAuthRoles(context);
+
+      const { repos } = context;
+
+      const usecase = new GetPublisherDetailsUsecase(repos.publisher);
+
+      const usecaseContext = {
+        roles,
+      };
+
+      const resultPublisher = await usecase.execute(
+        {
+          publisherId: parent.publisherId,
+        },
+        usecaseContext
+      );
+
+      if (resultPublisher.isLeft()) {
+        throw new Error(resultPublisher.value.message);
+      }
+
+      const publisher = resultPublisher.value;
+
+      return PublisherMap.toPersistence(publisher);
     },
   },
 };

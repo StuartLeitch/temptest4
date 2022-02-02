@@ -5,6 +5,9 @@ export const JOURNAL_FRAGMENT = `
     amount
     issn
     publisherId
+    publisher {
+      name
+    }
   }
 `;
 
@@ -18,14 +21,6 @@ query invoicingJournals(
     totalCount
     catalogItems {
       ...journalFragment
-    }
-  }
-  getPublishers(
-    pagination: $pagination
-  ) {
-    totalCount
-    publishers {
-      name
     }
   }
 }
