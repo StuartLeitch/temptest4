@@ -74,7 +74,7 @@ export class Config {
       iban: globalConfig.BANK_IBAN,
       bankAddress: globalConfig.BANK_ADDRESS,
       beneficiaryAddress: globalConfig.BANK_BENEFICIARY_ADDRESS,
-      accountCurrency: globalConfig.BANK_ACCOUNT_ADDRESS,
+      accountCurrency: globalConfig.BANK_ACCOUNT_CURRENCY,
     };
   }
 }
