@@ -203,6 +203,7 @@ export const env = {
     addressLine1: getOsEnv('BANK_ADDRESS_LINE_1'),
     addressLine2: getOsEnv('BANK_ADDRESS_LINE_2'),
     addressLine3: getOsEnv('BANK_ADDRESS_LINE_3'),
+    addressCountry: getOsEnv('BANK_ADDRESS_COUNTRY'),
     addressPostcode: getOsEnv('BANK_ADDRESS_POSTCODE'),
     beneficiaryAddressCity: getOsEnv('BANK_BENEFICIARY_ADDRESS_CITY'),
     beneficiaryAddressLine1: getOsEnv('BANK_BENEFICIARY_ADDRESS_LINE_1'),

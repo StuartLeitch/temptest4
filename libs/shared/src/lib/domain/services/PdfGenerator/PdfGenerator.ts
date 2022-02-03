@@ -82,7 +82,7 @@ export class PdfGeneratorService {
         sortCode: process.env.BANK_SORT_CODE,
         swift: process.env.BANK_SWIFT,
         iban: process.env.BANK_IBAN,
-        accountCurrency: env.ACCOUNT_CURRENCY,
+        accountCurrency: env.BANK_ACCOUNT_CURRENCY,
         bankAddress: [
           process.env.BANK_ADDRESS_LINE_1,
           process.env.BANK_ADDRESS_LINE_2,
@@ -90,6 +90,7 @@ export class PdfGeneratorService {
           process.env.BANK_ADDRESS_CITY,
           ...bankCounty,
           process.env.BANK_ADDRESS_POSTCODE,
+          process.env.BANK_ADDRESS_COUNTRY,
         ].join(', '),
         beneficiaryAddress: [
           process.env.BANK_BENEFICIARY_ADDRESS_LINE_1,
