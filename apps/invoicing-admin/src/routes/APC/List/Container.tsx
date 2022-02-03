@@ -67,8 +67,8 @@ const ApcContainer: React.FC = () => {
     },
     {
       title: 'Journal Code',
-      dataIndex: '',
-      key: 'journalCode',
+      dataIndex: 'journalCode',
+      key: 'code',
     },
     {
       title: 'ISSN',
@@ -129,10 +129,6 @@ const ApcContainer: React.FC = () => {
         <HeaderMain title='APC' className='mb-5 mt-4' />
         <Col lg={12} className='d-flex mb-3 mr-0 pr-0 px-0 my-sm-0'>
           <ButtonToolbar className='ml-auto'>
-            {/* <Button color='twitter' className='mr-0' onClick={downloadCSV}>
-              <i className='fas fa-download mr-2'></i>
-              Download CSV
-            </Button> */}
             {/* <Button
               type='primary'
               onClick={downloadCSV}

@@ -18,6 +18,7 @@ export interface CatalogItemProps {
   updated?: Date;
   publisherId?: PublisherId;
   isActive?: boolean;
+  journalCode: string;
 }
 
 export class CatalogItem extends AggregateRoot<CatalogItemProps> {
@@ -80,5 +81,9 @@ export class CatalogItem extends AggregateRoot<CatalogItemProps> {
 
   get publisherId(): PublisherId {
     return this.props.publisherId;
+  }
+
+  get journalCode(): string {
+    return this.props.journalCode;
   }
 }

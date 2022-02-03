@@ -159,6 +159,7 @@ type InvoicingJournal {
   issn: String
   publisherId: ID
   publisher: Publisher
+  journalCode: String
   # ... (TODO: add missing fields here)
 }
 

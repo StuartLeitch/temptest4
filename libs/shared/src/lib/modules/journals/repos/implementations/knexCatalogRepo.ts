@@ -86,7 +86,7 @@ export class KnexCatalogRepo
     const offset = pagination.offset * pagination.limit;
 
     const sql = applyFilters(getModel(), filters)
-      .orderBy(`${TABLES.CATALOG}.created`, 'desc')
+      .orderBy(`${TABLES.CATALOG}.journalTitle`, 'asc')
       .offset(offset < totalCount[0].count ? offset : 0)
       .limit(pagination.limit)
       .select([`${TABLES.CATALOG}.*`]);
