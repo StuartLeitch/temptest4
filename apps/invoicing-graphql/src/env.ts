@@ -187,6 +187,9 @@ export const env = {
     netsuiteTaxDetailsUkZero: toObject(
       nonEmptyOsEnv('NETSUITE_TAX_DETAILS_UK_ZERO')
     ),
+    netsuitePaymentAccountCodes: toObject(
+      nonEmptyOsEnv('NETSUITE_PAYMENT_ACCOUNT_CODES')
+    ),
   },
   migration: {
     token: getOsEnv('MIGRATION_TOKEN'),
@@ -200,12 +203,14 @@ export const env = {
     addressLine1: getOsEnv('BANK_ADDRESS_LINE_1'),
     addressLine2: getOsEnv('BANK_ADDRESS_LINE_2'),
     addressLine3: getOsEnv('BANK_ADDRESS_LINE_3'),
+    addressCountry: getOsEnv('BANK_ADDRESS_COUNTRY'),
     addressPostcode: getOsEnv('BANK_ADDRESS_POSTCODE'),
     beneficiaryAddressCity: getOsEnv('BANK_BENEFICIARY_ADDRESS_CITY'),
     beneficiaryAddressLine1: getOsEnv('BANK_BENEFICIARY_ADDRESS_LINE_1'),
     beneficiaryAddressLine2: getOsEnv('BANK_BENEFICIARY_ADDRESS_LINE_2'),
     beneficiaryAddressPostcode: getOsEnv('BANK_BENEFICIARY_ADDRESS_POSTCODE'),
     beneficiaryAddressState: getOsEnv('BANK_BENEFICIARY_ADDRESS_STATE'),
+    accountCurrency: getOsEnv('BANK_ACCOUNT_CURRENCY'),
     iban: getOsEnv('BANK_IBAN'),
     sortCode: getOsEnv('BANK_SORT_CODE'),
     swift: getOsEnv('BANK_SWIFT'),
