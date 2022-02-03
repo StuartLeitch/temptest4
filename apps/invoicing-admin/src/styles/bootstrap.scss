@@ -753,11 +753,14 @@ dt {
   .ant-pagination-next {
     display: none;
   }
+}
 
-//   .ant-pagination-jump-prev,
-//   .ant-pagination-jump-next,
-//   .ant-pagination-item {
-//     margin-right: 0px !important;
-//     border-radius: 0;
-//   }
+th {
+  font-size: inherit !important;
+  color: inherit !important;
+  font-weight: bold !important;
+}
+
+.table-row-dark {
+  background-color: #F5F5F5;
 }

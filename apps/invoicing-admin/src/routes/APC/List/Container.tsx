@@ -103,6 +103,8 @@ const ApcContainer: React.FC = () => {
           <Card className='mb-0 mt-5'>
             <Table
               columns={columns}
+              rowKey={record => record.id}
+              rowClassName={(record, index) => index % 2 === 0 ? 'table-row-light' :  'table-row-dark'}
               dataSource={data.invoicingJournals?.catalogItems}
               pagination={{
                 pageSize: 50,
@@ -126,7 +128,7 @@ const ApcContainer: React.FC = () => {
   return (
     <React.Fragment>
       <Container fluid={true}>
-        <HeaderMain title='APC' className='mb-5 mt-4' />
+        <HeaderMain title='APC' className='mb-1 mt-5' />
         <Col lg={12} className='d-flex mb-3 mr-0 pr-0 px-0 my-sm-0'>
           <ButtonToolbar className='ml-auto'>
             {/* <Button
