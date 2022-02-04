@@ -23,7 +23,7 @@ export class CatalogMap extends Mapper<CatalogItem> {
           ? PublisherId.create(new UniqueEntityID(raw.publisherId))
           : null,
         issn: raw.issn,
-        code: raw.journalCode,
+        code: raw.code,
       },
       new UniqueEntityID(raw.id)
     );
