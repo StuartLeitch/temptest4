@@ -31,7 +31,9 @@ export const invoicingJournals: Resolvers<Context> = {
       handleForbiddenUsecase(resultJournals);
 
       if (resultJournals.isLeft()) {
-        throw new Error(resultJournals.value.message);
+        const err = resultJournals.value;
+        context.services.logger.error(err.message, err);
+        return null;
       }
 
       const journalList = resultJournals.value;

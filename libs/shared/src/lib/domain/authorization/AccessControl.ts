@@ -336,6 +336,8 @@ accessControl
   .action('add')
   .resource('manuscript')
   .action('create')
+  .resource('journals')
+  .action('read')
   .resource('logs')
   .action('read');
 

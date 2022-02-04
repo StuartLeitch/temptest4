@@ -103,8 +103,10 @@ const ApcContainer: React.FC = () => {
           <Card className='mb-0 mt-5'>
             <Table
               columns={columns}
-              rowKey={record => record.id}
-              rowClassName={(record, index) => index % 2 === 0 ? 'table-row-light' :  'table-row-dark'}
+              rowKey={(record) => record.id}
+              rowClassName={(record, index) =>
+                index % 2 === 0 ? 'table-row-light' : 'table-row-dark'
+              }
               dataSource={data.invoicingJournals?.catalogItems}
               pagination={{
                 pageSize: 50,
