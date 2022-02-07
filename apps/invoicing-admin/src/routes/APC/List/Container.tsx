@@ -5,6 +5,9 @@ import { Pagination } from 'antd';
 
 import { APC_QUERY } from '../graphql';
 
+import Restricted from '../../../contexts/Restricted';
+import NotAuthorized from '../../components/NotAuthorized';
+
 import {
   Container,
   Row,
@@ -129,11 +132,12 @@ const ApcContainer: React.FC = () => {
 
   return (
     <React.Fragment>
-      <Container fluid={true}>
-        <HeaderMain title='APC' className='mb-1 mt-5' />
-        <Col lg={12} className='d-flex mb-3 mr-0 pr-0 px-0 my-sm-0'>
-          <ButtonToolbar className='ml-auto'>
-            {/* <Button
+      <Restricted to='list.apc' fallback={<NotAuthorized />}>
+        <Container fluid={true}>
+          <HeaderMain title='APC' className='mb-1 mt-5' />
+          <Col lg={12} className='d-flex mb-3 mr-0 pr-0 px-0 my-sm-0'>
+            <ButtonToolbar className='ml-auto'>
+              {/* <Button
               type='primary'
               onClick={downloadCSV}
               icon={<IconDownload />}
@@ -141,14 +145,15 @@ const ApcContainer: React.FC = () => {
             >
               Download CSV
             </Button> */}
-          </ButtonToolbar>
-        </Col>
-        <Row>
-          <Col lg={12} className='mb-5'>
-            <Content {...{ loading, error, data }} />
+            </ButtonToolbar>
           </Col>
-        </Row>
-      </Container>
+          <Row>
+            <Col lg={12} className='mb-5'>
+              <Content {...{ loading, error, data }} />
+            </Col>
+          </Row>
+        </Container>
+      </Restricted>
     </React.Fragment>
   );
 };

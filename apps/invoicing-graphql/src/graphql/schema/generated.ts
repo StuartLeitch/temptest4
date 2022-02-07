@@ -221,10 +221,15 @@ export type InvoicingJournal = {
   amount?: Maybe<Scalars['String']>;
   issn?: Maybe<Scalars['String']>;
   publisherId?: Maybe<Scalars['ID']>;
-  publisher?: Maybe<Publisher>;
+  publisher?: Maybe<InvoicingPublisher>;
   journalCode?: Maybe<Scalars['String']>;
 };
 
+
+export type InvoicingPublisher = {
+  __typename?: 'InvoicingPublisher';
+  name: Scalars['String'];
+};
 
 export type Log = {
   __typename?: 'Log';
@@ -409,7 +414,7 @@ export type PaginatedLogs = {
 export type PaginatedPublishers = {
   __typename?: 'PaginatedPublishers';
   totalCount?: Maybe<Scalars['Int']>;
-  publishers?: Maybe<Array<Maybe<Publisher>>>;
+  publishers?: Maybe<Array<Maybe<InvoicingPublisher>>>;
 };
 
 export type Pagination = {
@@ -478,11 +483,6 @@ export enum PaymentStatus {
   CREATED = 'CREATED'
 }
 
-export type Publisher = {
-  __typename?: 'Publisher';
-  name: Scalars['String'];
-};
-
 export type Query = {
   __typename?: 'Query';
   getCreditNoteByInvoiceId?: Maybe<CreditNote>;
@@ -491,7 +491,7 @@ export type Query = {
   getCreditNoteByReferenceNumber?: Maybe<CreditNote>;
   getPaymentMethods?: Maybe<Array<Maybe<PaymentMethod>>>;
   getClientToken?: Maybe<ClientToken>;
-  getPublisherDetails?: Maybe<Publisher>;
+  getPublisherDetails?: Maybe<InvoicingPublisher>;
   getPublishers?: Maybe<PaginatedPublishers>;
   generateCouponCode?: Maybe<CouponCode>;
   invoice?: Maybe<Invoice>;
@@ -756,6 +756,7 @@ export type ResolversTypes = {
   InvoicingArticleFilters: InvoicingArticleFilters;
   InvoicingJournal: ResolverTypeWrapper<InvoicingJournal>;
   InvoicingName: ResolverTypeWrapper<Scalars['InvoicingName']>;
+  InvoicingPublisher: ResolverTypeWrapper<InvoicingPublisher>;
   Log: ResolverTypeWrapper<Log>;
   LogsFilters: LogsFilters;
   MigrateAPC: MigrateApc;
@@ -777,7 +778,6 @@ export type ResolversTypes = {
   Payment: ResolverTypeWrapper<Payment>;
   PaymentMethod: ResolverTypeWrapper<PaymentMethod>;
   PaymentStatus: PaymentStatus;
-  Publisher: ResolverTypeWrapper<Publisher>;
   Query: ResolverTypeWrapper<{}>;
   ReferenceNumber: ResolverTypeWrapper<Scalars['ReferenceNumber']>;
   ReminderType: ReminderType;
@@ -815,6 +815,7 @@ export type ResolversParentTypes = {
   InvoicingArticleFilters: InvoicingArticleFilters;
   InvoicingJournal: InvoicingJournal;
   InvoicingName: Scalars['InvoicingName'];
+  InvoicingPublisher: InvoicingPublisher;
   Log: Log;
   LogsFilters: LogsFilters;
   MigrateAPC: MigrateApc;
@@ -834,7 +835,6 @@ export type ResolversParentTypes = {
   PayerInput: PayerInput;
   Payment: Payment;
   PaymentMethod: PaymentMethod;
-  Publisher: Publisher;
   Query: {};
   ReferenceNumber: Scalars['ReferenceNumber'];
   RemindersStatus: RemindersStatus;
@@ -996,7 +996,7 @@ export type InvoicingJournalResolvers<ContextType = any, ParentType extends Reso
   amount?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   issn?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   publisherId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
-  publisher?: Resolver<Maybe<ResolversTypes['Publisher']>, ParentType, ContextType>;
+  publisher?: Resolver<Maybe<ResolversTypes['InvoicingPublisher']>, ParentType, ContextType>;
   journalCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -1004,6 +1004,11 @@ export type InvoicingJournalResolvers<ContextType = any, ParentType extends Reso
 export interface InvoicingNameScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['InvoicingName'], any> {
   name: 'InvoicingName';
 }
+
+export type InvoicingPublisherResolvers<ContextType = any, ParentType extends ResolversParentTypes['InvoicingPublisher'] = ResolversParentTypes['InvoicingPublisher']> = {
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
 
 export type LogResolvers<ContextType = any, ParentType extends ResolversParentTypes['Log'] = ResolversParentTypes['Log']> = {
   id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
@@ -1065,7 +1070,7 @@ export type PaginatedLogsResolvers<ContextType = any, ParentType extends Resolve
 
 export type PaginatedPublishersResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaginatedPublishers'] = ResolversParentTypes['PaginatedPublishers']> = {
   totalCount?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  publishers?: Resolver<Maybe<Array<Maybe<ResolversTypes['Publisher']>>>, ParentType, ContextType>;
+  publishers?: Resolver<Maybe<Array<Maybe<ResolversTypes['InvoicingPublisher']>>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -1106,11 +1111,6 @@ export type PaymentMethodResolvers<ContextType = any, ParentType extends Resolve
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type PublisherResolvers<ContextType = any, ParentType extends ResolversParentTypes['Publisher'] = ResolversParentTypes['Publisher']> = {
-  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   getCreditNoteByInvoiceId?: Resolver<Maybe<ResolversTypes['CreditNote']>, ParentType, ContextType, RequireFields<QueryGetCreditNoteByInvoiceIdArgs, never>>;
   getCreditNoteById?: Resolver<Maybe<ResolversTypes['CreditNote']>, ParentType, ContextType, RequireFields<QueryGetCreditNoteByIdArgs, never>>;
@@ -1118,7 +1118,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   getCreditNoteByReferenceNumber?: Resolver<Maybe<ResolversTypes['CreditNote']>, ParentType, ContextType, RequireFields<QueryGetCreditNoteByReferenceNumberArgs, never>>;
   getPaymentMethods?: Resolver<Maybe<Array<Maybe<ResolversTypes['PaymentMethod']>>>, ParentType, ContextType>;
   getClientToken?: Resolver<Maybe<ResolversTypes['ClientToken']>, ParentType, ContextType>;
-  getPublisherDetails?: Resolver<Maybe<ResolversTypes['Publisher']>, ParentType, ContextType, RequireFields<QueryGetPublisherDetailsArgs, never>>;
+  getPublisherDetails?: Resolver<Maybe<ResolversTypes['InvoicingPublisher']>, ParentType, ContextType, RequireFields<QueryGetPublisherDetailsArgs, never>>;
   getPublishers?: Resolver<Maybe<ResolversTypes['PaginatedPublishers']>, ParentType, ContextType, RequireFields<QueryGetPublishersArgs, never>>;
   generateCouponCode?: Resolver<Maybe<ResolversTypes['CouponCode']>, ParentType, ContextType>;
   invoice?: Resolver<Maybe<ResolversTypes['Invoice']>, ParentType, ContextType, RequireFields<QueryInvoiceArgs, never>>;
@@ -1182,6 +1182,7 @@ export type Resolvers<ContextType = any> = {
   InvoicingArticle?: InvoicingArticleResolvers<ContextType>;
   InvoicingJournal?: InvoicingJournalResolvers<ContextType>;
   InvoicingName?: GraphQLScalarType;
+  InvoicingPublisher?: InvoicingPublisherResolvers<ContextType>;
   Log?: LogResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   PaginatedCatalog?: PaginatedCatalogResolvers<ContextType>;
@@ -1194,7 +1195,6 @@ export type Resolvers<ContextType = any> = {
   Payer?: PayerResolvers<ContextType>;
   Payment?: PaymentResolvers<ContextType>;
   PaymentMethod?: PaymentMethodResolvers<ContextType>;
-  Publisher?: PublisherResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   ReferenceNumber?: GraphQLScalarType;
   RemindersStatus?: RemindersStatusResolvers<ContextType>;
