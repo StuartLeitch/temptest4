@@ -53,8 +53,6 @@ variables:
   BT_MERCHANT_ID: 'test-merchant-id'
   BT_PUBLIC_KEY: 'test-public-key'
   BT_PRIVATE_KEY: 'test-private-key'
-  KUBERNETES_MEMORY_REQUEST: 3Gi
-  KUBERNETES_CPU_REQUEST: 3
   VAT_VALIDATION_SERVICE_ENDPOINT: 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
   # AFFECTED_APPS: 'invoicing-graphql'
   AFFECTED_COMMAND: ''
@@ -134,6 +132,8 @@ Validate Schema:qa:
     SCHEMA_REGISTRY_URL: $QA_SCHEMA_REGISTRY_URL
 
 Build:
+  variables:
+    KUBERNETES_MEMORY_REQUEST: 3Gi
   tags:
     - 'cluster:hindawi-dev'
   interruptible: true
