@@ -86,8 +86,4 @@ export class CatalogItem extends AggregateRoot<CatalogItemProps> {
   get publisherId(): PublisherId {
     return this.props.publisherId;
   }
-
-  get journalCode(): string {
-    return this.props.journalCode;
-  }
 }
