@@ -9,6 +9,7 @@ import { JournalId } from '../domain/JournalId';
 
 export class CatalogMap extends Mapper<CatalogItem> {
   public static toDomain(raw: any): Either<GuardFailure, CatalogItem> {
+    console.log(raw);
     return CatalogItem.create(
       {
         type: raw.type,
@@ -23,7 +24,7 @@ export class CatalogMap extends Mapper<CatalogItem> {
           ? PublisherId.create(new UniqueEntityID(raw.publisherId))
           : null,
         issn: raw.issn,
-        journalCode: raw.journalCode,
+        code: raw.code,
       },
       new UniqueEntityID(raw.id)
     );
@@ -42,7 +43,7 @@ export class CatalogMap extends Mapper<CatalogItem> {
       journalTitle: catalogItem.journalTitle,
       publisherId: catalogItem.publisherId.id.toString(),
       issn: catalogItem.issn,
-      journalCode: catalogItem.journalCode,
+      journalCode: catalogItem.code,
     };
   }
 }

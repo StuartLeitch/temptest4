@@ -37,7 +37,6 @@ export const invoicingJournals: Resolvers<Context> = {
       }
 
       const journalList = resultJournals.value;
-
       return {
         totalCount: journalList.totalCount,
         catalogItems: journalList.catalogItems.map(CatalogMap.toPersistence),
