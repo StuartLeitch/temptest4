@@ -222,7 +222,7 @@ export type InvoicingJournal = {
   issn?: Maybe<Scalars['String']>;
   publisherId?: Maybe<Scalars['ID']>;
   publisher?: Maybe<InvoicingPublisher>;
-  journalCode?: Maybe<Scalars['String']>;
+  code?: Maybe<Scalars['String']>;
 };
 
 
@@ -997,7 +997,7 @@ export type InvoicingJournalResolvers<ContextType = any, ParentType extends Reso
   issn?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   publisherId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   publisher?: Resolver<Maybe<ResolversTypes['InvoicingPublisher']>, ParentType, ContextType>;
-  journalCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  code?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
