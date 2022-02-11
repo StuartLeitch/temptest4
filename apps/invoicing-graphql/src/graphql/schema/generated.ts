@@ -35,6 +35,10 @@ export type AddressInput = {
   addressLine1?: Maybe<Scalars['String']>;
 };
 
+export type CatalogInput = {
+  amount?: Maybe<Scalars['Float']>;
+};
+
 export type ClientToken = {
   __typename?: 'ClientToken';
   token: Scalars['String'];
@@ -228,6 +232,7 @@ export type InvoicingJournal = {
 
 export type InvoicingPublisher = {
   __typename?: 'InvoicingPublisher';
+  id?: Maybe<Scalars['String']>;
   name: Scalars['String'];
 };
 
@@ -279,6 +284,7 @@ export type Mutation = {
   confirmInvoice: Payer;
   applyCoupon?: Maybe<Coupon>;
   updateCoupon?: Maybe<Coupon>;
+  updateCatalogItem?: Maybe<InvoicingJournal>;
   createCoupon?: Maybe<Coupon>;
   creditCardPayment: Payment;
   bankTransferPayment: Payment;
@@ -306,6 +312,11 @@ export type MutationApplyCouponArgs = {
 
 export type MutationUpdateCouponArgs = {
   coupon?: Maybe<CouponInput>;
+};
+
+
+export type MutationUpdateCatalogItemArgs = {
+  catalogItem?: Maybe<CatalogInput>;
 };
 
 
@@ -732,9 +743,10 @@ export type ResolversTypes = {
   Address: ResolverTypeWrapper<Address>;
   String: ResolverTypeWrapper<Scalars['String']>;
   AddressInput: AddressInput;
+  CatalogInput: CatalogInput;
+  Float: ResolverTypeWrapper<Scalars['Float']>;
   ClientToken: ResolverTypeWrapper<ClientToken>;
   Coupon: ResolverTypeWrapper<Coupon>;
-  Float: ResolverTypeWrapper<Scalars['Float']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   CouponCode: ResolverTypeWrapper<CouponCode>;
   CouponInput: CouponInput;
@@ -793,9 +805,10 @@ export type ResolversParentTypes = {
   Address: Address;
   String: Scalars['String'];
   AddressInput: AddressInput;
+  CatalogInput: CatalogInput;
+  Float: Scalars['Float'];
   ClientToken: ClientToken;
   Coupon: Coupon;
-  Float: Scalars['Float'];
   Int: Scalars['Int'];
   CouponCode: CouponCode;
   CouponInput: CouponInput;
@@ -1006,6 +1019,7 @@ export interface InvoicingNameScalarConfig extends GraphQLScalarTypeConfig<Resol
 }
 
 export type InvoicingPublisherResolvers<ContextType = any, ParentType extends ResolversParentTypes['InvoicingPublisher'] = ResolversParentTypes['InvoicingPublisher']> = {
+  id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -1025,6 +1039,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   confirmInvoice?: Resolver<ResolversTypes['Payer'], ParentType, ContextType, RequireFields<MutationConfirmInvoiceArgs, 'payer'>>;
   applyCoupon?: Resolver<Maybe<ResolversTypes['Coupon']>, ParentType, ContextType, RequireFields<MutationApplyCouponArgs, never>>;
   updateCoupon?: Resolver<Maybe<ResolversTypes['Coupon']>, ParentType, ContextType, RequireFields<MutationUpdateCouponArgs, never>>;
+  updateCatalogItem?: Resolver<Maybe<ResolversTypes['InvoicingJournal']>, ParentType, ContextType, RequireFields<MutationUpdateCatalogItemArgs, never>>;
   createCoupon?: Resolver<Maybe<ResolversTypes['Coupon']>, ParentType, ContextType, RequireFields<MutationCreateCouponArgs, never>>;
   creditCardPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationCreditCardPaymentArgs, 'invoiceId' | 'payerId' | 'paymentMethodId' | 'paymentMethodNonce' | 'amount'>>;
   bankTransferPayment?: Resolver<ResolversTypes['Payment'], ParentType, ContextType, RequireFields<MutationBankTransferPaymentArgs, 'invoiceId' | 'payerId' | 'paymentMethodId' | 'paymentReference' | 'amount' | 'datePaid'>>;

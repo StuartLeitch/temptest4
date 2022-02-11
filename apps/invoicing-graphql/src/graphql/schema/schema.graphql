@@ -187,6 +187,7 @@ type Address {
 }
 
 type InvoicingPublisher {
+  id: String
   name: String!
 }
 
@@ -258,6 +259,10 @@ input CouponInput {
   name: String
   code: String
   invoiceItemType: String
+}
+
+input CatalogInput {
+  amount: Float
 }
 
 type Waiver {
@@ -407,6 +412,7 @@ type Mutation {
   confirmInvoice(payer: PayerInput!): Payer!
   applyCoupon(invoiceId: ID, couponCode: String): Coupon
   updateCoupon(coupon: CouponInput): Coupon
+  updateCatalogItem(catalogItem: CatalogInput): InvoicingJournal
   createCoupon(coupon: CouponInput): Coupon
   creditCardPayment(
     invoiceId: ID!

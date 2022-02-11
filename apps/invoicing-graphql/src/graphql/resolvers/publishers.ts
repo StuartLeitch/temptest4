@@ -6,6 +6,7 @@ import {
   GetPublishersByPublisherIdUsecase,
   Roles,
   PublisherMap,
+  GetPublisherDetailsByNameUsecase,
 } from '@hindawi/shared';
 
 import { Context } from '../../builders';
@@ -65,6 +66,28 @@ export const publisher: Resolvers<Context> = {
         totalCount: publisherList.totalCount,
         publishers: publisherList.publishers.map(PublisherMap.toPersistence),
       };
+    },
+    async getPublisherByName(parent, args, context) {
+      const roles = getAuthRoles(context);
+
+      const { repos } = context;
+
+      const usecase = new GetPublisherDetailsByNameUsecase(repos.publisher);
+      const usecaseContext = { roles };
+
+      const resultPublisher = await usecase.execute(args, usecaseContext);
+
+      handleForbiddenUsecase(resultPublisher);
+
+      if (resultPublisher.isLeft()) {
+        const err = resultPublisher.value;
+        context.services.logger.error(err.message, err);
+        return null;
+      }
+
+      const publisher = resultPublisher.value;
+
+      return PublisherMap.toPersistence(publisher);
     },
   },
 };

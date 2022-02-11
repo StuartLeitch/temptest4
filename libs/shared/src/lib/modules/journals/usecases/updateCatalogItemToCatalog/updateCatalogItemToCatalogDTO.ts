@@ -1,8 +1,8 @@
 export interface UpdateCatalogItemToCatalogDTO {
-  type: string;
-  amount: number;
+  type?: string;
+  amount?: number;
   currency?: string;
-  journalId: string;
+  journalId?: string;
   journalTitle?: string;
   issn?: string;
   code?: string;

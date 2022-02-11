@@ -6,6 +6,7 @@ import {
   Roles,
   GetPublisherDetailsUsecase,
   PublisherMap,
+  UpdateCatalogItemToCatalogUseCase,
 } from '@hindawi/shared';
 
 import { Context } from '../../builders';
@@ -69,6 +70,28 @@ export const invoicingJournals: Resolvers<Context> = {
       const publisher = resultPublisher.value;
 
       return PublisherMap.toPersistence(publisher);
+    },
+  },
+  Mutation: {
+    async updateCatalogItem(parent, args, context) {
+      const roles = getAuthRoles(context);
+      const { repos } = context;
+
+      const usecase = new UpdateCatalogItemToCatalogUseCase(
+        repos.catalog,
+        repos.publisher
+      );
+      const usecaseContext = { roles };
+
+      const result = await usecase.execute(args.catalogItem, usecaseContext);
+
+      handleForbiddenUsecase(result);
+
+      if (result.isLeft()) {
+        throw new Error(result.value.message);
+      }
+
+      return CatalogMap.toPersistence(result.value);
     },
   },
 };
