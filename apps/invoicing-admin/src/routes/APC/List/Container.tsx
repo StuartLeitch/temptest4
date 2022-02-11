@@ -67,6 +67,7 @@ const ApcContainer: React.FC = () => {
       title: 'Journal Name',
       dataIndex: 'journalTitle',
       key: 'journalName',
+      width: 450,
     },
     {
       title: 'Journal Code',
