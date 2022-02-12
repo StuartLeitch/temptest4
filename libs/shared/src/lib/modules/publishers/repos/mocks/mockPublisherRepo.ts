@@ -47,6 +47,15 @@ export class MockPublisherRepo
     return publisher.map((p) => p.customValue);
   }
 
+  async getPublishers(): Promise<
+    Either<GuardFailure | RepoError, PublisherPaginated>
+  > {
+    return right({
+      publishers: this._items,
+      totalCount: this._items.length,
+    });
+  }
+
   async getPublisherByName(
     name: string
   ): Promise<Either<GuardFailure | RepoError, Publisher>> {

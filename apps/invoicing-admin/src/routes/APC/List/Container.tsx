@@ -3,7 +3,7 @@ import { useManualQuery } from 'graphql-hooks';
 import { useQueryState } from 'react-router-use-location-state';
 import { Pagination } from 'antd';
 
-import { APC_QUERY } from '../graphql';
+import { APC_QUERY, APC_PUBLISHER_LIST_QUERY } from '../graphql';
 
 import Restricted from '../../../contexts/Restricted';
 import NotAuthorized from '../../components/NotAuthorized';
@@ -22,7 +22,15 @@ import {
 import { HeaderMain } from '../../components/HeaderMain';
 import { Loading } from '../../components';
 
-import { Text, Table, Button, IconDownload } from '@hindawi/phenom-ui';
+import {
+  Text,
+  Table,
+  Space,
+  Dropdown,
+  Button,
+  IconDownload,
+  Menu,
+} from '@hindawi/phenom-ui';
 
 import _ from 'lodash';
 
@@ -31,9 +39,28 @@ const defaultPaginationSettings = { page: 1, offset: 0, limit: 50 };
 const ApcContainer: React.FC = () => {
   const [fetchJournals, { loading, error, data }] = useManualQuery(APC_QUERY);
 
+  const [fetchPublishers, { data: publisherListData }] = useManualQuery(
+    APC_PUBLISHER_LIST_QUERY
+  );
+
   const [page, setPageInUrl] = useQueryState(
     'page',
     defaultPaginationSettings.page
+  );
+
+  const fetchPublisherList = useCallback(
+    async (currentPage) => {
+      await fetchPublishers({
+        variables: {
+          pagination: {
+            ...defaultPaginationSettings,
+            page: currentPage,
+            offset: currentPage - 1,
+          },
+        },
+      });
+    },
+    [fetchPublishers]
   );
 
   const fetchData = useCallback(
@@ -60,7 +87,32 @@ const ApcContainer: React.FC = () => {
 
   useEffect(() => {
     fetchData(page);
+    fetchPublisherList(page);
   }, []);
+
+  const publishers = publisherListData?.getPublishers.publishers;
+
+  const menu = (
+    <Menu>
+      {publishers &&
+        publishers.map((publisher, index) => {
+          const { name } = publisher;
+
+          return (
+            <Menu.Item key={index}>
+              <a
+                target='_blank'
+                rel='noopener noreferrer'
+                href='https://www.antgroup.com'
+              >
+                {name}
+              </a>
+            </Menu.Item>
+          );
+        })}
+      ;
+    </Menu>
+  );
 
   const columns = [
     {
@@ -83,15 +135,33 @@ const ApcContainer: React.FC = () => {
       title: 'Publisher',
       dataIndex: ['publisher', 'name'],
       key: 'publisher',
+      render: (publisher: React.ReactNode) => (
+        <React.Fragment>
+          <Dropdown overlay={menu} trigger={['click']}>
+            <a
+              className='ant-dropdown-link'
+              onClick={(e) => e.preventDefault()}
+            >
+              {publisher}
+            </a>
+          </Dropdown>
+        </React.Fragment>
+      ),
     },
     {
       title: 'APC',
       dataIndex: 'amount',
       key: 'apc',
       render: (apc: React.ReactNode) => (
-        <Text type='success' strong>
-          ${apc}
-        </Text>
+        <React.Fragment>
+          <Text type='success' strong>
+            ${apc}
+          </Text>
+          <Space size='middle'>
+            <a>Edit</a>
+            <a className='ant-dropdown-link'>More actions</a>
+          </Space>
+        </React.Fragment>
       ),
     },
   ];

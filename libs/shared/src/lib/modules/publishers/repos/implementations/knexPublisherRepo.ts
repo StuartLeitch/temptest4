@@ -53,6 +53,41 @@ export class KnexPublisherRepo
     );
   }
 
+  async getPublishers(
+    args?: any
+  ): Promise<Either<GuardFailure | RepoError, PublisherPaginated>> {
+    const { pagination, filters } = args;
+    const { db } = this;
+
+    const getModel = () => db(TABLES.PUBLISHERS);
+
+    const totalCount = await applyFilters(getModel(), filters).count(
+      `${TABLES.PUBLISHERS}.id`
+    );
+
+    const offset = pagination.offset * pagination.limit;
+
+    const sql = await db
+      .select('*')
+      .from('publishers')
+      .orderBy(`${TABLES.PUBLISHERS}.dateCreated`, 'desc')
+      .offset(offset < totalCount[0].count ? offset : 0)
+      .limit(pagination.limit);
+
+    const publishers: Array<any> = await sql;
+
+    const maybePublishers = flatten(publishers.map(PublisherMap.toDomain));
+
+    if (maybePublishers.isLeft()) {
+      return left(maybePublishers.value);
+    }
+
+    return right({
+      totalCount: totalCount[0]['count'],
+      publishers: maybePublishers.value,
+    });
+  }
+
   async getPublishersByPublisherId(
     args?: any
   ): Promise<Either<GuardFailure | RepoError, PublisherPaginated>> {

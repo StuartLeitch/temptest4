@@ -4,6 +4,8 @@ import {
   GetPublisherDetailsUsecase,
   GetPublisherDetailsDTO,
   GetPublishersByPublisherIdUsecase,
+  GetPublisherDetailsByNameDTO,
+  GetPublishersUsecase,
   Roles,
   PublisherMap,
   GetPublisherDetailsByNameUsecase,
@@ -16,6 +18,31 @@ import { handleForbiddenUsecase, getAuthRoles } from './utils';
 
 export const publisher: Resolvers<Context> = {
   Query: {
+    async getPublishers(parent, args, context) {
+      const roles = getAuthRoles(context);
+
+      const { repos } = context;
+
+      const usecase = new GetPublishersUsecase(repos.publisher);
+
+      const usecaseContext = { roles };
+
+      const resultPublisherList = await usecase.execute(args, usecaseContext);
+
+      handleForbiddenUsecase(resultPublisherList);
+
+      if (resultPublisherList.isLeft()) {
+        throw new Error(resultPublisherList.value.message);
+      }
+
+      const publisherList = resultPublisherList.value;
+
+      return {
+        totalCount: publisherList.totalCount,
+        publishers: publisherList.publishers.map(PublisherMap.toPersistence),
+      };
+    },
+
     async getPublisherDetails(parent, args, context) {
       const roles = getAuthRoles(context);
       const { repos } = context;
@@ -43,7 +70,7 @@ export const publisher: Resolvers<Context> = {
       return PublisherMap.toPersistence(publishers);
     },
 
-    async getPublishers(parent, args, context) {
+    async getPublishersByPublisherId(parent, args, context) {
       const roles = getAuthRoles(context);
 
       const { repos } = context;
@@ -67,6 +94,7 @@ export const publisher: Resolvers<Context> = {
         publishers: publisherList.publishers.map(PublisherMap.toPersistence),
       };
     },
+
     async getPublisherByName(parent, args, context) {
       const roles = getAuthRoles(context);
 
@@ -75,7 +103,11 @@ export const publisher: Resolvers<Context> = {
       const usecase = new GetPublisherDetailsByNameUsecase(repos.publisher);
       const usecaseContext = { roles };
 
-      const resultPublisher = await usecase.execute(args, usecaseContext);
+      const request: GetPublisherDetailsByNameDTO = {
+        publisherName: args.publisherName,
+      };
+
+      const resultPublisher = await usecase.execute(request, usecaseContext);
 
       handleForbiddenUsecase(resultPublisher);
 

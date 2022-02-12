@@ -1,3 +1,13 @@
-import { APC_QUERY, APC_PUBLISHER_QUERY } from './queries';
+import {
+  APC_QUERY,
+  APC_PUBLISHER_QUERY,
+  APC_PUBLISHER_LIST_QUERY,
+} from './queries';
+import { CATALOG_ITEM_UPDATE } from './mutations';
 
-export { APC_QUERY, APC_PUBLISHER_QUERY };
+export {
+  APC_QUERY,
+  APC_PUBLISHER_QUERY,
+  CATALOG_ITEM_UPDATE,
+  APC_PUBLISHER_LIST_QUERY,
+};

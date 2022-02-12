@@ -188,7 +188,7 @@ type Address {
 
 type InvoicingPublisher {
   id: String
-  name: String!
+  name: String
 }
 
 input CreditCardInput {
@@ -384,8 +384,10 @@ type Query {
   getCreditNoteByReferenceNumber(referenceNumber: String): CreditNote
   getPaymentMethods: [PaymentMethod]
   getClientToken: ClientToken
-  getPublisherDetails(publisherId: ID): InvoicingPublisher
   getPublishers(pagination: Pagination): PaginatedPublishers
+  getPublisherDetails(publisherId: ID): InvoicingPublisher
+  getPublishersByPublisherId(pagination: Pagination): PaginatedPublishers
+  getPublisherByName(publisherName: String): InvoicingPublisher
   generateCouponCode: CouponCode
   invoice(invoiceId: ID): Invoice
   invoiceWithAuthorization(invoiceId: ID): Invoice

@@ -50,6 +50,7 @@ export class UpdateCatalogItemToCatalogUseCase
       journalId: rawJournalId,
       journalTitle,
       updated,
+      publisherId,
     } = request;
     let publisher: Publisher;
     const defaultPublisher = 'Hindawi';
@@ -96,6 +97,8 @@ export class UpdateCatalogItemToCatalogUseCase
           )
         );
       }
+
+      console.log(publisherId);
 
       const maybeUpdatedCatalogItem = CatalogMap.toDomain({
         id: catalogItem.id,

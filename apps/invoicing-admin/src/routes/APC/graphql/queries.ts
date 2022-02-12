@@ -28,6 +28,22 @@ query invoicingJournals(
   ${JOURNAL_FRAGMENT}
 `;
 
+export const APC_PUBLISHER_LIST_QUERY = `
+query getPublishers(
+  $pagination: Pagination
+) {
+  getPublishers(
+    pagination: $pagination
+  ) {
+    totalCount
+    publishers {
+      id
+      name
+    }
+  }
+}
+`;
+
 export const APC_PUBLISHER_QUERY = `
   query getPublisherDetails(
     $publisherId: ID

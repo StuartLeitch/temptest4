@@ -11,13 +11,13 @@ import {
   Authorize,
 } from '../../../../domain/authorization';
 
-import { PublisherRepoContract } from '@hindawi/shared';
+import { PublisherRepoContract } from '../../repos';
 
 // * Usecase specifics
-import { GetPublishersByPublisherIdResponse as Response } from './getPublishersByPublisherIdResponse';
-import type { GetPublishersByPublisherIdDTO as DTO } from './getPublishersByPublisherIdDTO';
+import { GetPublishersResponse as Response } from './getPublishersResponse';
+import type { GetPublishersDTO as DTO } from './getPublishersDTO';
 
-export class GetPublishersByPublisherIdUsecase
+export class GetPublishersUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(private publisherRepo: PublisherRepoContract) {
@@ -27,7 +27,7 @@ export class GetPublishersByPublisherIdUsecase
   @Authorize('publishers:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      const maybePaginatedResult = await this.publisherRepo.getPublishersByPublisherId(
+      const maybePaginatedResult = await this.publisherRepo.getPublishers(
         request
       );
 

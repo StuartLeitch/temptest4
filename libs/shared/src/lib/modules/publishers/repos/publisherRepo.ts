@@ -10,6 +10,9 @@ import { Publisher } from '../domain/Publisher';
 import { PublisherPaginated } from '../domain/PublisherPaginated';
 
 export interface PublisherRepoContract extends Repo<Publisher> {
+  getPublishers(
+    args?: any
+  ): Promise<Either<GuardFailure | RepoError, PublisherPaginated>>;
   getCustomValuesByPublisherId(
     id: PublisherId
   ): Promise<Either<GuardFailure | RepoError, PublisherCustomValues>>;

@@ -9,4 +9,5 @@ export interface UpdateCatalogItemToCatalogDTO {
   created?: string;
   updated?: string;
   isActive?: boolean;
+  publisherId?: string;
 }
