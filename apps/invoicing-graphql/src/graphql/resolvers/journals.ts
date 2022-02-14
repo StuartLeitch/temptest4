@@ -82,7 +82,6 @@ export const invoicingJournals: Resolvers<Context> = {
         repos.publisher
       );
       const usecaseContext = { roles };
-
       const result = await usecase.execute(args.catalogItem, usecaseContext);
 
       handleForbiddenUsecase(result);

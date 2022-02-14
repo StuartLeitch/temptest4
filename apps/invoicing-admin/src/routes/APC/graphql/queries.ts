@@ -1,5 +1,7 @@
 export const JOURNAL_FRAGMENT = `
   fragment journalFragment on InvoicingJournal {
+    journalId
+    id
     code
     journalTitle
     amount

@@ -52,6 +52,7 @@ export class UpdateCatalogItemToCatalogUseCase
       updated,
       publisherId,
     } = request;
+    console.log(request);
     let publisher: Publisher;
     const defaultPublisher = 'Hindawi';
     try {

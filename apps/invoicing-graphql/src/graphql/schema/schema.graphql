@@ -153,6 +153,7 @@ input PayerInput {
 }
 
 type InvoicingJournal {
+  id: String
   journalId: ID
   journalTitle: String
   amount: String
@@ -262,7 +263,9 @@ input CouponInput {
 }
 
 input CatalogInput {
-  amount: Float
+  journalId: ID
+  publisherId: String
+  amount: String
 }
 
 type Waiver {

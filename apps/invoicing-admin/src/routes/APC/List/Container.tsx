@@ -1,9 +1,12 @@
 import React, { useEffect, useCallback, useState } from 'react';
-import { useManualQuery } from 'graphql-hooks';
+import { useManualQuery, useMutation } from 'graphql-hooks';
 import { useQueryState } from 'react-router-use-location-state';
-import { Pagination } from 'antd';
 
-import { APC_QUERY, APC_PUBLISHER_LIST_QUERY } from '../graphql';
+import {
+  APC_QUERY,
+  APC_PUBLISHER_LIST_QUERY,
+  CATALOG_ITEM_UPDATE,
+} from '../graphql';
 
 import Restricted from '../../../contexts/Restricted';
 import NotAuthorized from '../../components/NotAuthorized';
@@ -13,8 +16,6 @@ import {
   Row,
   Col,
   Error,
-  ListPagination,
-  CardFooter,
   Card,
   ButtonToolbar,
 } from '../../../components';
@@ -22,24 +23,27 @@ import {
 import { HeaderMain } from '../../components/HeaderMain';
 import { Loading } from '../../components';
 
-import { Input, Button, Form, InputNumber, Typography } from 'antd';
+import { Input, Form, InputNumber } from 'antd';
 
-import { Text, Table, Space, Dropdown, Menu } from '@hindawi/phenom-ui';
+import { Text, Table, Menu, Select } from '@hindawi/phenom-ui';
 
 import _ from 'lodash';
 
+const { Option } = Select;
 const defaultPaginationSettings = { page: 1, offset: 0, limit: 50 };
 
 interface Item {
   id: string;
-  key: string;
-  name: string;
-  age: number;
-  address: string;
+  journalId: string;
+  journalTitle: string;
+  code: string;
+  publisher: string;
+  publisherId: string;
+  issn: string;
+  amount: string;
 }
 
-const originalFormData: Item[] = [];
-
+const originData: Item[] = [];
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   editing: boolean;
   dataIndex: string;
@@ -71,7 +75,6 @@ const EditableCell: React.FC<EditableCellProps> = ({
           rules={[
             {
               required: true,
-              message: `Please Input ${title}!`,
             },
           ]}
         >
@@ -86,19 +89,12 @@ const EditableCell: React.FC<EditableCellProps> = ({
 
 const ApcContainer: React.FC = () => {
   const [fetchJournals, { loading, error, data }] = useManualQuery(APC_QUERY);
-
   const [fetchPublishers, { data: publisherListData }] = useManualQuery(
     APC_PUBLISHER_LIST_QUERY
   );
-
-  const [isEditMode, setIsEditMode] = useState(false);
-
+  const [updateCatalogItem] = useMutation(CATALOG_ITEM_UPDATE);
   const [form] = Form.useForm();
-
-  const [formData, setFormData] = useState(originalFormData);
-
   const [editingKey, setEditingKey] = useState('');
-
   const [page, setPageInUrl] = useQueryState(
     'page',
     defaultPaginationSettings.page
@@ -156,11 +152,7 @@ const ApcContainer: React.FC = () => {
 
           return (
             <Menu.Item key={index}>
-              <a
-                target='_blank'
-                rel='noopener noreferrer'
-                href='https://www.antgroup.com'
-              >
+              <a target='_blank' rel='noopener noreferrer'>
                 {name}
               </a>
             </Menu.Item>
@@ -170,15 +162,66 @@ const ApcContainer: React.FC = () => {
     </Menu>
   );
 
-  const isEditing = (record: Item) => record.key === editingKey;
+  const isEditing = (record: Item) => record.id === editingKey;
 
-  const edit = (record: Partial<Item> & { key: React.Key }) => {
-    form.setFieldsValue({ name: '', age: '', address: '', ...record });
-    setEditingKey(record.key);
+  const edit = (record: Partial<Item> & { id: string }) => {
+    form.setFieldsValue({ amount: '', ...record });
+    setEditingKey(record.id);
   };
 
   const cancel = () => {
     setEditingKey('');
+  };
+
+  const [toUpdateData, setToUpdateData] = useState(originData);
+
+  const save = async (journalId: string) => {
+    try {
+      const row = (await form.validateFields()) as Item;
+      const newData = [...toUpdateData];
+      const index = newData.findIndex((item) => journalId === item.journalId);
+      if (index > -1) {
+        const item = newData[index];
+        newData.splice(index, 1, {
+          ...item,
+          ...row,
+        });
+        setToUpdateData(newData);
+        setEditingKey('');
+      } else {
+        newData.push(row);
+        setToUpdateData(newData);
+        setEditingKey('');
+        try {
+          const updateCatalogItemResult = await updateCatalogItem({
+            variables: {
+              catalogItem: {
+                amount: newData[0].amount,
+                journalId,
+              },
+            },
+          });
+
+          const updateCatalogItemError =
+            updateCatalogItemResult?.error?.graphQLErrors[0]['message'];
+
+          if (!updateCatalogItemError) {
+            fetchData(page);
+            console.log('success');
+          } else {
+            console.log('fail');
+          }
+        } catch (e) {
+          console.log(e.message);
+        }
+      }
+    } catch (errInfo) {
+      console.log(errInfo);
+    }
+  };
+
+  const handleChange = (value) => {
+    console.log(`selected ${value}`);
   };
 
   const columns = [
@@ -202,24 +245,35 @@ const ApcContainer: React.FC = () => {
       title: 'Publisher',
       dataIndex: ['publisher', 'name'],
       key: 'publisher',
-      render: (publisher: React.ReactNode) => (
-        <React.Fragment>
-          <Dropdown overlay={menu} trigger={['click']}>
-            <a
-              className='ant-dropdown-link'
-              onClick={(e) => e.preventDefault()}
-            >
-              {publisher}
-            </a>
-          </Dropdown>
-        </React.Fragment>
-      ),
+      render: (publisher: any, record: Item) => {
+        const editable = isEditing(record);
+        return editable ? (
+          <React.Fragment>
+            <Select defaultValue={publisher} onChange={handleChange}>
+              {publishers &&
+                publishers.map((publisher, index) => {
+                  const { name } = publisher;
+
+                  return (
+                    <Option key={index} value={name}>
+                      {' '}
+                      {name}
+                    </Option>
+                  );
+                })}
+            </Select>
+          </React.Fragment>
+        ) : (
+          <Text>{publisher}</Text>
+        );
+      },
     },
     {
       title: 'APC',
       dataIndex: 'amount',
-      key: 'apc',
+      key: 'amount',
       editable: true,
+      width: 200,
       render: (apc: React.ReactNode) => (
         <Text type='success' strong>
           ${apc}
@@ -228,25 +282,25 @@ const ApcContainer: React.FC = () => {
     },
     {
       title: '',
-      dataIndex: 'action',
+      dataIntes: 'action',
       render: (_: any, record: Item) => {
         const editable = isEditing(record);
         return editable ? (
           <span>
-            <Typography.Link
-              onClick={() => console.log(record.key)}
+            <Text
+              onClick={() => save(record.journalId)}
               style={{ marginRight: 8 }}
             >
               Save
-            </Typography.Link>
+            </Text>
+            <Text onClick={cancel}>
+              <a>Cancel</a>
+            </Text>
           </span>
         ) : (
-          <Typography.Link
-            disabled={editingKey !== ''}
-            onClick={() => edit(record)}
-          >
+          <Text disabled={editingKey !== ''} onClick={() => edit(record)}>
             Edit
-          </Typography.Link>
+          </Text>
         );
       },
     },
@@ -257,35 +311,53 @@ const ApcContainer: React.FC = () => {
 
     if (error) return <Error error={error} />;
 
+    const mergedColumns = columns.map((col) => {
+      if (!col.editable) {
+        return col;
+      }
+      return {
+        ...col,
+        onCell: (record: Item) => ({
+          record,
+          inputType: 'text',
+          dataIndex: col.dataIndex,
+          title: col.title,
+          editing: isEditing(record),
+        }),
+      };
+    });
+
     if (data)
       return (
         <>
-          <Card className='mb-0 mt-5'>
-            <Table
-              columns={columns}
-              components={{
-                body: {
-                  cell: EditableCell,
-                },
-              }}
-              rowKey={(record) => record.id}
-              rowClassName={(record, index) =>
-                index % 2 === 0 ? 'table-row-light' : 'table-row-dark'
-              }
-              dataSource={data.invoicingJournals?.catalogItems}
-              pagination={{
-                pageSize: 50,
-                total: data.invoicingJournals?.totalCount,
-                current: page,
-                onChange: (page, pageSize) =>
-                  onPageChange({ currentPage: page }),
-                showLessItems: true,
-                showSizeChanger: false,
-                showQuickJumper: false,
-                position: ['bottomCenter'],
-              }}
-            />
-          </Card>
+          <Form form={form} component={false}>
+            <Card className='mb-0 mt-5'>
+              <Table
+                columns={mergedColumns}
+                components={{
+                  body: {
+                    cell: EditableCell,
+                  },
+                }}
+                rowKey={(record) => record.id}
+                rowClassName={(record, index) =>
+                  index % 2 === 0 ? 'table-row-light' : 'table-row-dark'
+                }
+                dataSource={data.invoicingJournals?.catalogItems}
+                pagination={{
+                  pageSize: 50,
+                  total: data.invoicingJournals?.totalCount,
+                  current: page,
+                  onChange: (page, pageSize) =>
+                    onPageChange({ currentPage: page }),
+                  showLessItems: true,
+                  showSizeChanger: false,
+                  showQuickJumper: false,
+                  position: ['bottomCenter'],
+                }}
+              />
+            </Card>
+          </Form>
         </>
       );
 
