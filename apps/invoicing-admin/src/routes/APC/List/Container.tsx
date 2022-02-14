@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { useManualQuery } from 'graphql-hooks';
 import { useQueryState } from 'react-router-use-location-state';
 import { Pagination } from 'antd';
@@ -22,19 +22,67 @@ import {
 import { HeaderMain } from '../../components/HeaderMain';
 import { Loading } from '../../components';
 
-import {
-  Text,
-  Table,
-  Space,
-  Dropdown,
-  Button,
-  IconDownload,
-  Menu,
-} from '@hindawi/phenom-ui';
+import { Input, Button, Form, InputNumber, Typography } from 'antd';
+
+import { Text, Table, Space, Dropdown, Menu } from '@hindawi/phenom-ui';
 
 import _ from 'lodash';
 
 const defaultPaginationSettings = { page: 1, offset: 0, limit: 50 };
+
+interface Item {
+  id: string;
+  key: string;
+  name: string;
+  age: number;
+  address: string;
+}
+
+const originalFormData: Item[] = [];
+
+interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
+  editing: boolean;
+  dataIndex: string;
+  title: any;
+  inputType: 'number' | 'text';
+  record: Item;
+  index: number;
+  children: React.ReactNode;
+}
+
+const EditableCell: React.FC<EditableCellProps> = ({
+  editing,
+  dataIndex,
+  title,
+  inputType,
+  record,
+  index,
+  children,
+  ...restProps
+}) => {
+  const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
+
+  return (
+    <td {...restProps}>
+      {editing ? (
+        <Form.Item
+          name={dataIndex}
+          style={{ margin: 0 }}
+          rules={[
+            {
+              required: true,
+              message: `Please Input ${title}!`,
+            },
+          ]}
+        >
+          {inputNode}
+        </Form.Item>
+      ) : (
+        children
+      )}
+    </td>
+  );
+};
 
 const ApcContainer: React.FC = () => {
   const [fetchJournals, { loading, error, data }] = useManualQuery(APC_QUERY);
@@ -42,6 +90,14 @@ const ApcContainer: React.FC = () => {
   const [fetchPublishers, { data: publisherListData }] = useManualQuery(
     APC_PUBLISHER_LIST_QUERY
   );
+
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  const [form] = Form.useForm();
+
+  const [formData, setFormData] = useState(originalFormData);
+
+  const [editingKey, setEditingKey] = useState('');
 
   const [page, setPageInUrl] = useQueryState(
     'page',
@@ -114,6 +170,17 @@ const ApcContainer: React.FC = () => {
     </Menu>
   );
 
+  const isEditing = (record: Item) => record.key === editingKey;
+
+  const edit = (record: Partial<Item> & { key: React.Key }) => {
+    form.setFieldsValue({ name: '', age: '', address: '', ...record });
+    setEditingKey(record.key);
+  };
+
+  const cancel = () => {
+    setEditingKey('');
+  };
+
   const columns = [
     {
       title: 'Journal Name',
@@ -152,17 +219,36 @@ const ApcContainer: React.FC = () => {
       title: 'APC',
       dataIndex: 'amount',
       key: 'apc',
+      editable: true,
       render: (apc: React.ReactNode) => (
-        <React.Fragment>
-          <Text type='success' strong>
-            ${apc}
-          </Text>
-          <Space size='middle'>
-            <a>Edit</a>
-            <a className='ant-dropdown-link'>More actions</a>
-          </Space>
-        </React.Fragment>
+        <Text type='success' strong>
+          ${apc}
+        </Text>
       ),
+    },
+    {
+      title: '',
+      dataIndex: 'action',
+      render: (_: any, record: Item) => {
+        const editable = isEditing(record);
+        return editable ? (
+          <span>
+            <Typography.Link
+              onClick={() => console.log(record.key)}
+              style={{ marginRight: 8 }}
+            >
+              Save
+            </Typography.Link>
+          </span>
+        ) : (
+          <Typography.Link
+            disabled={editingKey !== ''}
+            onClick={() => edit(record)}
+          >
+            Edit
+          </Typography.Link>
+        );
+      },
     },
   ];
 
@@ -177,6 +263,11 @@ const ApcContainer: React.FC = () => {
           <Card className='mb-0 mt-5'>
             <Table
               columns={columns}
+              components={{
+                body: {
+                  cell: EditableCell,
+                },
+              }}
               rowKey={(record) => record.id}
               rowClassName={(record, index) =>
                 index % 2 === 0 ? 'table-row-light' : 'table-row-dark'
