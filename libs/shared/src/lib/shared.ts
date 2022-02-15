@@ -162,6 +162,7 @@ export * from './modules/journals/usecases/journals/getJournal/getJournalDTO';
 export * from './modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
 export * from './modules/journals/usecases/addCatalogItemToCatalog/addCatalogItemToCatalog';
 export * from './modules/journals/usecases/updateCatalogItemToCatalog';
+export * from './modules/journals/usecases/updateCatalogItemFields';
 
 // * Export User Subdomain
 export { Roles } from './modules/users/domain/enums/Roles';

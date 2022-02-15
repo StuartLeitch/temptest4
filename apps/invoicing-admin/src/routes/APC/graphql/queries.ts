@@ -53,6 +53,7 @@ export const APC_PUBLISHER_QUERY = `
     getPublisherDetails(
       publisherId: $publisherId
     ) {
+      id
       name
     }
   }

@@ -6,7 +6,7 @@ import {
   Roles,
   GetPublisherDetailsUsecase,
   PublisherMap,
-  UpdateCatalogItemToCatalogUseCase,
+  UpdateCatalogItemFieldsUsecase,
 } from '@hindawi/shared';
 
 import { Context } from '../../builders';
@@ -77,10 +77,7 @@ export const invoicingJournals: Resolvers<Context> = {
       const roles = getAuthRoles(context);
       const { repos } = context;
 
-      const usecase = new UpdateCatalogItemToCatalogUseCase(
-        repos.catalog,
-        repos.publisher
-      );
+      const usecase = new UpdateCatalogItemFieldsUsecase(repos.catalog);
       const usecaseContext = { roles };
       const result = await usecase.execute(args.catalogItem, usecaseContext);
 

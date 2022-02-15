@@ -43,7 +43,13 @@ interface Item {
   amount: string;
 }
 
-const originData: Item[] = [];
+const originData = [
+  {
+    journalId: '',
+    amount: '',
+    publisher: { name: '' },
+  },
+];
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   editing: boolean;
   dataIndex: string;
@@ -51,6 +57,7 @@ interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   inputType: 'number' | 'text';
   record: Item;
   index: number;
+  publishers: any;
   children: React.ReactNode;
 }
 
@@ -62,9 +69,12 @@ const EditableCell: React.FC<EditableCellProps> = ({
   record,
   index,
   children,
+  publishers,
   ...restProps
 }) => {
-  const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
+  const handleChange = async (value) => {
+    console.log(`selected ${value}`);
+  };
 
   return (
     <td {...restProps}>
@@ -78,7 +88,23 @@ const EditableCell: React.FC<EditableCellProps> = ({
             },
           ]}
         >
-          {inputNode}
+          {dataIndex === 'amount' ? (
+            <Input />
+          ) : (
+            <Select onChange={handleChange}>
+              {publishers &&
+                publishers.map((publisher, index) => {
+                  const { name, id } = publisher;
+
+                  return (
+                    <Option key={index} value={id}>
+                      {' '}
+                      {name}
+                    </Option>
+                  );
+                })}
+            </Select>
+          )}
         </Form.Item>
       ) : (
         children
@@ -144,24 +170,6 @@ const ApcContainer: React.FC = () => {
 
   const publishers = publisherListData?.getPublishers.publishers;
 
-  const menu = (
-    <Menu>
-      {publishers &&
-        publishers.map((publisher, index) => {
-          const { name } = publisher;
-
-          return (
-            <Menu.Item key={index}>
-              <a target='_blank' rel='noopener noreferrer'>
-                {name}
-              </a>
-            </Menu.Item>
-          );
-        })}
-      ;
-    </Menu>
-  );
-
   const isEditing = (record: Item) => record.id === editingKey;
 
   const edit = (record: Partial<Item> & { id: string }) => {
@@ -177,7 +185,7 @@ const ApcContainer: React.FC = () => {
 
   const save = async (journalId: string) => {
     try {
-      const row = (await form.validateFields()) as Item;
+      const row = (await form.validateFields()) as any;
       const newData = [...toUpdateData];
       const index = newData.findIndex((item) => journalId === item.journalId);
       if (index > -1) {
@@ -189,14 +197,15 @@ const ApcContainer: React.FC = () => {
         setToUpdateData(newData);
         setEditingKey('');
       } else {
-        newData.push(row);
         setToUpdateData(newData);
         setEditingKey('');
+
         try {
           const updateCatalogItemResult = await updateCatalogItem({
             variables: {
               catalogItem: {
-                amount: newData[0].amount,
+                amount: row.amount,
+                publisherId: row.publisher.name,
                 journalId,
               },
             },
@@ -220,10 +229,6 @@ const ApcContainer: React.FC = () => {
     }
   };
 
-  const handleChange = (value) => {
-    console.log(`selected ${value}`);
-  };
-
   const columns = [
     {
       title: 'Journal Name',
@@ -245,28 +250,8 @@ const ApcContainer: React.FC = () => {
       title: 'Publisher',
       dataIndex: ['publisher', 'name'],
       key: 'publisher',
-      render: (publisher: any, record: Item) => {
-        const editable = isEditing(record);
-        return editable ? (
-          <React.Fragment>
-            <Select defaultValue={publisher} onChange={handleChange}>
-              {publishers &&
-                publishers.map((publisher, index) => {
-                  const { name } = publisher;
-
-                  return (
-                    <Option key={index} value={name}>
-                      {' '}
-                      {name}
-                    </Option>
-                  );
-                })}
-            </Select>
-          </React.Fragment>
-        ) : (
-          <Text>{publisher}</Text>
-        );
-      },
+      editable: true,
+      render: (publisher: any, record: Item) => <Text>{publisher}</Text>,
     },
     {
       title: 'APC',
@@ -323,6 +308,7 @@ const ApcContainer: React.FC = () => {
           dataIndex: col.dataIndex,
           title: col.title,
           editing: isEditing(record),
+          publishers,
         }),
       };
     });
