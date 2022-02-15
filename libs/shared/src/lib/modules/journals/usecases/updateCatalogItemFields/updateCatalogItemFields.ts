@@ -61,7 +61,7 @@ export class UpdateCatalogItemFieldsUsecase
         id: catalogItem.id,
         amount,
         created: catalogItem.created,
-        updated: catalogItem.updated,
+        updated: new Date(),
         isActive: catalogItem.isActive,
         journalId: rawJournalId,
         publisherId,

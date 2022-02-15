@@ -9,3 +9,14 @@ export interface ApcType {
 export interface PublisherType {
   name: string;
 }
+
+export interface Item {
+  id: string;
+  journalId: string;
+  journalTitle: string;
+  code: string;
+  publisher: string;
+  publisherId: string;
+  issn: string;
+  amount: string;
+}

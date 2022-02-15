@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import { useManualQuery, useMutation } from 'graphql-hooks';
 import { useQueryState } from 'react-router-use-location-state';
+import { toast } from 'react-toastify';
 
 import {
   APC_QUERY,
@@ -23,95 +24,16 @@ import {
 import { HeaderMain } from '../../components/HeaderMain';
 import { Loading } from '../../components';
 
-import { Input, Form, InputNumber } from 'antd';
+import { Form } from 'antd';
 
-import { Text, Table, Menu, Select } from '@hindawi/phenom-ui';
+import { Text, Table } from '@hindawi/phenom-ui';
+
+import EditableCell from './components/EditableCell';
+import { Item } from '../types';
 
 import _ from 'lodash';
 
-const { Option } = Select;
 const defaultPaginationSettings = { page: 1, offset: 0, limit: 50 };
-
-interface Item {
-  id: string;
-  journalId: string;
-  journalTitle: string;
-  code: string;
-  publisher: string;
-  publisherId: string;
-  issn: string;
-  amount: string;
-}
-
-const originData = [
-  {
-    journalId: '',
-    amount: '',
-    publisher: { name: '' },
-  },
-];
-interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
-  editing: boolean;
-  dataIndex: string;
-  title: any;
-  inputType: 'number' | 'text';
-  record: Item;
-  index: number;
-  publishers: any;
-  children: React.ReactNode;
-}
-
-const EditableCell: React.FC<EditableCellProps> = ({
-  editing,
-  dataIndex,
-  title,
-  inputType,
-  record,
-  index,
-  children,
-  publishers,
-  ...restProps
-}) => {
-  const handleChange = async (value) => {
-    console.log(`selected ${value}`);
-  };
-
-  return (
-    <td {...restProps}>
-      {editing ? (
-        <Form.Item
-          name={dataIndex}
-          style={{ margin: 0 }}
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          {dataIndex === 'amount' ? (
-            <Input />
-          ) : (
-            <Select onChange={handleChange}>
-              {publishers &&
-                publishers.map((publisher, index) => {
-                  const { name, id } = publisher;
-
-                  return (
-                    <Option key={index} value={id}>
-                      {' '}
-                      {name}
-                    </Option>
-                  );
-                })}
-            </Select>
-          )}
-        </Form.Item>
-      ) : (
-        children
-      )}
-    </td>
-  );
-};
 
 const ApcContainer: React.FC = () => {
   const [fetchJournals, { loading, error, data }] = useManualQuery(APC_QUERY);
@@ -181,51 +103,34 @@ const ApcContainer: React.FC = () => {
     setEditingKey('');
   };
 
-  const [toUpdateData, setToUpdateData] = useState(originData);
-
   const save = async (journalId: string) => {
     try {
-      const row = (await form.validateFields()) as any;
-      const newData = [...toUpdateData];
-      const index = newData.findIndex((item) => journalId === item.journalId);
-      if (index > -1) {
-        const item = newData[index];
-        newData.splice(index, 1, {
-          ...item,
-          ...row,
-        });
-        setToUpdateData(newData);
-        setEditingKey('');
-      } else {
-        setToUpdateData(newData);
-        setEditingKey('');
-
-        try {
-          const updateCatalogItemResult = await updateCatalogItem({
-            variables: {
-              catalogItem: {
-                amount: row.amount,
-                publisherId: row.publisher.name,
-                journalId,
-              },
+      const row = await form.validateFields();
+      setEditingKey('');
+      try {
+        const updateCatalogItemResult = await updateCatalogItem({
+          variables: {
+            catalogItem: {
+              amount: row.amount,
+              publisherId: row.publisher.name,
+              journalId,
             },
-          });
+          },
+        });
 
-          const updateCatalogItemError =
-            updateCatalogItemResult?.error?.graphQLErrors[0]['message'];
+        const updateCatalogItemError =
+          updateCatalogItemResult?.error?.graphQLErrors[0]['message'];
 
-          if (!updateCatalogItemError) {
-            fetchData(page);
-            console.log('success');
-          } else {
-            console.log('fail');
-          }
-        } catch (e) {
-          console.log(e.message);
+        if (!updateCatalogItemError) {
+          fetchData(page);
+        } else {
+          toast.error(updateCatalogItemError);
         }
+      } catch (e) {
+        console.error(e.message);
       }
     } catch (errInfo) {
-      console.log(errInfo);
+      console.info('Validate Failed:', errInfo);
     }
   };
 
@@ -251,7 +156,7 @@ const ApcContainer: React.FC = () => {
       dataIndex: ['publisher', 'name'],
       key: 'publisher',
       editable: true,
-      render: (publisher: any, record: Item) => <Text>{publisher}</Text>,
+      render: (publisher: any) => <Text>{publisher}</Text>,
     },
     {
       title: 'APC',
