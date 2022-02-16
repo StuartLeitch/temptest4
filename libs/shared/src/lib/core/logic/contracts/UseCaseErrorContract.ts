@@ -1,3 +1,3 @@
-export interface UseCaseErrorErrorContract {
+export interface UseCaseErrorErrorContract extends Error {
   message: string;
 }

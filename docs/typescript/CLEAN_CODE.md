@@ -2677,7 +2677,7 @@ import { UserService } from '@services/UserService';
 ```
 
 ```js
-// tsconfig.json
+// tsconfig.base.json
 ...
   "compilerOptions": {
     ...

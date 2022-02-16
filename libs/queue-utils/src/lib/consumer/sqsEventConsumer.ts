@@ -3,15 +3,10 @@ import * as AWS from 'aws-sdk';
 import { SQS } from 'aws-sdk';
 import { get } from 'lodash';
 
-import { QueueConsumer, Handler } from './consumer';
+import { QueueEventConsumer, Handler } from './consumer';
 import { Event } from '../event';
 
-interface SqsEventConsumerOptions {
-  event: string;
-}
-
-export class SqsEventConsumer
-  implements QueueConsumer<SqsEventConsumerOptions> {
+export class SqsEventConsumer implements QueueEventConsumer {
   private sqsConsumer: Consumer;
   private sqs: SQS;
   private eventMap: {
@@ -20,25 +15,25 @@ export class SqsEventConsumer
 
   constructor(
     private readonly queueName: string,
-    private readonly awsProfile?: string
+    region?: string,
+    sqsEndpoint?: string,
+    accessKeyId?: string,
+    secretAccessKey?: string
   ) {
-    if (this.awsProfile) {
-      const credentials = new AWS.SharedIniFileCredentials({
-        profile: this.awsProfile,
-      });
-      AWS.config.credentials = credentials;
-    }
-
-    this.sqs = new SQS();
+    this.sqs = new AWS.SQS({
+      region,
+      accessKeyId,
+      secretAccessKey,
+      endpoint: sqsEndpoint,
+    });
   }
 
-  registerHandler(handler: Handler, options: SqsEventConsumerOptions) {
-    const { event } = options;
-    if (this.eventMap[event] == null) {
-      this.eventMap[event] = [];
+  registerHandler(eventName: string, handler: Handler) {
+    if (this.eventMap[eventName] == null) {
+      this.eventMap[eventName] = [];
     }
 
-    this.eventMap[event].push(handler);
+    this.eventMap[eventName].push(handler);
   }
 
   async start() {
@@ -80,7 +75,9 @@ export class SqsEventConsumer
 
     if (handlers && Array.isArray(handlers)) {
       await Promise.all(
-        this.eventMap[eventName].map(async (handler) => handler(data))
+        this.eventMap[eventName].map(async (handler) =>
+          handler(JSON.parse(data))
+        )
       );
     }
   }

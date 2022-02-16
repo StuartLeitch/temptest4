@@ -13,7 +13,7 @@ function createWebpackConfig(root: string) {
     const extensions = ['.ts', '.tsx', '.mjs', '.js', '.jsx'];
     config.resolve.plugins = [
       new TsConfigPathsPlugin({
-        configFile: path.resolve(root, 'tsconfig.json'),
+        configFile: path.resolve(root, 'tsconfig.base.json'),
         extensions,
         mainFields
       })

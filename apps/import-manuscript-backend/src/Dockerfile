@@ -1,16 +1,22 @@
-FROM node:14-alpine as build
+FROM node:16-alpine as build
+
 ENV HOME "/home/app"
 WORKDIR ${HOME}
 
-RUN apk update && apk upgrade && \
-    apk add --no-cache bash git openssh g++ make python \
-    chromium \
-    nss \
-    freetype \
-    freetype-dev \
-    harfbuzz \
-    ca-certificates \
-    ttf-freefont
+RUN apk add --no-cache \
+  bash \
+  ca-certificates \
+  chromium \
+  freetype \
+  freetype-dev \
+  g++ \
+  git \
+  harfbuzz \
+  make \
+  nss \
+  openssh \
+  python3 \
+  ttf-freefont
 
 # Copy package.json to the working directory
 COPY package.json yarn.lock ./
@@ -33,4 +39,5 @@ COPY dist/apps/import-manuscript-backend ./
 EXPOSE 3000
 
 # Run index.js when the container launches
-CMD ["node", "main.js"]
+CMD ["node", "--enable-source-maps", "main.js"]
+

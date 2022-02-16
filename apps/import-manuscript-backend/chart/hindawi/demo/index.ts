@@ -7,16 +7,16 @@ import { defaultValues } from '../../default';
 
 const values: WithAwsSecretsServiceProps = {
   ...defaultValues,
-  secretNames: ['demo/review/import-manuscript'],
+  secretNames: ['demo/review/import-manuscript-backend'],
   serviceProps: {
     ...defaultValues.serviceProps,
     ingressOptions: {
       rules: [
         {
-          host: 'import-manuscript.demo.phenom.pub',
+          host: 'import-manuscript-backend.demo.phenom.pub',
         },
         {
-          host: 'demo-gql.import-manuscript.hindawi.com',
+          host: 'demo-gql.import-manuscript-backend.hindawi.com',
         },
       ],
     },

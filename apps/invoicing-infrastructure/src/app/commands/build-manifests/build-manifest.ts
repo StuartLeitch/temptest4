@@ -19,6 +19,7 @@ function makeAppEnum(app: string): App | null {
     case App.importManuscriptBackend:
     case App.importManuscriptValidation:
     case App.invoicingErpInvoiceRegistration:
+    case App.importManuscriptWeb:
       return app as App;
 
     default:
@@ -37,11 +38,11 @@ interface EnvProps {
 
 export class BuildManifestsCommand implements Command {
   private parseEnv(): EnvProps {
-    let tenant: string = getOsEnv('TENANT');
-    let environment: string = getOsEnv('NODE_ENV');
-    let tag: string = getOsEnv('CI_COMMIT_SHA');
-    let awsRegistry: string = getOsEnv('AWS_REGISTRY');
-    let apps: App[] = getOsEnv('AFFECTED_APPS')
+    const tenant: string = getOsEnv('TENANT');
+    const environment: string = getOsEnv('NODE_ENV');
+    const tag: string = getOsEnv('CI_COMMIT_SHA');
+    const awsRegistry: string = getOsEnv('AWS_REGISTRY');
+    const apps: App[] = getOsEnv('AFFECTED_APPS')
       .split(/[\s,]/)
       .map((a) => a.trim())
       .map(makeAppEnum)

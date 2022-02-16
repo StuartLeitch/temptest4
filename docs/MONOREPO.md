@@ -155,16 +155,16 @@ later it can became more similar to:
 │    │   │   │       ├── bin/
 │    │   │   │       ├── docs/
 │    │   │   │       ├── src/
-│    │   │   │       ├── tsconfig.json
+│    │   │   │       ├── tsconfig.base.json
 │    │   │   │       └── tslint.json
-│    │   │   ├── tsconfig.json
+│    │   │   ├── tsconfig.base.json
 │    │   │   ├── README.md
 │    │   │   └── tslint.json
 │    │   └── payment-server/
 │    ├── components/
 │    │       ├── jest.config.js
 │    │       ├── package.json
-│    │       ├── tsconfig.json
+│    │       ├── tsconfig.base.json
 │    │       ├── src/
 │    │       │   ├── react/
 │    │       │   │   ├── component-a
@@ -182,7 +182,7 @@ later it can became more similar to:
 │    └── shared/
 │            ├── jest.config.js
 │            ├── package.json
-│            ├── tsconfig.json
+│            ├── tsconfig.base.json
 │            ├── lib/
 │            │   ├── core/
 │            │   ├── payments/
@@ -200,7 +200,7 @@ later it can became more similar to:
 ├── jest.config.js
 ├── lerna.json
 ├── package.json
-├── tsconfig.json
+├── tsconfig.base.json
 └── tslint.json
 ```
 
@@ -249,7 +249,7 @@ Each individual package will have its own `tsconfig.json` whose extended root, i
 
 ```json
 {
- "extends": "../../tsconfig.json",
+ "extends": "../../tsconfig.base.json",
  "compilerOptions": {
    "outDir": "./lib"
  },

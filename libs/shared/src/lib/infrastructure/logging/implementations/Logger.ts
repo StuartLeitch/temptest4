@@ -1,28 +1,8 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
-import * as path from 'path';
+import { VError } from 'verror';
 import winston from 'winston';
+import * as path from 'path';
 
-import { LoggerContract } from '@hindawi/shared';
-import { LoggerOptions } from '../Logger';
-import {VError} from "verror";
-
-const COLORS = {
-  info: '\x1b[36m',
-  error: '\x1b[31m',
-  warn: '\x1b[33m',
-  verbose: '\x1b[34m',
-  debug: '\x1b[34m',
-};
-
-const LOG_ICONS: any = {
-  debug: '🛠️',
-  info: '\u{2139}',
-  warn: '\u{26A0}',
-  error: '\u{2757}',
-  critical: '\u{203C}',
-};
+import { LoggerContract, LoggerOptions } from '../Logger';
 
 /**
  * core.Log
@@ -76,14 +56,15 @@ export class Logger implements LoggerContract {
 
         const toShowArgs = args.length > 0;
 
-        const isError = args.length > 0 && args[0] && Object.prototype.hasOwnProperty.call(args[0], 'error');
+        const isError =
+          args.length > 0 &&
+          args[0] &&
+          Object.prototype.hasOwnProperty.call(args[0], 'error');
         const logLine = `[${timestamp}] [${justLevel}] ${
-          metascope ? `[${metascope}] `: ''
-        }: ${COLORS[justLevel]}${message} ${
-          toShowArgs && !isError ? JSON.stringify(args): ''
-        } ${
+          metascope ? `[${metascope}] ` : ''
+        }: ${message} ${toShowArgs && !isError ? JSON.stringify(args) : ''} ${
           isError
-            ? `${COLORS[justLevel]}Error: ${args[0].error}\nStack: ${args[0].stack}\x1b[0m`
+            ? `\x1b[31mError: ${args[0].error}\nStack: ${args[0].stack}\x1b[0m`
             : ''
         }`;
 
@@ -97,13 +78,27 @@ export class Logger implements LoggerContract {
 
     const logger = winston.createLogger({
       format: winston.format.combine(
-        winston.format.colorize({ all: true }),
-        winston.format.label({ label: 'Maybe the correlation id and user id goes here' }),
-        winston.format.timestamp({format: 'DD-MM-YYYY HH:mm:ss Z', alias:'Date_alias'}),
+        winston.format.colorize({
+          all: true,
+          colors: {
+            error: 'red',
+            warn: 'yellow',
+            info: 'green',
+            debug: 'blueBG yellow',
+            verbose: 'blueBG yellow',
+          },
+        }),
+        winston.format.label({
+          label: 'Maybe the correlation id and user id goes here',
+        }),
+        winston.format.timestamp({
+          format: 'DD-MM-YYYY HH:mm:ss Z',
+          alias: 'Date_alias',
+        }),
         customFormat
       ),
       level: options.logLevel,
-      transports: [transport]
+      transports: [transport],
     });
 
     this.protocol = logger;
@@ -134,7 +129,11 @@ export class Logger implements LoggerContract {
       if (args.length) {
         newArgs = args.map((arg) => {
           if (arg instanceof VError) {
-            return { ...args, error: arg.message, stack: VError.fullStack(arg) };
+            return {
+              ...args,
+              error: arg.message,
+              stack: VError.fullStack(arg),
+            };
           }
           if (arg instanceof Error) {
             return { ...args, error: arg.message, stack: arg.stack };

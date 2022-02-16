@@ -1,3 +1,4 @@
+/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 // TODO generate this based on apps folder structure
 import { App, Tenant } from '../../types';
 import { WithAwsSecretsServiceProps } from '@hindawi/phenom-charts';
@@ -10,6 +11,7 @@ import { values as devReportingBackendValues } from 'apps/reporting-backend/char
 import { values as devInvoicingErpInvoiceRegistrationValues } from 'apps/invoicing-erp-invoice-registration/chart/hindawi/dev';
 import { values as devImportManuscriptBackend } from 'apps/import-manuscript-backend/chart/hindawi/dev';
 import { values as devImportManuscriptValidation } from 'apps/import-manuscript-validation/chart/hindawi/dev';
+import { values as devImportManuscriptWeb } from 'apps/import-manuscript-web/chart/hindawi/dev';
 
 import { values as qaInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/hindawi/qa';
 import { values as qaInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/qa';
@@ -18,6 +20,7 @@ import { values as qaReportingBackendValues } from 'apps/reporting-backend/chart
 import { values as qaInvoicingErpInvoiceRegistrationValues } from 'apps/invoicing-erp-invoice-registration/chart/hindawi/qa';
 import { values as qaImportManuscriptBackend } from 'apps/import-manuscript-backend/chart/hindawi/qa';
 import { values as qaImportManuscriptValidation } from 'apps/import-manuscript-validation/chart/hindawi/qa';
+import { values as qaImportManuscriptWeb } from 'apps/import-manuscript-web/chart/hindawi/qa';
 
 import { values as demoInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/hindawi/demo';
 import { values as demoInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/demo';
@@ -25,6 +28,7 @@ import { values as demoInvoicingAdminValues } from 'apps/invoicing-admin/chart/h
 import { values as demoInvoicingErpInvoiceRegistrationValues } from 'apps/invoicing-erp-invoice-registration/chart/hindawi/demo';
 import { values as demoImportManuscriptBackend } from 'apps/import-manuscript-backend/chart/hindawi/demo';
 import { values as demoImportManuscriptValidation } from 'apps/import-manuscript-validation/chart/hindawi/demo';
+import { values as demoImportManuscriptWeb } from 'apps/import-manuscript-web/chart/hindawi/demo';
 
 import { values as demoSalesInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/hindawi/demo-sales';
 import { values as demoSalesInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/demo-sales';
@@ -32,6 +36,7 @@ import { values as demoSalesInvoicingAdminValues } from 'apps/invoicing-admin/ch
 import { values as demoSalesInvoicingErpInvoiceRegistrationValues } from 'apps/invoicing-erp-invoice-registration/chart/hindawi/demo-sales';
 import { values as demoSalesImportManuscriptBackend } from 'apps/import-manuscript-backend/chart/hindawi/demo-sales';
 import { values as demoSalesImportManuscriptValidation } from 'apps/import-manuscript-validation/chart/hindawi/demo-sales';
+import { values as demoSalesImportManuscriptWeb } from 'apps/import-manuscript-web/chart/hindawi/demo-sales';
 
 import { values as gswDemoInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/gsw/demo';
 import { values as gswDemoInvoicingWebValues } from 'apps/invoicing-web/chart/gsw/demo';
@@ -42,8 +47,6 @@ import { values as preproductionInvoicingGraphqlValues } from 'apps/invoicing-gr
 import { values as preproductionInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/preproduction';
 import { values as preproductionInvoicingAdminValues } from 'apps/invoicing-admin/chart/hindawi/preproduction';
 import { values as preproductionInvoicingErpInvoiceRegistrationValues } from 'apps/invoicing-erp-invoice-registration/chart/hindawi/preproduction';
-import { values as preproductionImportManuscriptBackend } from 'apps/import-manuscript-backend/chart/hindawi/preproduction';
-import { values as preproductionImportManuscriptValidation } from 'apps/import-manuscript-validation/chart/hindawi/preproduction';
 
 import { values as gswProdInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/gsw/prod';
 import { values as gswProdInvoicingWebValues } from 'apps/invoicing-web/chart/gsw/prod';
@@ -58,6 +61,7 @@ import { values as hindawiProdReportingValues } from 'apps/reporting-backend/cha
 import { values as hindawiProdInvoicingErpInvoiceRegistrationValues } from 'apps/invoicing-erp-invoice-registration/chart/hindawi/prod';
 import { values as hindawiProdImportManuscriptBackend } from 'apps/import-manuscript-backend/chart/hindawi/prod';
 import { values as hindawiProdImportManuscriptValidation } from 'apps/import-manuscript-validation/chart/hindawi/prod';
+import { values as hindawiProdImportManuscriptWeb } from 'apps/import-manuscript-web/chart/hindawi/prod';
 
 import { values as automationInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/hindawi/automation';
 import { values as automationInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/automation';
@@ -65,6 +69,7 @@ import { values as automationInvoicingAdminValues } from 'apps/invoicing-admin/c
 import { values as automationInvoicingErpInvoiceRegistrationValues } from 'apps/invoicing-erp-invoice-registration/chart/hindawi/automation';
 import { values as automationImportManuscriptBackend } from 'apps/import-manuscript-backend/chart/hindawi/automation';
 import { values as automationImportManuscriptValidation } from 'apps/import-manuscript-validation/chart/hindawi/automation';
+import { values as automationImportManuscriptWeb } from 'apps/import-manuscript-web/chart/hindawi/automation';
 
 const masterConfig: {
   [tenant: string]: {
@@ -78,16 +83,15 @@ const masterConfig: {
       [App.admin]: hindawiProdInvoicingAdminValues,
       [App.reporting]: hindawiProdReportingValues,
       [App.web]: hindawiProdInvoicingWebValues,
-      [App.importManuscriptBackend]: hindawiProdImportManuscriptBackend,
-      [App.importManuscriptValidation]: hindawiProdImportManuscriptValidation,
+      // [App.importManuscriptBackend]: hindawiProdImportManuscriptBackend,
+      // [App.importManuscriptValidation]: hindawiProdImportManuscriptValidation,
+      // [App.importManuscriptWeb]: hindawiProdImportManuscriptWeb,,
     },
     preproduction: {
       [App.invoicingErpInvoiceRegistration]: preproductionInvoicingErpInvoiceRegistrationValues,
       [App.graphql]: preproductionInvoicingGraphqlValues,
       [App.admin]: preproductionInvoicingAdminValues,
       [App.web]: preproductionInvoicingWebValues,
-      [App.importManuscriptBackend]: preproductionImportManuscriptBackend,
-      [App.importManuscriptValidation]: preproductionImportManuscriptValidation,
     },
     demo: {
       [App.invoicingErpInvoiceRegistration]: demoInvoicingErpInvoiceRegistrationValues,
@@ -96,6 +100,7 @@ const masterConfig: {
       [App.web]: demoInvoicingWebValues,
       [App.importManuscriptBackend]: demoImportManuscriptBackend,
       [App.importManuscriptValidation]: demoImportManuscriptValidation,
+      [App.importManuscriptWeb]: demoImportManuscriptWeb,
     },
     'demo-sales': {
       [App.invoicingErpInvoiceRegistration]: demoSalesInvoicingErpInvoiceRegistrationValues,
@@ -104,6 +109,7 @@ const masterConfig: {
       [App.web]: demoSalesInvoicingWebValues,
       [App.importManuscriptBackend]: demoSalesImportManuscriptBackend,
       [App.importManuscriptValidation]: demoSalesImportManuscriptValidation,
+      [App.importManuscriptWeb]: demoSalesImportManuscriptWeb,
     },
     qa: {
       [App.invoicingErpInvoiceRegistration]: qaInvoicingErpInvoiceRegistrationValues,
@@ -113,15 +119,16 @@ const masterConfig: {
       [App.web]: qaInvoicingWebValues,
       [App.importManuscriptBackend]: qaImportManuscriptBackend,
       [App.importManuscriptValidation]: qaImportManuscriptValidation,
-
+      [App.importManuscriptWeb]: qaImportManuscriptWeb,
     },
-    automation:{
+    automation: {
       [App.invoicingErpInvoiceRegistration]: automationInvoicingErpInvoiceRegistrationValues,
       [App.graphql]: automationInvoicingGraphqlValues,
       [App.admin]: automationInvoicingAdminValues,
       [App.web]: automationInvoicingWebValues,
       [App.importManuscriptBackend]: automationImportManuscriptBackend,
       [App.importManuscriptValidation]: automationImportManuscriptValidation,
+      [App.importManuscriptWeb]: automationImportManuscriptWeb,
     },
     dev: {
       [App.invoicingErpInvoiceRegistration]: devInvoicingErpInvoiceRegistrationValues,
@@ -131,7 +138,7 @@ const masterConfig: {
       [App.web]: devInvoicingWebValues,
       [App.importManuscriptBackend]: devImportManuscriptBackend,
       [App.importManuscriptValidation]: devImportManuscriptValidation,
-
+      [App.importManuscriptWeb]: devImportManuscriptWeb,
     },
   },
   [Tenant.gsw]: {

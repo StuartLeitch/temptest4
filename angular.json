@@ -1,6 +1,27 @@
 {
   "version": 1,
   "projects": {
+    "env-utils": {
+      "root": "libs/env-utils",
+      "sourceRoot": "libs/env-utils/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/env-utils/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/env-utils"],
+          "options": {
+            "jestConfig": "libs/env-utils/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "eve": {
       "root": "libs/eve",
       "sourceRoot": "libs/eve/src",
@@ -49,6 +70,7 @@
       "root": "apps/import-manuscript-backend",
       "sourceRoot": "apps/import-manuscript-backend/src",
       "projectType": "application",
+      "prefix": "import-manuscript-backend",
       "architect": {
         "build": {
           "builder": "@nrwl/node:build",
@@ -57,19 +79,17 @@
             "outputPath": "dist/apps/import-manuscript-backend",
             "main": "apps/import-manuscript-backend/src/main.ts",
             "tsConfig": "apps/import-manuscript-backend/tsconfig.app.json",
-            "assets": ["apps/import-manuscript-backend/src/assets"]
+            "assets": [
+              "apps/import-manuscript-backend/src/assets",
+              "apps/import-manuscript-backend/src/Dockerfile"
+            ],
+            "webpackConfig": "apps/import-manuscript-backend/webpack.config.js"
           },
           "configurations": {
             "production": {
               "optimization": true,
               "extractLicenses": true,
-              "inspect": false,
-              "fileReplacements": [
-                {
-                  "replace": "apps/import-manuscript-backend/src/environments/environment.ts",
-                  "with": "apps/import-manuscript-backend/src/environments/environment.prod.ts"
-                }
-              ]
+              "inspect": false
             }
           }
         },
@@ -80,17 +100,37 @@
           }
         },
         "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "outputs": ["{options.outputFile}"],
+          "builder": "@nrwl/linter:lint",
           "options": {
+            "linter": "eslint",
+            "config": "apps/import-manuscript-backend/.eslintrc",
+            "tsConfig": [
+              "apps/import-manuscript-backend/tsconfig.app.json",
+              "apps/import-manuscript-backend/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!apps/import-manuscript-backend/**"
+            ],
             "lintFilePatterns": ["apps/import-manuscript-backend/**/*.ts"]
           }
         },
         "test": {
+          "builder": "./tools/builders:cucumber",
+          "options": {
+            "tsConfig": "apps/import-manuscript-backend/tsconfig.spec.json",
+            "features": "apps/import-manuscript-backend/tests/**/*.feature",
+            "steps": "apps/import-manuscript-backend/tests/**/*.steps.ts",
+            "path": "apps/import-manuscript-backend",
+            "format": "json",
+            "coverage": true
+          }
+        },
+        "jest": {
           "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/import-manuscript-backend"],
           "options": {
             "jestConfig": "apps/import-manuscript-backend/jest.config.js",
+            "tsConfig": "apps/import-manuscript-backend/tsconfig.spec.json",
             "passWithNoTests": true
           }
         }
@@ -100,6 +140,7 @@
       "root": "apps/import-manuscript-validation",
       "sourceRoot": "apps/import-manuscript-validation/src",
       "projectType": "application",
+      "prefix": "import-manuscript-validation",
       "architect": {
         "build": {
           "builder": "@nrwl/node:build",
@@ -108,19 +149,16 @@
             "outputPath": "dist/apps/import-manuscript-validation",
             "main": "apps/import-manuscript-validation/src/main.ts",
             "tsConfig": "apps/import-manuscript-validation/tsconfig.app.json",
-            "assets": ["apps/import-manuscript-validation/src/assets"]
+            "assets": [
+              "apps/import-manuscript-validation/src/assets",
+              "apps/import-manuscript-validation/src/Dockerfile"
+            ]
           },
           "configurations": {
             "production": {
               "optimization": true,
               "extractLicenses": true,
-              "inspect": false,
-              "fileReplacements": [
-                {
-                  "replace": "apps/import-manuscript-validation/src/environments/environment.ts",
-                  "with": "apps/import-manuscript-validation/src/environments/environment.prod.ts"
-                }
-              ]
+              "inspect": false
             }
           }
         },
@@ -131,18 +169,140 @@
           }
         },
         "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "outputs": ["{options.outputFile}"],
+          "builder": "@nrwl/linter:lint",
           "options": {
+            "linter": "eslint",
+            "config": "apps/import-manuscript-validation/.eslintrc",
+            "tsConfig": [
+              "apps/import-manuscript-validation/tsconfig.app.json",
+              "apps/import-manuscript-validation/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!apps/import-manuscript-validation/**"
+            ],
             "lintFilePatterns": ["apps/import-manuscript-validation/**/*.ts"]
           }
         },
         "test": {
+          "builder": "./tools/builders:cucumber",
+          "options": {
+            "tsConfig": "apps/import-manuscript-validation/tsconfig.spec.json",
+            "features": "apps/import-manuscript-validation/tests/**/*.feature",
+            "steps": "apps/import-manuscript-validation/tests/**/*.steps.ts",
+            "path": "apps/import-manuscript-validation",
+            "format": "json",
+            "coverage": true
+          }
+        },
+        "jest": {
           "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/import-manuscript-validation"],
           "options": {
             "jestConfig": "apps/import-manuscript-validation/jest.config.js",
+            "tsConfig": "apps/import-manuscript-validation/tsconfig.spec.json",
             "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "import-manuscript-web": {
+      "root": "apps/import-manuscript-web",
+      "sourceRoot": "apps/import-manuscript-web/src",
+      "projectType": "application",
+      "architect": {
+        "build": {
+          "builder": "@nrwl/web:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/import-manuscript-web",
+            "index": "apps/import-manuscript-web/src/index.html",
+            "main": "apps/import-manuscript-web/src/main.tsx",
+            "polyfills": "apps/import-manuscript-web/src/polyfills.ts",
+            "tsConfig": "apps/import-manuscript-web/tsconfig.app.json",
+            "assets": [
+              "apps/import-manuscript-web/src/favicon.ico",
+              "apps/import-manuscript-web/src/assets",
+              "apps/import-manuscript-web/src/silent-check-sso.html",
+              "apps/import-manuscript-web/src/env-template.js",
+              "apps/import-manuscript-web/src/Dockerfile",
+              "apps/import-manuscript-web/src/nginx.conf"
+            ],
+            "styles": ["apps/import-manuscript-web/src/styles.less"],
+            "scripts": [],
+            "webpackConfig": "@nrwl/react/plugins/webpack"
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/import-manuscript-web/src/environments/environment.ts",
+                  "with": "apps/import-manuscript-web/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/web:dev-server",
+          "options": {
+            "buildTarget": "import-manuscript-web:build",
+            "hmr": true
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "import-manuscript-web:build:production",
+              "hmr": false
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": [
+              "apps/import-manuscript-web/**/*.{ts,tsx,js,jsx}"
+            ]
+          }
+        }
+      }
+    },
+    "import-manuscript-web-e2e": {
+      "root": "apps/import-manuscript-web-e2e",
+      "sourceRoot": "apps/import-manuscript-web-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/import-manuscript-web-e2e/cypress.json",
+            "devServerTarget": "import-manuscript-web:serve",
+            "tsConfig": "apps/import-manuscript-web-e2e/tsconfig.json"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "import-manuscript-web:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["apps/import-manuscript-web-e2e/**/*.{js,ts}"]
           }
         }
       }
@@ -562,6 +722,55 @@
         }
       }
     },
+    "lib-import-manuscript-commons": {
+      "root": "libs/import-manuscript-commons",
+      "sourceRoot": "libs/import-manuscript-commons/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/import-manuscript-commons/tsconfig.lib.json",
+              "libs/import-manuscript-commons/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!libs/import-manuscript-commons/**/*"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/import-manuscript-commons"],
+          "options": {
+            "jestConfig": "libs/import-manuscript-commons/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "queue-utils": {
+      "root": "libs/queue-utils",
+      "sourceRoot": "libs/queue-utils/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/queue-utils/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/queue-utils"],
+          "options": {
+            "jestConfig": "libs/queue-utils/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "react-components": {
       "root": "libs/react-components",
       "sourceRoot": "libs/react-components/src",
@@ -821,48 +1030,6 @@
           "options": {
             "jestConfig": "apps/sisif-test/jest.config.js",
             "tsConfig": "apps/sisif-test/tsconfig.spec.json",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
-    "env-utils": {
-      "root": "libs/env-utils",
-      "sourceRoot": "libs/env-utils/src",
-      "projectType": "library",
-      "architect": {
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["libs/env-utils/**/*.ts"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/env-utils"],
-          "options": {
-            "jestConfig": "libs/env-utils/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
-    "queue-utils": {
-      "root": "libs/queue-utils",
-      "sourceRoot": "libs/queue-utils/src",
-      "projectType": "library",
-      "architect": {
-        "lint": {
-          "builder": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["libs/queue-utils/**/*.ts"]
-          }
-        },
-        "test": {
-          "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/queue-utils"],
-          "options": {
-            "jestConfig": "libs/queue-utils/jest.config.js",
             "passWithNoTests": true
           }
         }

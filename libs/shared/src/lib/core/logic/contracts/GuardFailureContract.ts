@@ -1,3 +1,3 @@
-export interface GuardFailureContract {
+export interface GuardFailureContract extends Error {
   message: string;
 }

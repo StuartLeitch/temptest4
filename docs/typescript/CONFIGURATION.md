@@ -11,7 +11,7 @@
   // "files": [], // A list of relative or absolute file paths to include.
   // "extends": "", // A string containing a path to another configuration file to inherit from.
   // "references": [], // An array of objects `{"path": "./to/dirOrConfig"}` specifying projects to reference. https://www.typescriptlang.org/docs/handbook/project-references.html
-  // "compileOnSave": false, // Signals to the IDE to generate all files for a given tsconfig.json upon saving.
+  // "compileOnSave": false, // Signals to the IDE to generate all files for a given tsconfig.base.json upon saving.
 
   "compilerOptions": {
 

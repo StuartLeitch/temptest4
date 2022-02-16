@@ -1,0 +1,56 @@
+{
+  "compileOnSave": false,
+  "ts-node": {
+    "compilerOptions": {
+      "esModuleInterop": true,
+      "moduleResolution": "node",
+      "module": "commonjs",
+      "skipLibCheck": true
+    }
+  },
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "downlevelIteration": true,
+    "module": "esnext",
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["es2015", "es2017", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@env/*": ["apps/invoicing-graphql/src/environments/*"],
+      "@hindawi/domain": ["libs/shared/src/lib/domain/index.ts"],
+      "@hindawi/env-utils": ["libs/env-utils/src/index.ts"],
+      "@hindawi/eve": ["libs/eve/src/index.ts"],
+      "@hindawi/import-manuscript-backend/*": [
+        "apps/import-manuscript-backend/src/*"
+      ],
+      "@hindawi/import-manuscript-validation/*": [
+        "apps/import-manuscript-validation/src/*"
+      ],
+      "@hindawi/infrastructure": [
+        "libs/shared/src/lib/infrastructure/index.ts"
+      ],
+      "@hindawi/invoicing-graphql/*": ["apps/invoicing-graphql/src/*"],
+      "@hindawi/invoicing-web/*": ["apps/invoicing-web/src/*"],
+      "@hindawi/queue-utils": ["libs/queue-utils/src/index.ts"],
+      "@hindawi/react-components": ["libs/react-components/src/index.ts"],
+      "@hindawi/reporting-backend/*": ["apps/reporting-backend/src/*"],
+      "@hindawi/shared": ["libs/shared/src/index.ts"],
+      "@hindawi/sisif": ["libs/sisif/src/index.ts"],
+      "@hindawi/import-manuscript-commons": [
+        "libs/import-manuscript-commons/src/index.ts"
+      ],
+      "@utils": ["libs/shared/src/lib/utils/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp", "dist", "coverage", "report"]
+}

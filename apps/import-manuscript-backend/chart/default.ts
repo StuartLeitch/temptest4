@@ -8,7 +8,7 @@ const defaultValues: WithAwsSecretsServiceProps = {
   serviceProps: {
     image: {
       repository:
-        '916437579680.dkr.ecr.eu-west-1.amazonaws.com/import-manuscript-validation',
+        '916437579680.dkr.ecr.eu-west-1.amazonaws.com/import-manuscript-backend',
       tag: 'latest',
     },
     replicaCount: 1,

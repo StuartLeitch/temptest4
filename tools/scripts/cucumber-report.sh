@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 set -ex
-
-if [ -f "$1" ]; then
-    node ./tools/scripts/cucumber/report.js "$1"
+files=$(shopt -s nullglob dotglob; echo reports/cucumber/*.json)
+if (( ${#files} )); then
+    node ./tools/scripts/cucumber/report.js
 else
-    echo "Missing $1 . Skipping cucumber report generation."
+    echo "Missing test results. Skipping cucumber report generation."
 fi
