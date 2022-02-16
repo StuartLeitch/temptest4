@@ -45,9 +45,9 @@ const EditableCell: React.FC<EditableCellProps> = ({
           ]}
         >
           {dataIndex === 'amount' ? (
-            <Input />
+            <Input style={{ width: 80, textAlign: 'right' }} />
           ) : (
-            <Select>
+            <Select style={{ width: 100 }}>
               {publishers &&
                 publishers.map((publisher, index) => {
                   const { name, id } = publisher;

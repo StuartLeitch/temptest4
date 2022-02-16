@@ -13,6 +13,7 @@ type PermissionCache = {
 
 const PERMISSIONS = {
   SUPER_ADMIN: [
+    'apc.edit',
     'list.apc',
     'list.invoices',
     'list.credit-notes',
@@ -25,6 +26,7 @@ const PERMISSIONS = {
     'stop.reminders',
   ],
   ADMIN: [
+    'apc.edit',
     'list.apc',
     'list.invoices',
     'list.credit-notes',
@@ -37,6 +39,7 @@ const PERMISSIONS = {
     'stop.reminders',
   ],
   FINANCIAL_CONTROLLER: [
+    'apc.edit',
     'list.apc',
     'list.invoices',
     'list.credit-notes',

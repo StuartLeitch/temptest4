@@ -17,6 +17,15 @@
   }
 }
 
-// .ant-btn.edit-btn {
-//   display: none;
-// }
+span.anticon.edit-button {
+  display: none;
+}
+
+.ant-table-row:hover span.anticon.edit-button {
+  display: block;
+  float: left;
+}
+
+.ant-table-row {
+  height: 3.45em;
+}

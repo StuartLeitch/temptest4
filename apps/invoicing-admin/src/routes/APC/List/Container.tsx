@@ -26,7 +26,14 @@ import { Loading } from '../../components';
 
 import { Form } from 'antd';
 
-import { Text, Table } from '@hindawi/phenom-ui';
+import {
+  Text,
+  Table,
+  IconEdit,
+  IconSave,
+  IconRemove,
+  Space,
+} from '@hindawi/phenom-ui';
 
 import EditableCell from './components/EditableCell';
 import { Item } from '../types';
@@ -139,22 +146,24 @@ const ApcContainer: React.FC = () => {
       title: 'Journal Name',
       dataIndex: 'journalTitle',
       key: 'journalName',
-      width: 450,
     },
     {
       title: 'Journal Code',
       dataIndex: 'code',
       key: 'code',
+      width: 200,
     },
     {
       title: 'ISSN',
       dataIndex: 'issn',
       key: 'issn',
+      with: 200,
     },
     {
       title: 'Publisher',
       dataIndex: ['publisher', 'name'],
       key: 'publisher',
+      width: 150,
       editable: true,
       render: (publisher: any) => <Text>{publisher}</Text>,
     },
@@ -163,7 +172,8 @@ const ApcContainer: React.FC = () => {
       dataIndex: 'amount',
       key: 'amount',
       editable: true,
-      width: 200,
+      align: 'right' as const,
+      width: 150,
       render: (apc: React.ReactNode) => (
         <Text type='success' strong>
           ${apc}
@@ -173,24 +183,24 @@ const ApcContainer: React.FC = () => {
     {
       title: '',
       dataIntes: 'action',
+      width: 150,
       render: (_: any, record: Item) => {
         const editable = isEditing(record);
         return editable ? (
           <span>
-            <Text
-              onClick={() => save(record.journalId)}
-              style={{ marginRight: 8 }}
-            >
-              Save
-            </Text>
-            <Text onClick={cancel}>
-              <a>Cancel</a>
-            </Text>
+            <Space size='middle'>
+              <IconSave onClick={() => save(record.journalId)}>Save</IconSave>
+              <IconRemove onClick={cancel}>
+                <a>Cancel</a>
+              </IconRemove>
+            </Space>
           </span>
         ) : (
-          <Text disabled={editingKey !== ''} onClick={() => edit(record)}>
-            Edit
-          </Text>
+          <Restricted to='apc.edit'>
+            <IconEdit className='edit-button' onClick={() => edit(record)}>
+              Edit
+            </IconEdit>
+          </Restricted>
         );
       },
     },
