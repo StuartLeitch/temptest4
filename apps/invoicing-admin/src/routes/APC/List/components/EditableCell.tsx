@@ -1,8 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-import { Input, Form } from 'antd';
-
-import { Select } from '@hindawi/phenom-ui';
+import { Select, Input, Form } from '@hindawi/phenom-ui';
 
 import { Item } from '../../types';
 

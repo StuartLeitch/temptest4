@@ -24,9 +24,8 @@ import {
 import { HeaderMain } from '../../components/HeaderMain';
 import { Loading } from '../../components';
 
-import { Form } from 'antd';
-
 import {
+  Form,
   Text,
   Table,
   IconEdit,
