@@ -29,3 +29,9 @@ span.anticon.edit-button {
 .ant-table-row {
   height: 3.45em;
 }
+
+.amount-field {
+  .ant-form-item-explain-connected {
+    display: none;
+  }
+}

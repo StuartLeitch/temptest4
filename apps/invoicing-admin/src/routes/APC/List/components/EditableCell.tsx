@@ -33,33 +33,48 @@ const EditableCell: React.FC<EditableCellProps> = ({
   return (
     <td {...restProps}>
       {editing ? (
-        <Form.Item
-          name={dataIndex}
-          style={{ margin: 0 }}
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
+        <React.Fragment>
           {dataIndex === 'amount' ? (
-            <Input maxLength={6} style={{ width: 80, textAlign: 'right' }} />
+            <Form.Item
+              className='amount-field'
+              name={dataIndex}
+              style={{ margin: 0 }}
+              rules={[
+                {
+                  required: true,
+                  pattern: new RegExp(/^[0-9]+$/),
+                  message: '',
+                },
+              ]}
+            >
+              <Input maxLength={6} style={{ width: 80, textAlign: 'right' }} />
+            </Form.Item>
           ) : (
-            <Select style={{ width: 100 }}>
-              {publishers &&
-                publishers.map((publisher, index) => {
-                  const { name, id } = publisher;
+            <Form.Item
+              name={dataIndex}
+              style={{ margin: 0 }}
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+            >
+              <Select style={{ width: 100 }}>
+                {publishers &&
+                  publishers.map((publisher, index) => {
+                    const { name, id } = publisher;
 
-                  return (
-                    <Option key={index} value={name}>
-                      {' '}
-                      {name}
-                    </Option>
-                  );
-                })}
-            </Select>
+                    return (
+                      <Option key={index} value={name}>
+                        {' '}
+                        {name}
+                      </Option>
+                    );
+                  })}
+              </Select>
+            </Form.Item>
           )}
-        </Form.Item>
+        </React.Fragment>
       ) : (
         children
       )}
