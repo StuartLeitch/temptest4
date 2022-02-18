@@ -1,7 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import { useManualQuery, useMutation } from 'graphql-hooks';
 import { useQueryState } from 'react-router-use-location-state';
-import { toast } from 'react-toastify';
 
 import {
   APC_QUERY,
