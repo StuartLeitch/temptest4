@@ -118,7 +118,7 @@ const ApcContainer: React.FC = () => {
           variables: {
             catalogItem: {
               amount: row.amount,
-              publisherId: row.publisher.name,
+              publisherName: row.publisher.name,
               journalId,
             },
           },
@@ -129,8 +129,6 @@ const ApcContainer: React.FC = () => {
 
         if (!updateCatalogItemError) {
           fetchData(page);
-        } else {
-          toast.error(updateCatalogItemError);
         }
       } catch (e) {
         console.error(e.message);

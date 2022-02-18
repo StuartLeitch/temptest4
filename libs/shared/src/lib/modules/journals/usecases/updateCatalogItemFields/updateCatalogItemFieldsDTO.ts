@@ -1,5 +1,5 @@
 export interface UpdateCatalogItemFieldsDTO {
-  amount?: number;
+  amount?: string;
   journalId?: string;
-  publisherId?: string;
+  publisherName?: string;
 }

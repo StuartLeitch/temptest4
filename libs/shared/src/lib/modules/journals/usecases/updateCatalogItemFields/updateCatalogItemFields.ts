@@ -15,6 +15,7 @@ import { JournalId } from '../../domain/JournalId';
 import { CatalogMap } from '../../mappers/CatalogMap';
 
 import { CatalogRepoContract } from '../../repos/catalogRepo';
+import { PublisherRepoContract } from '../../../publishers/repos';
 
 import { UpdateCatalogItemFieldsResponse as Response } from './updateCatalogItemFieldsResponse';
 import type { UpdateCatalogItemFieldsDTO as DTO } from './updateCatalogItemFieldsDTO';
@@ -24,23 +25,27 @@ export class UpdateCatalogItemFieldsUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Response, Context> {
   private catalogRepo: CatalogRepoContract;
+  private publisherRepo: PublisherRepoContract;
 
-  constructor(catalogRepo: CatalogRepoContract) {
+  constructor(
+    catalogRepo: CatalogRepoContract,
+    publisherRepo: PublisherRepoContract
+  ) {
     super();
 
     this.catalogRepo = catalogRepo;
+    this.publisherRepo = publisherRepo;
   }
 
   @Authorize('journal:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
-    const { amount, journalId: rawJournalId, publisherId } = request;
-
+    const { amount, journalId: rawJournalId, publisherName } = request;
     try {
       const journalId: JournalId = JournalId.create(
         new UniqueEntityID(rawJournalId)
       );
 
-      // getting catalog item id
+      // getting catalog item by id
       const maybeCatalogItem = await this.catalogRepo.getCatalogItemByJournalId(
         journalId
       );
@@ -57,6 +62,17 @@ export class UpdateCatalogItemFieldsUsecase
         return left(new Errors.CatalogNotFound(journalId.id.toString()));
       }
 
+      //getting publisherId by publisher name
+      const maybePublisherId = await this.publisherRepo.getPublisherByName(
+        publisherName
+      );
+      if (maybePublisherId.isLeft()) {
+        return left(
+          new UnexpectedError(new Error(maybePublisherId.value.message))
+        );
+      }
+
+      const publisherId = maybePublisherId.value;
       const maybeUpdatedCatalogItem = CatalogMap.toDomain({
         id: catalogItem.id,
         amount,
@@ -64,7 +80,7 @@ export class UpdateCatalogItemFieldsUsecase
         updated: new Date(),
         isActive: catalogItem.isActive,
         journalId: rawJournalId,
-        publisherId,
+        publisherId: publisherId.id.toString(),
       });
 
       if (maybeUpdatedCatalogItem.isLeft()) {

@@ -5,7 +5,7 @@ export const CATALOG_ITEM_UPDATE = `
     updateCatalogItem(
       catalogItem: $catalogItem
     ) {
-      publisherId
+      publisherName
       amount
     }
   }

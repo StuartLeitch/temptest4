@@ -160,6 +160,7 @@ type InvoicingJournal {
   issn: String
   publisherId: ID
   publisher: InvoicingPublisher
+  publisherName: String
   code: String
   # ... (TODO: add missing fields here)
 }
@@ -264,7 +265,7 @@ input CouponInput {
 
 input CatalogInput {
   journalId: ID
-  publisherId: String
+  publisherName: String
   amount: String
 }
 

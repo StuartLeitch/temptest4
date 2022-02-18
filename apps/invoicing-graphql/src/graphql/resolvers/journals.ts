@@ -77,7 +77,10 @@ export const invoicingJournals: Resolvers<Context> = {
       const roles = getAuthRoles(context);
       const { repos } = context;
 
-      const usecase = new UpdateCatalogItemFieldsUsecase(repos.catalog);
+      const usecase = new UpdateCatalogItemFieldsUsecase(
+        repos.catalog,
+        repos.publisher
+      );
       const usecaseContext = { roles };
       const result = await usecase.execute(args.catalogItem, usecaseContext);
 

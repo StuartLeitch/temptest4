@@ -9,6 +9,7 @@ export const JOURNAL_FRAGMENT = `
     publisherId
     publisher {
       name
+      id
     }
   }
 `;
@@ -44,6 +45,20 @@ query getPublishers(
     }
   }
 }
+`;
+
+export const APC_PUBLISHER_BY_NAME_QUERY = `
+  query getPublisherByName(
+    $name: String
+    ) {
+      getPublisherByName(
+        name: $name
+      ) {
+        id
+        name
+      }
+    }
+  )
 `;
 
 export const APC_PUBLISHER_QUERY = `

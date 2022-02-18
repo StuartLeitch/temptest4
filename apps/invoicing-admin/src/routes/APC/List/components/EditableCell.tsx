@@ -43,7 +43,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
           ]}
         >
           {dataIndex === 'amount' ? (
-            <Input style={{ width: 80, textAlign: 'right' }} />
+            <Input maxLength={6} style={{ width: 80, textAlign: 'right' }} />
           ) : (
             <Select style={{ width: 100 }}>
               {publishers &&
@@ -51,7 +51,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
                   const { name, id } = publisher;
 
                   return (
-                    <Option key={index} value={id}>
+                    <Option key={index} value={name}>
                       {' '}
                       {name}
                     </Option>
