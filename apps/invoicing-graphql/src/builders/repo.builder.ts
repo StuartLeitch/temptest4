@@ -62,6 +62,7 @@ export function buildRepos(db: Knex, loggerBuilder: LoggerBuilder): Repos {
       articleRepo,
       invoiceItemRepo
     ),
+
     invoiceItem: invoiceItemRepo,
     transaction: new KnexTransactionRepo(db, loggerBuilder.getLogger()),
     payer: new KnexPayerRepo(db, loggerBuilder.getLogger()),
