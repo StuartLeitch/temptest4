@@ -1,66 +1,112 @@
-export interface GuardResult {
-  succeeded: boolean;
-  message?: string;
+abstract class GuardBaseResult {
+  readonly succeeded: boolean;
+  readonly message?: string;
+
+  get failed(): boolean {
+    return !this.succeeded;
+  }
+
+  combine(other: GuardResult): GuardResult {
+    if (this.failed) {
+      return this;
+    }
+
+    return other;
+  }
+
+  isSuccess(): this is GuardSuccess {
+    return this.succeeded;
+  }
+
+  isFail(): this is GuardFail {
+    return this.failed;
+  }
+}
+
+class GuardSuccess extends GuardBaseResult {
+  readonly succeeded: boolean = true;
+
+  constructor() {
+    super();
+  }
+}
+
+class GuardFail extends GuardBaseResult {
+  readonly succeeded: boolean = false;
+
+  constructor(public readonly message: string) {
+    super();
+    if (!message) {
+      throw new Error('Message is required for failed guards');
+    }
+  }
+}
+
+type GuardResult = GuardSuccess | GuardFail;
+
+function success() {
+  return new GuardSuccess();
+}
+
+function fail(message: string) {
+  return new GuardFail(message);
 }
 
 export interface GuardArgument {
-  argument: any;
   argumentName: string;
+  argument: unknown;
 }
 
 export type GuardArgumentCollection = GuardArgument[];
 
 export class Guard {
-  public static combine(guardResults: GuardResult[]): GuardResult {
+  public static combineResults(guardResults: GuardResult[]): GuardResult {
     for (const result of guardResults) {
-      if (result.succeeded === false) return result;
+      if (result.isFail()) {
+        return result;
+      }
     }
 
-    return { succeeded: true };
+    return success();
   }
 
   public static greaterThan(
     minValue: number,
     actualValue: number
   ): GuardResult {
-    return actualValue > minValue
-      ? { succeeded: true }
-      : {
-          succeeded: false,
-          message: `Number given {${actualValue}} is not greater than {${minValue}}`,
-        };
+    if (actualValue > minValue) {
+      return success();
+    } else {
+      const msg = `Number given {${actualValue}} is not greater than {${minValue}}`;
+      return fail(msg);
+    }
   }
 
   public static againstNullOrUndefined(
-    argument: any,
+    argument: unknown,
     argumentName: string
   ): GuardResult {
     if (argument === null || argument === undefined) {
-      return {
-        succeeded: false,
-        message: `${argumentName} is null or undefined`,
-      };
+      return fail(`${argumentName} is null or undefined`);
     } else {
-      return { succeeded: true };
+      return success();
     }
   }
 
   public static againstAtLeast(numChars: number, text: string): GuardResult {
-    return text.length >= numChars
-      ? { succeeded: true }
-      : {
-          succeeded: false,
-          message: `Text is not at least ${numChars} chars.`,
-        };
+    if (text.length >= numChars) {
+      return success();
+    } else {
+      return fail(`Text is not at least ${numChars} chars.`);
+    }
   }
 
   public static againstAtMost(numChars: number, text: string): GuardResult {
-    return text.length <= numChars
-      ? { succeeded: true }
-      : {
-          succeeded: false,
-          message: `Text is greater than ${numChars} chars.`,
-        };
+    if (text.length <= numChars) {
+      return success();
+    } else {
+      return fail(`Text is greater than ${numChars} chars.`);
+    }
   }
 
   public static againstNullOrUndefinedBulk(
@@ -71,34 +117,30 @@ export class Guard {
         arg.argument,
         arg.argumentName
       );
-      if (!result.succeeded) return result;
-    }
-
-    return { succeeded: true, message: '' };
-  }
-
-  public static isOneOf(
-    value: any,
-    validValues: any[],
-    argumentName: string
-  ): GuardResult {
-    let isValid = false;
-    for (let validValue of validValues) {
-      if (value === validValue) {
-        isValid = true;
+      if (!result.succeeded) {
+        return result;
       }
     }
 
-    if (isValid) {
-      return { succeeded: true };
-    } else {
-      return {
-        succeeded: false,
-        message: `${argumentName} isn't oneOf the correct types in ${JSON.stringify(
-          validValues
-        )}. Got "${value}".`,
-      };
+    return success();
+  }
+
+  public static isOneOf(
+    value: unknown,
+    validValues: Array<unknown>,
+    argumentName: string
+  ): GuardResult {
+    for (const validValue of validValues) {
+      if (value === validValue) {
+        return success();
+      }
     }
+
+    const msg = `${argumentName} isn't oneOf the correct types in ${JSON.stringify(
+      validValues
+    )}. Got "${value}".`;
+
+    return fail(msg);
   }
 
   public static inRange(
@@ -108,13 +150,10 @@ export class Guard {
     argumentName: string
   ): GuardResult {
     const isInRange = num >= min && num <= max;
-    if (!isInRange) {
-      return {
-        succeeded: false,
-        message: `${argumentName} is not within range ${min} to ${max}.`,
-      };
+    if (isInRange) {
+      return success();
     } else {
-      return { succeeded: true };
+      return fail(`${argumentName} is not within range ${min} to ${max}.`);
     }
   }
 
@@ -124,19 +163,18 @@ export class Guard {
     max: number,
     argumentName: string
   ): GuardResult {
-    let failingResult;
+    let failingResult: GuardResult;
     for (const num of numbers) {
       const numIsInRangeResult = this.inRange(num, min, max, argumentName);
-      if (!numIsInRangeResult.succeeded) failingResult = numIsInRangeResult;
+      if (!numIsInRangeResult.succeeded) {
+        failingResult = numIsInRangeResult;
+      }
     }
 
     if (failingResult) {
-      return {
-        succeeded: false,
-        message: `${argumentName} is not within the range.`,
-      };
+      return fail(`${argumentName} is not within the range.`);
     } else {
-      return { succeeded: true };
+      return success();
     }
   }
 
@@ -145,15 +183,10 @@ export class Guard {
       /^(([^<>()\[\]\\.,;:\s@"“”]+(\.[^<>()\[\]\\.,;:\s@"“”]+)*))@(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})$/i
     );
 
-    if (!emailRegex.test(email)) {
-      return {
-        succeeded: false,
-        message: `${email} is an invalid email address.`,
-      };
+    if (emailRegex.test(email)) {
+      return success();
     }
 
-    return {
-      succeeded: true,
-    };
+    return fail(`${email} is an invalid email address.`);
   }
 }

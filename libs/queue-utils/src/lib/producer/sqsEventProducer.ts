@@ -1,5 +1,4 @@
 import { v4 as uuidV4 } from 'uuid';
-import * as AWS from 'aws-sdk';
 import { SQS } from 'aws-sdk';
 
 import { Producer } from './producer';
@@ -13,17 +12,24 @@ export class SqsEventProducer implements Producer {
     private readonly eventNamespace: string,
     private readonly publisherName: string,
     private readonly serviceName: string,
+    private readonly region: string,
     private readonly defaultMessageAttributes: Record<string, unknown> = {},
-    private readonly awsProfile?: string
+    private readonly sqsEndpoint?: string,
+    private readonly accessKeyId?: string,
+    private readonly secretAccessKey?: string
   ) {
-    if (this.awsProfile) {
-      const credentials = new AWS.SharedIniFileCredentials({
-        profile: this.awsProfile,
-      });
-      AWS.config.credentials = credentials;
+    let sqsOptions: SQS.ClientConfiguration = { region: this.region };
+
+    if (accessKeyId && secretAccessKey && sqsEndpoint) {
+      sqsOptions = {
+        region: this.region,
+        accessKeyId: this.accessKeyId,
+        secretAccessKey: this.secretAccessKey,
+        endpoint: this.sqsEndpoint,
+      };
     }
 
-    this.sqs = new SQS();
+    this.sqs = new SQS(sqsOptions);
   }
 
   async start() {

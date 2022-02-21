@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "allowJs": true,
     "module": "esnext",
@@ -72,5 +72,6 @@
     "src/lib/infrastructure/database/knex/migrations/20210514203412_insert_50_percent_country_waiver.js",
     "src/lib/infrastructure/database/knex/migrations/20210812143533_add_audit_log_table.js",
     "src/lib/infrastructure/database/knex/migrations/20210823102546_add_is_cascaded_to_articles.js",
-    "src/lib/infrastructure/database/knex/migrations/20211202110250_add_target_to_logs_table.js"]
+    "src/lib/infrastructure/database/knex/migrations/20211202110250_add_target_to_logs_table.js",
+    "src/lib/infrastructure/database/knex/migrations/20220202125506_add_journal_code_to_catalog_table.js"]
 }

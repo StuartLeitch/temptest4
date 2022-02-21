@@ -3,25 +3,26 @@ import * as AWS from 'aws-sdk';
 import { SQS } from 'aws-sdk';
 import { get } from 'lodash';
 
-import { QueueConsumer, Handler } from './consumer';
+import { QueuePlainConsumer, Handler } from './consumer';
 
-export class SqsPlainConsumer implements QueueConsumer<null> {
+export class SqsPlainConsumer implements QueuePlainConsumer {
   private sqsConsumer: Consumer;
   private sqs: SQS;
   private handlers: Array<Handler> = [];
 
   constructor(
     private readonly queueName: string,
-    private readonly awsProfile?: string
+    region?: string,
+    sqsEndpoint?: string,
+    accessKeyId?: string,
+    secretAccessKey?: string
   ) {
-    if (this.awsProfile) {
-      const credentials = new AWS.SharedIniFileCredentials({
-        profile: this.awsProfile,
-      });
-      AWS.config.credentials = credentials;
-    }
-
-    this.sqs = new SQS();
+    this.sqs = new AWS.SQS({
+      region,
+      accessKeyId,
+      secretAccessKey,
+      endpoint: sqsEndpoint,
+    });
   }
 
   registerHandler(handler: Handler) {

@@ -1,11 +1,15 @@
-import {shallowEqual} from 'shallow-equal-object';
+import { shallowEqual } from 'shallow-equal-object';
 
 /**
  * @description ValueObjects are objects that we determine their
  * equality through their structural property.
  */
 
-export abstract class ValueObject<T extends Partial<Record<string, any>>> {
+export interface ValueObjectProps {
+  [key: string]: any;
+}
+
+export abstract class ValueObject<T extends Partial<ValueObjectProps>> {
   public readonly props: Readonly<T>;
 
   constructor(props: T) {

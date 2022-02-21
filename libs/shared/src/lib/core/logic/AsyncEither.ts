@@ -2,7 +2,7 @@ import { cloneDeep } from 'lodash';
 
 import { Either, Right, right } from './Either';
 
-type MutationFunction = (r: any) => any;
+type MutationFunction<T = unknown> = (r: unknown) => T;
 
 type MappingFunction<L = unknown, R = unknown> = (
   val: Either<L, R>
@@ -39,21 +39,6 @@ function allFilters<R>(
   };
 }
 
-function anyFilter<R>(
-  filters: { (r: R): Promise<Either<unknown, boolean>> }[]
-) {
-  return async (r: R) => {
-    let finalResult = right<unknown, boolean>(false);
-    for (const fn of filters) {
-      const result = await fn(r);
-      finalResult = finalResult.chain((val) =>
-        result.map((resVal) => val || resVal)
-      );
-    }
-    return finalResult;
-  };
-}
-
 export function flattenEither<L, R>(eithers: Either<L, R>[]): Either<L, R[]> {
   const response: R[] = [];
   for (const either of eithers) {
@@ -72,8 +57,8 @@ export async function asyncFlattenEither<L, R>(
   return Promise.all(eithers).then(flattenEither);
 }
 
-function advancePastGuard<L, R>(val: Either<L, R>) {
-  return async (fn: MutationFunction) => {
+function advancePastGuard<L, R, L2, R2>(val: Either<L, R>) {
+  return async (fn: MutationFunction<Promise<Either<L2, R2>>>) => {
     if (val.isLeft()) return val;
 
     const maybeResult: Either<unknown, unknown> = await fn(val.value);
@@ -93,25 +78,21 @@ function emptyMapping<L, R>(val: Either<L, R>) {
   return async () => val;
 }
 
-function combineAsyncEithers<L, R>(val: Either<L, R>) {
-  return async (fn: MutationFunction) => {
-    if (val.isLeft()) return val;
-    const execution = await fn(val.value);
-    return execution.execute();
-  };
-}
-
 function doThen<L, R>(val: Either<L, R>) {
-  return async (fn: MutationFunction) => {
+  return async (fn: MutationFunction<Either<L, R>>) => {
     return val.chain<L, R>(fn);
   };
 }
 
 function doMap<L, R>(val: Either<L, R>) {
-  return async (fn: MutationFunction) => {
+  return async (fn: MutationFunction<R>) => {
     return val.map<R>(fn);
   };
 }
+
+type ChainFunction<R, L2, R2> = (
+  r: R
+) => Promise<Either<L2, R2>> | Either<L2, R2>;
 
 export class AsyncEither<L = null, R = unknown> {
   private readonly value: R;
@@ -122,19 +103,27 @@ export class AsyncEither<L = null, R = unknown> {
     this.mutations = [];
   }
 
-  map<R2>(fn: (r: R) => R2) {
+  map<R2>(fn: (r: R) => R2): AsyncEither<L, R2> {
     const newInstance = this.clone();
     newInstance.mutations.push({ type: 'map', fn });
     return (newInstance as unknown) as AsyncEither<L, R2>;
   }
 
-  then<L2, R2>(fn: (r: R) => Promise<Either<L2, R2>>) {
+  then<L2, R2>(fn: (r: R) => Promise<Either<L2, R2>>): AsyncEither<L2 | L, R2> {
     const newInstance = this.clone();
     newInstance.mutations.push({ type: 'then', fn });
     return (newInstance as unknown) as AsyncEither<L2 | L, R2>;
   }
 
-  advanceOrEnd(...fns: { (r: R): Promise<Either<unknown, boolean>> }[]) {
+  chain<L2, R2>(fn: ChainFunction<R, L2, R2>): AsyncEither<L2 | L, R2> {
+    const newInstance = this.clone();
+    newInstance.mutations.push({ type: 'then', fn });
+    return (newInstance as unknown) as AsyncEither<L2 | L, R2>;
+  }
+
+  advanceOrEnd(
+    ...fns: { (r: R): Promise<Either<unknown, boolean>> }[]
+  ): AsyncEither<L, R> {
     const newInstance = this.clone();
     newInstance.mutations.push({ type: 'guard', fn: allFilters(fns) });
     return newInstance;

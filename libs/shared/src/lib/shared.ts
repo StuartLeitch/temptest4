@@ -1,14 +1,5 @@
 // * Export Core Subdomain
-export * from './core/domain/UniqueEntityID';
 export * from './infrastructure/Repo';
-
-// * Export Shared Subdomain
-export * from './domain/Amount';
-export * from './domain/File';
-export * from './domain/Name';
-export * from './domain/Email';
-export * from './domain/PhoneNumber';
-export * from './domain/authorization';
 
 // * Export Address Subdomain
 export * from './modules/addresses/domain/AddressId';
@@ -301,24 +292,11 @@ export * from './modules/audit/repos/implementations/knexAuditLogRepo';
 export * from './modules/audit/mappers/AuditLogMap';
 export * from './modules/audit/usecases/getRecentLogs/getRecentLogs';
 
-// * Services Contracts
-export * from './domain/services/payment/braintree-service';
-export * from './domain/services/payment/paypal-service';
-export * from './domain/services/ExchangeRateService';
-export * from './domain/services/SQSPublishService';
-export * from './domain/services/PdfGenerator';
-
 // * Domain Types
 export * from './domain/PaymentClientToken';
 
-export * from './core/domain/CorrelationID';
-export * from './core/logic/UseCaseError';
-
 // ? Should we export this
 export * from './modules/waivers/repos/implementations/knexWaiverRepo';
-export { VATService } from './domain/services/VATService';
-export { WaiverService } from './domain/services/WaiverService';
-export * from './domain/services/ErpService';
 
 // * Export Utils
 export * from './utils/FormatUtils';
@@ -329,5 +307,19 @@ export * from './utils/VersionCompare';
 export * from './utils/ObjectUtils';
 export * from './utils/EventUtils';
 
-export * from './core/logic/AsyncEither';
-export * from './core/logic/Either';
+export * from './core/logic';
+export * from './core/domain';
+export * from './core/tests';
+export * from './domain';
+export {
+  AccessControlledUsecase,
+  isAuthorizationError,
+  GenericAuthorize,
+} from './domain/authorization/decorators';
+export type {
+  AccessControlledUsecaseContract,
+  AccessControlContext,
+  AuthorizationContext,
+  Authorization,
+} from './domain/authorization/decorators';
+export * from './domain/authorization/graphql';

@@ -134,6 +134,8 @@ Validate Schema:qa:
     SCHEMA_REGISTRY_URL: $QA_SCHEMA_REGISTRY_URL
 
 Build:
+  variables:
+    KUBERNETES_MEMORY_REQUEST: 3Gi
   tags:
     - 'cluster:hindawi-dev'
   interruptible: true

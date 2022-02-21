@@ -76,3 +76,16 @@ export function normalizePort(port: string): number | string | boolean {
   }
   return false;
 }
+
+export function getOsEnvOptionalIfOtherExists(
+  key: string,
+  otherKey: string
+): string {
+  const otherKeyValue = getOsEnvOptional(otherKey);
+
+  if (otherKeyValue) {
+    return null;
+  }
+
+  return getOsEnv(key);
+}

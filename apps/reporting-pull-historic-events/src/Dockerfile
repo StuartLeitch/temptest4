@@ -34,4 +34,5 @@ COPY dist/apps/reporting-pull-historic-events .
 EXPOSE 3000
 
 # Run index.js when the container launches
-CMD ["node", "main.js"]
+CMD ["node", "--enable-source-maps", "main.js"]
+

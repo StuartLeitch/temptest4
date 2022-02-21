@@ -26,6 +26,9 @@
     }
   },
   "projects": {
+    "env-utils": {
+      "tags": []
+    },
     "eve": {
       "tags": []
     },
@@ -34,6 +37,13 @@
     },
     "import-manuscript-validation": {
       "tags": []
+    },
+    "import-manuscript-web": {
+      "tags": []
+    },
+    "import-manuscript-web-e2e": {
+      "tags": [],
+      "implicitDependencies": ["import-manuscript-web"]
     },
     "invoicing-admin": {
       "tags": []
@@ -56,6 +66,12 @@
     "invoicing-web-e2e": {
       "tags": []
     },
+    "lib-import-manuscript-commons": {
+      "tags": []
+    },
+    "queue-utils": {
+      "tags": []
+    },
     "react-components": {
       "tags": []
     },
@@ -72,12 +88,6 @@
       "tags": []
     },
     "sisif-test": {
-      "tags": []
-    },
-    "env-utils": {
-      "tags": []
-    },
-    "queue-utils": {
       "tags": []
     }
   }

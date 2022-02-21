@@ -6,6 +6,7 @@ export enum App {
   invoicingErpInvoiceRegistration = 'invoicing-erp-invoice-registration',
   importManuscriptBackend = 'import-manuscript-backend',
   importManuscriptValidation = 'import-manuscript-validation',
+  importManuscriptWeb = 'import-manuscript-web',
 }
 
 export enum Tenant {
@@ -18,5 +19,5 @@ export enum Environment {
   demo = 'demo',
   prod = 'prod',
   qa = 'qa',
-  automation = "automation"
+  automation = 'automation',
 }

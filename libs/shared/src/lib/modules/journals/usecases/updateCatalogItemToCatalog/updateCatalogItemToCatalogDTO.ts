@@ -5,6 +5,7 @@ export interface UpdateCatalogItemToCatalogDTO {
   journalId: string;
   journalTitle?: string;
   issn?: string;
+  code?: string;
   created?: string;
   updated?: string;
   isActive?: boolean;

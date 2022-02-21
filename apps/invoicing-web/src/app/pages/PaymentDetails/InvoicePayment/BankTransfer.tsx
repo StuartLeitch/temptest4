@@ -13,6 +13,7 @@ interface Props {
   iban?: string;
   bankAddress?: string;
   beneficiaryAddress?: string;
+  accountCurrency?:string;
 }
 
 const BankTransferRow = ({ label, value }: any) => (
@@ -26,6 +27,7 @@ const BankTransferRow = ({ label, value }: any) => (
   </Flex>
 );
 
+
 const BankTransfer: React.FunctionComponent<Props> = ({
   invoiceReference,
   accountName,
@@ -36,6 +38,7 @@ const BankTransfer: React.FunctionComponent<Props> = ({
   iban,
   bankAddress,
   beneficiaryAddress,
+  accountCurrency
 }: any) => {
   return (
     <Fragment>
@@ -47,6 +50,7 @@ const BankTransfer: React.FunctionComponent<Props> = ({
       <BankTransferRow label="Sort Code" value={sortCode} />
       <BankTransferRow label="SWIFT/BIC Code" value={swift} />
       <BankTransferRow label="IBAN" value={iban} />
+      <BankTransferRow label="Currency" value={accountCurrency} />
       <BankTransferRow label="Bank Address" value={bankAddress} />
       <BankTransferRow label="Beneficiary Address" value={beneficiaryAddress} />
       <BankTransferRow label="Reference Number" value={invoiceReference} />

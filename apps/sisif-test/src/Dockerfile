@@ -27,4 +27,5 @@ COPY dist/apps/sisif-test .
 EXPOSE 3000
 
 # Run index.js when the container launches
-CMD ["node", "main.js"]
+CMD ["node", "--enable-source-maps", "main.js"]
+

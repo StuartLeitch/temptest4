@@ -199,7 +199,7 @@ export const invoice: Resolvers<Context> = {
       const getInvoices = async () =>
         Promise.all(
           invoicesList.invoices.map(async (invoiceDetails: any) => {
-            let assocInvoice = null;
+            const assocInvoice = null;
 
             return {
               ...InvoiceMap.toPersistence(invoiceDetails),
@@ -662,8 +662,8 @@ export const invoice: Resolvers<Context> = {
           payer: payerRepo,
           waiver: waiverRepo,
         },
-        services: { emailService, vatService, logger: loggerService,  },
-        auditLoggerServiceProvider
+        services: { emailService, vatService, logger: loggerService },
+        auditLoggerServiceProvider,
       } = context;
       const {
         sanctionedCountryNotificationReceiver,

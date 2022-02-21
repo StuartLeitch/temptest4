@@ -26,4 +26,5 @@ COPY dist/apps/reporting-backend .
 
 EXPOSE 3000
 
-CMD ["node", "main.js"]
+CMD ["node", "--enable-source-maps", "main.js"]
+

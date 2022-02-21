@@ -1,6 +1,9 @@
 import { KeycloakContext } from 'keycloak-connect-graphql';
 
-import { LoggerBuilderContract, AuditLoggerServiceProvider, AuditLoggerServiceContract } from '@hindawi/shared';
+import {
+  AuditLoggerServiceContract,
+  LoggerBuilderContract,
+} from '@hindawi/shared';
 
 import { Services } from './service.builder';
 import { Repos } from './repo.builder';
