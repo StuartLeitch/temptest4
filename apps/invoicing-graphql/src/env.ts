@@ -219,4 +219,8 @@ export const env = {
     companyRegistrationNumber: getOsEnv('COMPANY_REGISTRATION_NUMBER'),
     companyVatNumber: getOsEnv('COMPANY_VAT_NUMBER'),
   },
+  antiFraud: {
+    supportEmail: getOsEnv('ANTI_FRAUD_SUPPORT_EMAIL'),
+    policyUrl: getOsEnv('ANTI_FRAUD_POLICY_URL'),
+  },
 };

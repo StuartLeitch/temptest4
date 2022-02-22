@@ -78,7 +78,9 @@ const waiverService: WaiverService = new WaiverService(
 const emailService: EmailService = new EmailService(
   true,
   process.env.FE_ROOT,
-  process.env.TENANT_NAME
+  process.env.TENANT_NAME,
+  '',
+  ''
 );
 const vatService: VATService = new VATService();
 const loggerService: any = null;

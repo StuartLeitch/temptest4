@@ -115,7 +115,7 @@ Before({ tags: '@ValidateApplyCoupon' }, () => {
   mockCatalogRepo = new MockCatalogRepo();
   mockPublisherRepo = new MockPublisherRepo();
   mockWaiverRepo = new MockWaiverRepo();
-  emailService = new EmailService(mailingDisabled, fePath, tenantName);
+  emailService = new EmailService(mailingDisabled, fePath, tenantName, '', '');
   mockLogger = new MockLogger();
   mockInvoiceRepo = new MockInvoiceRepo(
     mockManuscriptRepo,
