@@ -127,7 +127,9 @@ export async function buildServices(
     emailService: new EmailService(
       env.app.mailingDisabled,
       env.app.FERoot,
-      env.app.tenantName
+      env.app.tenantName,
+      env.antiFraud.supportEmail,
+      env.antiFraud.policyUrl
     ),
     exchangeRateService: new ExchangeRateService(),
     schedulingService: sisifEnabled

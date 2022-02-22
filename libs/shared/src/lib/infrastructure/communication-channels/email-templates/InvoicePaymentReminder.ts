@@ -5,13 +5,15 @@ import { EmailContent } from '../EmailProps';
 import { CatalogItem } from '../../../modules/journals/domain/CatalogItem';
 import { Invoice } from '../../../modules/invoices/domain/Invoice';
 
-interface BuildData {
+export interface PaymentReminderBuildData {
   manuscriptCustomId: string;
   catalogItem: CatalogItem;
   invoice: Invoice;
   invoiceButton: string;
   publisherName: string;
   publisherSite: string;
+  antiFraudSupportEmail: string;
+  antiFraudPolicyUrl: string;
 }
 
 export class InvoicePaymentFirstReminderTemplate {
@@ -21,8 +23,10 @@ export class InvoicePaymentFirstReminderTemplate {
     invoice,
     invoiceButton,
     publisherName,
-    publisherSite
-  }: BuildData): EmailContent {
+    publisherSite,
+    antiFraudSupportEmail,
+    antiFraudPolicyUrl,
+  }: PaymentReminderBuildData): EmailContent {
     const price = `${catalogItem.currency} ${invoice.getInvoiceTotal()}`;
 
     const subject = `${manuscriptCustomId}: Article Processing Charges - Payment Reminder`;
@@ -41,11 +45,14 @@ export class InvoicePaymentFirstReminderTemplate {
       ${publisherSite}<br/>
       *************************************<br/>
       This is an automated email - if you have already paid your invoice, please ignore this email whilst we update our records.
+      <br/>
+      <br/>
+      If you receive a suspicious email that appears to be from Hindawi, requesting payment in an alternative method, please forward it to <a href="mailto:${antiFraudSupportEmail}">${antiFraudSupportEmail}</a> for further investigation. For further information please see our <a href="${antiFraudPolicyUrl}">Fraud Prevention Policy</a>.
     `;
 
     return {
       paragraph,
-      subject
+      subject,
     };
   }
 }
@@ -57,8 +64,10 @@ export class InvoicePaymentSecondReminderTemplate {
     invoice,
     invoiceButton,
     publisherName,
-    publisherSite
-  }: BuildData): EmailContent {
+    publisherSite,
+    antiFraudSupportEmail,
+    antiFraudPolicyUrl,
+  }: PaymentReminderBuildData): EmailContent {
     const price = `${catalogItem.currency} ${invoice.getInvoiceTotal()}`;
     const issueDate = format(invoice.dateIssued, 'd MMMM yyyy');
 
@@ -83,12 +92,14 @@ export class InvoicePaymentSecondReminderTemplate {
       ${publisherSite}<br/>
       *************************************<br/>
       This is an automated email - if you have already paid your invoice, please ignore this email whilst we update our records.
-
+      <br/>
+      <br/>
+      If you receive a suspicious email that appears to be from Hindawi, requesting payment in an alternative method, please forward it to <a href="mailto:${antiFraudSupportEmail}">${antiFraudSupportEmail}</a> for further investigation. For further information please see our <a href="${antiFraudPolicyUrl}">Fraud Prevention Policy</a>.
     `;
 
     return {
       paragraph,
-      subject
+      subject,
     };
   }
 }
@@ -100,8 +111,10 @@ export class InvoicePaymentThirdReminderTemplate {
     invoice,
     invoiceButton,
     publisherName,
-    publisherSite
-  }: BuildData): EmailContent {
+    publisherSite,
+    antiFraudSupportEmail,
+    antiFraudPolicyUrl,
+  }: PaymentReminderBuildData): EmailContent {
     const price = `${catalogItem.currency} ${invoice.getInvoiceTotal()}`;
     const daysNo = differenceInCalendarDays(new Date(), invoice.dateIssued);
 
@@ -123,11 +136,14 @@ export class InvoicePaymentThirdReminderTemplate {
       ${publisherSite}<br/>
       *************************************<br/>
       This is an automated email - if you have already paid your invoice, please ignore this email whilst we update our records.
+      <br/>
+      <br/>
+      If you receive a suspicious email that appears to be from Hindawi, requesting payment in an alternative method, please forward it to <a href="mailto:${antiFraudSupportEmail}">${antiFraudSupportEmail}</a> for further investigation. For further information please see our <a href="${antiFraudPolicyUrl}">Fraud Prevention Policy</a>.
     `;
 
     return {
       paragraph,
-      subject
+      subject,
     };
   }
 }

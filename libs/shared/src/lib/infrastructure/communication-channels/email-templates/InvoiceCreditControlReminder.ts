@@ -12,7 +12,9 @@ export class InvoiceCreditControlReminderTemplate {
     invoice: Invoice,
     invoiceButton: string,
     publisherName: string,
-    publisherSite: string
+    publisherSite: string,
+    antiFraudSupportEmail: string,
+    antiFraudPolicyUrl: string
   ): EmailContent {
     const price = `${catalogItem.currency} ${invoice.getInvoiceTotal()}`;
     const daysNo = differenceInCalendarDays(new Date(), invoice.dateIssued);
@@ -36,11 +38,14 @@ export class InvoiceCreditControlReminderTemplate {
       ${publisherName}<br/>
       ${publisherSite}<br/>
       ********************************
+      <br/>
+      <br/>
+      If you receive a suspicious email that appears to be from Hindawi, requesting payment in an alternative method, please forward it to <a href="mailto:${antiFraudSupportEmail}">${antiFraudSupportEmail}</a> for further investigation. For further information please see our <a href="${antiFraudPolicyUrl}">Fraud Prevention Policy</a>.
     `;
 
     return {
       paragraph,
-      subject
+      subject,
     };
   }
 }

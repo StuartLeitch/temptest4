@@ -20,6 +20,7 @@ import {
   InvoicePaymentFirstReminderTemplate,
   InvoicePaymentThirdReminderTemplate,
   InvoicePendingNotificationTemplate,
+  PaymentReminderBuildData,
   ButtonLinkTemplate,
 } from './email-templates';
 
@@ -53,7 +54,7 @@ export interface PaymentReminder {
 export type PaymentReminderType = 'first' | 'second' | 'third';
 type PaymentReminderTemplateMapper = {
   [key in PaymentReminderType]: (
-    ...d: any
+    d: PaymentReminderBuildData
   ) => { subject: string; paragraph: string };
 };
 
@@ -61,14 +62,16 @@ export class EmailService {
   private journalProps: JournalProps;
 
   constructor(
-    private mailingDisabled: boolean,
-    private fePath: string,
-    tenantName: string
+    private readonly mailingDisabled: boolean,
+    private readonly fePath: string,
+    private readonly tenantName: string,
+    private readonly antiFraudSupportEmail: string,
+    private readonly antiFraudPolicyUrl: string
   ) {
-    if (tenantName === 'GeoScienceWorld') {
+    if (this.tenantName === 'GeoScienceWorld') {
       this.journalProps = { ...gswConfig.journal };
       this.journalProps.address = ''; // address is in privacy text
-    } else if (tenantName === 'Hindawi') {
+    } else if (this.tenantName === 'Hindawi') {
       this.journalProps = { ...hindawiDefault.journal };
       this.journalProps.address = ''; // address is in privacy text
     }
@@ -86,7 +89,7 @@ export class EmailService {
     invoice: Invoice,
     receiverEmail: string,
     senderEmail: string
-  ) {
+  ): Email {
     const content = InvoicePendingNotificationTemplate.build(invoice);
     const emailProps = new EmailPropsBuilder()
       .addSender(senderEmail)
@@ -105,7 +108,7 @@ export class EmailService {
     bankTransferCopyReceiverAddress: string,
     senderAddress: string,
     senderName: string
-  ) {
+  ): Email {
     const publisherName = process.env.TENANT_NAME;
     const invoiceLink = this.createSingleButton(
       'INVOICE DETAILS',
@@ -139,7 +142,7 @@ export class EmailService {
     manuscript: Manuscript,
     receiverEmail: string,
     senderEmail: string
-  ) {
+  ): Email {
     const invoiceLink = this.createURL(
       `/payment-details/${invoice.invoiceId.id.toString()}`
     );
@@ -162,7 +165,7 @@ export class EmailService {
     invoiceId,
     sender,
     author,
-  }: ConfirmationReminder) {
+  }: ConfirmationReminder): Email {
     const publisherName = process.env.TENANT_NAME;
     const invoiceButton = this.createSingleButton(
       'INVOICE DETAILS',
@@ -205,13 +208,15 @@ export class EmailService {
       invoiceButton,
       publisherName,
       publisherSite: this.journalProps.logoLink,
+      antiFraudPolicyUrl: this.antiFraudPolicyUrl,
+      antiFraudSupportEmail: this.antiFraudSupportEmail,
     });
   }
 
   public invoicePaymentReminder(
     data: PaymentReminder,
     kind: PaymentReminderType
-  ) {
+  ): Email {
     const invoiceButton = this.createSingleButton(
       'INVOICE DETAILS',
       `/payment-details/${data.invoice.invoiceId.id.toString()}`
@@ -236,7 +241,7 @@ export class EmailService {
     return Email.create(emailProps, this.journalProps, this.mailingDisabled);
   }
 
-  public invoiceCreditControlReminder(data: PaymentReminder) {
+  public invoiceCreditControlReminder(data: PaymentReminder): Email {
     const invoiceButton = this.createSingleButton(
       'INVOICE DETAILS',
       `/payment-details/${data.invoice.invoiceId.id.toString()}`
@@ -248,7 +253,9 @@ export class EmailService {
       data.invoice,
       invoiceButton,
       data.sender.name,
-      this.journalProps.logoLink
+      this.journalProps.logoLink,
+      this.antiFraudSupportEmail,
+      this.antiFraudPolicyUrl
     );
     const receiver: EmailReceiver = {
       email: data.author.email,
