@@ -210,13 +210,6 @@ Package Images:dev:
     paths:
       - dist-k8s
 
-Update Environment:
-  tags:
-    - 'cluster:hindawi-dev'
-  stage: deploy-to-automation
-  needs: ["Deploy:automation"]
-  script: 'this is stupid'
-
 Trigger to Phenom-Automation:
   stage: acceptance
   trigger:
@@ -261,6 +254,7 @@ Deploy:automation:
   dependencies:
     - Package Images:dev
   <<: *script_deploy
+  when: on_success
   variables:
     TENANT: hindawi
     NODE_ENV: automation
