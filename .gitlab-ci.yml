@@ -211,6 +211,8 @@ Package Images:dev:
       - dist-k8s
 
 Update Environment:
+  tags:
+    - 'cluster:hindawi-dev'
   stage: deploy-to-automation
   needs: ["Deploy:automation"]
   script: 'this is stupid'
