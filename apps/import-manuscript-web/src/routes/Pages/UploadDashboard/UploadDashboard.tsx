@@ -1,6 +1,8 @@
-import { useManualQuery, useMutation } from 'graphql-hooks';
 import React, { useState } from 'react';
+import { useManualQuery, useMutation } from 'graphql-hooks';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { useHistory } from "react-router-dom";
 
 import {
   IconRemoveSolid,
@@ -12,6 +14,7 @@ import {
 } from '@hindawi/phenom-ui';
 
 import { UPLOAD_FILE_MUTATION, UPLOAD_FILE_QUERY } from './graphql';
+import { upload } from '../../../uploadSlice';
 
 const controller = new AbortController();
 
@@ -19,6 +22,8 @@ const UploadDashboard = () => {
   const [fileList, setFileList] = useState([]);
   const [uploadError, setUploadError] = useState(null);
   const [retryProps, setRetryProps] = useState(null);
+
+  const history = useHistory();
 
   const [confirmS3Upload] = useMutation(
     UPLOAD_FILE_MUTATION
@@ -29,6 +34,7 @@ const UploadDashboard = () => {
     { error },
   ] = useManualQuery(UPLOAD_FILE_QUERY);
 
+  const dispatch = useDispatch();
 
   const props = {
     name: 'file',
@@ -80,6 +86,13 @@ const UploadDashboard = () => {
           status: 'success',
           size: res.config.data.size,
         }]);
+
+        dispatch(upload(file.name));
+
+        setTimeout(() => {
+          history.push('/successful-upload');
+        }, 1000);
+
       } catch (err) {
         console.error('Error: ', err);
         onError({ err });
