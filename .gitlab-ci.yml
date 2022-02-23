@@ -212,6 +212,8 @@ Package Images:dev:
 
 Trigger Acceptance Tests:
   stage: acceptance
+  interruptible: true
+  allow_failure: false
   trigger:
     project: hindawi/phenom-automation
     branch: main
@@ -254,6 +256,7 @@ Deploy:automation:
   dependencies:
     - Package Images:dev
   <<: *script_deploy
+  when: on_success
   interruptible: true
   allow_failure: false
   needs: [Package Images:dev]
