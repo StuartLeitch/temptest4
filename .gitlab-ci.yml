@@ -210,10 +210,10 @@ Package Images:dev:
     paths:
       - dist-k8s
 
-Trigger to Phenom-Automation:
+Trigger Acceptance Tests:
   stage: acceptance
   trigger:
-    project: razvan.ariciuc/phenom-automation
+    project: hindawi/phenom-automation
     branch: main
     strategy: depend
 
@@ -254,7 +254,9 @@ Deploy:automation:
   dependencies:
     - Package Images:dev
   <<: *script_deploy
-  when: on_success
+  interruptible: true
+  allow_failure: false
+  needs: [Package Images:dev]
   variables:
     TENANT: hindawi
     NODE_ENV: automation
