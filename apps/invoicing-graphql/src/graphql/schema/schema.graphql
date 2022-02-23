@@ -153,8 +153,15 @@ input PayerInput {
 }
 
 type InvoicingJournal {
+  id: String
   journalId: ID
   journalTitle: String
+  amount: String
+  issn: String
+  publisherId: ID
+  publisher: InvoicingPublisher
+  publisherName: String
+  code: String
   # ... (TODO: add missing fields here)
 }
 
@@ -179,6 +186,11 @@ type Address {
   state: String
   postalCode: String
   addressLine1: String
+}
+
+type InvoicingPublisher {
+  id: String
+  name: String
 }
 
 input CreditCardInput {
@@ -251,6 +263,12 @@ input CouponInput {
   invoiceItemType: String
 }
 
+input CatalogInput {
+  journalId: ID
+  publisherName: String
+  amount: String
+}
+
 type Waiver {
   reduction: Float
   type_id: String
@@ -273,6 +291,15 @@ type PaginatedCoupons {
 type PaginatedLogs {
   totalCount: Int
   logs: [Log]
+}
+
+type PaginatedPublishers {
+  totalCount: Int
+  publishers: [InvoicingPublisher]
+}
+type PaginatedCatalog {
+  totalCount: Int
+  catalogItems: [InvoicingJournal]
 }
 
 type PaginatedCreditNotes {
@@ -361,6 +388,10 @@ type Query {
   getCreditNoteByReferenceNumber(referenceNumber: String): CreditNote
   getPaymentMethods: [PaymentMethod]
   getClientToken: ClientToken
+  getPublishers(pagination: Pagination): PaginatedPublishers
+  getPublisherDetails(publisherId: ID): InvoicingPublisher
+  getPublishersByPublisherId(pagination: Pagination): PaginatedPublishers
+  getPublisherByName(publisherName: String): InvoicingPublisher
   generateCouponCode: CouponCode
   invoice(invoiceId: ID): Invoice
   invoiceWithAuthorization(invoiceId: ID): Invoice
@@ -375,7 +406,7 @@ type Query {
   coupon(couponCode: String!): Coupon
   coupons(pagination: Pagination): PaginatedCoupons
   invoiceIdByManuscriptCustomId(customId: ID): InvoiceId
-  invoicingJournals: [InvoicingJournal]
+  invoicingJournals(pagination: Pagination): PaginatedCatalog
   echo(value: String): String
   remindersStatus(invoiceId: ID!): RemindersStatus
   remindersSent(invoiceId: ID!): [SentReminder]
@@ -387,6 +418,7 @@ type Mutation {
   confirmInvoice(payer: PayerInput!): Payer!
   applyCoupon(invoiceId: ID, couponCode: String): Coupon
   updateCoupon(coupon: CouponInput): Coupon
+  updateCatalogItem(catalogItem: CatalogInput): InvoicingJournal
   createCoupon(coupon: CouponInput): Coupon
   creditCardPayment(
     invoiceId: ID!

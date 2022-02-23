@@ -732,3 +732,34 @@ dt {
     }
   }
 }
+
+.navbar {
+  padding: 1rem;
+}
+
+.navbar-nav {
+  .btn-group .btn {
+    color: #4f4f4f !important;
+  }
+
+  .dropdown-header {
+    color: #4f4f4f !important;
+  }
+}
+
+.ant-pagination {
+  .ant-pagination-prev,
+  .ant-pagination-next {
+    display: none;
+  }
+}
+
+th {
+  font-size: inherit !important;
+  color: inherit !important;
+  font-weight: bold !important;
+}
+
+.table-row-dark {
+  background-color: #f5f5f5;
+}

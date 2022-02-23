@@ -81,6 +81,10 @@ accessControl
   .resource('VAT')
   .action('validate')
   .resource('journal')
+  .action('read')
+  .resource('journals')
+  .action('read')
+  .resource('publishers')
   .action('read');
 
 accessControl
@@ -132,9 +136,12 @@ accessControl
   .action('read')
   .resource('journal')
   .action('read')
+  .action('update')
   .resource('journals')
   .action('read')
   .resource('logs')
+  .action('read')
+  .resource('publishers')
   .action('read');
 
 accessControl
@@ -184,6 +191,10 @@ accessControl
   .resource('VAT')
   .action('validate')
   .resource('logs')
+  .action('read')
+  .resource('journals')
+  .action('read')
+  .resource('publishers')
   .action('read');
 
 accessControl
@@ -212,6 +223,12 @@ accessControl
   .resource('paymentMethods')
   .action('read')
   .resource('logs')
+  .action('read')
+  .resource('journal')
+  .action('read')
+  .resource('journals')
+  .action('read')
+  .resource('publishers')
   .action('read');
 
 accessControl
@@ -248,6 +265,10 @@ accessControl
   .resource('paymentMethods')
   .action('read')
   .resource('journal')
+  .action('read')
+  .resource('journals')
+  .action('read')
+  .resource('publishers')
   .action('read');
 
 accessControl
@@ -294,6 +315,14 @@ accessControl
   .resource('waiver')
   .action('read')
   .resource('logs')
+  .action('read')
+  .resource('journal')
+  .action('read')
+  .resource('journals')
+  .action('read')
+  .resource('publishers')
+  .action('read')
+  .resource('logs')
   .action('read');
 
 accessControl
@@ -334,8 +363,8 @@ accessControl
   .action('add')
   .resource('manuscript')
   .action('create')
-  .resource('logs')
-  .action('read');
+  .resource('journal')
+  .action('update');
 
 accessControl
   .grant(Roles.FINANCIAL_ADMIN)
@@ -364,9 +393,7 @@ accessControl
   .action('register')
   .where(paymentIsBankTransfer)
   .action('create')
-  .action('update')
-  .resource('logs')
-  .action('read');
+  .action('update');
 
 accessControl
   .grant(Roles.FINANCIAL_SUPPORT)
@@ -382,9 +409,7 @@ accessControl
   .resource('coupon')
   // * Allow coupon apply
   .action('apply')
-  .action('generateCode')
-  .resource('logs')
-  .action('read');
+  .action('generateCode');
 
 accessControl
   .grant(Roles.MARKETING)
@@ -404,8 +429,6 @@ accessControl
   .action('apply')
   // * Allow coupon edit
   .action('update')
-  .action('generateCode')
-  .resource('logs')
-  .action('read');
+  .action('generateCode');
 
 export { accessControl };

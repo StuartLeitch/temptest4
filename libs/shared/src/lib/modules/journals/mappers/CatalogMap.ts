@@ -42,7 +42,7 @@ export class CatalogMap extends Mapper<CatalogItem> {
       journalTitle: catalogItem.journalTitle,
       publisherId: catalogItem.publisherId.id.toString(),
       issn: catalogItem.issn,
-      journalCode: catalogItem.code,
+      code: catalogItem.code,
     };
   }
 }

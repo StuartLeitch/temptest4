@@ -256,7 +256,10 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
               className={classNames(layoutClass, themeClass)}
               ref={this.containerRef}
             >
-              {!this.state.sidebarHidden &&
+              <div className='layout__wrap'>
+                {!this.state.navbarHidden && navbars}
+
+                {!this.state.sidebarHidden &&
                 sidebar &&
                 React.cloneElement(sidebar, {
                   sidebarSlim:
@@ -267,9 +270,6 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
                   sidebarCollapsed:
                     !this.props.sidebarSlim && this.state.sidebarCollapsed,
                 })}
-
-              <div className='layout__wrap'>
-                {!this.state.navbarHidden && navbars}
 
                 {content}
               </div>

@@ -38,7 +38,7 @@ export class UpdateCatalogItemToCatalogUseCase
     this.publisherRepo = publisherRepo;
   }
 
-  @Authorize('journal:read')
+  @Authorize('journal:update')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const {
       amount,
@@ -133,7 +133,6 @@ export class UpdateCatalogItemToCatalogUseCase
       // TODO: will editors change here?
       return right(updatedCatalogItem);
     } catch (err) {
-      console.log(err);
       return left(new UnexpectedError(err));
     }
   }

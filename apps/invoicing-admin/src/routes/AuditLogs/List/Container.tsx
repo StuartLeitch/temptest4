@@ -147,7 +147,7 @@ const AuditLogsContainer: React.FC = () => {
   return (
     <React.Fragment>
       <Container fluid={true}>
-        <HeaderMain title='Audit Logs' className='mb-5 mt-4' />
+        <HeaderMain title='Audit Logs' className='mb-1 mt-5' />
         <Col lg={12} className='d-flex mb-3 mr-0 pr-0 px-0 my-sm-0'>
           <ButtonToolbar className='ml-auto'>
             <span className='pl-1 pr-0 mr-1 mt-2 font-weight-bold'>From</span>
