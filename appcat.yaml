@@ -1,4 +1,4 @@
-# https://confluence.wiley.com/display/REF/Technology+metadata
+---
 id: 4a77e05f-4d19-460f-b959-a4f88f34a92e
 appCode: phenom-invoicing-admin
 name: Phenom Invoicing Admin Service
@@ -12,6 +12,7 @@ usages:
 personalData:
   applies: true
   scope:
+    - Employee
     - Customer
   supports:
     - Country
