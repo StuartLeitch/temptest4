@@ -5350,7 +5350,7 @@
   integrity sha512-cTY/9+rloQepwVx0CsKm9+//4H6qJA7QNzPv5WrGoO1iRV8vKqpMg8E3v+Gn2JCfpv9tqsMAd1C//hxVbcGRSQ==
   dependencies:
     animejs "^3.0.1"
-    faker "git+https://github.com/Marak/faker.js.git"
+    faker "5.5.3"
     highcharts "^7.1.2"
     url-join "^4.0.0"
 
