@@ -1,26 +1,26 @@
-import Knex from 'knex';
-
-// Migrations
-import * as create_events_table from './migrations/20200128172115_create_events_tables';
-import * as create_countries_table from './migrations/20200131121058_create_countries_table';
-import * as create_submission_data_table from './migrations/20200224125858_create_submission_data_table';
-import * as remove_submission_data_dates from './migrations/20200304113458_remove_wrong_dates_from_submission_data';
-import * as create_article_events_table from './migrations/20200304123458_create_article_events_table';
-import * as create_checker_events_table from './migrations/20200309150525_create_checker_events_table';
-import * as create_materialized_views from './migrations/create_materialized_views';
-import * as create_journal_to_publisher_table from './migrations/20200311104931_create_journal_to_publisher_table';
-import * as create_superset_helper_functions from './migrations/20200325162543_create_superset_helper_functions';
-import * as add_sub_data_update_trigger from './migrations/20200406150014_add_sub_data_update_trigger';
-import * as add_sub_data_index from './migrations/20200416123141_add_sub_data_index';
 import * as add_acceptance_rates_table from './migrations/20200610141941_add_acceptance_rates_table';
-import * as create_syndication_events_table from './migrations/20200629123541_add_syndication_events_table';
 import * as add_deleted_manuscripts_table from './migrations/20200703082115_add_deleted_manuscripts_table';
 import * as add_preprint_value_to_submission_data from './migrations/20200831162115_add_preprint_value_to_submission_data';
-import * as move_article_events from './migrations/20201012162115_move_article_events';
-import * as create_peer_review_events_table from './migrations/20210111133315_create_peer_review_events_table';
-import * as move_peer_review_events from './migrations/20210112142215_move_peer_review_events';
-import * as fix_submission_data_version from './migrations/20210204150015_fix_submission_data_version';
 import * as add_source_journal_to_submission_data from './migrations/20210301162115_add_source_journal_to_submission_data';
+import * as add_sub_data_index from './migrations/20200416123141_add_sub_data_index';
+import * as add_sub_data_update_trigger from './migrations/20200406150014_add_sub_data_update_trigger';
+import * as create_article_events_table from './migrations/20200304123458_create_article_events_table';
+import * as create_checker_events_table from './migrations/20200309150525_create_checker_events_table';
+import * as create_countries_table from './migrations/20200131121058_create_countries_table';
+// Migrations
+import * as create_events_table from './migrations/20200128172115_create_events_tables';
+import * as create_journal_to_publisher_table from './migrations/20200311104931_create_journal_to_publisher_table';
+import * as create_materialized_views from './migrations/create_materialized_views';
+import * as create_peer_review_events_table from './migrations/20210111133315_create_peer_review_events_table';
+import * as create_submission_data_table from './migrations/20200224125858_create_submission_data_table';
+import * as create_superset_helper_functions from './migrations/20200325162543_create_superset_helper_functions';
+import * as create_syndication_events_table from './migrations/20200629123541_add_syndication_events_table';
+import * as fix_submission_data_version from './migrations/20210204150015_fix_submission_data_version';
+import * as move_article_events from './migrations/20201012162115_move_article_events';
+import * as move_peer_review_events from './migrations/20210112142215_move_peer_review_events';
+import * as remove_submission_data_dates from './migrations/20200304113458_remove_wrong_dates_from_submission_data';
+
+import Knex from 'knex';
 
 interface KnexMigration {
   up(Knex: Knex): Promise<any>;
@@ -241,6 +241,26 @@ class KnexMigrationSource {
     add_source_journal_to_submission_data,
     rebuild_materialized_views(
       '20210301162115_add_source_journal_to_submission_data',
+      true
+    ),
+    rebuild_materialized_views(
+      '00_migration_log_utilities',
+      true
+    ),
+    rebuild_materialized_views(
+      '01_migration_table_explosion_create',
+      true
+    ),
+    rebuild_materialized_views(
+      '02_migration_views_triggers_functions_create',
+      true
+    ),
+    rebuild_materialized_views(
+      '03_migration_views_triggers_functions_execute',
+      true
+    ),
+    rebuild_materialized_views(
+      '04_migration_table_explosion_execute',
       true
     ),
   ].map(makeViewObject);
