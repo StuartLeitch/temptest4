@@ -243,26 +243,26 @@ class KnexMigrationSource {
       '20210301162115_add_source_journal_to_submission_data',
       true
     ),
-    rebuild_materialized_views(
-      '00_migration_log_utilities',
-      true
-    ),
-    rebuild_materialized_views(
-      '01_migration_table_explosion_create',
-      true
-    ),
-    rebuild_materialized_views(
-      '02_migration_views_triggers_functions_create',
-      true
-    ),
-    rebuild_materialized_views(
-      '03_migration_views_triggers_functions_execute',
-      true
-    ),
-    rebuild_materialized_views(
-      '04_migration_table_explosion_execute',
-      true
-    ),
+    // rebuild_materialized_views(
+    //   '00_migration_log_utilities',
+    //   true
+    // ),
+    // rebuild_materialized_views(
+    //   '01_migration_table_explosion_create',
+    //   true
+    // ),
+    // rebuild_materialized_views(
+    //   '02_migration_views_triggers_functions_create',
+    //   true
+    // ),
+    // rebuild_materialized_views(
+    //   '03_migration_views_triggers_functions_execute',
+    //   true
+    // ),
+    // rebuild_materialized_views(
+    //   '04_migration_table_explosion_execute',
+    //   true
+    // ),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {

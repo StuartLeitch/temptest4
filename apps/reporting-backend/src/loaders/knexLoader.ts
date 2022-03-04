@@ -25,12 +25,9 @@ export const knexLoader: MicroframeworkLoader = async (
   });
 
   await knex.migrate.latest().then(async ([_, ]) => {
-
-
-        console.log(`Refreshing`);
+    console.log(`Refreshing`);
         // avoid running concurent queries that will break if ran first
-        await knex.raw(`CALL public.refresh_all_materialized_views()`);
-
+    await knex.raw(`CALL public.refresh_all_materialized_views()`);
     console.log('Finished refresh');
   });
 
