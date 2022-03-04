@@ -7,12 +7,9 @@ const logger = new Logger(__filename);
 export async function refreshViews(knex: Knex) {
   const refreshStart = new Date();
 
-    const queryStart = new Date();
-    try {
+  try {
       await knex.raw(`CALL public.refresh_all_materialized_views()`);
-      logger.info(
-        `Refresh views took ${differenceInSeconds(queryStart)} seconds`
-      );
+
     } catch (error) {
       logger.error(error);
     }
