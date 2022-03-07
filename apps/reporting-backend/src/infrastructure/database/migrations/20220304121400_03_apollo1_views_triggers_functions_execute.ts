@@ -308,4 +308,4 @@ export async function up(knex: Knex): Promise<any> {
   export async function down(knex: Knex): Promise<any> {
   }
 
-  export const name = '03_migration_views_triggers_functions_execute';
+  export const name = '20220304121400_03_migration_views_triggers_functions_execute';

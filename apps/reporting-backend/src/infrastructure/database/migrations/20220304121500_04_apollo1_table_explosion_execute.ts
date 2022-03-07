@@ -79,4 +79,4 @@ export async function up(knex: Knex): Promise<any> {
   export async function down(knex: Knex): Promise<any> {
   }
 
-  export const name = '04_migration_table_explosion_execute';
+  export const name = '20220304121500_04_migration_table_explosion_execute';

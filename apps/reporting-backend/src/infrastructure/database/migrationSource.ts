@@ -4,6 +4,11 @@ import * as add_preprint_value_to_submission_data from './migrations/20200831162
 import * as add_source_journal_to_submission_data from './migrations/20210301162115_add_source_journal_to_submission_data';
 import * as add_sub_data_index from './migrations/20200416123141_add_sub_data_index';
 import * as add_sub_data_update_trigger from './migrations/20200406150014_add_sub_data_update_trigger';
+import * as apollo1_log_utilities from './migrations/20220304121100_00_apollo1_log_utilities';
+import * as apollo1_table_explosion_create from './migrations/20220304121200_01_apollo1_table_explosion_create';
+import * as apollo1_table_explosion_execute from './migrations/20220304121500_04_apollo1_table_explosion_execute';
+import * as apollo1_views_triggers_functions_create from './migrations/20220304121300_02_apollo1_views_triggers_functions_create';
+import * as apollo1_views_triggers_functions_execute from './migrations/20220304121400_03_apollo1_views_triggers_functions_execute';
 import * as create_article_events_table from './migrations/20200304123458_create_article_events_table';
 import * as create_checker_events_table from './migrations/20200309150525_create_checker_events_table';
 import * as create_countries_table from './migrations/20200131121058_create_countries_table';
@@ -243,26 +248,11 @@ class KnexMigrationSource {
       '20210301162115_add_source_journal_to_submission_data',
       true
     ),
-    // rebuild_materialized_views(
-    //   '00_migration_log_utilities',
-    //   true
-    // ),
-    // rebuild_materialized_views(
-    //   '01_migration_table_explosion_create',
-    //   true
-    // ),
-    // rebuild_materialized_views(
-    //   '02_migration_views_triggers_functions_create',
-    //   true
-    // ),
-    // rebuild_materialized_views(
-    //   '03_migration_views_triggers_functions_execute',
-    //   true
-    // ),
-    // rebuild_materialized_views(
-    //   '04_migration_table_explosion_execute',
-    //   true
-    // ),
+    apollo1_log_utilities,
+    apollo1_table_explosion_create,
+    apollo1_views_triggers_functions_create,
+    apollo1_views_triggers_functions_execute,
+    apollo1_table_explosion_execute,
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {

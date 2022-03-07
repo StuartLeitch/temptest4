@@ -3304,5 +3304,4 @@ export async function up(knex: Knex): Promise<any> {
   export async function down(knex: Knex): Promise<any> {
   }
 
-
-  export const name = '01_migration_table_explosion_create';
+  export const name = '20220304121200_01_migration_table_explosion_create';

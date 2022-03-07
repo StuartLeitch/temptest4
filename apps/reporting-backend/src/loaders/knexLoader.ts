@@ -4,6 +4,7 @@ import {
 } from 'microframework-w3tec';
 
 import Knex from 'knex';
+import { differenceInSeconds } from '../utils/utils';
 import { env } from '../env';
 import { knexMigrationSource } from '../infrastructure/database/migrationSource';
 
@@ -24,11 +25,15 @@ export const knexLoader: MicroframeworkLoader = async (
     // debug: true
   });
 
-  await knex.migrate.latest().then(async ([_, ]) => {
-    console.log(`Refreshing`);
-        // avoid running concurent queries that will break if ran first
-    await knex.raw(`CALL public.refresh_all_materialized_views()`);
-    console.log('Finished refresh');
+  await knex.migrate.latest().then(async () => {
+    const refreshStart = new Date();
+    try {
+        console.log(`Start refresh views.`);
+        await knex.raw(`CALL public.refresh_all_materialized_views()`);
+        console.log(`Refresh views took ${differenceInSeconds(refreshStart)} seconds.`);
+      } catch (error) {
+        console.error(error);
+      }
   });
 
   if (settings) {

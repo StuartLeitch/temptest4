@@ -3732,4 +3732,4 @@ export async function up(knex: Knex): Promise<any> {
   export async function down(knex: Knex): Promise<any> {
   }
 
-export const name = '02_migration_views_triggers_functions_create';
+  export const name = '20220304121300_02_migration_views_triggers_functions_create';
