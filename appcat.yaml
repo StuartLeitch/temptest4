@@ -1,5 +1,5 @@
 ---
-id: 4a77e05f-4d19-460f-b959-a4f88f34a92e
+id: 6dfb7771-9f74-4436-a444-745232d698ad
 appCode: phenom-invoicing-admin
 name: Phenom Invoicing Admin Service
 description: Invoicing admin UI used by the finance team.
@@ -107,7 +107,7 @@ financialData:
 id: 9f3e5c09-92ec-48b0-a2c7-4b64800ca158
 appCode: phenom-iris
 name: Phenom Iris
-description: 'apache-superset server. In Greek mythology, Iris (/ˈaɪrɪs/; Greek: Ίρις Ancient Greek: [îːris]) is the personification and goddess of the rainbow and messenger of the gods.'
+description: 'apache-superset server. In Greek mythology, Iris is the personification and goddess of the rainbow and messenger of the gods.'
 state: Active
 documentationUrl: https://hindawi.atlassian.net/wiki/spaces/PPT/pages/2571304987/Phenom+Reporting
 issueTrackerUrl: https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74
