@@ -179,26 +179,26 @@ const ApcContainer: React.FC = () => {
       dataIntes: 'action',
       width: 150,
       render: (_: any, record: Item) => {
-        // const editable = isEditing(record);
-        // return editable ? (
-        //   <Restricted to='edit.apc'>
-        //     <span>
-        //     <Space size='middle'>
-        //       <IconSave onClick={() => save(record.journalId)}>Save</IconSave>
-        //       <IconRemove onClick={cancel}>
-        //         <a>Cancel</a>
-        //       </IconRemove>
-        //     </Space>
-        //   </span>
-        //   </Restricted>
-        // ) : (
-        //   <Restricted to='edit.apc'>
-        //     <IconEdit className='edit-button' onClick={() => edit(record)}>
-        //       Edit
-        //     </IconEdit>
-        //   </Restricted>
-        // );
-        return null;
+        const editable = isEditing(record);
+        return editable ? (
+          <Restricted to='edit.apc'>
+            <span>
+            <Space size='middle'>
+              <IconSave onClick={() => save(record.journalId)}>Save</IconSave>
+              <IconRemove onClick={cancel}>
+                <a>Cancel</a>
+              </IconRemove>
+            </Space>
+          </span>
+          </Restricted>
+        ) : (
+          <Restricted to='edit.apc'>
+            <IconEdit className='edit-button' onClick={() => edit(record)}>
+              Edit
+            </IconEdit>
+          </Restricted>
+        );
+        // return null;
       },
     },
   ];

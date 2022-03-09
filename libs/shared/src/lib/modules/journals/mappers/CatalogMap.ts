@@ -12,7 +12,7 @@ export class CatalogMap extends Mapper<CatalogItem> {
     return CatalogItem.create(
       {
         type: raw.type,
-        amount: raw.amount,
+        amount: Number(raw.amount),
         journalId: JournalId.create(new UniqueEntityID(raw.journalId)),
         created: raw.created ? new Date(raw.created) : null,
         updated: raw.updated ? new Date(raw.updated) : null,
@@ -33,7 +33,7 @@ export class CatalogMap extends Mapper<CatalogItem> {
     return {
       id: catalogItem.id.toString(),
       type: catalogItem.type || 'APC',
-      amount: catalogItem.amount,
+      amount: Number(catalogItem.amount),
       journalId: catalogItem.journalId.id.toString(),
       created: catalogItem.created,
       updated: catalogItem.updated,

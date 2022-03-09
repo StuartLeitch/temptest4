@@ -75,11 +75,19 @@ export const invoicingJournals: Resolvers<Context> = {
   Mutation: {
     async updateCatalogItem(parent, args, context) {
       const roles = getAuthRoles(context);
-      const { repos } = context;
+      const userData = (context.keycloakAuth.accessToken as any)?.content;
+
+      const {
+        repos,
+        auditLoggerServiceProvider
+      } = context;
+
+      const auditLoggerService = auditLoggerServiceProvider(userData);
 
       const usecase = new UpdateCatalogItemFieldsUsecase(
         repos.catalog,
-        repos.publisher
+        repos.publisher,
+        auditLoggerService
       );
       const usecaseContext = { roles };
       const result = await usecase.execute(args.catalogItem, usecaseContext);
