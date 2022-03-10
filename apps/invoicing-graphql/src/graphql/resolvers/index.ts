@@ -16,6 +16,7 @@ import { coupon } from './coupon';
 // import { generateDraftCompensatoryEvents } from './generateDraftCompensatoryEvents';
 import { audit } from './audit';
 import { payer } from './payer';
+import { publisher } from './publishers';
 
 export const resolvers: Resolvers<Context> = merge(
   {},
@@ -25,6 +26,7 @@ export const resolvers: Resolvers<Context> = merge(
   coupon,
   payments,
   invoicingJournals,
+  publisher,
   generateInvoiceCompensatoryEvents,
   reminders,
   // generateDraftCompensatoryEvents,

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { LogoThemed } from '../LogoThemed/LogoThemed';
 
 const HeaderAuth = (props: any) => (
-  <div className='mb-4'>
+  <div className='mb-4' style={{ width: "300px", margin: "120px auto", textAlign: "center" }}>
     <div className="mb-4 text-center">
       {
           props.icon ? (

@@ -147,10 +147,10 @@ const InvoicesContainer: React.FC = () => {
         <Container fluid={true}>
           <HeaderMain title='Invoices' className='mb-5 mt-4' />
           <Row>
-            <Col lg={3}>
+            <Col lg={2}>
               <InvoicesLeftNav filters={filters} setFilter={setFilter} />
             </Col>
-            <Col lg={9} className='mt-n4 mb-5'>
+            <Col lg={10} className='mt-n4 mb-5'>
               <ButtonToolbar className='d-flex justify-content-end'>
                 <ButtonGroup className='mr-2'>
                   <Button

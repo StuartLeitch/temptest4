@@ -126,10 +126,13 @@ export * from './modules/publishers/domain/PublisherCustomValues';
 export * from './modules/publishers/repos/publisherRepo';
 export * from './modules/publishers/repos/implementations/knexPublisherRepo';
 export * from './modules/publishers/repos/mocks/mockPublisherRepo';
+export * from './modules/publishers/mappers/PublisherMap';
 export * from './modules/publishers/usecases/getPublisherCustomValues';
 export * from './modules/publishers/usecases/getPublisherCustomValuesByName';
 export * from './modules/publishers/usecases/getPublisherDetails';
 export * from './modules/publishers/usecases/getPublisherDetailsByName';
+export * from './modules/publishers/usecases/getPublishersByPublisherId';
+export * from './modules/publishers/usecases/getPublishers';
 
 // * Export Catalog Subdomain
 export { CatalogItem } from './modules/journals/domain/CatalogItem';
@@ -150,6 +153,7 @@ export * from './modules/journals/usecases/journals/getJournal/getJournalDTO';
 export * from './modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
 export * from './modules/journals/usecases/addCatalogItemToCatalog/addCatalogItemToCatalog';
 export * from './modules/journals/usecases/updateCatalogItemToCatalog';
+export * from './modules/journals/usecases/updateCatalogItemFields';
 
 // * Export User Subdomain
 export { Roles } from './modules/users/domain/enums/Roles';

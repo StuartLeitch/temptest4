@@ -6,6 +6,7 @@ import { ClientContext } from 'graphql-hooks';
 import { useAuth } from '../contexts/Auth';
 
 import UploadDashboard from './Pages/UploadDashboard';
+import SuccessfulUpload from './Pages/SuccessfulUpload';
 
 //------ Route Definitions --------
 export const RoutedContent = () => {
@@ -29,6 +30,9 @@ export const RoutedContent = () => {
       {/*     Package Submission Routes      */}
       <PrivateRoute exact path='/transfer-manuscript'>
         <UploadDashboard />
+      </PrivateRoute>
+      <PrivateRoute exact path='/successful-upload'>
+        <SuccessfulUpload />
       </PrivateRoute>
       {/*    404    */}
       <Redirect to='/pages/error-404' />
@@ -61,3 +65,4 @@ function PrivateRoute({ children, ...rest }: any): any {
     return childrenInRoute(children, rest.computedMatch, rest);
   }
 }
+

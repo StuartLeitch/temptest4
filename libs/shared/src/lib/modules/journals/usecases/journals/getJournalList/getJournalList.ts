@@ -27,13 +27,17 @@ export class GetJournalListUsecase
   @Authorize('journals:read')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
-      const result = await this.journalRepo.getCatalogCollection();
+      const maybePaginatedResult = await this.journalRepo.getCatalogCollection(
+        request
+      );
 
-      if (result.isLeft()) {
-        return left(new UnexpectedError(new Error(result.value.message)));
+      if (maybePaginatedResult.isLeft()) {
+        return left(
+          new UnexpectedError(new Error(maybePaginatedResult.value.message))
+        );
       }
 
-      return right(result.value);
+      return right(maybePaginatedResult.value);
     } catch (err) {
       return left(new UnexpectedError(err, 'Getting journal list failed'));
     }

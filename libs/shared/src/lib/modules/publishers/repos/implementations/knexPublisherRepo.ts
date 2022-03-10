@@ -1,5 +1,5 @@
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { Either, right, left } from '../../../../core/logic/Either';
+import { Either, right, left, flatten } from '../../../../core/logic/Either';
 import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
@@ -13,6 +13,8 @@ import { Publisher } from '../../domain/Publisher';
 import { PublisherMap } from '../../mappers/PublisherMap';
 
 import { PublisherRepoContract } from '../publisherRepo';
+import { PublisherPaginated } from '../../domain/PublisherPaginated';
+import { applyFilters } from '../../../invoices/repos/implementations/utils';
 
 export class KnexPublisherRepo
   extends AbstractBaseDBRepo<Knex, Publisher>
@@ -25,7 +27,7 @@ export class KnexPublisherRepo
       creditAccountId: '',
       debitAccountId: '',
       itemId: '',
-      creditAccountIdForCascaded: ''
+      creditAccountIdForCascaded: '',
     };
     const data = await this.db(TABLES.PUBLISHER_CUSTOM_VALUES)
       .select('name', 'value')
@@ -49,6 +51,78 @@ export class KnexPublisherRepo
         emptyValues
       )
     );
+  }
+
+  async getPublishers(
+    args?: any
+  ): Promise<Either<GuardFailure | RepoError, PublisherPaginated>> {
+    const { pagination, filters } = args;
+    const { db } = this;
+
+    const getModel = () => db(TABLES.PUBLISHERS);
+
+    const totalCount = await applyFilters(getModel(), filters).count(
+      `${TABLES.PUBLISHERS}.id`
+    );
+
+    const offset = pagination.offset * pagination.limit;
+
+    const sql = await db
+      .select('*')
+      .from('publishers')
+      .orderBy(`${TABLES.PUBLISHERS}.name`, 'asc')
+      .offset(offset < totalCount[0].count ? offset : 0)
+      .limit(pagination.limit);
+
+    const publishers: Array<any> = await sql;
+
+    const maybePublishers = flatten(publishers.map(PublisherMap.toDomain));
+
+    if (maybePublishers.isLeft()) {
+      return left(maybePublishers.value);
+    }
+
+    return right({
+      totalCount: totalCount[0]['count'],
+      publishers: maybePublishers.value,
+    });
+  }
+
+  async getPublishersByPublisherId(
+    args?: any
+  ): Promise<Either<GuardFailure | RepoError, PublisherPaginated>> {
+    const { pagination, filters } = args;
+    const { db } = this;
+
+    const getModel = () => db(TABLES.CATALOG);
+    const totalCount = await applyFilters(getModel(), filters).count(
+      `${TABLES.CATALOG}.id`
+    );
+
+    const offset = pagination.offset * pagination.limit;
+
+    const sql = await db
+      .select('publishers.name AS name')
+      .from('publishers')
+      .leftJoin('catalog', 'catalog.publisherId', '=', 'publishers.id')
+      .orderBy(`${TABLES.CATALOG}.created`, 'desc')
+      .offset(offset < totalCount[0].count ? offset : 0)
+      .limit(pagination.limit);
+
+    const publisherNames: Array<any> = await sql;
+
+    const maybePublisherNames = flatten(
+      publisherNames.map(PublisherMap.toDomain)
+    );
+
+    if (maybePublisherNames.isLeft()) {
+      return left(maybePublisherNames.value);
+    }
+
+    return right({
+      totalCount: totalCount[0]['count'],
+      publishers: maybePublisherNames.value,
+    });
   }
 
   async getPublisherById(

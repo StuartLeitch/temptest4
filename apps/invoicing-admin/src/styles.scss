@@ -16,3 +16,22 @@
     #{$name}: $color;
   }
 }
+
+span.anticon.edit-button {
+  display: none;
+}
+
+.ant-table-row:hover span.anticon.edit-button {
+  display: block;
+  float: left;
+}
+
+.ant-table-row {
+  height: 3.45em;
+}
+
+.amount-field {
+  .ant-form-item-explain-connected {
+    display: none;
+  }
+}

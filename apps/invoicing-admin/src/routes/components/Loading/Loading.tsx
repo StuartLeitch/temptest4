@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import LoadingOverlay from 'react-loading-overlay';
 
-import { Spinner } from '../../../components';
+import { Spinner } from '@hindawi/phenom-ui';
 
 // can be either used as a HOC or individual component
 const Loading: React.FC<LoadingProps> = ({ loading = true, children = null }) => (
@@ -9,8 +9,7 @@ const Loading: React.FC<LoadingProps> = ({ loading = true, children = null }) =>
     active={loading}
     spinner={
       <Spinner
-        style={{ width: '12em', height: '12em' }}
-        color='primary'
+        size="large"
       />
     }
   >

@@ -1,9 +1,16 @@
 /* eslint-disable @nrwl/nx/enforce-module-boundaries */
 
-import { GetJournalListUsecase, CatalogMap, Roles } from '@hindawi/shared';
+import {
+  GetJournalListUsecase,
+  CatalogMap,
+  Roles,
+  GetPublisherDetailsUsecase,
+  PublisherMap,
+  UpdateCatalogItemFieldsUsecase,
+} from '@hindawi/shared';
 
 import { Context } from '../../builders';
-import { Resolvers } from '../schema';
+import { Resolvers, InvoicingJournal } from '../schema';
 
 import { handleForbiddenUsecase, getAuthRoles } from './utils';
 
@@ -20,7 +27,70 @@ export const invoicingJournals: Resolvers<Context> = {
         roles,
       };
 
-      const result = await usecase.execute(args, usecaseContext);
+      const resultJournals = await usecase.execute(args, usecaseContext);
+
+      handleForbiddenUsecase(resultJournals);
+
+      if (resultJournals.isLeft()) {
+        const err = resultJournals.value;
+        context.services.logger.error(err.message, err);
+        return null;
+      }
+
+      const journalList = resultJournals.value;
+      return {
+        totalCount: journalList.totalCount,
+        catalogItems: journalList.catalogItems.map(CatalogMap.toPersistence),
+      };
+    },
+  },
+  InvoicingJournal: {
+    async publisher(parent: InvoicingJournal, args, context) {
+      const roles = getAuthRoles(context);
+
+      const { repos } = context;
+
+      const usecase = new GetPublisherDetailsUsecase(repos.publisher);
+
+      const usecaseContext = {
+        roles,
+      };
+
+      const resultPublisher = await usecase.execute(
+        {
+          publisherId: parent.publisherId,
+        },
+        usecaseContext
+      );
+
+      if (resultPublisher.isLeft()) {
+        throw new Error(resultPublisher.value.message);
+      }
+
+      const publisher = resultPublisher.value;
+
+      return PublisherMap.toPersistence(publisher);
+    },
+  },
+  Mutation: {
+    async updateCatalogItem(parent, args, context) {
+      const roles = getAuthRoles(context);
+      const userData = (context.keycloakAuth.accessToken as any)?.content;
+
+      const {
+        repos,
+        auditLoggerServiceProvider
+      } = context;
+
+      const auditLoggerService = auditLoggerServiceProvider(userData);
+
+      const usecase = new UpdateCatalogItemFieldsUsecase(
+        repos.catalog,
+        repos.publisher,
+        auditLoggerService
+      );
+      const usecaseContext = { roles };
+      const result = await usecase.execute(args.catalogItem, usecaseContext);
 
       handleForbiddenUsecase(result);
 
@@ -28,9 +98,7 @@ export const invoicingJournals: Resolvers<Context> = {
         throw new Error(result.value.message);
       }
 
-      const journalsList = result.value;
-
-      return journalsList.map(CatalogMap.toPersistence);
+      return CatalogMap.toPersistence(result.value);
     },
   },
 };

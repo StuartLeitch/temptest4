@@ -1,11 +1,13 @@
 import React from 'react';
+import { Spinner } from '@hindawi/phenom-ui';
 
 import {
-  Spinner,
   ThemeConsumer
 } from '../../../components';
 
+
 import { HeaderAuth } from '../Pages/HeaderAuth';
+
 
 export const PendingLogging: React.FC = () => (
   <React.Fragment>
@@ -21,7 +23,7 @@ export const PendingLogging: React.FC = () => (
           {() => (
             <div className='mb-4'>
               <div className='mb-4 text-center'>
-                <Spinner style={{ width: '6em', height: '6em' }} color='primary' />
+                <Spinner size='large' />
               </div>
             </div>
           )}

@@ -15,7 +15,7 @@ export const PendingLogging: React.FC = () => (
     />
     {/* END Header */}
     {/* START Spinner */}
-    <div className='mb-4'>
+    <div className='mb-4' style={{ width: "300px", margin: "0 auto", textAlign: "center" }}>
       <div className='mb-4 text-center'>
         <Spinner size='large' />
       </div>

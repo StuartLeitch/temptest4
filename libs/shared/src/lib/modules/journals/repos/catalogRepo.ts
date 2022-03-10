@@ -6,6 +6,7 @@ import { RepoError } from '../../../infrastructure/RepoError';
 import { Repo } from '../../../infrastructure/Repo';
 
 import { CatalogItem } from '../domain/CatalogItem';
+import { CatalogPaginated } from '../domain/CatalogPaginated';
 import { JournalId } from '../domain/JournalId';
 
 export interface CatalogRepoContract extends Repo<CatalogItem> {
@@ -15,9 +16,9 @@ export interface CatalogRepoContract extends Repo<CatalogItem> {
   getCatalogItemById(
     catalogId: UniqueEntityID
   ): Promise<Either<GuardFailure | RepoError, CatalogItem>>;
-  getCatalogCollection(): Promise<
-    Either<GuardFailure | RepoError, CatalogItem[]>
-  >;
+  getCatalogCollection(
+    args?: any
+  ): Promise<Either<GuardFailure | RepoError, CatalogPaginated>>;
   updateCatalogItem(
     catalogItem: CatalogItem
   ): Promise<Either<GuardFailure | RepoError, CatalogItem>>;

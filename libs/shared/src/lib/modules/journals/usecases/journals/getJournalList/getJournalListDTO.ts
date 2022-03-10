@@ -1,1 +1,6 @@
-export interface GetJournalListDTO {}
+export interface GetJournalListDTO {
+  pagination?: {
+    offset?: number;
+    limit?: number;
+  };
+}

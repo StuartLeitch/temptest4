@@ -24,9 +24,9 @@ const SidebarTopA = () => {
   return (
     <React.Fragment>
       {/* START: Sidebar Default */}
-      <Sidebar.HideSlim>
-        <Sidebar.Section className='pt-0'>
-          <Link to='/' className='d-block'>
+      {/* <Sidebar.HideSlim>
+        <Sidebar.Section className='pt-0'> */}
+          {/* <Link to='/' className='d-block'>
             <Sidebar.HideSlim>
               <Avatar.Image
                 size='md'
@@ -45,7 +45,7 @@ const SidebarTopA = () => {
                 ]}
               />
             </Sidebar.HideSlim>
-          </Link>
+          </Link> */}
 
           <UncontrolledButtonDropdown>
             <DropdownToggle
@@ -55,7 +55,7 @@ const SidebarTopA = () => {
               {username}
               <i className='fas fa-angle-down ml-2'></i>
             </DropdownToggle>
-            <DropdownMenu persist>
+            <DropdownMenu right>
               <DropdownItem header><strong>{name}</strong></DropdownItem>
               <DropdownItem header>
                 <i className='fas fa-user-secret mr-2'></i> {roles && roles[0].replace(/_/g, ' ').replace(/(^|\s)\S/g, function(t) { return t.toUpperCase() })}</DropdownItem>
@@ -71,32 +71,32 @@ const SidebarTopA = () => {
               </DropdownItem>
             </DropdownMenu>{' '}
           </UncontrolledButtonDropdown>
-          <div className='small sidebar__link--muted'>{profile}</div>
-        </Sidebar.Section>
-      </Sidebar.HideSlim>
+          {/* <div className='small sidebar__link--muted'>{profile}</div> */}
+        {/* </Sidebar.Section>
+      </Sidebar.HideSlim> */}
       {/* END: Sidebar Default */}
 
       {/* START: Sidebar Slim */}
-      <Sidebar.ShowSlim>
-        <Sidebar.Section>
-          <Avatar.Image
-            size='sm'
-            src={picture}
-            addOns={[
-              <AvatarAddOn.Icon
-                className='fa fas fa-circle'
-                color='white'
-                key='avatar-icon-bg'
-              />,
-              <AvatarAddOn.Icon
-                className='fa fas fa-circle'
-                color='success'
-                key='avatar-icon-fg'
-              />,
-            ]}
-          />
-        </Sidebar.Section>
-      </Sidebar.ShowSlim>
+      {/* // <Sidebar.ShowSlim>
+      //   <Sidebar.Section>
+      //     <Avatar.Image
+      //       size='sm'
+      //       src={picture}
+      //       addOns={[
+      //         <AvatarAddOn.Icon
+      //           className='fa fas fa-circle'
+      //           color='white'
+      //           key='avatar-icon-bg'
+      //         />,
+      //         <AvatarAddOn.Icon
+      //           className='fa fas fa-circle'
+      //           color='success'
+      //           key='avatar-icon-fg'
+      //         />,
+      //       ]}
+      //     />
+      //   </Sidebar.Section>
+      // </Sidebar.ShowSlim> */}
       {/* END: Sidebar Slim */}
     </React.Fragment>
   );
