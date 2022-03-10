@@ -18,6 +18,7 @@ export const env = {
     version: pkg.version,
     description: pkg.description,
     banner: toBool(getOsEnv('APP_BANNER')),
+    xmlDefinitionsLocation: getOsEnv('IMPORT_MANUSCRIPT_XML_DEFINITION_PATH'),
   },
   log: {
     level: getOsEnv('LOG_LEVEL'),

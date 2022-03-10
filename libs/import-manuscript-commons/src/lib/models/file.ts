@@ -2,10 +2,7 @@ import {
   ValueObjectProps,
   GuardFailure,
   ValueObject,
-  Either,
   Guard,
-  right,
-  left,
 } from '@hindawi/shared';
 
 import { Path } from './path';
@@ -44,7 +41,7 @@ export class File extends ValueObject<FileProps> {
     super(props);
   }
 
-  static create(props: FileProps): Either<GuardFailure, File> {
+  static create(props: FileProps): File {
     const guardResult = Guard.againstNullOrUndefinedBulk([
       { argument: props.name, argumentName: 'name' },
       { argument: props.path, argumentName: 'path' },
@@ -53,9 +50,9 @@ export class File extends ValueObject<FileProps> {
     ]);
 
     if (guardResult.isFail()) {
-      return left(new GuardFailure(guardResult.message));
+      throw new GuardFailure(guardResult.message);
     } else {
-      return right(new File(props));
+      return new File(props);
     }
   }
 }

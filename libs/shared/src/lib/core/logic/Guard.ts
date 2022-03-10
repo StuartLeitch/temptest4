@@ -93,6 +93,31 @@ export class Guard {
     }
   }
 
+  public static againstEmpty(
+    argument: string | Array<unknown> | Record<string, unknown>,
+    argumentName: string
+  ): GuardResult {
+    const nullResult = Guard.againstNullOrUndefined(argument, argumentName);
+
+    if (nullResult.failed) {
+      return nullResult;
+    }
+
+    if (typeof argument === 'string' && argument === '') {
+      return fail(`${argumentName} is an empty string`);
+    }
+
+    if (Array.isArray(argument) && argument.length === 0) {
+      return fail(`${argumentName} is an empty array`);
+    }
+
+    if (typeof argument === 'object' && Object.keys(argument).length === 0) {
+      return fail(`${argumentName} is an empty object`);
+    }
+
+    return success();
+  }
+
   public static againstAtLeast(numChars: number, text: string): GuardResult {
     if (text.length >= numChars) {
       return success();

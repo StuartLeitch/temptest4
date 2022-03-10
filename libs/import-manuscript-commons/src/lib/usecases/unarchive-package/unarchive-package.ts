@@ -5,9 +5,11 @@ import { randomBytes } from 'crypto';
 import {
   UnexpectedError,
   eitherFromTry,
+  GuardFailure,
   AsyncEither,
   UseCase,
   Either,
+  right,
   left,
 } from '@hindawi/shared';
 
@@ -39,7 +41,7 @@ export class UnarchivePackageUsecase
 
     try {
       const maybeExtracted = await new AsyncEither(targetSrc)
-        .chain(Path.create)
+        .chain(createPath)
         .chain(this.downloadObject(request.name))
         .chain(this.unzip)
         .chain(deleteZip)
@@ -78,6 +80,15 @@ export class UnarchivePackageUsecase
       source,
       target,
     }));
+  }
+}
+
+async function createPath(path: string): Promise<Either<GuardFailure, Path>> {
+  try {
+    const a = Path.create(path);
+    return right(a);
+  } catch (err) {
+    return left(err);
   }
 }
 

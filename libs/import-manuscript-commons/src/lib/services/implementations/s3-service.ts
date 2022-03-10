@@ -100,7 +100,11 @@ function makeFilePath(target: Path, objectKey: string) {
   return () => {
     const filePath = `${target.src}/${objectKey}`;
 
-    return Path.create(filePath);
+    try {
+      return right(Path.create(filePath));
+    } catch (err) {
+      return left(err);
+    }
   };
 }
 

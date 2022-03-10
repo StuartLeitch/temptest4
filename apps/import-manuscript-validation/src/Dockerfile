@@ -1,34 +1,24 @@
-FROM node:16-alpine as build
+FROM node:16-slim as build
 
 ENV HOME "/home/app"
 WORKDIR ${HOME}
 
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
   bash \
   ca-certificates \
-  chromium \
-  freetype \
-  freetype-dev \
   g++ \
   git \
-  harfbuzz \
   make \
-  nss \
-  openssh \
-  python3 \
-  ttf-freefont
+  libnss3 \
+  openssh-server \
+  python3
 
 # Copy package.json to the working directory
 COPY package.json yarn.lock ./
 
-
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 # Install any needed packages specified in package.json
 RUN yarn install --frozen-lockfile --production
 
-COPY libs/shared/src/lib/infrastructure/database/knex/migrations/ ./migrations/
-COPY libs/shared/src/lib/infrastructure/database/knex/seeds/ ./seeds/
 COPY config/ ./config/
 COPY dist/apps/import-manuscript-validation ./
 
