@@ -359,13 +359,16 @@ pages:
   interruptible: true
   stage: reports
   script:
+    - echo $CI_COMMIT_REF_SLUG
+    - mkdir -p $CI_PROJECT_DIR/public/$CI_COMMIT_REF_SLUG
     - cp -r -a reports/* $HOME/reports/
     - cd $HOME
     - yarn run ci:coverage
-    - cp -r -a $HOME/reports/* $CI_PROJECT_DIR/public/
+    - cp -r -a $HOME/reports/* $CI_PROJECT_DIR/public/$CI_COMMIT_REF_SLUG
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   needs: [Test]
   artifacts:
     paths:
       - public
       - reports
+    expire_in: 7 days
