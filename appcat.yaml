@@ -1,143 +1,196 @@
-# https://confluence.wiley.com/display/REF/Technology+metadata
-id: 4a77e05f-4d19-460f-b959-a4f88f34a92e
-appCode: phenom-invoicing-admin
-name: Phenom Invoicing Admin Service
-description: Invoicing admin UI used by the finance team.
-state: Active
-documentationUrl: https://hindawi.atlassian.net/wiki/spaces/PPT/pages/1137344514/Phenom+Finance
-issueTrackerUrl: https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74
-systemId: 318c5bb2-ffff-4ee5-b536-1df0dfe4d59c
-usages:
-  - Product
-personalData:
-  applies: true
-  scope:
-    - Customer
-  supports:
-    - Country
+---
+!<Application>
+id: '6dfb7771-9f74-4436-a444-745232d698ad'
+modelType: 'Application'
+appCode: 'phenom-invoicing-admin'
+atlasId: 'APP-9721'
+name: 'Phenom Invoicing Admin Service'
+appType: 'Built'
+description: 'Invoicing admin UI used by the finance team.'
+state: 'Active'
+documentationUrl: 'https://hindawi.atlassian.net/wiki/spaces/PPT/pages/1137344514/Phenom+Finance'
+issueTrackerUrl: 'https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74'
 financialData:
   applies: true
   scope:
-    - SalesTax
-    - Other
----
-id: 37465ecf-8aa5-4ccb-8f03-7dc7ce6db044
-appCode: phenom-invoicing-graphql
-name: Phenom Invoicing Backend Service
-description: Invoicing graphql backend. Alse includes express endpoints, event listener, erp scheduler, internal scheduling system - sisif, etc.
-state: Active
-documentationUrl: https://hindawi.atlassian.net/wiki/spaces/PPT/pages/1137344514/Phenom+Finance
-issueTrackerUrl: https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74
-systemId: 318c5bb2-ffff-4ee5-b536-1df0dfe4d59c
-usages:
-  - Product
+    - 'SalesTax'
+    - 'Other'
 personalData:
   applies: true
   scope:
-    - Employee
-    - Customer
+    - 'Customer'
+    - 'Employee'
   supports:
-    - Country
+    - 'Country'
+usages:
+  - 'Product'
+systemId: '318c5bb2-ffff-4ee5-b536-1df0dfe4d59c'
+shortCode: 'phenom-invcngd'
+isSystem: false
+---
+!<Application>
+id: '37465ecf-8aa5-4ccb-8f03-7dc7ce6db044'
+modelType: 'Application'
+appCode: 'phenom-invoicing-graphql'
+atlasId: 'APP-9722'
+name: 'Phenom Invoicing Backend Service'
+appType: 'Built'
+description:
+  "Invoicing graphql backend. Alse includes express endpoints, event listener,\
+  \ erp scheduler, internal scheduling system - sisif, etc."
+state: 'Active'
+documentationUrl: 'https://hindawi.atlassian.net/wiki/spaces/PPT/pages/1137344514/Phenom+Finance'
+issueTrackerUrl: 'https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74'
 financialData:
   applies: true
   scope:
-    - Other
----
-id: 146bb74f-70cb-49db-90f8-e9d78944fa94
-appCode: phenom-invoicing-web
-name: Phenom Invoicing Client App
-description: Payment details pages used by users to pay invoices for manuscripts.
-state: Active
-documentationUrl: https://hindawi.atlassian.net/wiki/spaces/PPT/pages/1137344514/Phenom+Finance
-issueTrackerUrl: https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74
-systemId: 318c5bb2-ffff-4ee5-b536-1df0dfe4d59c
-usages:
-  - Product
+    - 'Other'
 personalData:
   applies: true
   scope:
-    - Employee
-    - Customer
+    - 'Customer'
+    - 'Employee'
   supports:
-    - Country
+    - 'Country'
+usages:
+  - 'Product'
+systemId: '318c5bb2-ffff-4ee5-b536-1df0dfe4d59c'
+shortCode: 'phenom-invcngg'
+isSystem: false
+---
+!<Application>
+id: '146bb74f-70cb-49db-90f8-e9d78944fa94'
+modelType: 'Application'
+appCode: 'phenom-invoicing-web'
+atlasId: 'APP-9723'
+name: 'Phenom Invoicing Client App'
+appType: 'Built'
+description: 'Payment details pages used by users to pay invoices for manuscripts.'
+state: 'Active'
+documentationUrl: 'https://hindawi.atlassian.net/wiki/spaces/PPT/pages/1137344514/Phenom+Finance'
+issueTrackerUrl: 'https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74'
 financialData:
   applies: true
   scope:
-    - Other
----
-id: 825fae9e-c227-48c2-936c-620dbc7ec914
-appCode: phenom-reporting-backend
-name: Phenom Reporting
-description: Reporting backend listens to phenom events and saves them in a database used by Iris.
-state: Active
-documentationUrl: https://hindawi.atlassian.net/wiki/spaces/PPT/pages/2571304987/Phenom+Reporting
-issueTrackerUrl: https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74
-systemId: 318c5bb2-ffff-4ee5-b536-1df0dfe4d59c
-usages:
-  - Product
+    - 'Other'
 personalData:
   applies: true
   scope:
-    - Employee
-    - Customer
+    - 'Customer'
+    - 'Employee'
   supports:
-    - Country
+    - 'Country'
+usages:
+  - 'Product'
+systemId: '318c5bb2-ffff-4ee5-b536-1df0dfe4d59c'
+shortCode: 'phenom-invcngw'
+isSystem: false
+---
+!<Application>
+id: '825fae9e-c227-48c2-936c-620dbc7ec914'
+modelType: 'Application'
+appCode: 'phenom-reporting-backend'
+atlasId: 'APP-9724'
+name: 'Phenom Reporting'
+appType: 'Built'
+description:
+  "Reporting backend listens to phenom events and saves them in a database\
+  \ used by Iris."
+state: 'Active'
+documentationUrl: 'https://hindawi.atlassian.net/wiki/spaces/PPT/pages/2571304987/Phenom+Reporting'
+issueTrackerUrl: 'https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74'
 financialData:
   applies: true
   scope:
-    - Other
+    - 'Other'
   supports:
-    - SOXReporting
----
-id: 448f6c6d-9398-4dc1-9673-cd210ada92f9
-appCode: phenom-eve
-name: Phenom Eve
-description: 'Multi purpose utility app, usecases: pull events from s3 and write them to sqs, pull events from s3 send to rest endpoint, etc.'
-state: Active
-issueTrackerUrl: https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74
-systemId: 318c5bb2-ffff-4ee5-b536-1df0dfe4d59c
-usages:
-  - Product
-personalData:
-  applies: false
-financialData:
-  applies: false
----
-id: 9f3e5c09-92ec-48b0-a2c7-4b64800ca158
-appCode: phenom-iris
-name: Phenom Iris
-description: 'apache-superset server. In Greek mythology, Iris (/ˈaɪrɪs/; Greek: Ίρις Ancient Greek: [îːris]) is the personification and goddess of the rainbow and messenger of the gods.'
-state: Active
-documentationUrl: https://hindawi.atlassian.net/wiki/spaces/PPT/pages/2571304987/Phenom+Reporting
-issueTrackerUrl: https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74
-systemId: 318c5bb2-ffff-4ee5-b536-1df0dfe4d59c
-usages:
-  - Product
+    - 'SOXReporting'
 personalData:
   applies: true
   scope:
-    - Employee
-    - Customer
+    - 'Customer'
+    - 'Employee'
   supports:
-    - Country
-financialData:
-  applies: true
-  scope:
-    - Other
-  supports:
-    - SOXReporting
----
-id: 0bda3229-a381-4b0e-8edd-6a03ba32d21b
-appCode: phenom-sisif
-name: Phenom Sisif
-description: Job scheduling system. Uses redis as backend to schedule jobs after a delay or by cron.
-state: Active
-documentationUrl: https://hindawi.atlassian.net/wiki/spaces/PPT/pages/2571304987/Phenom+Reporting
-issueTrackerUrl: https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74
-systemId: 318c5bb2-ffff-4ee5-b536-1df0dfe4d59c
+    - 'Country'
 usages:
-  - Product
-personalData:
-  applies: false
+  - 'Product'
+systemId: '318c5bb2-ffff-4ee5-b536-1df0dfe4d59c'
+shortCode: 'phenom-rprtngb'
+isSystem: false
+---
+!<Application>
+id: '448f6c6d-9398-4dc1-9673-cd210ada92f9'
+modelType: 'Application'
+appCode: 'phenom-eve'
+atlasId: 'APP-9725'
+name: 'Phenom Eve'
+appType: 'Built'
+description:
+  "Multi purpose utility app, usecases: pull events from s3 and write them\
+  \ to sqs, pull events from s3 send to rest endpoint, etc."
+state: 'Active'
+issueTrackerUrl: 'https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74'
 financialData:
   applies: false
+personalData:
+  applies: false
+usages:
+  - 'Product'
+systemId: '318c5bb2-ffff-4ee5-b536-1df0dfe4d59c'
+shortCode: 'phenom-eve'
+isSystem: false
+---
+!<Application>
+id: '9f3e5c09-92ec-48b0-a2c7-4b64800ca158'
+modelType: 'Application'
+appCode: 'phenom-iris'
+atlasId: 'APP-9726'
+name: 'Phenom Iris'
+appType: 'Built'
+description:
+  "apache-superset server. In Greek mythology, Iris is the personification\
+  \ and goddess of the rainbow and messenger of the gods."
+state: 'Active'
+documentationUrl: 'https://hindawi.atlassian.net/wiki/spaces/PPT/pages/2571304987/Phenom+Reporting'
+issueTrackerUrl: 'https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74'
+financialData:
+  applies: true
+  scope:
+    - 'Other'
+  supports:
+    - 'SOXReporting'
+personalData:
+  applies: true
+  scope:
+    - 'Customer'
+    - 'Employee'
+  supports:
+    - 'Country'
+usages:
+  - 'Product'
+systemId: '318c5bb2-ffff-4ee5-b536-1df0dfe4d59c'
+shortCode: 'phenom-iris'
+isSystem: false
+---
+!<Application>
+id: '0bda3229-a381-4b0e-8edd-6a03ba32d21b'
+modelType: 'Application'
+appCode: 'phenom-sisif'
+atlasId: 'APP-9727'
+name: 'Phenom Sisif'
+appType: 'Built'
+description:
+  "Job scheduling system. Uses redis as backend to schedule jobs after\
+  \ a delay or by cron."
+state: 'Active'
+documentationUrl: 'https://hindawi.atlassian.net/wiki/spaces/PPT/pages/2571304987/Phenom+Reporting'
+issueTrackerUrl: 'https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74'
+financialData:
+  applies: false
+personalData:
+  applies: false
+usages:
+  - 'Product'
+systemId: '318c5bb2-ffff-4ee5-b536-1df0dfe4d59c'
+shortCode: 'phenom-sisif'
+isSystem: false

@@ -48,12 +48,21 @@ export class SqsEventConsumer implements QueueEventConsumer {
     });
 
     this.sqsConsumer.on('error', (err) => {
-      console.error(err.message);
-      process.exit(1);
+      if (
+        process.env.NODE_ENV === 'development' ||
+        process.env.NODE_ENV === 'dev'
+      ) {
+        console.log(err.message);
+      }
     });
 
     this.sqsConsumer.on('processing_error', (err) => {
-      console.error(err.message);
+      if (
+        process.env.NODE_ENV === 'development' ||
+        process.env.NODE_ENV === 'dev'
+      ) {
+        console.log(err.message);
+      }
     });
 
     this.sqsConsumer.start();

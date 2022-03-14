@@ -1,11 +1,10 @@
+import { join } from 'path';
+
 import {
   ValueObjectProps,
   GuardFailure,
   ValueObject,
-  Either,
   Guard,
-  right,
-  left,
 } from '@hindawi/shared';
 
 interface PathProps extends ValueObjectProps {
@@ -21,12 +20,18 @@ export class Path extends ValueObject<PathProps> {
     super(props);
   }
 
-  static create(src: string): Either<GuardFailure, Path> {
+  static create(src: string): Path {
     const guardResult = Guard.againstNullOrUndefined(src, 'source');
     if (guardResult.isFail()) {
-      return left(new GuardFailure(guardResult.message));
+      throw new GuardFailure(guardResult.message);
     } else {
-      return right(new Path({ src }));
+      return new Path({ src });
     }
+  }
+
+  join(...paths: Array<string | Path>): Path {
+    const p = paths.map((i) => (typeof i === 'string' ? i : i.src));
+
+    return Path.create(join(this.src, ...p));
   }
 }

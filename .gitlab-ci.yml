@@ -8,6 +8,7 @@ stages:
   - build
   - package
   - deploy
+  - acceptance
   - deploy-prod
 
 include:
@@ -54,7 +55,7 @@ variables:
   BT_PUBLIC_KEY: 'test-public-key'
   BT_PRIVATE_KEY: 'test-private-key'
   VAT_VALIDATION_SERVICE_ENDPOINT: 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
-  # AFFECTED_APPS: 'invoicing-graphql'
+  AFFECTED_APPS: 'invoicing-graphql'
   AFFECTED_COMMAND: ''
   AFFECTED_ARGS: '--base=remotes/origin/develop'
   AFFECTED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend'
@@ -208,6 +209,13 @@ Package Images:dev:
     paths:
       - dist-k8s
 
+Trigger Acceptance Tests:
+  stage: acceptance
+  when: manual
+  trigger:
+    project: hindawi/phenom-automation
+    branch: main
+
 Deploy:dev:
   tags:
     - 'cluster:hindawi-dev'
@@ -234,6 +242,23 @@ Deploy:qa:
     TENANT: hindawi
     NODE_ENV: qa
     NAMESPACE: qa
+    CLUSTER: hindawi-dev
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+
+Deploy:automation:
+  tags:
+    - 'cluster:hindawi-dev'
+  stage: deploy
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  interruptible: true
+  allow_failure: true
+  variables:
+    TENANT: hindawi
+    NODE_ENV: automation
+    NAMESPACE: automation
     CLUSTER: hindawi-dev
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests

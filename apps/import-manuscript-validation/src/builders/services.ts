@@ -4,7 +4,9 @@ import { LoggerBuilder } from '@hindawi/shared';
 import {
   ObjectStoreServiceContract,
   ArchiveServiceContract,
+  XmlServiceContract,
   ArchiveService,
+  XmlService,
   S3Service,
 } from '@hindawi/import-manuscript-commons';
 
@@ -13,6 +15,7 @@ import { env } from '../env';
 export interface Services {
   objectStoreService: ObjectStoreServiceContract;
   archiveService: ArchiveServiceContract;
+  xmlService: XmlServiceContract;
   jobQueue: QueueEventConsumer;
 }
 
@@ -32,6 +35,7 @@ export function buildServices(loggerBuilder: LoggerBuilder): Services {
       env.aws.secretKey
     ),
     archiveService: new ArchiveService(),
+    xmlService: new XmlService(),
   };
 
   return services;

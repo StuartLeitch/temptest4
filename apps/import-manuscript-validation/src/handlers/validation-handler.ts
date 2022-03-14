@@ -1,22 +1,19 @@
-import { readdir } from 'fs/promises';
-
 import {
-  ObjectStoreServiceContract,
   UnarchivePackageUsecase,
-  ArchiveServiceContract,
+  ValidatePackageUseCase,
   ValidatePackageEvent,
-  EventHandler,
 } from '@hindawi/import-manuscript-commons';
+
+import { EventHandler } from './event-handler';
+import { Context } from '../builders';
+
+import { env } from '../env';
 
 const VALIDATE_PACKAGE = 'ValidatePackage';
 
 export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
   event: VALIDATE_PACKAGE,
-  handler(
-    objectStoreService: ObjectStoreServiceContract,
-    archiveService: ArchiveServiceContract,
-    zipLocation: string
-  ) {
+  handler(context: Context) {
     return async (data: ValidatePackageEvent) => {
       /*
         example of how the event looks on SQS:
@@ -38,13 +35,19 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
         }
       */
 
+      const {
+        services: { objectStoreService, archiveService, xmlService },
+        loggerBuilder,
+      } = context;
+      const logger = loggerBuilder.getLogger();
+
       const usecase = new UnarchivePackageUsecase(
         objectStoreService,
         archiveService
       );
 
       const res = await usecase.execute({
-        saveLocation: zipLocation,
+        saveLocation: env.zip.saveLocation,
         name: data.fileName,
       });
 
@@ -52,9 +55,17 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
         throw res.value;
       }
 
-      console.log('unzipped package in folder:', res.value.src);
-      const files = await readdir(res.value.src);
-      console.log('package contained these files:', files);
+      const validateUsecase = new ValidatePackageUseCase(xmlService, logger);
+
+      try {
+        await validateUsecase.execute({
+          definitionsPath: env.app.xmlDefinitionsLocation,
+          packagePath: res.value.src,
+        });
+      } catch (err) {
+        logger.error(err);
+        throw err;
+      }
     };
   },
 };

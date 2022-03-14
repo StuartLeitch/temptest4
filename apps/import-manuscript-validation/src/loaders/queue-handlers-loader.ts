@@ -6,8 +6,6 @@ import {
 import { ValidatePackageHandler } from '../handlers/validation-handler';
 import { Context } from '../builders';
 
-import { env } from '../env';
-
 export const queueHandlerLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ) => {
@@ -21,14 +19,7 @@ export const queueHandlerLoader: MicroframeworkLoader = async (
 
     if (queue) {
       Object.values(handlers).forEach((handler) => {
-        queue.registerHandler(
-          handler.event,
-          handler.handler(
-            context.services.objectStoreService,
-            context.services.archiveService,
-            env.zip.saveLocation
-          )
-        );
+        queue.registerHandler(handler.event, handler.handler(context));
       });
       await queue.start();
     }

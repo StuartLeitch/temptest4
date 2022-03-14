@@ -16,6 +16,7 @@ import { CatalogMap } from '../../mappers/CatalogMap';
 
 import { CatalogRepoContract } from '../../repos/catalogRepo';
 import { PublisherRepoContract } from '../../../publishers/repos';
+import { AuditLoggerServiceContract } from '../../../../infrastructure/audit';
 
 import { UpdateCatalogItemFieldsResponse as Response } from './updateCatalogItemFieldsResponse';
 import type { UpdateCatalogItemFieldsDTO as DTO } from './updateCatalogItemFieldsDTO';
@@ -26,20 +27,24 @@ export class UpdateCatalogItemFieldsUsecase
   implements UseCase<DTO, Response, Context> {
   private catalogRepo: CatalogRepoContract;
   private publisherRepo: PublisherRepoContract;
+  private auditLoggerService: AuditLoggerServiceContract;
 
   constructor(
     catalogRepo: CatalogRepoContract,
-    publisherRepo: PublisherRepoContract
+    publisherRepo: PublisherRepoContract,
+    auditLoggerService: AuditLoggerServiceContract
   ) {
     super();
 
     this.catalogRepo = catalogRepo;
     this.publisherRepo = publisherRepo;
+    this.auditLoggerService = auditLoggerService;
   }
 
   @Authorize('journal:update')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const { amount, journalId: rawJournalId, publisherName } = request;
+
     try {
       const journalId: JournalId = JournalId.create(
         new UniqueEntityID(rawJournalId)
@@ -98,6 +103,18 @@ export class UpdateCatalogItemFieldsUsecase
 
       if (maybeResult.isLeft()) {
         return left(new UnexpectedError(new Error(maybeResult.value.message)));
+      }
+
+      // * PPBK_2715: if there's a price change, log it
+      if (Number(catalogItem.amount) !== Number(updatedCatalogItem.amount)) {
+        // * Save information as audit log
+        this.auditLoggerService.log({
+          action: 'edited',
+          entity: 'journal',
+          item_reference: updatedCatalogItem.journalId.toString(),
+          target: `Journal #${updatedCatalogItem.journalId.toString()}`,
+          timestamp: new Date(),
+        });
       }
 
       return right(updatedCatalogItem);
