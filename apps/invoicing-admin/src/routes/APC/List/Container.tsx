@@ -29,6 +29,10 @@ import {
   IconSave,
   IconRemove,
   Space,
+  Modal,
+  IconNotificationAlert,
+  Title,
+  Button,
 } from '@hindawi/phenom-ui';
 
 import EditableCell from './components/EditableCell';
@@ -109,12 +113,13 @@ const ApcContainer: React.FC = () => {
   const save = async (journalId: string) => {
     try {
       const row = await form.validateFields();
+
       setEditingKey('');
       try {
         const updateCatalogItemResult = await updateCatalogItem({
           variables: {
             catalogItem: {
-              amount: row.amount,
+              amount: parseInt(row.amount),
               publisherName: row.publisher.name,
               journalId,
             },
@@ -135,29 +140,50 @@ const ApcContainer: React.FC = () => {
     }
   };
 
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const modalValidator = async () => {
+    try {
+      await form.validateFields();
+      setIsModalVisible(true);
+    } catch (errInfo) {
+      console.info('Validate Failed:', errInfo);
+    }
+  };
+
+  const handleOk = (record) => {
+    setIsModalVisible(false);
+    save(record.journalId);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
   const columns = [
     {
       title: 'Journal Name',
       dataIndex: 'journalTitle',
       key: 'journalName',
+      width: '34%',
     },
     {
       title: 'Journal Code',
       dataIndex: 'code',
       key: 'code',
-      width: 200,
+      width: '17%',
     },
     {
       title: 'ISSN',
       dataIndex: 'issn',
       key: 'issn',
-      with: 200,
+      with: '17%',
     },
     {
       title: 'Publisher',
       dataIndex: ['publisher', 'name'],
       key: 'publisher',
-      width: 150,
+      width: '11%',
       editable: true,
       render: (publisher: any) => <Text>{publisher}</Text>,
     },
@@ -167,7 +193,7 @@ const ApcContainer: React.FC = () => {
       key: 'amount',
       editable: true,
       align: 'right' as const,
-      width: 150,
+      width: '11%',
       render: (apc: React.ReactNode) => (
         <Text type='success' strong>
           ${apc}
@@ -177,28 +203,52 @@ const ApcContainer: React.FC = () => {
     {
       title: '',
       dataIntes: 'action',
-      width: 150,
+      width: '10%',
       render: (_: any, record: Item) => {
         const editable = isEditing(record);
         return editable ? (
           <Restricted to='edit.apc'>
             <span>
-            <Space size='middle'>
-              <IconSave onClick={() => save(record.journalId)}>Save</IconSave>
-              <IconRemove onClick={cancel}>
-                <a>Cancel</a>
-              </IconRemove>
-            </Space>
-          </span>
+              <Space size={0} style={{ float: 'right', marginRight: '24px' }}>
+                <Button
+                  className='cancel-button'
+                  type='text'
+                  onClick={cancel}
+                  icon={<IconRemove />}
+                />
+                <Button
+                  className='save-button'
+                  type='text'
+                  onClick={modalValidator}
+                  icon={<IconSave />}
+                />
+                <Modal
+                  title={
+                    <div className='modal-title-wrap'>
+                      <IconNotificationAlert className='notification-input-icon' />
+                      <Title
+                        className='notification-input-tile'
+                        preset='primary'
+                      >
+                        Do you want to save your changes?
+                      </Title>
+                    </div>
+                  }
+                  visible={isModalVisible}
+                  onOk={() => handleOk(record)}
+                  centered
+                  onCancel={handleCancel}
+                  okText='SAVE CHANGES'
+                  cancelText='CANCEL'
+                ></Modal>
+              </Space>
+            </span>
           </Restricted>
         ) : (
           <Restricted to='edit.apc'>
-            <IconEdit className='edit-button' onClick={() => edit(record)}>
-              Edit
-            </IconEdit>
+            <IconEdit className='edit-button' onClick={() => edit(record)} />
           </Restricted>
         );
-        // return null;
       },
     },
   ];

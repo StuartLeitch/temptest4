@@ -13,6 +13,7 @@ import { PublishCreditNoteCreatedUsecase } from '../../../../libs/shared/src/lib
 import { PublishInvoiceConfirmedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceConfirmed';
 import { PublishInvoiceFinalizedUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoiceFinalized';
 import { PublishInvoicePaidUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/publishEvents/publishInvoicePaid';
+import { PublishJournalAPCUpdatedUsecase } from '../../../../libs/shared/src/lib/modules/journals/usecases/publishEvents/publishJournalAPCUpdated';
 
 import { AfterInvoiceDraftDueAmountUpdatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDueAmountUpdateEvent';
 import { AfterInvoiceDraftCreatedEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceDraftCreatedEvent';
@@ -24,6 +25,7 @@ import { AfterInvoiceConfirmed } from '../../../../libs/shared/src/lib/modules/i
 import { AfterInvoiceFinalized } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoiceFinalizedEvent';
 import { AfterPaymentCompleted } from './../../../../libs/shared/src/lib/modules/payments/subscriptions/after-payment-completed';
 import { AfterInvoicePaidEvent } from '../../../../libs/shared/src/lib/modules/invoices/subscriptions/AfterInvoicePaidEvents';
+import { AfterJournalAPCUpdated } from '../../../../libs/shared/src/lib/modules/journals/subscriptions/AfterJournalAPCUpdatedEvent';
 
 import { Context } from '../builders';
 import { env } from '../env';
@@ -38,6 +40,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         paymentMethod,
         invoiceItem,
         manuscript,
+        catalog,
         creditNote,
         address,
         invoice,
@@ -60,9 +63,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
     const publishInvoiceDraftDeleted = new PublishInvoiceDraftDeletedUseCase(
       queue
     );
-    const publishInvoiceDraftDueAmountUpdated = new PublishInvoiceDraftDueAmountUpdatedUseCase(
-      queue
-    );
+    const publishInvoiceDraftDueAmountUpdated =
+      new PublishInvoiceDraftDueAmountUpdatedUseCase(queue);
     const publishInvoiceCreatedUsecase = new PublishInvoiceCreatedUsecase(
       queue
     );
@@ -70,6 +72,7 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
     const publishInvoiceFinalized = new PublishInvoiceFinalizedUsecase(queue);
     const publishInvoiceCredited = new PublishCreditNoteCreatedUsecase(queue);
     const publishInvoicePaid = new PublishInvoicePaidUsecase(queue);
+    const publishJournalAPCUpdated = new PublishJournalAPCUpdatedUsecase(queue);
 
     // * Registering Invoice Events
     // tslint:disable-next-line: no-unused-expression
@@ -79,7 +82,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       manuscript,
       coupon,
       waiver,
-      publishInvoiceDraftCreated
+      publishInvoiceDraftCreated,
+      loggerService
     );
 
     // tslint:disable-next-line: no-unused-expression
@@ -89,7 +93,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       manuscript,
       coupon,
       waiver,
-      publishInvoiceDraftDeleted
+      publishInvoiceDraftDeleted,
+      loggerService
     );
 
     // tslint:disable-next-line: no-unused-expression
@@ -99,7 +104,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       manuscript,
       coupon,
       waiver,
-      publishInvoiceDraftDueAmountUpdated
+      publishInvoiceDraftDueAmountUpdated,
+      loggerService
     );
 
     // tslint:disable-next-line: no-unused-expression
@@ -110,7 +116,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       publishInvoiceCreatedUsecase,
       schedulingService,
       env.scheduler.confirmationReminderDelay,
-      env.scheduler.emailRemindersQueue
+      env.scheduler.emailRemindersQueue,
+      loggerService
     );
 
     // tslint:disable-next-line: no-unused-expression
@@ -179,5 +186,11 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
     );
 
     new AfterInvoiceMovedToPending(loggerService, emailService);
+
+    new AfterJournalAPCUpdated(
+      catalog,
+      publishJournalAPCUpdated,
+      loggerService
+    );
   }
 };

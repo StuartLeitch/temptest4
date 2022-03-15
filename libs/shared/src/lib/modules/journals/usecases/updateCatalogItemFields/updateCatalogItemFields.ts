@@ -1,3 +1,4 @@
+import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { right, left } from '../../../../core/logic/Either';
@@ -24,7 +25,8 @@ import * as Errors from './updateCatalogItemFieldsErrors';
 
 export class UpdateCatalogItemFieldsUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Response, Context> {
+  implements UseCase<DTO, Response, Context>
+{
   private catalogRepo: CatalogRepoContract;
   private publisherRepo: PublisherRepoContract;
   private auditLoggerService: AuditLoggerServiceContract;
@@ -96,6 +98,11 @@ export class UpdateCatalogItemFieldsUsecase
 
       const updatedCatalogItem = maybeUpdatedCatalogItem.value;
 
+      // trigger the JOURNAL_APC_UPDATED event given it has a different value than one registered already
+
+      catalogItem.amount = amount;
+      await this.catalogRepo.save(catalogItem);
+
       // * Call knex update method from service for DB changes
       const maybeResult = await this.catalogRepo.updateCatalogItem(
         updatedCatalogItem
@@ -105,6 +112,7 @@ export class UpdateCatalogItemFieldsUsecase
         return left(new UnexpectedError(new Error(maybeResult.value.message)));
       }
 
+      DomainEvents.dispatchEventsForAggregate(catalogItem.id);
       // * PPBK_2715: if there's a price change, log it
       if (Number(catalogItem.amount) !== Number(updatedCatalogItem.amount)) {
         // * Save information as audit log
@@ -119,7 +127,6 @@ export class UpdateCatalogItemFieldsUsecase
 
       return right(updatedCatalogItem);
     } catch (err) {
-      console.log(err);
       return left(new UnexpectedError(err));
     }
   }

@@ -1,6 +1,7 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { Roles } from '../../../domain/authorization';
+import { LoggerContract } from '../../../infrastructure/logging/Logger';
 
 import { InvoiceDraftDueAmountUpdated } from '../domain/events/invoiceDraftDueAmountUpdated';
 
@@ -16,14 +17,16 @@ import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getIte
 import { GetInvoiceDetailsUsecase } from '../usecases/getInvoiceDetails';
 
 export class AfterInvoiceDraftDueAmountUpdatedEvent
-  implements HandleContract<InvoiceDraftDueAmountUpdated> {
+  implements HandleContract<InvoiceDraftDueAmountUpdated>
+{
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
-    private publishInvoiceDraftDueAmountUpdated: PublishInvoiceDraftDueAmountUpdatedUseCase
+    private publishInvoiceDraftDueAmountUpdated: PublishInvoiceDraftDueAmountUpdatedUseCase,
+    private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
   }
@@ -107,7 +110,7 @@ export class AfterInvoiceDraftDueAmountUpdatedEvent
         }
       }
     } catch (err) {
-      console.log(
+      this.loggerService.error(
         `[AfterInvoiceDraftDueAmountUpdated]: Failed to execute onInvoiceDraftDueAmountUpdatedEvent subscription AfterInvoiceDraftDueAmountUpdatedEvent. Err: ${err}`
       );
     }

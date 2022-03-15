@@ -1,6 +1,7 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { Roles } from '../../../domain/authorization';
+import { LoggerContract } from '../../../infrastructure/logging';
 
 import { InvoiceDraftDeleted } from '../domain/events/invoiceDraftDeleted';
 
@@ -16,14 +17,16 @@ import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice';
 import { GetInvoiceDetailsUsecase } from '../usecases/getInvoiceDetails';
 
 export class AfterInvoiceDraftDeletedEvent
-  implements HandleContract<InvoiceDraftDeleted> {
+  implements HandleContract<InvoiceDraftDeleted>
+{
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
     private manuscriptRepo: ArticleRepoContract,
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
-    private publishInvoiceDeleted: PublishInvoiceDraftDeletedUseCase
+    private publishInvoiceDeleted: PublishInvoiceDraftDeletedUseCase,
+    private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
   }
@@ -107,7 +110,7 @@ export class AfterInvoiceDraftDeletedEvent
         }
       }
     } catch (err) {
-      console.log(
+      this.loggerService.error(
         `[AfterInvoiceDraftDeleted]: Failed to execute onInvoiceDeletedEvent subscription AfterInvoiceDraftDeleted. Err: ${err}`
       );
     }

@@ -8,13 +8,18 @@ import { left } from '../../../core/logic/Either';
 
 import { JournalUpdated as JournalUpdatedEvent } from '../domain/events/JournalUpdated';
 
-import { CatalogRepoContract } from '../../journals/repos/catalogRepo';
-import { GetJournalUsecase } from '../../journals/usecases/journals/getJournal';
+import { CatalogRepoContract } from '../repos/catalogRepo';
+import { GetJournalUsecase } from '../usecases/journals/getJournal';
+import { PublishJournalAPCUpdatedUsecase } from '../usecases/publishEvents/publishJournalAPCUpdated';
 
-export class AfterJournalUpdatedEvent
-  implements HandleContract<JournalUpdatedEvent> {
+export class AfterJournalAPCUpdated
+  implements HandleContract<JournalUpdatedEvent>
+{
   constructor(
     private journalRepo: CatalogRepoContract,
+    private publishJournalAPCUpdated:
+      | PublishJournalAPCUpdatedUsecase
+      | NoOpUseCase,
     private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
@@ -22,12 +27,12 @@ export class AfterJournalUpdatedEvent
 
   setupSubscriptions(): void {
     DomainEvents.register(
-      this.onJournalUpdatedEvent.bind(this),
+      this.onJournalAPCUpdated.bind(this),
       JournalUpdatedEvent.name
     );
   }
 
-  private async onJournalUpdatedEvent(
+  private async onJournalAPCUpdated(
     event: JournalUpdatedEvent
   ): Promise<unknown> {
     const defaultContext = {
@@ -47,10 +52,21 @@ export class AfterJournalUpdatedEvent
       }
 
       const journal = maybeJournal.value;
+      const publishResult = await this.publishJournalAPCUpdated.execute(
+        { journal },
+        defaultContext
+      );
+
+      if (publishResult.isLeft()) {
+        return left(publishResult.value.message);
+      }
+
+      this.loggerService.info(
+        `[AfterJournalAPCUpdated]: Successfully executed onJournalAPCUpdated event usecase`
+      );
     } catch (err) {
-      console.error(err);
-      console.log(
-        `[AfterJournalUpdated]: Failed to execute onJournalUpdatedEvent usecase. Err: ${err}`
+      this.loggerService.error(
+        `[AfterJournalAPCUpdated]: Failed to execute onJournalUpdatedEvent usecase. Err: ${err}`
       );
     }
     return null;

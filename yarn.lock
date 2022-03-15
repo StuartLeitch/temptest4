@@ -4154,9 +4154,9 @@
     constructs "2.0.1"
 
 "@hindawi/phenom-events@^1.17.1":
-  version "1.17.1"
-  resolved "https://registry.yarnpkg.com/@hindawi/phenom-events/-/phenom-events-1.17.1.tgz#694c7aaa0344f0ebf57eb0106201c11fa87219d7"
-  integrity sha512-k4bKxHa662boGGmwEiFVfna/1mJrGBqq0cOF1pIZ90iu4fBSRlcVfEDZNFOX1tzqqIndyfgZp3ZZF6S+Ob6Gig==
+  version "1.17.2"
+  resolved "https://registry.yarnpkg.com/@hindawi/phenom-events/-/phenom-events-1.17.2.tgz#977fe539da3db5efa84784f12a9b311a673b5886"
+  integrity sha512-kvnP1huYZMEp9D+8M87YBW4uynLej5kQZi6L0N2GVxkoRlsaQ9984EsO9ROkbRc0CyLb3Nr2LSPp1QPlqZ9Fxw==
 
 "@hindawi/phenom-ui@0.1.0-beta.57":
   version "0.1.0-beta.57"

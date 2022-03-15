@@ -2,6 +2,7 @@ import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { NoOpUseCase } from './../../../core/domain/NoOpUseCase';
 import { Roles } from '../../../domain/authorization';
+import { LoggerContract } from '../../../infrastructure/logging/Logger';
 
 import { PayloadBuilder } from '../../../infrastructure/message-queues/payloadBuilder';
 import { SchedulerContract } from '../../../infrastructure/scheduler/Scheduler';
@@ -23,7 +24,8 @@ import { InvoiceRepoContract } from '../repos/invoiceRepo';
 import { PublishInvoiceCreatedUsecase } from '../usecases/publishEvents/publishInvoiceCreated';
 
 export class AfterInvoiceCreatedEvent
-  implements HandleContract<InvoiceCreated> {
+  implements HandleContract<InvoiceCreated>
+{
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -31,7 +33,8 @@ export class AfterInvoiceCreatedEvent
     private publishInvoiceCreated: PublishInvoiceCreatedUsecase | NoOpUseCase,
     private scheduler: SchedulerContract,
     private confirmationReminderDelay: number,
-    private confirmationReminderQueueName: string
+    private confirmationReminderQueueName: string,
+    private loggerService: LoggerContract
   ) {
     this.setupSubscriptions();
   }
@@ -127,11 +130,11 @@ export class AfterInvoiceCreatedEvent
         newTimer
       );
 
-      console.log(
+      this.loggerService.info(
         `[AfterInvoiceCreated]: Successfully executed onInvoiceCreatedEvent use case InvoiceCreatedEvent`
       );
     } catch (err) {
-      console.log(
+      this.loggerService.error(
         `[AfterInvoiceCreated]: Failed to execute onInvoiceCreatedEvent subscription AfterInvoiceCreated. Err: ${err}`
       );
     }
