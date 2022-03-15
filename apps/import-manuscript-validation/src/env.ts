@@ -21,8 +21,11 @@ export const env = {
     description: pkg.description,
     banner: toBool(getOsEnv('APP_BANNER')),
     xmlDefinitionsLocation: getOsEnv('IMPORT_MANUSCRIPT_XML_DEFINITION_PATH'),
+    mailingDisabled: toBool(getOsEnv('MAILING_DISABLED')),
+    validationSenderEmail: getOsEnv('VALIDATION_SENDER_EMAIL'),
     submissionGraphqlEndpoint: getOsEnv('IMPORT_MANUSCRIPT_SUBMISSION_GRAPHQL'),
     reviewAppBasePath: getOsEnv('IMPORT_MANUSCRIPT_REVIEW_APP_BASE_PATH'),
+    importManuscriptAppBasePath: getOsEnv('IMPORT_MANUSCRIPT_APP_BASE_PATH'),
     submissionAdminUsername: getOsEnv(
       'IMPORT_MANUSCRIPT_SUBMISSION_ADMIN_USERNAME'
     ),

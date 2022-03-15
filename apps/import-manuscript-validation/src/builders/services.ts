@@ -1,4 +1,5 @@
 import { QueueEventConsumer, SqsEventConsumer } from '@hindawi/queue-utils';
+import { EmailService, LoggerBuilder } from '@hindawi/shared';
 import { KeycloakAuthenticator } from '@hindawi/import-manuscript-commons';
 
 import {
@@ -12,11 +13,8 @@ import {
   S3Service,
 } from '@hindawi/import-manuscript-commons';
 
-import { EmailService } from '../libs/email';
-
-import Keycloak from 'keycloak-connect';
-import { LoggerBuilder, LogLevel } from '@hindawi/shared';
 import { env } from '../env';
+import Keycloak from 'keycloak-connect';
 
 export interface Services {
   objectStoreService: ObjectStoreServiceContract;
@@ -27,16 +25,9 @@ export interface Services {
   emailService: EmailService;
 }
 
-export function buildServices(): Services {
+export function buildServices(loggerBuilder: LoggerBuilder): Services {
   const keycloak = new Keycloak({}, env.app.submissionKeycloakConfig);
 
-  const loggerBuilder = new LoggerBuilder(
-    LogLevel[env.log.level]
-    // {
-    //   isDevelopment: env.isDevelopment,
-    //   logLevel: env.log.level,
-    // }
-  );
   const reviewSystemAuthenticator: KeycloakAuthenticator =
     new KeycloakAuthenticator(
       env.app.submissionAdminUsername,
@@ -60,11 +51,13 @@ export function buildServices(): Services {
       env.aws.secretKey
     ),
     archiveService: new ArchiveService(),
-    xmlService: new XmlService(),
+    xmlService: new XmlService(loggerBuilder.getLogger(XmlService.name)),
     emailService: new EmailService(
-      env.aws.ses.accessKey,
-      env.aws.ses.secretKey,
-      env.aws.region
+      env.app.mailingDisabled,
+      env.app.reviewAppBasePath,
+      'ImportManuscript',
+      '',
+      ''
     ),
     reviewClient: new ReviewClient(
       env.app.submissionGraphqlEndpoint,

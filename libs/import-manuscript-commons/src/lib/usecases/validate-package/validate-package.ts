@@ -1,14 +1,20 @@
-import {join} from 'path';
+import { join } from 'path';
 import VError from 'verror';
 
-import {LoggerContract, UseCase} from '@hindawi/shared';
+import { LoggerContract, UseCase } from '@hindawi/shared';
 
-import {XmlServiceContract} from '../../services';
-import {FileUtils} from '../../utils';
-import {Manifest, ManifestProps, MecaFileType, PackageItem, Path,} from '../../models';
+import { XmlServiceContract } from '../../services';
+import { FileUtils } from '../../utils';
+import {
+  Manifest,
+  ManifestProps,
+  MecaFileType,
+  PackageItem,
+  Path,
+} from '../../models';
 
-import type {ValidatePackage as Response} from './validate-package-response';
-import type {ValidatePackageDTO as DTO} from './validate-package-dto';
+import type { ValidatePackage as Response } from './validate-package-response';
+import type { ValidatePackageDTO as DTO } from './validate-package-dto';
 
 type ManifestXML = {
   manifest: ManifestProps;
@@ -31,24 +37,30 @@ export class ValidatePackageUseCase
     const manifestDefinitionPath = Path.create(
       join(request.definitionsPath, 'MECA_manifest.dtd')
     );
+
     await this.xmlService.validate(manifestPath, manifestDefinitionPath);
+
     const rawManifest = await this.xmlService.parseXml<ManifestXML>(
       manifestPath
     );
+
     const manifest = Manifest.create(rawManifest.manifest);
     validateItemTypeCount(manifest);
     await validateItemAreAccessible(packagePath, manifest);
 
-
     const transferDefinitionPath = Path.create(
       join(request.definitionsPath, 'MECA_transfer.dtd')
     );
-    const transferPath = Path.create(join(request.packagePath, manifest.items.find(it => it.type === MecaFileType.transferMetadata).uri));
+    const transferPath = Path.create(
+      join(
+        request.packagePath,
+        manifest.items.find((it) => it.type === MecaFileType.transferMetadata)
+          .uri
+      )
+    );
     await this.xmlService.validate(transferPath, transferDefinitionPath);
 
-
     const rawTransfer = await this.xmlService.parseXml(transferPath);
-
 
     validateTransferMetadata(rawTransfer);
 

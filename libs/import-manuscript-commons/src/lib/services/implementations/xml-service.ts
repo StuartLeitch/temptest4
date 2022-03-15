@@ -11,11 +11,12 @@ import {
   XmlServiceContract,
   ParsedXml,
 } from '../contracts';
+import { LoggerContract } from '@hindawi/shared';
 
 export class XmlService implements XmlServiceContract {
   readonly parser: XMLParser;
 
-  constructor() {
+  constructor(private readonly loggerService: LoggerContract) {
     this.parser = new XMLParser({
       allowBooleanAttributes: true,
       ignoreAttributes: false,
@@ -34,7 +35,12 @@ export class XmlService implements XmlServiceContract {
     const dtdsExist = await this.filesExist(...dtdPaths);
 
     if (!dtdsExist) {
-      throw new VError(`The DTD files %j do not exist`, dtdPaths, xmlPath);
+      this.loggerService.error(
+        `The DTD files do not exist: `,
+        dtdPaths,
+        xmlPath
+      );
+      throw new VError(`An error occured. DTD required file(s) missing.`);
     }
 
     try {

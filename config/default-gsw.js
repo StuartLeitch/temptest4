@@ -16,6 +16,4 @@ const gswConfig = {
   },
 };
 
-// console.info(gswConfig);
-
 module.exports = gswConfig;

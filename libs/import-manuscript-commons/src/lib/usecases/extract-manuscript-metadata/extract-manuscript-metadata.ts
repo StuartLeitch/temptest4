@@ -1,4 +1,8 @@
-import { LoggerBuilder, LoggerContract, UseCase } from '@hindawi/shared';
+import {
+  LoggerBuilderContract,
+  LoggerContract,
+  UseCase,
+} from '@hindawi/shared';
 
 import { ManuscriptMapper, RawManuscriptProps } from '../../models/mappers';
 import { Path } from '../../models';
@@ -17,7 +21,7 @@ export class ExtractManuscriptMetadataUseCase
 
   constructor(
     private readonly xmlService: XmlServiceContract,
-    loggerBuilder: LoggerBuilder
+    loggerBuilder: LoggerBuilderContract
   ) {
     this.logger = loggerBuilder.getLogger(
       ExtractManuscriptMetadataUseCase.name

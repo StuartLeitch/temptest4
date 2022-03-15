@@ -2,7 +2,7 @@
 import { getCode } from 'country-list';
 import {
   GuardFailure,
-  LoggerBuilder,
+  LoggerBuilderContract,
   LoggerContract,
   UseCase,
 } from '@hindawi/shared';
@@ -45,7 +45,7 @@ export class SubmitManuscriptUseCase
     private readonly reviewAppBasePath: string,
     private readonly supportedArticleTypes: string[],
     private readonly mecaTypes: any,
-    loggerBuilder: LoggerBuilder
+    loggerBuilder: LoggerBuilderContract
   ) {
     this.logger = loggerBuilder.getLogger(SubmitManuscriptUseCase.name);
 
@@ -141,7 +141,7 @@ export class SubmitManuscriptUseCase
     this.logger.info(
       `Creating submission edit url for manuscriptID: ${manuscriptId} submissionId: ${submissionId}`
     );
-    return `${this.reviewAppBasePath}/submit/${submissionId}/${manuscriptId}`;
+    return `/submit/${submissionId}/${manuscriptId}`;
   }
 
   private async uploadFiles(
@@ -199,7 +199,6 @@ export class SubmitManuscriptUseCase
     mapper: Map<MecaFileType, SubmissionSystemFileType>
   ): SubmissionSystemFileType {
     const submissionSystemFileType = mapper.get(mecaFileType);
-
     this.logger.info(`Mapping ${mecaFileType} to ${submissionSystemFileType} `);
     return submissionSystemFileType;
   }

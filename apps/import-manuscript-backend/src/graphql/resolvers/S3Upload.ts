@@ -26,6 +26,7 @@ export const s3Upload: Resolvers<Context> = {
       };
 
       const email = context.keycloakAuth.accessToken['content']['email'];
+      const receiverName = context.keycloakAuth.accessToken['content']['name'];
 
       const { services, repos, loggerBuilder } = context;
       try {
@@ -37,7 +38,12 @@ export const s3Upload: Resolvers<Context> = {
             loggerBuilder.getLogger(ConfirmManuscriptUploadUseCase.name)
           );
         const response = await confirmManuscriptUploadUseCase.execute(
-          { fileName, failsEmail: email, successEmail: email },
+          {
+            fileName,
+            receiverName,
+            failsEmail: email,
+            successEmail: email,
+          },
           useCaseContext
         );
 

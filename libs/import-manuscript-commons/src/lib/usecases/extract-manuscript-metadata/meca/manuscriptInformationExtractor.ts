@@ -142,6 +142,10 @@ function extractAuthorData(
   const authorAff = affiliations.find((aff) => aff['@_id'] === authorAffId);
   const affiliationRinggoldId = extractRinggoldId(authorAff);
 
+  if (!authorAff['country']['@_country']) {
+    throw new VError('Country code for an author is not valid.');
+  }
+
   const rawAuthor: RawAuthorProps = {
     affiliationName: authorAff['institution-wrap']['institution'],
     affiliationRorId: '',

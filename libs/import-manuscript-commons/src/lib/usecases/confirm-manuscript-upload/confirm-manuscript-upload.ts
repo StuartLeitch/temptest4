@@ -64,6 +64,7 @@ export class ConfirmManuscriptUploadUseCase
       const eventName = 'ValidatePackage';
       const event: ValidatePackageEvent = {
         fileName,
+        receiverName: request.receiverName,
         failContactEmail: request.failsEmail,
         successContactEmail: request.successEmail,
       };

@@ -2,6 +2,7 @@ import { cloneDeep } from 'lodash';
 
 import hindawiDefault from '../../../../../../config/default';
 import gswConfig from '../../../../../../config/default-gsw';
+import importManuscriptConfig from '../../../../../../config/importManuscript';
 
 import { Manuscript } from '../../modules/manuscripts/domain/Manuscript';
 import { CatalogItem } from '../../modules/journals/domain/CatalogItem';
@@ -14,14 +15,20 @@ import { JournalProps, Email } from './Email';
 import {
   AutoConfirmMissingCountryNotificationTemplate,
   InvoiceCanBeConfirmedNotificationTemplate,
+  PackageUnsuccessfulValidationTemplate,
   InvoiceCreditControlReminderTemplate,
   InvoicePaymentSecondReminderTemplate,
   InvoiceConfirmationReminderTemplate,
   InvoicePaymentFirstReminderTemplate,
   InvoicePaymentThirdReminderTemplate,
+  PackageSuccessfulValidationTemplate,
   InvoicePendingNotificationTemplate,
   PaymentReminderBuildData,
+  UnsuccessTextTemplate,
+  SuccessTextTemplate,
+  ReasonsListTemplate,
   ButtonLinkTemplate,
+  SectionTemplate,
 } from './email-templates';
 
 interface ConfirmationReminder {
@@ -53,9 +60,10 @@ export interface PaymentReminder {
 
 export type PaymentReminderType = 'first' | 'second' | 'third';
 type PaymentReminderTemplateMapper = {
-  [key in PaymentReminderType]: (
-    d: PaymentReminderBuildData
-  ) => { subject: string; paragraph: string };
+  [key in PaymentReminderType]: (d: PaymentReminderBuildData) => {
+    subject: string;
+    paragraph: string;
+  };
 };
 
 export class EmailService {
@@ -63,7 +71,7 @@ export class EmailService {
 
   constructor(
     private readonly mailingDisabled: boolean,
-    private readonly fePath: string,
+    private readonly basePath: string,
     private readonly tenantName: string,
     private readonly antiFraudSupportEmail: string,
     private readonly antiFraudPolicyUrl: string
@@ -74,15 +82,102 @@ export class EmailService {
     } else if (this.tenantName === 'Hindawi') {
       this.journalProps = { ...hindawiDefault.journal };
       this.journalProps.address = ''; // address is in privacy text
+    } else if (this.tenantName === 'ImportManuscript') {
+      this.journalProps = { ...importManuscriptConfig.journal };
+      this.journalProps.address = '';
     }
   }
 
   private createURL(path: string) {
-    return `${this.fePath}${path}`;
+    return `${this.basePath}${path}`;
   }
 
   private createSingleButton(label: string, path: string) {
     return ButtonLinkTemplate.build(label, this.createURL(path));
+  }
+
+  private createSuccessText(text: string) {
+    return SuccessTextTemplate.build(text);
+  }
+
+  private createSectionText(text: string) {
+    return SectionTemplate.build(text);
+  }
+
+  private createUnsuccessText(text: string) {
+    return UnsuccessTextTemplate.build(text);
+  }
+
+  private createReasonsList(reasons: string[]) {
+    return ReasonsListTemplate.build(reasons);
+  }
+
+  public createSuccesfulValidationNotification(
+    fileName: string,
+    senderEmail: string,
+    receiver: { name: string; email: string },
+    manuscriptTitle: string,
+    submissionUrl: string
+  ): Email {
+    const successTxt = `✓ Your uploaded zip file has been successfully analyzed!`;
+    const manuscriptTitleText = manuscriptTitle;
+
+    const reviewSubmissionButton = this.createSingleButton(
+      'REVIEW SUBMISSION',
+      submissionUrl
+    );
+
+    const successTextSection = this.createSuccessText(successTxt);
+    const manuscriptTitleTextSection =
+      this.createSectionText(manuscriptTitleText);
+
+    const content = PackageSuccessfulValidationTemplate.build(
+      fileName,
+      manuscriptTitleTextSection,
+      reviewSubmissionButton,
+      successTextSection
+    );
+
+    const emailProps = new EmailPropsBuilder()
+      .addSender(senderEmail)
+      .addReceiver(receiver)
+      .addContent(content)
+      .buildProps();
+
+    return Email.create(emailProps, this.journalProps, this.mailingDisabled);
+  }
+
+  public createUnsuccesfulValidationNotification(
+    fileName: string,
+    senderEmail: string,
+    receiver: { name: string; email: string },
+    error: any,
+    importManuscriptPath: string
+  ): Email {
+    const unsuccessTxt = '⚠ Your uploaded zip file could not be analyzed!';
+
+    const gotoPhenomButton = ButtonLinkTemplate.build(
+      'GO TO PHENOM',
+      importManuscriptPath
+    );
+    const errorReasons = [error.message.split('VError:').pop()];
+    const unsuccessText = this.createUnsuccessText(unsuccessTxt);
+    const reasonsList = this.createReasonsList(errorReasons);
+
+    const content = PackageUnsuccessfulValidationTemplate.build(
+      fileName,
+      reasonsList,
+      gotoPhenomButton,
+      unsuccessText
+    );
+
+    const emailProps = new EmailPropsBuilder()
+      .addSender(senderEmail)
+      .addReceiver(receiver)
+      .addContent(content)
+      .buildProps();
+
+    return Email.create(emailProps, this.journalProps, this.mailingDisabled);
   }
 
   public createInvoicePendingNotification(

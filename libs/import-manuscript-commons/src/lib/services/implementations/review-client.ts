@@ -267,6 +267,7 @@ export class ReviewClient implements ReviewClientContract {
       if (resp.data['errors']) {
         throw parseGqlErrors(resp.data['errors']);
       }
+
       return resp.data.data;
     } catch (err) {
       if (err.response?.data?.errors) {

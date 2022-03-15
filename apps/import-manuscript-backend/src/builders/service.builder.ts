@@ -1,11 +1,9 @@
-import { LoggerContract, LoggerBuilder } from '@hindawi/shared';
 import { SqsEventProducer } from '@hindawi/queue-utils';
 import {
   UploadServiceContract,
   S3UploadService,
 } from '@hindawi/import-manuscript-commons';
 
-import { Repos } from './repo.builder';
 import { env } from '../env';
 
 export interface Services {

@@ -1,21 +1,16 @@
-import { LogLevel } from '@hindawi/shared';
 import {
   ExtractManuscriptMetadataUseCase,
+  SubmitManuscriptUseCase,
   UnarchivePackageUsecase,
   ValidatePackageUseCase,
   ValidatePackageEvent,
   ManuscriptMapper,
-  SubmitManuscriptUseCase,
 } from '@hindawi/import-manuscript-commons';
 
 import { EventHandler } from './event-handler';
 import { Context } from '../builders';
 
 import { env } from '../env';
-
-import { Logger } from '../libs/logger';
-import { VError } from 'verror';
-import { LoggerBuilder } from '@hindawi/shared';
 
 const VALIDATE_PACKAGE = 'ValidatePackage';
 
@@ -52,9 +47,8 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
         },
         loggerBuilder,
       } = context;
-      // const logger = loggerBuilder.getLogger();
 
-      const logger = new Logger(LogLevel[env.log.level], 'validation-handler');
+      const logger = loggerBuilder.getLogger('validation-handler');
 
       const usecase = new UnarchivePackageUsecase(
         objectStoreService,
@@ -73,10 +67,7 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
       logger.debug(`Package ${res.value.src} extracted`);
       const validateUsecase = new ValidatePackageUseCase(xmlService, logger);
       const extractManuscriptMetadataUseCase =
-        new ExtractManuscriptMetadataUseCase(
-          xmlService,
-          new LoggerBuilder(LogLevel[env.log.level])
-        );
+        new ExtractManuscriptMetadataUseCase(xmlService, loggerBuilder);
 
       try {
         await validateUsecase.execute({
@@ -100,25 +91,38 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
           env.app.reviewAppBasePath,
           env.app.supportedArticleTypes,
           env.app.mecaArticleTypes,
-          new LoggerBuilder(LogLevel[env.log.level])
+          loggerBuilder
         ).execute({ manuscript, packagePath: res.value.src });
         logger.info(`Submission url ${submissionEditURL}`);
 
-        context.services.emailService.sendEmail(
-          [data.successContactEmail],
-          'import-manuscript@hindawi.com',
-          'Important Message',
-          logger.messages
-        );
+        context.services.emailService
+          .createSuccesfulValidationNotification(
+            data.fileName,
+            env.app.validationSenderEmail,
+            {
+              name: data.receiverName,
+              email: data.successContactEmail,
+            },
+            manuscript.title,
+            submissionEditURL
+          )
+          .sendEmail();
       } catch (err) {
-        context.services.emailService.sendEmail(
-          [data.failContactEmail],
-          'import-manuscript@hindawi.com',
-          'Important Message',
-          `ERROR processing package: ${err.message} ${err.stack}`
-        );
-        logger.error(err.message, err);
-        throw new VError(err);
+        // rejection email here
+        context.services.emailService
+          .createUnsuccesfulValidationNotification(
+            data.fileName,
+            env.app.validationSenderEmail,
+            {
+              name: data.receiverName,
+              email: data.failContactEmail,
+            },
+            err,
+            env.app.importManuscriptAppBasePath
+          )
+          .sendEmail();
+        logger.error(err);
+        throw err;
       }
     };
   },
