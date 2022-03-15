@@ -142,7 +142,6 @@ Build:
   script:
     - cd $HOME
     - git fetch
-    - ls -ail apps/reporting/src/infrastructure/database/migrations
     - |
       if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
         AFFECTED_COMMAND="yarn run nx run-many --target=build --projects=$AFFECTED_APPS --configuration=production --parallel --maxParallel=2"
