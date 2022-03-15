@@ -6,6 +6,7 @@ import { Either, right } from '../../../core/logic/Either';
 
 import { PublisherId } from '../../publishers/domain/PublisherId';
 import { JournalId } from '../domain/JournalId';
+import { JournalUpdated } from '../domain/events/JournalUpdated';
 
 export interface CatalogItemProps {
   type: string;
@@ -39,51 +40,103 @@ export class CatalogItem extends AggregateRoot<CatalogItemProps> {
     return right(catalogItem);
   }
 
-  public get id(): UniqueEntityID {
+  get id(): UniqueEntityID {
     return this._id;
   }
 
-  public get type(): string {
+  get type(): string {
     return this.props.type;
   }
 
-  public get amount(): number {
+  set type(type: string) {
+    this.props.type = type;
+  }
+
+  get amount(): number {
     return this.props.amount;
   }
 
-  public get journalId(): JournalId {
+  set amount(newAmount: number) {
+    if (this.props.amount !== newAmount) {
+      this.generateCatalogUpdatedEvent();
+    }
+    this.props.amount = newAmount;
+  }
+
+  get journalId(): JournalId {
     return this.props.journalId;
   }
 
-  public get journalTitle(): string {
+  set journalId(journalId: JournalId) {
+    this.props.journalId = journalId;
+  }
+
+  get journalTitle(): string {
     return this.props.journalTitle;
   }
 
-  public get currency(): string {
+  set journalTitle(journalTitle: string) {
+    this.props.journalTitle = journalTitle;
+  }
+
+  get currency(): string {
     return this.props.currency;
   }
 
-  public get issn(): string {
+  set currency(currency: string) {
+    this.props.currency = currency;
+  }
+
+  get issn(): string {
     return this.props.issn;
   }
 
-  public get code(): string {
+  set issn(issn: string) {
+    this.props.issn = issn;
+  }
+
+  get code(): string {
     return this.props.code;
   }
 
-  public get created(): Date {
+  set code(code: string) {
+    this.props.code = code;
+  }
+
+  get created(): Date {
     return this.props.created;
   }
 
-  public get updated(): Date {
+  set created(created: Date) {
+    this.props.created = created;
+  }
+
+  get updated(): Date {
     return this.props.updated;
   }
 
-  public get isActive(): boolean {
+  set updated(updated: Date) {
+    this.props.updated = updated;
+  }
+
+  get isActive(): boolean {
     return this.props.isActive;
+  }
+
+  set isActive(isActive: boolean) {
+    this.props.isActive = isActive;
   }
 
   get publisherId(): PublisherId {
     return this.props.publisherId;
+  }
+
+  set publisherId(publisherId: PublisherId) {
+    this.props.publisherId = publisherId;
+  }
+
+  public generateCatalogUpdatedEvent(): void {
+    const now = new Date();
+    this.addDomainEvent(new JournalUpdated(this, now));
   }
 }

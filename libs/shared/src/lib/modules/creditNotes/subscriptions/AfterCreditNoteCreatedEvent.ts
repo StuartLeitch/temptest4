@@ -25,7 +25,8 @@ import { GetInvoiceDetailsUsecase } from '../../invoices/usecases/getInvoiceDeta
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
 
 export class AfterCreditNoteCreatedEvent
-  implements HandleContract<CreditNoteCreatedEvent> {
+  implements HandleContract<CreditNoteCreatedEvent>
+{
   constructor(
     private creditNoteRepo: CreditNoteRepoContract,
     private paymentMethodRepo: PaymentMethodRepoContract,
@@ -201,8 +202,7 @@ export class AfterCreditNoteCreatedEvent
         `[AfterCreditNoteCreated]: Successfully executed onCreditNoteCreated event usecase.`
       );
     } catch (err) {
-      console.error(err);
-      console.log(
+      this.loggerService.error(
         `[AfterCreditNoteCreated]: Failed to execute onCreditNoteCreatedEvent usecase. Err: ${err}`
       );
     }

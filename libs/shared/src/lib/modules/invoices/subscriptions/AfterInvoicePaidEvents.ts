@@ -22,7 +22,8 @@ import { PublishInvoicePaidUsecase } from '../usecases/publishEvents/publishInvo
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
 
 export class AfterInvoicePaidEvent
-  implements HandleContract<InvoicePaymentAddedEvent> {
+  implements HandleContract<InvoicePaymentAddedEvent>
+{
   constructor(
     private paymentMethodRepo: PaymentMethodRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -166,12 +167,11 @@ export class AfterInvoicePaidEvent
         throw publishResult.value;
       }
 
-      console.log(
+      this.loggerService.info(
         `[AfterInvoicePaid]: Successfully executed onInvoicePaidEvent use case InvoicePaidEvent`
       );
     } catch (err) {
-      console.error(err);
-      console.log(
+      this.loggerService.error(
         `[AfterInvoicePaid]: Failed to execute onInvoicePaidEvent use case InvoicePaidEvent. Err: ${err.message}`
       );
     }

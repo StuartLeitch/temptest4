@@ -1,6 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Select, Input, Form } from '@hindawi/phenom-ui';
+import {
+  Select,
+  Input,
+  Form,
+  IconCaretUp,
+  IconCaretDown,
+} from '@hindawi/phenom-ui';
 
 import { Item } from '../../types';
 
@@ -30,6 +36,12 @@ const EditableCell: React.FC<EditableCellProps> = ({
   publishers,
   ...restProps
 }) => {
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState('');
+
+  const handleChange = (e) => {
+    setValue(e.target.value.replace(/[^\w\s]/gi, ''));
+  };
   return (
     <td {...restProps}>
       {editing ? (
@@ -44,10 +56,18 @@ const EditableCell: React.FC<EditableCellProps> = ({
                   required: true,
                   pattern: new RegExp(/^[0-9]+$/),
                   message: '',
+                  whitespace: false,
                 },
               ]}
             >
-              <Input maxLength={6} style={{ width: 80, textAlign: 'right' }} />
+              <Input
+                className='amount-input'
+                prefix={'$'}
+                maxLength={6}
+                onChange={handleChange}
+                value={value}
+                style={{ width: 80 }}
+              />
             </Form.Item>
           ) : (
             <Form.Item
@@ -59,7 +79,18 @@ const EditableCell: React.FC<EditableCellProps> = ({
                 },
               ]}
             >
-              <Select style={{ width: 100 }}>
+              <Select
+                onClick={() => setOpen(!open)}
+                suffixIcon={
+                  open ? (
+                    <IconCaretUp onClick={() => setOpen(!open)} />
+                  ) : (
+                    <IconCaretDown onClick={() => setOpen(!open)} />
+                  )
+                }
+                open={open}
+                style={{ width: 100 }}
+              >
                 {publishers &&
                   publishers.map((publisher, index) => {
                     const { name, id } = publisher;
