@@ -79,6 +79,7 @@ const WAIVER_POLICY_COUNTRIES = {
   TO: { country: 'Tonga' },
   TV: { country: 'Tuvalu' },
   UG: { country: 'Uganda' },
+  UA: { country: 'Ukraine' },
   TZ: { country: 'United Republic of Tanzania' },
   VU: { country: 'Vanuatu' },
   YE: { country: 'Yemen' },
