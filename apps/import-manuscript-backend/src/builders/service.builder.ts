@@ -1,4 +1,4 @@
-import { LoggerContract, LoggerBuilder } from '@hindawi/shared';
+import { LoggerContract, LoggerBuilder, EmailService } from '@hindawi/shared';
 import { SqsEventProducer } from '@hindawi/queue-utils';
 import {
   UploadServiceContract,
@@ -12,6 +12,7 @@ export interface Services {
   uploadService: UploadServiceContract;
   queueService: SqsEventProducer;
   logger: LoggerContract;
+  emailService: EmailService;
 }
 export async function buildServices(
   repos: Repos,
@@ -45,6 +46,13 @@ export async function buildServices(
     logger: loggerBuilder.getLogger(),
     uploadService: s3UploadService,
     queueService: sqsService,
+    emailService: new EmailService(
+      env.app.mailingDisabled,
+      env.app.FERoot,
+      env.app.tenantName,
+      env.antiFraud.supportEmail,
+      env.antiFraud.policyUrl
+    ),
   };
   return services;
 }

@@ -24,6 +24,7 @@ export const env = {
     host: getOsEnv('APP_HOST'),
     port: normalizePort(process.env.PORT || getOsEnv('APP_PORT')),
     routePrefix: getOsEnv('APP_ROUTE_PREFIX'),
+    FERoot: getOsEnv('FE_ROOT'),
     skippingSeeding: toBool(getOsEnv('SKIPPING_SEEDING')),
     banner: toBool(getOsEnv('APP_BANNER')),
     dirs: {
@@ -33,6 +34,9 @@ export const env = {
     keycloakConfig: toObject(getOsEnv('IMPORT_MANUSCRIPT_KEYCLOAK_CONFIG')),
     keycloakClientId: getOsEnv('IMPORT_MANUSCRIPT_KEYCLOAK_CLIENT_ID'),
     sessionSecret: getOsEnv('SESSION_SECRET'),
+    mailingDisabled: toBool(getOsEnv('MAILING_DISABLED')),
+    tenantName: getOsEnv('TENANT_NAME'),
+    validationUnsuccessfulEmail: getOsEnv('VALIDATION_UNSUCCESSFUL_EMAIL')
   },
   log: {
     level: getOsEnv('LOG_LEVEL'),
@@ -72,5 +76,9 @@ export const env = {
         'IMPORT_MANUSCRIPT_AWS_S3_SIGNED_URL_EXPIRATION_IN_SEC'
       ),
     },
+  },
+  antiFraud: {
+    supportEmail: getOsEnv('ANTI_FRAUD_SUPPORT_EMAIL'),
+    policyUrl: getOsEnv('ANTI_FRAUD_POLICY_URL'),
   },
 };

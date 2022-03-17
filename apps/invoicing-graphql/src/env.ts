@@ -39,6 +39,8 @@ export const env = {
     ),
     skippingSeeding: toBool(getOsEnv('SKIPPING_SEEDING')),
     mailingDisabled: toBool(getOsEnv('MAILING_DISABLED')),
+    validationUnsuccessfulEmail: getOsEnv('VALIDATION_UNSUCCESSFUL_EMAIL'),
+
     banner: toBool(getOsEnv('APP_BANNER')),
     tenantName: getOsEnv('TENANT_NAME'),
     tenantAddress: getOsEnv('TENANT_ADDRESS'),

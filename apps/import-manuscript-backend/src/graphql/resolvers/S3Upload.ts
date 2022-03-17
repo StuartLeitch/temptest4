@@ -20,6 +20,9 @@ export const s3Upload: Resolvers<Context> = {
     async confirmS3Upload(parent, args, context) {
       const { fileName }: { fileName: string } = args.confirmation;
 
+      const senderEmail = utils.getUserEmail(context);
+      const receiverEmail = env.app.validationUnsuccessfulEmail;
+
       const contextRoles = utils.getAuthRoles(context);
       const useCaseContext = {
         roles: contextRoles,
@@ -30,10 +33,11 @@ export const s3Upload: Resolvers<Context> = {
         const confirmManuscriptUploadUseCase = new ConfirmManuscriptUploadUseCase(
           services.uploadService,
           services.queueService,
-          services.logger
+          services.logger,
+          services.emailService
         );
         const response = await confirmManuscriptUploadUseCase.execute(
-          { fileName },
+          { fileName, senderEmail, receiverEmail },
           useCaseContext
         );
 

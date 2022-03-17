@@ -7,6 +7,7 @@ import {
   UseCase,
   right,
   left,
+  EmailService
 } from '@hindawi/shared';
 
 import type { UsecaseAuthorizationContext as Context } from '../../authorization';
@@ -23,14 +24,15 @@ export class ConfirmManuscriptUploadUseCase
   constructor(
     private readonly uploadService: UploadServiceContract,
     private readonly eventProducer: SqsEventProducer,
-    private readonly logger: LoggerContract
+    private readonly logger: LoggerContract,
+    private readonly emailService: EmailService,
   ) {
     super();
   }
 
   @Authorize('manuscript:upload')
   public async execute(request: DTO, context?: Context): Promise<Response> {
-    const { fileName } = request;
+    const { fileName, senderEmail, receiverEmail } = request;
 
     this.logger.debug(`Confirming upload for '${fileName}'`);
 
@@ -68,6 +70,12 @@ export class ConfirmManuscriptUploadUseCase
       this.logger.debug(
         `Sending the begin validation event for '${fileName}'... Done!`
       );
+
+      // * Send email to publishing staff member admin
+      this.logger.debug(`Send email --> ${fileName}`);
+      await this.emailService
+        .createUnsuccesfulValidationNotification(fileName, senderEmail, receiverEmail)
+        .sendEmail();
 
       return right(null);
     } catch (err) {

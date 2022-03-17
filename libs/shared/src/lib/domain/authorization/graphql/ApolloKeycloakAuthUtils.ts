@@ -45,4 +45,14 @@ export class ApolloKeycloakAuthUtils<Context extends BaseContext, Roles>
 
     return contextRoles;
   }
+
+  getUserEmail(context: Context): string {
+    if (!context.keycloakAuth.accessToken) {
+      throw new AuthenticationError('You must be logged in!');
+    }
+
+    const { content } = context.keycloakAuth.accessToken as any;
+
+    return `${content.name} <${content.username}>`;
+  }
 }

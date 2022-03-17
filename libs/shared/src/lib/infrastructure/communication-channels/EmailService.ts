@@ -22,6 +22,9 @@ import {
   InvoicePendingNotificationTemplate,
   PaymentReminderBuildData,
   ButtonLinkTemplate,
+  PackageUnsuccessfulValidationTemplate,
+  UnsuccessTextTemplate,
+  ReasonsListTemplate
 } from './email-templates';
 
 interface ConfirmationReminder {
@@ -264,6 +267,53 @@ export class EmailService {
     const emailProps = new EmailPropsBuilder()
       .addSender(`${data.sender.name} <${data.sender.email}>`)
       .addReceiver(receiver)
+      .addContent(content)
+      .buildProps();
+
+    return Email.create(emailProps, this.journalProps, this.mailingDisabled);
+  }
+
+  private createUnsuccessText(text: string) {
+    return UnsuccessTextTemplate.build(text);
+  }
+
+  private createReasonsList(reasons: string[]) {
+    return ReasonsListTemplate.build(reasons);
+  }
+
+
+  public createUnsuccesfulValidationNotification(fileName: string, senderEmail: string, receiverEmail: string): Email {
+
+    const unsuccessTxt = '⚠ Your uploaded zip file could not be analyzed!';
+    const reasons = [
+      'Zip file ID is not unique',
+      '.zip file is corrupted or password protected',
+      'manifest.xml file - does not exist or is not syntactic valid',
+      'manifest.xml file - files referenced are not found',
+      'transfer.xml -  does not exist or is not syntactic valid',
+      'transfer.xml - is not semantic valid',
+      'article.xml -  does not exist or is not syntactic valid',
+      'article.xml - is not semantic valid',
+    ];
+
+    const gotoPhenomButton = this.createSingleButton(
+      'GO TO PHENOM',
+      `/phenom-url`
+    );
+
+    const unsuccessText = this.createUnsuccessText(unsuccessTxt);
+    const reasonsList = this.createReasonsList(reasons);
+
+    const content = PackageUnsuccessfulValidationTemplate.build(
+      fileName,
+      reasonsList,
+      gotoPhenomButton,
+      unsuccessText
+    );
+
+    const emailProps = new EmailPropsBuilder()
+      .addSender(senderEmail)
+      .addReceiver({ "email": receiverEmail, "name": "TzuTzu" })
       .addContent(content)
       .buildProps();
 
