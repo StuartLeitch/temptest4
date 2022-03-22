@@ -23,7 +23,7 @@ abstract class GuardBaseResult {
   }
 }
 
-class GuardSuccess extends GuardBaseResult {
+export class GuardSuccess extends GuardBaseResult {
   readonly succeeded: boolean = true;
 
   constructor() {
@@ -31,7 +31,7 @@ class GuardSuccess extends GuardBaseResult {
   }
 }
 
-class GuardFail extends GuardBaseResult {
+export class GuardFail extends GuardBaseResult {
   readonly succeeded: boolean = false;
 
   constructor(public readonly message: string) {
@@ -205,6 +205,7 @@ export class Guard {
 
   public static againstInvalidEmail(email: string): GuardResult {
     const emailRegex = new RegExp(
+      /* eslint-disable-next-line no-useless-escape */
       /^(([^<>()\[\]\\.,;:\s@"“”]+(\.[^<>()\[\]\\.,;:\s@"“”]+)*))@(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})$/i
     );
 
@@ -214,4 +215,53 @@ export class Guard {
 
     return fail(`${email} is an invalid email address.`);
   }
+
+  public static againstInvalidIssn(issn: string): GuardResult {
+    const issnRegex = /^[0-9]{4}-[0-9]{3}[0-9xX]$/;
+
+    if (!issnRegex.test(issn)) {
+      return fail(`${issn} is an invalid ISSN`);
+    }
+
+    if (isIssnCheckSumValid(issn)) {
+      return success();
+    }
+
+    return fail(`${issn} is an invalid ISSN`);
+  }
+}
+
+function getCheckDigitValue(issn: string): number {
+  const d = issn[issn.length - 1];
+
+  if (d === 'x' || d === 'X') {
+    return 10;
+  }
+
+  return Number.parseInt(d, 10);
+}
+
+function isIssnCheckSumValid(issn: string): boolean {
+  const onlyDigits = `${issn}`.replace('-', '');
+  const withoutCheckDigit = onlyDigits.substring(0, 7);
+  const checkDigit = getCheckDigitValue(onlyDigits);
+
+  const sum = withoutCheckDigit
+    .split('')
+    .map((n) => Number.parseInt(n, 10))
+    .reduce((acc, num, index) => {
+      return acc + num * (8 - index);
+    }, 0);
+
+  const remainder = sum % 11;
+
+  if (remainder === 0 && checkDigit === 0) {
+    return true;
+  }
+
+  if (11 - remainder === checkDigit) {
+    return true;
+  }
+
+  return false;
 }
