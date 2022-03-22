@@ -1,5 +1,6 @@
 // * Export Core Subdomain
 export * from './infrastructure/Repo';
+export * from './infrastructure/Mapper';
 
 // * Export Address Subdomain
 export * from './modules/addresses/domain/AddressId';
