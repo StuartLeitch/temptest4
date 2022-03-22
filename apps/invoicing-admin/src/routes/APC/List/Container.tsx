@@ -202,54 +202,54 @@ const ApcContainer: React.FC = () => {
     },
     {
       title: '',
-      dataIntes: 'action',
+      dataIndex: 'action',
       width: '10%',
       render: (_: any, record: Item) => {
-      //   const editable = isEditing(record);
-      //   return editable ? (
-      //     <Restricted to='edit.apc'>
-      //       <span>
-      //         <Space size={0} style={{ float: 'right', marginRight: '24px' }}>
-      //           <Button
-      //             className='cancel-button'
-      //             type='text'
-      //             onClick={cancel}
-      //             icon={<IconRemove />}
-      //           />
-      //           <Button
-      //             className='save-button'
-      //             type='text'
-      //             onClick={modalValidator}
-      //             icon={<IconSave />}
-      //           />
-      //           <Modal
-      //             title={
-      //               <div className='modal-title-wrap'>
-      //                 <IconNotificationAlert className='notification-input-icon' />
-      //                 <Title
-      //                   className='notification-input-tile'
-      //                   preset='primary'
-      //                 >
-      //                   Do you want to save your changes?
-      //                 </Title>
-      //               </div>
-      //             }
-      //             visible={isModalVisible}
-      //             onOk={() => handleOk(record)}
-      //             centered
-      //             onCancel={handleCancel}
-      //             okText='SAVE CHANGES'
-      //             cancelText='CANCEL'
-      //           ></Modal>
-      //         </Space>
-      //       </span>
-      //     </Restricted>
-      //   ) : (
-      //     <Restricted to='edit.apc'>
-      //       <IconEdit className='edit-button' onClick={() => edit(record)} />
-      //     </Restricted>
-      //   );
         return null;
+        // const editable = isEditing(record);
+        // return editable ? (
+        //   <Restricted to='edit.apc'>
+        //     <span>
+        //       <Space size={0} style={{ float: 'right', marginRight: '24px' }}>
+        //         <Button
+        //           className='cancel-button'
+        //           type='text'
+        //           onClick={cancel}
+        //           icon={<IconRemove />}
+        //         />
+        //         <Button
+        //           className='save-button'
+        //           type='text'
+        //           onClick={modalValidator}
+        //           icon={<IconSave />}
+        //         />
+        //         <Modal
+        //           title={
+        //             <div className='modal-title-wrap'>
+        //               <IconNotificationAlert className='notification-input-icon' />
+        //               <Title
+        //                 className='notification-input-tile'
+        //                 preset='primary'
+        //               >
+        //                 Do you want to save your changes?
+        //               </Title>
+        //             </div>
+        //           }
+        //           visible={isModalVisible}
+        //           onOk={() => handleOk(record)}
+        //           centered
+        //           onCancel={handleCancel}
+        //           okText='SAVE CHANGES'
+        //           cancelText='CANCEL'
+        //         ></Modal>
+        //       </Space>
+        //     </span>
+        //   </Restricted>
+        // ) : (
+        //   <Restricted to='edit.apc'>
+        //     <IconEdit className='edit-button' onClick={() => edit(record)} />
+        //   </Restricted>
+        // );
       },
     },
   ];
