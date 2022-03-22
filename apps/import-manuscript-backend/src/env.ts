@@ -36,7 +36,8 @@ export const env = {
     sessionSecret: getOsEnv('SESSION_SECRET'),
     mailingDisabled: toBool(getOsEnv('MAILING_DISABLED')),
     tenantName: getOsEnv('TENANT_NAME'),
-    validationUnsuccessfulEmail: getOsEnv('VALIDATION_UNSUCCESSFUL_EMAIL')
+    validationUnsuccessfulEmail: getOsEnv('VALIDATION_UNSUCCESSFUL_EMAIL'),
+    validationUnsuccessfulReceiver: getOsEnv('VALIDATION_UNSUCCESSFUL_RECEIVER_NAME')
   },
   log: {
     level: getOsEnv('LOG_LEVEL'),

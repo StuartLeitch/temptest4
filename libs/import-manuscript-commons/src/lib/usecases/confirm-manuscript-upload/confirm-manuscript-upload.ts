@@ -32,7 +32,7 @@ export class ConfirmManuscriptUploadUseCase
 
   @Authorize('manuscript:upload')
   public async execute(request: DTO, context?: Context): Promise<Response> {
-    const { fileName, senderEmail, receiverEmail } = request;
+    const { fileName, senderEmail, receiver } = request;
 
     this.logger.debug(`Confirming upload for '${fileName}'`);
 
@@ -74,7 +74,7 @@ export class ConfirmManuscriptUploadUseCase
       // * Send email to publishing staff member admin
       this.logger.debug(`Send email --> ${fileName}`);
       await this.emailService
-        .createUnsuccesfulValidationNotification(fileName, senderEmail, receiverEmail)
+        .createUnsuccesfulValidationNotification(fileName, senderEmail, receiver)
         .sendEmail();
 
       return right(null);

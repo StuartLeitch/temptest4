@@ -21,7 +21,10 @@ export const s3Upload: Resolvers<Context> = {
       const { fileName }: { fileName: string } = args.confirmation;
 
       const senderEmail = utils.getUserEmail(context);
-      const receiverEmail = env.app.validationUnsuccessfulEmail;
+      const receiver = {
+        email: env.app.validationUnsuccessfulEmail,
+        name: env.app.validationUnsuccessfulReceiver
+      };
 
       const contextRoles = utils.getAuthRoles(context);
       const useCaseContext = {
@@ -37,7 +40,7 @@ export const s3Upload: Resolvers<Context> = {
           services.emailService
         );
         const response = await confirmManuscriptUploadUseCase.execute(
-          { fileName, senderEmail, receiverEmail },
+          { fileName, senderEmail, receiver },
           useCaseContext
         );
 

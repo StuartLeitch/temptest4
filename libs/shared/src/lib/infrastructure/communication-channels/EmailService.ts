@@ -282,7 +282,11 @@ export class EmailService {
   }
 
 
-  public createUnsuccesfulValidationNotification(fileName: string, senderEmail: string, receiverEmail: string): Email {
+  public createUnsuccesfulValidationNotification(
+    fileName: string,
+    senderEmail: string,
+    receiver: { name: string, email: string }
+  ): Email {
 
     const unsuccessTxt = '⚠ Your uploaded zip file could not be analyzed!';
     const reasons = [
@@ -313,7 +317,7 @@ export class EmailService {
 
     const emailProps = new EmailPropsBuilder()
       .addSender(senderEmail)
-      .addReceiver({ "email": receiverEmail, "name": "TzuTzu" })
+      .addReceiver(receiver)
       .addContent(content)
       .buildProps();
 
