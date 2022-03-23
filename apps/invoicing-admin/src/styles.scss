@@ -19,11 +19,27 @@
 
 span.anticon.edit-button {
   display: none;
+  float: right;
+  margin-right: 24px;
+}
+
+.save-button {
+  display: flex;
+  justify-content: center;
+}
+
+.cancel-button {
+  display: flex;
+  justify-content: center;
 }
 
 .ant-table-row:hover span.anticon.edit-button {
   display: block;
-  float: left;
+
+  svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
 }
 
 .ant-table-row {
@@ -34,4 +50,67 @@ span.anticon.edit-button {
   .ant-form-item-explain-connected {
     display: none;
   }
+
+  .ant-input-affix-wrapper > input.ant-input {
+    text-align: right !important;
+  }
+}
+
+.ant-table-thead
+  > tr
+  > th:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before {
+  background-color: white !important;
+}
+
+.ant-select-selection-item {
+  color: #333333 !important;
+}
+
+.ant-select-arrow .anticon {
+  color: #333333 !important;
+}
+
+.ant-table-container table > thead > tr:first-child th:first-child {
+  padding-left: 32px !important;
+}
+
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background-color: white !important;
+}
+
+.ant-table-cell:first-child {
+  padding-left: 32px !important;
+}
+
+.ant-table-content {
+  border: 1px !important;
+}
+
+span.anticon.notification-input-icon {
+  svg {
+    width: 40px !important;
+    height: 40px !important;
+    margin-top: 0.5em;
+  }
+}
+
+.modal-title-wrap {
+  display: flex;
+  .notification-input-title {
+    margin-top: 2em;
+    flex: 1;
+  }
+
+  .notification-input-icon {
+    margin-right: 1em;
+  }
+
+  h2.ant-typography.primary {
+    font-size: 18px !important;
+    line-height: 60px !important;
+  }
+}
+
+.ant-modal-body {
+  padding: 18px !important;
 }

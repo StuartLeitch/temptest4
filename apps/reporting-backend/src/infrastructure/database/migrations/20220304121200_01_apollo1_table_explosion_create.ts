@@ -3225,6 +3225,7 @@ commit;
 -- CREATE TRIGGERS
 -- ///////////////////////////////////////////////////////////////////////////
 
+
 -- Trigger: after_ae_insert
 
 -- DROP TRIGGER IF EXISTS after_ae_insert ON public.article_events;

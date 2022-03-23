@@ -38,7 +38,7 @@ export type AddressInput = {
 export type CatalogInput = {
   journalId?: Maybe<Scalars['ID']>;
   publisherName?: Maybe<Scalars['String']>;
-  amount?: Maybe<Scalars['String']>;
+  amount?: Maybe<Scalars['Float']>;
 };
 
 export type ClientToken = {
@@ -225,10 +225,11 @@ export type InvoicingJournal = {
   id?: Maybe<Scalars['String']>;
   journalId?: Maybe<Scalars['ID']>;
   journalTitle?: Maybe<Scalars['String']>;
-  amount?: Maybe<Scalars['String']>;
+  amount?: Maybe<Scalars['Float']>;
   issn?: Maybe<Scalars['String']>;
   publisherId?: Maybe<Scalars['ID']>;
   publisher?: Maybe<InvoicingPublisher>;
+  publisherName?: Maybe<Scalars['String']>;
   code?: Maybe<Scalars['String']>;
 };
 
@@ -759,9 +760,9 @@ export type ResolversTypes = {
   String: ResolverTypeWrapper<Scalars['String']>;
   AddressInput: AddressInput;
   CatalogInput: CatalogInput;
+  Float: ResolverTypeWrapper<Scalars['Float']>;
   ClientToken: ResolverTypeWrapper<ClientToken>;
   Coupon: ResolverTypeWrapper<Coupon>;
-  Float: ResolverTypeWrapper<Scalars['Float']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   CouponCode: ResolverTypeWrapper<CouponCode>;
   CouponInput: CouponInput;
@@ -821,9 +822,9 @@ export type ResolversParentTypes = {
   String: Scalars['String'];
   AddressInput: AddressInput;
   CatalogInput: CatalogInput;
+  Float: Scalars['Float'];
   ClientToken: ClientToken;
   Coupon: Coupon;
-  Float: Scalars['Float'];
   Int: Scalars['Int'];
   CouponCode: CouponCode;
   CouponInput: CouponInput;
@@ -1022,10 +1023,11 @@ export type InvoicingJournalResolvers<ContextType = any, ParentType extends Reso
   id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   journalId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   journalTitle?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  amount?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  amount?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   issn?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   publisherId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   publisher?: Resolver<Maybe<ResolversTypes['InvoicingPublisher']>, ParentType, ContextType>;
+  publisherName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   code?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };

@@ -13,7 +13,7 @@ export enum FileType {
   manuscript = 'manuscript',
 }
 
-interface FileProps extends ValueObjectProps {
+export interface FileProps extends ValueObjectProps {
   name: string;
   size: number;
   type: FileType;

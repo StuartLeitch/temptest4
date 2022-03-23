@@ -42,23 +42,22 @@ gemnasium-python-dependency_scanning:
     - 'cluster:hindawi-dev'
 
 variables:
-  # https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#docker-in-docker-with-tls-disabled
-  DOCKER_HOST: tcp://docker:2375
-  DOCKER_TLS_CERTDIR: ''
-  #
-  NODE_VERSION: 14.4.0
-  BUILD_IMAGE: $AWS_DEV_REGISTRY/belzebuth-runner:$CI_COMMIT_SHA
-  LATEST_BUILD_IMAGE: $AWS_DEV_REGISTRY/belzebuth-runner:latest
-  AWS_REGION: 'eu-west-1'
-  BT_ENVIRONMENT: 'sandbox'
-  BT_MERCHANT_ID: 'test-merchant-id'
-  BT_PUBLIC_KEY: 'test-public-key'
-  BT_PRIVATE_KEY: 'test-private-key'
-  VAT_VALIDATION_SERVICE_ENDPOINT: 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
-  AFFECTED_APPS: 'invoicing-graphql'
-  AFFECTED_COMMAND: ''
-  AFFECTED_ARGS: '--base=remotes/origin/develop'
-  AFFECTED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend'
+# https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#docker-in-docker-with-tls-disabled
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ''
+    NODE_VERSION: 14.4.0
+    BUILD_IMAGE: $AWS_DEV_REGISTRY/belzebuth-runner:$CI_COMMIT_SHA
+    LATEST_BUILD_IMAGE: $AWS_DEV_REGISTRY/belzebuth-runner:latest
+    AWS_REGION: 'eu-west-1'
+    BT_ENVIRONMENT: 'sandbox'
+    BT_MERCHANT_ID: 'test-merchant-id'
+    BT_PUBLIC_KEY: 'test-public-key'
+    BT_PRIVATE_KEY: 'test-private-key'
+    VAT_VALIDATION_SERVICE_ENDPOINT: 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
+    AFFECTED_APPS: 'invoicing-graphql'
+    AFFECTED_COMMAND: ''
+    AFFECTED_ARGS: '--base=remotes/origin/develop'
+    AFFECTED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend'
 
 Install Dependencies:
   tags:
@@ -211,7 +210,8 @@ Package Images:dev:
 
 Trigger Acceptance Tests:
   stage: acceptance
-  when: manual
+  variables:
+    TRIGGERED_BY: invoicing
   trigger:
     project: hindawi/phenom-automation
     branch: main
@@ -254,6 +254,7 @@ Deploy:automation:
     - Package Images:dev
   <<: *script_deploy
   interruptible: true
+  when: on_success
   allow_failure: true
   variables:
     TENANT: hindawi
@@ -359,13 +360,16 @@ pages:
   interruptible: true
   stage: reports
   script:
+    - echo $CI_COMMIT_REF_SLUG
+    - mkdir -p $CI_PROJECT_DIR/public/$CI_COMMIT_REF_SLUG
     - cp -r -a reports/* $HOME/reports/
     - cd $HOME
     - yarn run ci:coverage
-    - cp -r -a $HOME/reports/* $CI_PROJECT_DIR/public/
+    - cp -r -a $HOME/reports/* $CI_PROJECT_DIR/public/$CI_COMMIT_REF_SLUG
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
   needs: [Test]
   artifacts:
     paths:
       - public
       - reports
+    expire_in: 7 days

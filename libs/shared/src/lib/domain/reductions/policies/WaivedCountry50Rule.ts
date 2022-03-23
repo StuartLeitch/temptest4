@@ -43,7 +43,6 @@ const WAIVER_POLICY_COUNTRIES = {
   SC: { country: 'Seychelles' },
   LK: { country: 'Sri Lanka' },
   TN: { country: 'Tunisia' },
-  UA: { country: 'Ukraine' },
   UZ: { country: 'Uzbekistan' },
   VE: { country: 'Venezuela (Bolivarian Republic of)' },
   VN: { country: 'Viet Nam' },

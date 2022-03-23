@@ -17,7 +17,11 @@ const context: UsecaseAuthorizationContext = {
 let mockCouponRepo: MockCouponRepo = null;
 let usecase: CreateCouponUsecase = null;
 let response: CreateCouponResponse = null;
-let mockAuditLogger = { log: () => null };
+const mockAuditLogger = { log: () => null };
+
+const futureDate = new Date();
+futureDate.setDate(futureDate.getDate() + 10);
+const futureDateString = futureDate.toISOString().substring(0, 10);
 
 Before({ tags: '@ValidateCreateCoupon' }, () => {
   mockCouponRepo = new MockCouponRepo();
@@ -35,7 +39,7 @@ Given(
     const couponDetails = {
       id: testId,
       invoiceItemType: 'APC',
-      expirationDate: '2022-03-12',
+      expirationDate: futureDateString,
       type: 'MULTIPLE_USE',
       reduction: 30,
       status: 'ACTIVE',
@@ -56,7 +60,7 @@ Given(
     const couponDetails = {
       id: testId,
       invoiceItemType: 'APC',
-      expirationDate: '2022-03-12',
+      expirationDate: futureDateString,
       type: 'MULTIPLE_USE',
       reduction: 30,
       status: 'INACTIVE',
