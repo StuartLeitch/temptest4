@@ -3310,4 +3310,4 @@ export async function up(knex: Knex): Promise<any> {
   export async function down(knex: Knex): Promise<any> {
   }
 
-  export const name = '20220304121200_01_apollo1_table_explosion_create.ts';
+  export const name = '20220304121200_01_apollo1_table_explosion_create';
