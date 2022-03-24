@@ -11,6 +11,7 @@
     "start": "nx serve",
     "build": "nx build",
     "test": "nx test",
+    "jest": "nx jest",
     "lint": "nx workspace-lint && nx lint",
     "e2e": "nx e2e",
     "affected:apps": "nx affected:apps",
