@@ -2,7 +2,7 @@ import { Either, flatten, right, left } from '../../../../core/logic/Either';
 import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
-import { Knex, TABLES } from '../../../../infrastructure/database/knex';
+import {TABLES } from '../../../../infrastructure/database/knex';
 import { RepoError } from '../../../../infrastructure/RepoError';
 
 import { WaiverAssignedCollection } from '../../domain/WaiverAssignedCollection';
@@ -12,6 +12,7 @@ import { WaiverType, Waiver } from '../../domain/Waiver';
 import { WaiverMap } from '../../mappers/WaiverMap';
 
 import { WaiverRepoContract } from '../waiverRepo';
+import Knex from "knex";
 
 export class KnexWaiverRepo
   extends AbstractBaseDBRepo<Knex, Waiver>

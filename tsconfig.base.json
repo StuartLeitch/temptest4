@@ -33,6 +33,9 @@
       "@hindawi/import-manuscript-backend/*": [
         "apps/import-manuscript-backend/src/*"
       ],
+      "@hindawi/import-manuscript-commons": [
+        "libs/import-manuscript-commons/src/index.ts"
+      ],
       "@hindawi/import-manuscript-validation/*": [
         "apps/import-manuscript-validation/src/*"
       ],
@@ -46,9 +49,6 @@
       "@hindawi/reporting-backend/*": ["apps/reporting-backend/src/*"],
       "@hindawi/shared": ["libs/shared/src/index.ts"],
       "@hindawi/sisif": ["libs/sisif/src/index.ts"],
-      "@hindawi/import-manuscript-commons": [
-        "libs/import-manuscript-commons/src/index.ts"
-      ],
       "@utils": ["libs/shared/src/lib/utils/index.ts"]
     }
   },

@@ -4,7 +4,7 @@ import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
-import { Knex, TABLES } from '../../../../infrastructure/database/knex';
+import { TABLES } from '../../../../infrastructure/database/knex';
 
 import { ExternalOrderId } from '../../domain/external-order-id';
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
@@ -14,6 +14,7 @@ import { Payment } from './../../domain/Payment';
 import { PaymentRepoContract } from './../paymentRepo';
 
 import { PaymentMap } from './../../mapper/Payment';
+import Knex from "knex";
 
 export class KnexPaymentRepo
   extends AbstractBaseDBRepo<Knex, Payment>

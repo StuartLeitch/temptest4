@@ -60,6 +60,7 @@ export class S3UploadService implements UploadServiceContract {
   async createSignedUrlForUpload(
     fileName: string
   ): Promise<Either<Error, string>> {
+
     try {
       const signedUrl = await this.s3.getSignedUrlPromise('putObject', {
         Bucket: this.bucketName,

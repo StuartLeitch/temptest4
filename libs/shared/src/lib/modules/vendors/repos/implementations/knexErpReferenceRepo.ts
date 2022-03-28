@@ -3,7 +3,7 @@ import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
-import { Knex, TABLES } from '../../../../infrastructure/database/knex';
+import {TABLES } from '../../../../infrastructure/database/knex';
 import { RepoError } from '../../../../infrastructure/RepoError';
 
 import { InvoiceErpReferences } from './../../../invoices/domain/InvoiceErpReferences';
@@ -12,6 +12,7 @@ import { ErpReferenceMap } from './../../mapper/ErpReference';
 import { ErpReference } from '../../domain/ErpReference';
 
 import { ErpReferenceRepoContract } from '../ErpReferenceRepo';
+import Knex from "knex";
 
 export class KnexErpReferenceRepo
   extends AbstractBaseDBRepo<Knex, ErpReference>

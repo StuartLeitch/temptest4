@@ -283,6 +283,7 @@ export { EmailService } from './infrastructure/communication-channels';
 import * as QueuePayloads from './infrastructure/message-queues/payloads';
 export { QueuePayloads };
 export * from './infrastructure/message-queues/payloadBuilder';
+export * from './infrastructure/Mapper';
 
 // * LoggerBuilder/Logger
 export * from './infrastructure/logging/LoggerBuilder';

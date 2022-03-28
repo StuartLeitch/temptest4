@@ -3,7 +3,7 @@ import { Either, right, left } from '../../../../core/logic/Either';
 import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
-import { Knex, TABLES } from '../../../../infrastructure/database/knex';
+import { TABLES } from '../../../../infrastructure/database/knex';
 import { RepoError } from '../../../../infrastructure/RepoError';
 
 import { NotificationPause } from '../../domain/NotificationPause';
@@ -20,6 +20,7 @@ import {
 } from './knexPausedReminderUtils';
 
 import { Transform } from 'stream';
+import Knex from "knex";
 
 const notificationTypeToPersistance = {
   [NotificationType.REMINDER_CONFIRMATION]: 'pauseConfirmation',

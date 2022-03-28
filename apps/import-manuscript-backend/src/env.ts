@@ -42,6 +42,7 @@ export const env = {
     username: getOsEnvOptional('IMPORT_MANUSCRIPT_DB_USERNAME'),
     password: getOsEnvOptional('IMPORT_MANUSCRIPT_DB_PASSWORD'),
     database: getOsEnv('IMPORT_MANUSCRIPT_DB_DATABASE'),
+    logQueries: toBool(getOsEnv('IMPORT_MANUSCRIPT_DB_LOG_QUERIES')),
   },
   graphql: {
     enabled: toBool(getOsEnv('GRAPHQL_ENABLED')),

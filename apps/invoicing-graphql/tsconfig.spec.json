@@ -15,5 +15,5 @@
       "@utils": ["../../libs/shared/src/lib/utils/index.ts"]
     }
   },
-  "include": ["**/*.spec.ts", "**/*.d.ts"]
+  "include": ["**/*.spec.ts", "**/*.test.ts", "**/*.d.ts"]
 }

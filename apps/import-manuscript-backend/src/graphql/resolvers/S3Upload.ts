@@ -25,10 +25,11 @@ export const s3Upload: Resolvers<Context> = {
         roles: contextRoles,
       };
 
-      const { services } = context;
+      const { services, repos } = context;
       try {
         const confirmManuscriptUploadUseCase = new ConfirmManuscriptUploadUseCase(
           services.uploadService,
+          repos.manuscriptInfoRepo,
           services.queueService,
           services.logger
         );
@@ -60,11 +61,12 @@ export const s3Upload: Resolvers<Context> = {
         roles: contextRoles,
       };
 
-      const { services } = context;
+      const { services, repos } = context;
 
       try {
         const createManuscriptUploadUrlUseCase = new CreateManuscriptUploadUrlUseCase(
           services.uploadService,
+          repos.manuscriptInfoRepo,
           services.logger
         );
         const response = await createManuscriptUploadUrlUseCase.execute(

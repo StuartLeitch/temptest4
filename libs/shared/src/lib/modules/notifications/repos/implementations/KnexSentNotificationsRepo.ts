@@ -3,7 +3,7 @@ import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { RepoErrorCode, RepoError } from '../../../../infrastructure/RepoError';
-import { Knex, TABLES } from '../../../../infrastructure/database/knex';
+import { TABLES } from '../../../../infrastructure/database/knex';
 
 import { NotificationType, Notification } from '../../domain/Notification';
 import { NotificationMap } from '../../mappers/NotificationMap';
@@ -11,6 +11,7 @@ import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { NotificationId } from '../../domain/NotificationId';
 
 import { SentNotificationRepoContract } from '../SentNotificationRepo';
+import Knex from "knex";
 
 export class KnexSentNotificationsRepo
   extends AbstractBaseDBRepo<Knex, Notification>
