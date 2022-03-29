@@ -127,7 +127,7 @@ Validate Schema:qa:
     changes:
       - 'apps/invoicing-graphql/**/*'
   variables:
-    SERVICE: 'invoicing'
+    SERVICE: 'invoicing-graphql'
     FILE_PATH: './src/graphql/schema/schema.graphql'
     SCHEMA_REGISTRY_URL: $QA_SCHEMA_REGISTRY_URL
 
