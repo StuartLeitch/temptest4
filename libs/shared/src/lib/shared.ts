@@ -152,7 +152,7 @@ export * from './modules/journals/usecases/journals/getJournalList/getJournalLis
 export * from './modules/journals/usecases/journals/getJournal/getJournal';
 export * from './modules/journals/usecases/journals/getJournal/getJournalDTO';
 export * from './modules/journals/usecases/editorialBoards/assignEditorsToJournal/assignEditorsToJournal';
-export * from './modules/journals/usecases/addCatalogItemToCatalog/addCatalogItemToCatalog';
+export * from './modules/journals/usecases/addCatalogItemToCatalog';
 export * from './modules/journals/usecases/updateCatalogItemToCatalog';
 export * from './modules/journals/usecases/updateCatalogItemFields';
 

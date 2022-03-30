@@ -1,10 +1,5 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
 import { JournalUpdated } from '@hindawi/phenom-events';
-import { Roles } from '@hindawi/shared';
-
-import { UpdateCatalogItemToCatalogUseCase } from '../../../../../libs/shared/src/lib/modules/journals/usecases/updateCatalogItemToCatalog';
+import { Roles, UpdateCatalogItemToCatalogUseCase } from '@hindawi/shared';
 
 import { Context } from '../../builders';
 
@@ -38,7 +33,6 @@ export const JournalUpdatedHandler: EventHandler<JournalUpdated> = {
           created: data.created,
           updated: data.updated,
           journalId: data.id,
-          amount: data.apc,
           currency: 'USD',
           issn: data.issn,
           code: data.code,
