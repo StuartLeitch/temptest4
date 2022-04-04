@@ -118,7 +118,7 @@ const masterConfig: {
     qa: {
       [App.invoicingErpInvoiceRegistration]:
         qaInvoicingErpInvoiceRegistrationValues,
-      // [App.reporting]: qaReportingBackendValues,
+      [App.reporting]: qaReportingBackendValues,
       [App.graphql]: qaInvoicingGraphqlValues,
       [App.admin]: qaInvoicingAdminValues,
       [App.web]: qaInvoicingWebValues,
