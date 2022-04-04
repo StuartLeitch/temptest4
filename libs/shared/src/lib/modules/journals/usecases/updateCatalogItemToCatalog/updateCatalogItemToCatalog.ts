@@ -24,7 +24,8 @@ import * as Errors from './updateCatalogItemToCatalogErrors';
 
 export class UpdateCatalogItemToCatalogUseCase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Response, Context> {
+  implements UseCase<DTO, Response, Context>
+{
   private catalogRepo: CatalogRepoContract;
   private publisherRepo: PublisherRepoContract;
 
@@ -41,7 +42,6 @@ export class UpdateCatalogItemToCatalogUseCase
   @Authorize('journal:update')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const {
-      amount,
       created,
       currency,
       isActive,
@@ -99,7 +99,7 @@ export class UpdateCatalogItemToCatalogUseCase
 
       const maybeUpdatedCatalogItem = CatalogMap.toDomain({
         id: catalogItem.id,
-        amount,
+        amount: catalogItem.amount,
         created: created ? new Date(created) : null,
         updated: updated ? new Date(updated) : null,
         currency,

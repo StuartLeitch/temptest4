@@ -29,39 +29,3 @@ export class UnexpectedError extends UseCaseError {
   }
 }
 
-enum ErrorCodes {
-  VALIDATION_ERROR,
-  GUARD_ERROR
-}
-
-/**
- * An error outside from outside the domain/application, like the network going down, an aws service error
- * (either configuration or api parameter related)
- */
-export class RuntimeError extends ChainedError{
-  constructor(message: string, cause: Error = new Error()) {
-    super(message, cause);
-  }
-}
-
-/**
- * An application error, from within our domain
- */
-export class ApplicationError extends RuntimeError{
-  constructor(public readonly errorCode:ErrorCodes, message: string = "", cause?: Error) {
-    super(message, cause);
-  }
-}
-
-export class GuardError extends ApplicationError{
-  constructor(message: string, cause?: Error) {
-    super(ErrorCodes.GUARD_ERROR, message, cause);
-  }
-}
-
-export class ValidationError extends ApplicationError{
-  constructor(message: string, cause?: Error) {
-    super(ErrorCodes.VALIDATION_ERROR, message, cause);
-  }
-}
-

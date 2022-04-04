@@ -12,4 +12,7 @@ export * from './usecases/confirm-manuscript-upload';
 export * from './usecases/create-manuscript-upload-url';
 export * from './usecases/validate-package';
 
+export * from './repo/contracts/manuscriptUploadInfoRepoContract';
+export * from './repo/implementations/manuscriptUploadInfoRepo';
+
 export * from './authorization';

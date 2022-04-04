@@ -4,7 +4,7 @@ import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
-import { Knex, TABLES } from '../../../../infrastructure/database/knex';
+import { TABLES } from '../../../../infrastructure/database/knex';
 
 import { PublisherCustomValues } from '../../domain/PublisherCustomValues';
 import { PublisherId } from '../../domain/PublisherId';
@@ -15,6 +15,7 @@ import { PublisherMap } from '../../mappers/PublisherMap';
 import { PublisherRepoContract } from '../publisherRepo';
 import { PublisherPaginated } from '../../domain/PublisherPaginated';
 import { applyFilters } from '../../../invoices/repos/implementations/utils';
+import Knex from "knex";
 
 export class KnexPublisherRepo
   extends AbstractBaseDBRepo<Knex, Publisher>

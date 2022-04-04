@@ -29,6 +29,8 @@ export const knexLoader: MicroframeworkLoader = async (
       password: env.db.password,
       database: env.db.database,
     },
+    asyncStackTraces: true,
+    debug: env.db.logQueries
   };
 
   const knex = Knex(knexParams);

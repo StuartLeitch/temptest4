@@ -19,76 +19,72 @@
       "runner": "@nrwl/nx-cloud",
       "options": {
         "accessToken": "YWJkZTZhMmMtNzEwNi00NDM2LTk1ZmQtOWRlMTNmMzQyZTRkfHJlYWQtd3JpdGU=",
-        "cacheableOperations": ["build", "lint", "e2e"],
+        "cacheableOperations": [
+          "build",
+          "lint",
+          "e2e"
+        ],
         "canTrackAnalytics": false,
-        "showUsageWarnings": true
+        "showUsageWarnings": true,
+        "parallel": 1
       }
     }
   },
-  "projects": {
-    "env-utils": {
-      "tags": []
+  "cli": {
+    "defaultCollection": "@nrwl/node",
+    "analytics": false
+  },
+  "defaultProject": "invoicing-graphql",
+  "generators": {
+    "@nrwl/workspace": {
+      "library": {
+        "linter": "eslint"
+      }
     },
-    "eve": {
-      "tags": []
+    "@nrwl/cypress": {
+      "cypress-project": {
+        "linter": "eslint"
+      }
     },
-    "import-manuscript-backend": {
-      "tags": []
+    "@nrwl/react": {
+      "application": {
+        "style": "scss",
+        "linter": "eslint",
+        "babel": true
+      },
+      "component": {
+        "style": "scss"
+      },
+      "library": {
+        "style": "scss",
+        "linter": "eslint"
+      }
     },
-    "import-manuscript-validation": {
-      "tags": []
+    "@nrwl/next": {
+      "application": {
+        "style": "scss",
+        "linter": "eslint"
+      }
     },
-    "import-manuscript-web": {
-      "tags": []
+    "@nrwl/web": {
+      "application": {
+        "linter": "eslint"
+      }
     },
-    "import-manuscript-web-e2e": {
-      "tags": [],
-      "implicitDependencies": ["import-manuscript-web"]
+    "@nrwl/node": {
+      "application": {
+        "linter": "eslint"
+      }
     },
-    "invoicing-admin": {
-      "tags": []
+    "@nrwl/nest": {
+      "application": {
+        "linter": "eslint"
+      }
     },
-    "invoicing-admin-e2e": {
-      "tags": []
-    },
-    "invoicing-erp-invoice-registration": {
-      "tags": []
-    },
-    "invoicing-graphql": {
-      "tags": []
-    },
-    "invoicing-infrastructure": {
-      "tags": []
-    },
-    "invoicing-web": {
-      "tags": []
-    },
-    "invoicing-web-e2e": {
-      "tags": []
-    },
-    "lib-import-manuscript-commons": {
-      "tags": []
-    },
-    "queue-utils": {
-      "tags": []
-    },
-    "react-components": {
-      "tags": []
-    },
-    "reporting-backend": {
-      "tags": []
-    },
-    "reporting-pull-historic-events": {
-      "tags": []
-    },
-    "shared": {
-      "tags": []
-    },
-    "sisif": {
-      "tags": []
-    },
-    "sisif-test": {
-      "tags": []
+    "@nrwl/express": {
+      "application": {
+        "linter": "eslint"
+      }
     }
   }
 }

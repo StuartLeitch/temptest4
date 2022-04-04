@@ -1,5 +1,6 @@
 module.exports = {
-  testMatch: ['**/+(*.)+(spec|test|steps).+(ts|js)?(x)'],
+  testMatch: ['**/+(*.)+(test).+(ts|js)?(x)'],
+  preset: 'ts-jest',
   transform: {
     '^.+\\.(ts|js|html)$': 'ts-jest',
   },

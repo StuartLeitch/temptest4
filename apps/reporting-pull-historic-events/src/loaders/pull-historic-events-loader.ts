@@ -45,6 +45,7 @@ export const pullHistoricEventsLoader: MicroframeworkLoader = async (
     s3Config.bucketName,
     fsResumeService
   );
+  const loggerBuilder = new LoggerBuilder();
 
   let consumer;
   switch (env.consumerTransport) {
@@ -64,7 +65,6 @@ export const pullHistoricEventsLoader: MicroframeworkLoader = async (
         settings.onShutdown(() => knex.destroy());
       }
 
-      const loggerBuilder = new LoggerBuilder();
       const filterEventsServiceLogger = loggerBuilder.getLogger();
       filterEventsServiceLogger.setScope('service:FilterEvents');
 
