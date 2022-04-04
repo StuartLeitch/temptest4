@@ -27,8 +27,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 # Install any needed packages specified in package.json
 RUN yarn install --frozen-lockfile --production
 
-COPY libs/shared/src/lib/infrastructure/database/knex/migrations/ ./migrations/
-COPY libs/shared/src/lib/infrastructure/database/knex/seeds/ ./seeds/
+COPY apps/import-manuscript-backend/src/lib/infrastructure/database/knex/migrations ./migrations/
 COPY config/ ./config/
 COPY dist/apps/import-manuscript-backend ./
 

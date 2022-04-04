@@ -3,7 +3,7 @@ import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { RepoErrorCode, RepoError } from '../../../../infrastructure/RepoError';
-import { Knex, TABLES } from '../../../../infrastructure/database/knex';
+import { TABLES } from '../../../../infrastructure/database/knex';
 
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { PayerId } from '../../domain/PayerId';
@@ -12,6 +12,8 @@ import { Payer } from '../../domain/Payer';
 import { PayerMap } from '../../mapper/Payer';
 
 import { PayerRepoContract } from '../payerRepo';
+import Knex from "knex";
+
 
 export class KnexPayerRepo
   extends AbstractBaseDBRepo<Knex, Payer>

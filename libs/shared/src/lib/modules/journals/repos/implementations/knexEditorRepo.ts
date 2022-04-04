@@ -1,5 +1,3 @@
-import Knex from 'knex';
-
 import { Either, flatten, right, left } from '../../../../core/logic/Either';
 import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
@@ -14,6 +12,8 @@ import { Editor } from '../../domain/Editor';
 import { EditorMap } from '../../mappers/EditorMap';
 
 import { EditorRepoContract } from '../editorRepo';
+import Knex from "knex";
+
 
 export class KnexEditorRepo
   extends AbstractBaseDBRepo<Knex, Editor>

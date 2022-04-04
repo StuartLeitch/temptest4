@@ -6,7 +6,7 @@ import {
   LoggerContract,
   UseCase,
   right,
-  left,
+  left, UniqueEntityID,
 } from '@hindawi/shared';
 
 import type { UsecaseAuthorizationContext as Context } from '../../authorization';
@@ -16,12 +16,15 @@ import { Authorize } from '../../authorization';
 
 import { ConfirmManuscriptUploadResponse as Response } from './confirm-manuscript-upload-response';
 import { ConfirmManuscriptUploadDTO as DTO } from './confirm-manuscript-upload-dto';
+import {ManuscriptUploadInfoRepo} from "../../repo/implementations/manuscriptUploadInfoRepo";
+import {ManuscriptStatus, ManuscriptUploadInfo} from "../../models/manuscriptUploadInfo";
 
 export class ConfirmManuscriptUploadUseCase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context> {
   constructor(
     private readonly uploadService: UploadServiceContract,
+    private readonly manuscriptUploadInfoRepo: ManuscriptUploadInfoRepo,
     private readonly eventProducer: SqsEventProducer,
     private readonly logger: LoggerContract
   ) {
@@ -35,9 +38,7 @@ export class ConfirmManuscriptUploadUseCase
     this.logger.debug(`Confirming upload for '${fileName}'`);
 
     try {
-      const maybeIsUploaded = await this.uploadService.hasFileUploadedSuccessfully(
-        fileName
-      );
+      const maybeIsUploaded = await this.uploadService.hasFileUploadedSuccessfully(fileName);
 
       if (maybeIsUploaded.isLeft()) {
         return maybeIsUploaded.map(() => null);
@@ -63,6 +64,16 @@ export class ConfirmManuscriptUploadUseCase
         `Sending the begin validation event for '${fileName}'...`
       );
 
+      const manuscriptUploadInfo = ManuscriptUploadInfo.create(
+        {
+          fileName: fileName,
+          status: ManuscriptStatus.VALIDATION_STARTED,
+          dateUpdated: new Date(),
+          dateCreated: new Date()
+        },
+        new UniqueEntityID()
+      );
+      await this.manuscriptUploadInfoRepo.persistManuscriptInfo(manuscriptUploadInfo);
       await this.eventProducer.sendEvent(event, eventName);
 
       this.logger.debug(

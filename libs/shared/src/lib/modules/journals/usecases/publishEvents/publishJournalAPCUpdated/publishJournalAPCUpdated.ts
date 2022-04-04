@@ -15,7 +15,7 @@ import { PublishJournalAPCUpdatedResponse as Response } from './publishJournalAP
 import { PublishJournalAPCUpdatedDTO as DTO } from './publishJournalAPCUpdatedDTO';
 import * as Errors from './publishJournalAPCUpdatedErrors';
 
-const JOURNAL_APC_UDPATED = 'JOURNAL_APC_UDPATED';
+const JOURNAL_APC_UDPATED = 'JournalAPCUpdated';
 
 export class PublishJournalAPCUpdatedUsecase
   implements UseCase<DTO, Promise<Response>, Context>

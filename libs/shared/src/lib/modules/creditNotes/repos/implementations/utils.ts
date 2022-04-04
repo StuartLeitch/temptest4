@@ -1,6 +1,7 @@
 import { TABLES } from '../../../../infrastructure';
 import { LeanTraversal, ParseUtils, toPath, Categories, Cached } from '@utils';
-import { QueryBuilder } from 'knex';
+import knex from "knex";
+import QueryBuilder = knex.QueryBuilder;
 
 type Scalar = boolean | string | number;
 type Filter = Scalar[];

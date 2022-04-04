@@ -6,7 +6,7 @@ import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
 import { RepoError, RepoErrorCode } from '../../../../infrastructure/RepoError';
-import { Knex, TABLES } from '../../../../infrastructure/database/knex';
+import { TABLES } from '../../../../infrastructure/database/knex';
 
 import { TransactionId } from '../../../transactions/domain/TransactionId';
 import { InvoicePaymentInfo } from '../../domain/InvoicePaymentInfo';
@@ -23,6 +23,8 @@ import { InvoiceItemRepoContract } from '../invoiceItemRepo';
 import { InvoiceRepoContract } from '../invoiceRepo';
 
 import { applyFilters } from './utils';
+import Knex from "knex";
+
 
 export class KnexInvoiceRepo
   extends AbstractBaseDBRepo<Knex, Invoice>

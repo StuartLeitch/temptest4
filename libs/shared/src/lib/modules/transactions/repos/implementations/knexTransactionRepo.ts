@@ -1,5 +1,3 @@
-import Knex from 'knex';
-
 import { Either, flatten, right, left } from '../../../../core/logic/Either';
 import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
@@ -14,6 +12,7 @@ import { Transaction } from '../../domain/Transaction';
 import { TransactionMap } from '../../mappers/TransactionMap';
 
 import { TransactionRepoContract } from '../transactionRepo';
+import Knex from "knex";
 
 export class KnexTransactionRepo
   extends AbstractBaseDBRepo<Knex, Transaction>
