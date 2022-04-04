@@ -3225,9 +3225,12 @@ commit;
 -- CREATE TRIGGERS
 -- ///////////////////////////////////////////////////////////////////////////
 
+
 -- Trigger: after_ae_insert
 
 -- DROP TRIGGER IF EXISTS after_ae_insert ON public.article_events;
+
+DROP TRIGGER IF EXISTS after_ae_insert on public.article_events;
 
 CREATE TRIGGER after_ae_insert
     AFTER INSERT
@@ -3235,10 +3238,10 @@ CREATE TRIGGER after_ae_insert
     FOR EACH ROW
     EXECUTE FUNCTION public.insert_into_article_tables();
 	
-
 -- Trigger: after_ce_insert
 
 -- DROP TRIGGER IF EXISTS after_ce_insert ON public.checker_events;
+DROP TRIGGER IF EXISTS after_ce_insert on public.checker_events;
 
 CREATE TRIGGER after_ce_insert
     AFTER INSERT
@@ -3250,6 +3253,7 @@ CREATE TRIGGER after_ce_insert
 -- Trigger: after_ie_insert
 
 -- DROP TRIGGER IF EXISTS after_ie_insert ON public.invoice_events;
+DROP TRIGGER IF EXISTS after_ie_insert on public.invoice_events;
 
 CREATE TRIGGER after_ie_insert
     AFTER INSERT
@@ -3261,6 +3265,7 @@ CREATE TRIGGER after_ie_insert
 -- Trigger: after_je_insert
 
 -- DROP TRIGGER IF EXISTS after_je_insert ON public.journal_events;
+DROP TRIGGER IF EXISTS after_je_insert on public.journal_events;
 
 CREATE TRIGGER after_je_insert
     AFTER INSERT
@@ -3272,6 +3277,7 @@ CREATE TRIGGER after_je_insert
 -- Trigger: after_se_insert
 
 -- DROP TRIGGER IF EXISTS after_se_insert_1 ON public.submission_events;
+DROP TRIGGER IF EXISTS after_se_insert_into_manuscripts on public.submission_events;
 
 CREATE TRIGGER after_se_insert_into_manuscripts
     AFTER INSERT
@@ -3283,6 +3289,7 @@ CREATE TRIGGER after_se_insert_into_manuscripts
 -- Trigger: after_ue_insert
 
 -- DROP TRIGGER IF EXISTS after_ue_insert ON public.user_events;
+DROP TRIGGER IF EXISTS after_ue_insert on public.user_events;
 
 CREATE TRIGGER after_ue_insert
     AFTER INSERT
@@ -3304,4 +3311,4 @@ export async function up(knex: Knex): Promise<any> {
   export async function down(knex: Knex): Promise<any> {
   }
 
-  export const name = '20220304121200_01_migration_table_explosion_create';
+  export const name = '20220304121200_01_apollo1_table_explosion_create';

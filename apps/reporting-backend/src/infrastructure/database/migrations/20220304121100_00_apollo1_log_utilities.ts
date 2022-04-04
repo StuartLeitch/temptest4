@@ -32,5 +32,5 @@ export async function up(knex: Knex): Promise<any> {
   export async function down(knex: Knex): Promise<any> {
   }
 
-  export const name = '20220304121100_00_migration_log_utilities';
+  export const name = '20220304121100_00_apollo1_log_utilities';
 

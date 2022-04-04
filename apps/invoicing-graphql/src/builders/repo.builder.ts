@@ -57,6 +57,7 @@ export function buildRepos(db: Knex, loggerBuilder: LoggerBuilder): Repos {
     catalog: new KnexCatalogRepo(db, loggerBuilder.getLogger()),
     invoice: new KnexInvoiceRepo(
       db,
+
       loggerBuilder.getLogger(),
       null,
       articleRepo,
