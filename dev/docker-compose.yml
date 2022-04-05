@@ -4,6 +4,8 @@ services:
   postgres:
     image: postgres:10
     restart: always
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - 5432:5432
     volumes:
@@ -29,9 +31,62 @@ services:
       - ADMINER_DEFAULT_DB_HOST=localhost:5432
       - ADMINER_DEFAULT_DB_NAME=postgres
 
-
   sqs:
     image: roribio16/alpine-sqs:latest
     ports:
       - 9324:9324
       - 9325:9325
+
+  gql-schema-registry-db:
+    image: mysql:8
+    command: mysqld --default-authentication-plugin=mysql_native_password --skip-mysqlx
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: schema_registry
+    ports:
+      - 6000:3306
+    volumes:
+      - gql-schema-registry-db-volume:/var/lib/mysql
+    healthcheck:
+      test:
+        ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'healthcheck']
+      timeout: 5s
+      retries: 10
+
+  gql-schema-registry:
+    image: pipedrive/graphql-schema-registry:2.0.0
+    ports:
+      - 6001:3000
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=gql-schema-registry-db
+      - DB_NAME=schema_registry
+      - DB_PORT=3306
+      - DB_SECRET=root
+      - DB_USERNAME=root
+      - PORT=3000
+      - REDIS_HOST=gql-schema-registry-redis
+      - REDIS_PORT=6004
+    depends_on:
+      - gql-schema-registry-redis
+      - gql-schema-registry-db
+
+  gql-schema-registry-redis:
+    image: redis:6-alpine
+    ports:
+      - 6004:6379
+
+  app-gql-gateway:
+    image: registry.gitlab.com/hindawi/xpub/xpub-screening/app-gql-gateway:a85c1762992e35660879ab631f8e36efd26db61a
+    command: sh -c "yarn start"
+    ports:
+      - 4001:3000
+    environment:
+      - PORT=3000
+      - SCHEMA_REGISTRY_URL=http://gql-schema-registry:3000
+      - NODE_ENV=development
+    depends_on:
+      - gql-schema-registry
+
+volumes:
+  gql-schema-registry-db-volume:

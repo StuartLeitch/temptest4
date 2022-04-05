@@ -1,4 +1,4 @@
-import { ApolloServer } from 'apollo-server-express';
+import { ApolloServer, gql } from 'apollo-server-express';
 import Keycloak from 'keycloak-connect';
 import session from 'express-session';
 import {
@@ -10,55 +10,59 @@ import {
   MicroframeworkSettings,
   MicroframeworkLoader,
 } from 'microframework-w3tec';
+import { validateAndRegisterSchema } from '@phenom.pub/schema-registry-cli/lib/register-schema';
 
 import { resolvers } from '../graphql/resolvers';
 import { typeDefs } from '../graphql/schema';
 
 import { env } from '../env';
 
-export const graphqlLoader: MicroframeworkLoader = (
+export const graphqlLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ) => {
-  if (settings && env.graphql.enabled) {
-    const context = settings.getData('context');
-    const expressApp = settings.getData('express_app');
-
-    const memoryStore = new session.MemoryStore();
-
-    expressApp.use(
-      session({
-        secret: env.app.sessionSecret,
-        resave: false,
-        saveUninitialized: true,
-        store: memoryStore,
-      })
-    );
-
-    const { keycloak } = configureKeycloak(
-      expressApp,
-      memoryStore,
-      env.graphql.route
-    );
-
-    const graphqlServer = new ApolloServer({
-      typeDefs: [KeycloakTypeDefs, typeDefs], // 1. Add the Keycloak Type Defs
-      schemaDirectives: KeycloakSchemaDirectives, // 2. Add the KeycloakSchemaDirectives
-      resolvers,
-      context: ({ req }) => {
-        return {
-          ...context,
-          keycloakAuth: new KeycloakContext({ req } as any, keycloak), // 3. add the KeycloakContext to `kAuth`
-        };
-      },
-      playground: env.graphql.editor,
-    });
-
-    // Add graphql layer to the express app
-    graphqlServer.applyMiddleware({
-      app: expressApp,
-      path: env.graphql.route,
-    });
+  if (!(settings && env.graphql.enabled)) {
+    return;
   }
+
+  const context = settings.getData('context');
+  const expressApp = settings.getData('express_app');
+  const memoryStore = new session.MemoryStore();
+
+  const service = {
+    name: env.app.name,
+    url: env.graphql.serviceUrl,
+  };
+  await validateAndRegisterSchema(service, gql`${typeDefs}`)
+
+  expressApp.use(
+    session({
+      secret: env.app.sessionSecret,
+      resave: false,
+      saveUninitialized: true,
+      store: memoryStore
+    })
+  );
+  const {keycloak} = configureKeycloak(
+    expressApp,
+    memoryStore,
+    env.graphql.route
+  );
+  const graphqlServer = new ApolloServer({
+    typeDefs: [KeycloakTypeDefs, typeDefs], // 1. Add the Keycloak Type Defs
+    schemaDirectives: KeycloakSchemaDirectives, // 2. Add the KeycloakSchemaDirectives
+    resolvers,
+    context: ({req}) => {
+      return {
+        ...context,
+        keycloakAuth: new KeycloakContext({req} as any, keycloak) // 3. add the KeycloakContext to `kAuth`
+      };
+    },
+    playground: env.graphql.editor
+  });
+  graphqlServer.applyMiddleware({
+    app: expressApp,
+    path: env.graphql.route
+  });
 };
 
 function configureKeycloak(app, memoryStore, graphqlPath) {

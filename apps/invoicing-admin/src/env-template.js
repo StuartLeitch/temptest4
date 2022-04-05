@@ -1,8 +1,8 @@
 window._env_ = {
   APP_NAME: '${APP_NAME}',
   BACKEND_URL: '${APP_URL}',
-  GQL_ROOT: '${APP_URL}/graphql',
-  API_ROOT: '${APP_URL}/api',
+  GQL_ROOT: '${GQL_ROOT}',
+  API_ROOT: '${API_ROOT}',
   FE_ROOT: '${FE_ROOT}',
 
   AUTH_ENABLED: '${AUTH_ENABLED}',
