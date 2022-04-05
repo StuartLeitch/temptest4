@@ -82,7 +82,7 @@ const masterConfig: {
         hindawiProdInvoicingErpInvoiceRegistrationValues,
       [App.graphql]: hindawiProdInvoicingGraphqlValues,
       [App.admin]: hindawiProdInvoicingAdminValues,
-      // [App.reporting]: hindawiProdReportingValues,
+      [App.reporting]: hindawiProdReportingValues,
       [App.web]: hindawiProdInvoicingWebValues,
       // [App.importManuscriptBackend]: hindawiProdImportManuscriptBackend,
       // [App.importManuscriptValidation]: hindawiProdImportManuscriptValidation,
