@@ -18,14 +18,13 @@ RUN apk add --no-cache \
   python3 \
   ttf-freefont
 
-# Copy package.json to the working directory
-COPY package.json yarn.lock ./
-
-
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+# Copy package.json to the working directory
 # Install any needed packages specified in package.json
-RUN yarn install --frozen-lockfile --production
+COPY package.json yarn.lock ./
+ADD node_modules_production ./node_modules
 
 COPY apps/import-manuscript-backend/src/lib/infrastructure/database/knex/migrations ./migrations/
 COPY config/ ./config/
@@ -39,4 +38,5 @@ EXPOSE 3000
 
 # Run index.js when the container launches
 CMD ["node", "--enable-source-maps", "main.js"]
+
 

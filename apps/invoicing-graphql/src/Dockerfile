@@ -18,14 +18,11 @@ RUN apk add --no-cache \
   python3 \
   ttf-freefont
 
-# Copy package.json to the working directory
 COPY package.json yarn.lock ./
-
+ADD node_modules_production ./node_modules
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-# Install any needed packages specified in package.json
-RUN yarn install --frozen-lockfile --production
 
 COPY libs/shared/src/lib/infrastructure/database/knex/migrations/ ./migrations/
 COPY libs/shared/src/lib/infrastructure/database/knex/seeds/ ./seeds/

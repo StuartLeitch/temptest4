@@ -18,11 +18,8 @@ RUN apk add --no-cache \
   python3 \
   ttf-freefont
 
-# Copy package.json to the working directory
 COPY package.json yarn.lock ./
-
-# Install any needed packages specified in package.json
-RUN yarn install --frozen-lockfile --production
+ADD node_modules_production ./node_modules
 
 COPY config/ ./config/
 COPY dist/apps/invoicing-erp-invoice-registration ./

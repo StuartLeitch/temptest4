@@ -13,9 +13,8 @@ WORKDIR ${HOME}
 
 # Copy package.json to the working directory
 COPY package.json yarn.lock ./
+ADD node_modules_production ./node_modules
 
-# Install any needed packages specified in package.json
-RUN yarn install --frozen-lockfile --production
 
 FROM node:16-alpine
 

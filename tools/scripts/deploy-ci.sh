@@ -1,4 +1,5 @@
 set -e
+set -x
 
 rm -rf dist-k8s
 yarn build invoicing-infrastructure

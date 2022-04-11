@@ -29,7 +29,7 @@
     "dep-graph": "nx dep-graph",
     "help": "nx help",
     "deploy": "ts-node --skip-project tools/scripts/deploy",
-    "ci:coverage": "istanbul-combine -d reports/coverage -r lcov -r html reports/coverage/coverage-final.json && ./tools/scripts/cucumber-report.sh",
+    "ci:coverage": "istanbul-combine -d ./reports/coverage -r lcov -r html ./reports/coverage/coverage-final.json && ./tools/scripts/cucumber-report.sh",
     "storybook": "cd libs/react-components && start-storybook -p 6006",
     "codegen:graphql": "graphql-codegen --config apps/invoicing-graphql/codegen.yml"
   },

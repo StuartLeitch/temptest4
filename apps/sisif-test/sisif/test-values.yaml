@@ -1,3 +1,0 @@
-redisHost: test-redis-master
-redisPort: 6379
-# debug: true

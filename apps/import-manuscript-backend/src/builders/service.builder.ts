@@ -26,6 +26,7 @@ export async function buildServices(
       env.aws.s3.signedUrlExpirationInSeconds
     ),
   };
+
   const sqsService = new SqsEventProducer(
     env.aws.sqs.queueName,
     env.aws.sqs.eventNamespace,
