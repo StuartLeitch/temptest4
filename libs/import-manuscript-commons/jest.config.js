@@ -1,11 +1,7 @@
 module.exports = {
   displayName: 'lib-import-manuscript-commons',
-  preset: '../../jest.preset.js',
-  globals: {
-    'ts-jest': {
-      tsconfig: '<rootDir>/tsconfig.spec.json',
-    },
-  },
+  testMatch: ['__test__/*/*Test.ts'],
+  preset: './jest.preset.js',
   transform: {
     '^.+\\.[tj]sx?$': 'ts-jest',
   },

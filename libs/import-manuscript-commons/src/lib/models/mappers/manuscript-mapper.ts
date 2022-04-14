@@ -2,42 +2,17 @@ import { UniqueEntityID, Mapper } from '@hindawi/shared';
 
 import { ManuscriptProps, Manuscript } from '../manuscript';
 
-import { SourceJournalMapper, JournalMapper } from './journal-mapper';
-import { AuthorMapper } from './author-mapper';
-import { FileMapper } from './file-mapper';
+import { RawFoundingProps, FoundingMapper } from './founding-mapper';
+import { RawAuthorProps, AuthorMapper } from './author-mapper';
+import { RawFileProps, FileMapper } from './file-mapper';
+import {
+  RawSourceJournalProps,
+  SourceJournalMapper,
+  RawJournalProps,
+  JournalMapper,
+} from './journal-mapper';
 
-interface RawAuthorProps {
-  affiliationRorId?: string;
-  isCorresponding: boolean;
-  affiliationName: string;
-  isSubmitting: boolean;
-  countryCode: string;
-  givenName: string;
-  surname: string;
-  email: string;
-}
-interface RawJournalProps {
-  phenomId: string;
-  name: string;
-  code: string;
-}
-
-interface RawSourceJournalProps {
-  phenomId: string;
-  name: string;
-  code: string;
-  eissn?: string;
-  pissn: string;
-}
-
-interface RawFileProps {
-  name: string;
-  path: string;
-  size: number;
-  type: string;
-}
-
-interface RawManuscriptProps {
+export interface RawManuscriptProps {
   sourceManuscriptId: string;
   articleTypeId: string;
   destinationJournal: RawJournalProps;
@@ -48,25 +23,26 @@ interface RawManuscriptProps {
   title: string;
 
   conflictOfInterest?: string;
-  foundingStatement?: string;
   dataAvailability?: string;
   preprintValue?: string;
+  founding?: RawFoundingProps;
 }
 
 export class ManuscriptMapper extends Mapper<Manuscript> {
   static toDomain(raw: RawManuscriptProps): Manuscript {
     const props: ManuscriptProps = {
+      sourceManuscriptId:
+        raw.sourceManuscriptId && new UniqueEntityID(raw.sourceManuscriptId),
+      articleTypeId: raw.articleTypeId && new UniqueEntityID(raw.articleTypeId),
       destinationJournal: JournalMapper.toDomain(raw.destinationJournal),
-      sourceManuscriptId: new UniqueEntityID(raw.sourceManuscriptId),
       sourceJournal: SourceJournalMapper.toDomain(raw.sourceJournal),
-      articleTypeId: new UniqueEntityID(raw.articleTypeId),
       authors: raw.authors.map(AuthorMapper.toDomain),
       files: raw.files.map(FileMapper.toDomain),
       articleAbstract: raw.articleAbstract,
       title: raw.title,
 
+      founding: raw.founding ? FoundingMapper.toDomain(raw.founding) : null,
       conflictOfInterest: raw.conflictOfInterest,
-      foundingStatement: raw.foundingStatement,
       dataAvailability: raw.dataAvailability,
       preprintValue: raw.preprintValue,
     };
@@ -78,10 +54,10 @@ export class ManuscriptMapper extends Mapper<Manuscript> {
     return {
       sourceManuscriptId: manuscript.sourceManuscriptId.toString(),
       authors: manuscript.authors.map(AuthorMapper.toPersistance),
+      founding: FoundingMapper.toPersistance(manuscript.founding),
       files: manuscript.files.map(FileMapper.toPersistance),
       articleTypeId: manuscript.articleTypeId.toString(),
       conflictOfInterest: manuscript.conflictOfInterest,
-      foundingStatement: manuscript.foundingStatement,
       dataAvailability: manuscript.dataAvailability,
       articleAbstract: manuscript.articleAbstract,
       preprintValue: manuscript.preprintValue,

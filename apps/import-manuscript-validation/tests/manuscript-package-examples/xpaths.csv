@@ -1,0 +1,48 @@
+article.xml
+
+Journal Title, /article/front/journal-meta/journal-title-group/journal-title
+Manuscript Title, /article/front/article-meta/title-group/article-title
+Abstract, /article/front/article-meta/abstract/p
+Article Type, /article/front/article-meta/article-categories/subj-group[@subj-group-type='Article Type']/subject
+Conflict of Interest, /article/front/article-meta/custom-meta-group/custom-meta[@id='ConflictOfInterest1']
+Founding id, /article/front/article-meta/funding-group/award-group/funding-source/named-content[@id='funder-id']
+Submitting author, /article/front/article-meta/contrib-group/contrib[1]
+
+Corresponding author, /article/front/article-meta/contrib-group/contrib[@contrib-type='author' and @corresp='yes][1]
+        <contrib contrib-type="author" corresp="yes">
+          <role content-type="1" />
+
+
+Co authors, /article/front/article-meta/contrib-group/contrib[position() > 1]
+Author Lastname Name, /article/front/article-meta/contrib-group/contrib[1]/name/surname
+Author First Name, /article/front/article-meta/contrib-group/contrib[1]/name/given-names
+Author Email, /article/front/article-meta/contrib-group/contrib[1]/email
+
+? Author Country, /article/front/article-meta/contrib-group/contrib[1]/xref[@ref-type='aff']@rid = refId
+                /article/front/article-meta/contrib-group/aff[@id='refId']/country
+
+Affiliations, /article/front/article-meta/contrib-group/aff/institution-wrap/institution
+Affiliations, /article/front/article-meta/contrib-group/aff/institution-wrap/country
+
+pISSN, /article/front/journal-meta/issn[@pub-type='ppub']
+eISSN, /article/front/journal-meta/issn[@pub-type='epub']
+
+
+transfer.xml
+Source Journal, /transfer/transfer-source/publication/publication-title
+Destination Journal, /transfer/destination/publication/publication-title
+
+
+manifest.xml
+supporting information, /manifest/item[@item-type='supporting-information']/instance/@xlink:href
+reports and responses, /manifest/item[@item-type='reports-and-responses']/instance/@xlink:href
+manuscript, /manifest/item[@item-type='manuscript']/instance/@xlink:href
+cover letter, /manifest/item[@item-type='cover-letter']/instance/@xlink:href
+conflict-of-interest-statement, /manifest/item[@item-type='conflict-of-interest-statement']/instance/@xlink:href
+review-metadata, /manifest/item[@item-type='review-metadata']/instance/@xlink:href
+transfer-metadata, /manifest/item[@item-type='transfer-metadata']/instance/@xlink:href
+article-metadata, /manifest/item[@item-type='article-metadata']/instance/@xlink:href
+manifest-metadata, /manifest/item[@item-type='manifest-metadata']/instance/@xlink:href
+
+
+

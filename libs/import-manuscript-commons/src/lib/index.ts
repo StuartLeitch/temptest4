@@ -1,5 +1,5 @@
-export * from './models/file';
-export * from './models/path';
+export * from './models';
+export * from './models/mappers';
 
 export * from './queue/events';
 
@@ -10,6 +10,7 @@ export * from './services/implementations';
 export * from './usecases/unarchive-package/';
 export * from './usecases/confirm-manuscript-upload';
 export * from './usecases/create-manuscript-upload-url';
+export * from './usecases/extract-manuscript-metadata';
 export * from './usecases/validate-package';
 
 export * from './repo/contracts/manuscriptUploadInfoRepoContract';

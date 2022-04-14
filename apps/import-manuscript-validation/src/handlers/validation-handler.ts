@@ -1,7 +1,9 @@
 import {
+  ExtractManuscriptMetadataUseCase,
   UnarchivePackageUsecase,
   ValidatePackageUseCase,
   ValidatePackageEvent,
+  ManuscriptMapper,
 } from '@hindawi/import-manuscript-commons';
 
 import { EventHandler } from './event-handler';
@@ -55,6 +57,7 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
         throw res.value;
       }
 
+      logger.debug(`Package ${res.value.src} extracted`);
       const validateUsecase = new ValidatePackageUseCase(xmlService, logger);
 
       try {
@@ -62,6 +65,24 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
           definitionsPath: env.app.xmlDefinitionsLocation,
           packagePath: res.value.src,
         });
+      } catch (err) {
+        logger.error(err);
+        throw err;
+      }
+      logger.debug(`Package ${res.value.src} validated`);
+
+      const extractManuscriptMetadataUseCase =
+        new ExtractManuscriptMetadataUseCase(xmlService, logger);
+
+      try {
+        const manuscript = await extractManuscriptMetadataUseCase.execute({
+          definitionsPath: env.app.xmlDefinitionsLocation,
+          packagePath: res.value.src,
+        });
+
+        logger.debug(
+          JSON.stringify(ManuscriptMapper.toPersistance(manuscript), null, 2)
+        );
       } catch (err) {
         logger.error(err);
         throw err;

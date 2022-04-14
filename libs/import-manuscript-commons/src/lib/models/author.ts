@@ -8,6 +8,7 @@ import {
 
 export interface AuthorProps extends ValueObjectProps {
   affiliationRorId?: string;
+  affiliationRinggoldId: string;
   isCorresponding: boolean;
   affiliationName: string;
   isSubmitting: boolean;
@@ -20,6 +21,10 @@ export interface AuthorProps extends ValueObjectProps {
 export class Author extends ValueObject<AuthorProps> {
   get affiliationName(): string {
     return this.props.affiliationName;
+  }
+
+  get affiliationRinggoldId(): string {
+    return this.props.affiliationRinggoldId;
   }
 
   get affiliationRorId(): string | null {
@@ -47,7 +52,7 @@ export class Author extends ValueObject<AuthorProps> {
   }
 
   get email(): Email {
-    return this.props.Email;
+    return this.props.email;
   }
 
   private constructor(props: AuthorProps) {

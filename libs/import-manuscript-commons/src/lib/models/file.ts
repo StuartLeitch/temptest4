@@ -9,7 +9,7 @@ import { Path } from './path';
 
 export enum FileType {
   supplementary = 'supplementary',
-  coverLetter = 'coverLetter',
+  coverLetter = 'cover-letter',
   manuscript = 'manuscript',
 }
 
@@ -45,7 +45,6 @@ export class File extends ValueObject<FileProps> {
     const guardResult = Guard.againstNullOrUndefinedBulk([
       { argument: props.name, argumentName: 'name' },
       { argument: props.path, argumentName: 'path' },
-      { argument: props.size, argumentName: 'size' },
       { argument: props.type, argumentName: 'type' },
     ]);
 

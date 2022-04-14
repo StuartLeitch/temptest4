@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE article PUBLIC "-//NLM//DTD JATS (Z39.96) Journal Archiving and Interchange DTD v1.2 20190208//EN" "JATS/JATS-archivearticle1.dtd">
+<article dtd-version="1.2" article-type="Communication">
+  <front>
+    <journal-meta>
+      <journal-id journal-id-type="publisher">vchtriala</journal-id>
+      <journal-id journal-id-type="email">trash101@ariessys.com</journal-id>
+      <journal-title-group>
+        <journal-title>VCH Trial A Site</journal-title>
+      </journal-title-group>
+      <issn pub-type="ppub">0000-000Y</issn>
+      <issn pub-type="epub"></issn>
+    </journal-meta>
+    <article-meta>
+      <article-id pub-id-type="publisher-id">mabi235</article-id>
+      <article-id pub-id-type="manuscript">mabi235</article-id>
+      <article-id pub-id-type="global-manuscript-id">EM_VCHTrialA_695</article-id>
+      <article-id pub-id-type="internal-id">695</article-id>
+      <article-categories>
+        <subj-group subj-group-type="Article Type">
+          <subject>Communication</subject>
+        </subj-group>
+      </article-categories>
+      <title-group>
+        <article-title>Test Manuscript for MECA</article-title>
+      </title-group>
+      <contrib-group>
+        <contrib contrib-type="author" corresp="yes">
+          <role content-type="1" />
+          <name>
+            <surname>Nerger</surname>
+            <given-names>Elisabeth</given-names>
+            <prefix>Ms.</prefix>
+          </name>
+          <email>etreutlein@wiley.com</email>
+          <xref ref-type="aff" rid="aff1" />
+        </contrib>
+
+        <contrib contrib-type="author">
+          <role content-type="2" />
+          <name>
+            <surname>test</surname>
+            <given-names>test author</given-names>
+          </name>
+          <email>test@wiley.com</email>
+          <xref ref-type="aff" rid="aff2" />
+        </contrib>
+
+        <contrib contrib-type="editor">
+          <name>
+            <surname>Lenders</surname>
+            <given-names>Jos</given-names>
+          </name>
+          <email>jlenders@wiley.com</email>
+          <role>Super Editor</role>
+          <xref ref-type="aff" rid="aff3" />
+        </contrib>
+        <aff id="aff1">
+          <institution-wrap>
+            <institution>Wiley-VCH</institution>
+            <institution-id institution-id-type="Ringgold">801</institution-id>
+          </institution-wrap>
+          <institution content-type="position">Deputy Managing Editor</institution>
+          <addr-line content-type="addrline1">Boschstr. 12</addr-line>
+          <country>GERMANY</country>
+        </aff>
+        <aff id="aff2">
+          <institution-wrap>
+            <institution>University of Dundee</institution>
+            <institution-id institution-id-type="Ringgold">3042</institution-id>
+          </institution-wrap>
+          <addr-line content-type="addrline1">street</addr-line>
+          <country>AZERBAIJAN</country>
+        </aff>
+        <aff id="aff3">
+          <institution>Wiley-VCH</institution>
+          <institution content-type="position">Editor</institution>
+          <addr-line content-type="addrline1">Boschstrasse 12</addr-line>
+          <country>GERMANY</country>
+          <addr-line content-type="city">Weinheim</addr-line>
+          <addr-line content-type="zipcode">69469</addr-line>
+        </aff>
+      </contrib-group>
+      <history>
+        <date date-type="received">
+          <day>18</day>
+          <month>03</month>
+          <year>2021</year>
+        </date>
+        <date date-type="accepted">
+          <day>18</day>
+          <month>03</month>
+          <year>2021</year>
+        </date>
+      </history>
+      <abstract>
+        <p>This is the abstract of my manuscript. This is the abstract of my manuscript. This is the abstract of my manuscript. This is the abstract of my manuscript. This is the abstract of my manuscript. This is the abstract of my manuscript. This is the abstract of my manuscript. This is the abstract of my manuscript. This is the abstract of my manuscript. This is the abstract of my manuscript. This is the abstract of my manuscript. This is the abstract of my manuscript. This is the abstract of my manuscript. This is the abstract of my manuscript. This is the abstract of my manuscript.</p>
+      </abstract>
+      <kwd-group>
+        <kwd>keyword, keyword2</kwd>
+      </kwd-group>
+      <funding-group>
+        <award-group id="ID0EZKAC23">
+          <funding-source>
+            Max-Planck-Institut zur Erforschung Multireligiöser und Multiethnischer Gesellschaften
+            <named-content content-type="funder-id">http://dx.doi.org/10.13039/501100002344</named-content>
+          </funding-source>
+          <award-id>123456</award-id>
+          <principal-award-recipient>Elisabeth Nerger</principal-award-recipient>
+        </award-group>
+      </funding-group>
+      <counts>
+        <fig-count count="0" />
+      </counts>
+      <custom-meta-group>
+        <custom-meta id="DataAvailabilityStatement">
+          <meta-name>This journal's &lt;a href=https://authorservices.wiley.com/author-resources/Journal-Authors/open-access/data-sharing-citation/data-sharing-policy.html target="_blank"&gt;Expects Data Policy&lt;/a&gt; requires a Data Availability Statement (even if no data are shared), which will be published alongside your manuscript if it is accepted for publication.
+&lt;br&gt;
+&lt;br&gt;
+Do you choose to share the research data described in this manuscript?</meta-name>
+          <meta-value>No. Research data are not shared.;</meta-value>
+        </custom-meta>
+        <custom-meta id="ExpectsDAS">
+          <meta-name>This journal supports data sharing and has adopted an &lt;a href=https://authorservices.wiley.com/author-resources/Journal-Authors/open-access/data-sharing-citation/data-sharing-policy.html target="_blank"&gt;Expects Data Sharing&lt;/a&gt; policy:
+&lt;br&gt;
+&lt;br&gt;
+- You are encouraged to make your data available, for instance in a public repository.&lt;br&gt;
+- Your article must include a Data Availability Statement; please select a template from the options below or provide a custom Statement.&lt;br&gt;
+- When data is openly available, please provide the name and URL/DOI of the repository and cite the data in the references section of your manuscript.
+&lt;br&gt;
+&lt;br&gt;
+&lt;b&gt;Is your data available?&lt;/b&gt;</meta-name>
+          <meta-value>Author elects to not share data;</meta-value>
+        </custom-meta>
+        <custom-meta id="DAS10">
+          <meta-name>Please confirm the selected template for your Data Availability Statement below.
+&lt;br&gt;
+&lt;br&gt;
+&lt;b&gt;Please note that accordingly the Statement "Research data are not shared." will be published as part of your article if it is accepted for publication.&lt;/b&gt;</meta-name>
+          <meta-value>Research data are not shared.;</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>Does the research described in this manuscript include animal experiments or human subjects or tissue samples from human subjects?</meta-name>
+          <meta-value>No;</meta-value>
+        </custom-meta>
+        <custom-meta id="ConflictOfInterest1">
+          <meta-name>Do you or any of your co-authors have a conflict of interest to declare?</meta-name>
+          <meta-value>No. The authors declare no conflict of interest.;</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>Black and White Image Count</meta-name>
+          <meta-value>0</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>Color Image Count</meta-name>
+          <meta-value>0</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>Online Open</meta-name>
+          <meta-value>No response</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>OO Blended Deal</meta-name>
+          <meta-value>no</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>OnlineOpenSelection</meta-name>
+          <meta-value>No</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>LicenseType</meta-name>
+          <meta-value>Subscription</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>LicenseSub-type</meta-name>
+          <meta-value>CTA_Custom</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>ContributorSelection</meta-name>
+          <meta-value>NA</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>CopyrightLine</meta-name>
+          <meta-value>WILEY-VCH Verlag GmbH &amp; Co. KGaA, Weinheim</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>LicenseSystemOfRecord</meta-name>
+          <meta-value>EM</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>PaymentStatus</meta-name>
+          <meta-value>NA</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>DEAL eligibility check</meta-name>
+          <meta-value>Not checked</meta-value>
+        </custom-meta>
+      </custom-meta-group>
+    </article-meta>
+  </front>
+  <body />
+</article>

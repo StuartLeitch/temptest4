@@ -8,6 +8,7 @@ import {
 
 import { SourceJournal, Journal } from './journal';
 import { FileType, File } from './file';
+import { Founding } from './founding';
 import { Author } from './author';
 
 export interface ManuscriptProps extends ValueObjectProps {
@@ -21,9 +22,9 @@ export interface ManuscriptProps extends ValueObjectProps {
   title: string;
 
   conflictOfInterest?: string;
-  foundingStatement?: string;
   dataAvailability?: string;
   preprintValue?: string;
+  founding?: Founding;
 }
 
 export class Manuscript extends ValueObject<ManuscriptProps> {
@@ -83,8 +84,8 @@ export class Manuscript extends ValueObject<ManuscriptProps> {
     return this.props.conflictOfInterest || null;
   }
 
-  get foundingStatement(): string | null {
-    return this.props.foundingStatement || null;
+  get founding(): Founding | null {
+    return this.props.founding || null;
   }
 
   get dataAvailability(): string | null {
