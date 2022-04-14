@@ -9,6 +9,11 @@ import { CatalogItem } from '../domain/CatalogItem';
 import { CatalogPaginated } from '../domain/CatalogPaginated';
 import { JournalId } from '../domain/JournalId';
 
+export interface JournalPriceUpdate {
+  journalId?: JournalId;
+  amount?: number;
+}
+
 export interface CatalogRepoContract extends Repo<CatalogItem> {
   getCatalogItemByJournalId(
     journalId: JournalId
@@ -22,4 +27,7 @@ export interface CatalogRepoContract extends Repo<CatalogItem> {
   updateCatalogItem(
     catalogItem: CatalogItem
   ): Promise<Either<GuardFailure | RepoError, CatalogItem>>;
+  bulkUpdate(
+    args: Array<JournalPriceUpdate>
+  ): Promise<Either<GuardFailure | RepoError, void>>;
 }

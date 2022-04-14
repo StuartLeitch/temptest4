@@ -302,8 +302,6 @@ accessControl
   .action('read')
   .resource('manuscript')
   .action('read')
-  .resource('journals')
-  .action('read')
   .resource('transaction')
   .action('read')
   .resource('payments')
