@@ -120,7 +120,7 @@ export class Logger implements LoggerContract {
     this.log('error', message, args);
   }
 
-  private log(level: string, message: string, args: any[]): void {
+  protected log(level: string, message: string, args: any[]): void {
     const metadata: Record<string, any> = { scope: this.scope };
 
     let newArgs = [];

@@ -25,16 +25,19 @@ export const s3Upload: Resolvers<Context> = {
         roles: contextRoles,
       };
 
+      const email = context.keycloakAuth.accessToken['content']['email'];
+
       const { services, repos } = context;
       try {
-        const confirmManuscriptUploadUseCase = new ConfirmManuscriptUploadUseCase(
-          services.uploadService,
-          repos.manuscriptInfoRepo,
-          services.queueService,
-          services.logger
-        );
+        const confirmManuscriptUploadUseCase =
+          new ConfirmManuscriptUploadUseCase(
+            repos.manuscriptInfoRepo,
+            services.uploadService,
+            services.queueService,
+            services.logger
+          );
         const response = await confirmManuscriptUploadUseCase.execute(
-          { fileName },
+          { fileName, failsEmail: email, successEmail: email },
           useCaseContext
         );
 
@@ -64,11 +67,12 @@ export const s3Upload: Resolvers<Context> = {
       const { services, repos } = context;
 
       try {
-        const createManuscriptUploadUrlUseCase = new CreateManuscriptUploadUrlUseCase(
-          services.uploadService,
-          repos.manuscriptInfoRepo,
-          services.logger
-        );
+        const createManuscriptUploadUrlUseCase =
+          new CreateManuscriptUploadUrlUseCase(
+            services.uploadService,
+            repos.manuscriptInfoRepo,
+            services.logger
+          );
         const response = await createManuscriptUploadUrlUseCase.execute(
           { fileName },
           useCaseContext

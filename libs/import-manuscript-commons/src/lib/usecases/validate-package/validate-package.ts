@@ -1,12 +1,17 @@
-import { readdir } from 'fs/promises';
 import { join } from 'path';
 import VError from 'verror';
 
 import { LoggerContract, UseCase } from '@hindawi/shared';
 
-import { ManifestProps, Manifest, Path, PackageItem } from '../../models';
 import { XmlServiceContract } from '../../services';
 import { FileUtils } from '../../utils';
+import {
+  ManifestProps,
+  PackageItem,
+  FileType,
+  Manifest,
+  Path,
+} from '../../models';
 
 import type { ValidatePackage as Response } from './validate-package-response';
 import type { ValidatePackageDTO as DTO } from './validate-package-dto';
@@ -39,7 +44,6 @@ export class ValidatePackageUseCase
     const manifest = Manifest.create(rawManifest.manifest);
 
     validateItemTypeCount(manifest);
-    await validateFilesInPackage(packagePath, manifest);
     await validateItemAreAccessible(packagePath, manifest);
 
     this.logger.info(
@@ -66,7 +70,7 @@ async function getInaccessibleFiles(
   return files.filter((f) => !f.isAccessible);
 }
 
-function getItemCount(manifest: Manifest, desiredType: string): number {
+function getItemCount(manifest: Manifest, desiredType: FileType): number {
   const matchingItems = manifest.items.filter(
     (item) => item.type === desiredType
   );
@@ -74,11 +78,19 @@ function getItemCount(manifest: Manifest, desiredType: string): number {
   return matchingItems.length;
 }
 
-function exactlyOne(manifest: Manifest, itemType: string): void {
+function noMoreThanOne(manifest: Manifest, itemType: FileType): void {
   const errMultipleItems = (itemType: string): Error => {
     return new VError('The manifest contains multiple %s items', itemType);
   };
 
+  const count = getItemCount(manifest, itemType);
+
+  if (count > 1) {
+    throw errMultipleItems(itemType);
+  }
+}
+
+function exactlyOne(manifest: Manifest, itemType: FileType): void {
   const errNoItem = (itemType: string): Error => {
     return new VError('The manifest does not contain any %s item', itemType);
   };
@@ -89,32 +101,16 @@ function exactlyOne(manifest: Manifest, itemType: string): void {
     throw errNoItem(itemType);
   }
 
-  if (count > 1) {
-    throw errMultipleItems(itemType);
-  }
+  noMoreThanOne(manifest, itemType);
 }
 
 function validateItemTypeCount(manifest: Manifest): void {
-  exactlyOne(manifest, 'manuscript');
-  exactlyOne(manifest, 'manifest-metadata');
-  exactlyOne(manifest, 'article-metadata');
-  exactlyOne(manifest, 'transfer-metadata');
-}
-
-async function validateFilesInPackage(
-  packagePath: Path,
-  manifest: Manifest
-): Promise<void> {
-  const files = await readdir(packagePath.src);
-
-  if (files.length !== manifest.items.length) {
-    throw new VError(
-      `The number of items in manifest.xml does not match the number of files present in package:
-      manifest.xml contains %d items, whereas there are %d files in package`,
-      manifest.items.length,
-      files.length
-    );
-  }
+  exactlyOne(manifest, FileType.manuscript);
+  exactlyOne(manifest, FileType.manifestMetadata);
+  exactlyOne(manifest, FileType.articleMetadata);
+  exactlyOne(manifest, FileType.transferMetadata);
+  noMoreThanOne(manifest, FileType.coverLetter);
+  noMoreThanOne(manifest, FileType.conflictOfInterestStatement);
 }
 
 async function validateItemAreAccessible(

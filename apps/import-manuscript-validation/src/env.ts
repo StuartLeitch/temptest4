@@ -43,6 +43,10 @@ export const env = {
       endpoint: getOsEnvOptional('IMPORT_MANUSCRIPT_AWS_S3_ENDPOINT'),
       zipBucket: getOsEnv('IMPORT_MANUSCRIPT_AWS_S3_ZIP_BUCKET'),
     },
+    ses: {
+      accessKey: getOsEnvOptional('IMPORT_MANUSCRIPT_AWS_SES_ACCESS_KEY'),
+      secretKey: getOsEnv('IMPORT_MANUSCRIPT_AWS_SES_SECRET_KEY'),
+    },
   },
   zip: {
     saveLocation: getOsEnv('IMPORT_MANUSCRIPT_ZIP_SAVE_LOCATION'),

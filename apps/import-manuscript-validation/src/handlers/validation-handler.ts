@@ -11,6 +11,8 @@ import { Context } from '../builders';
 
 import { env } from '../env';
 
+import { Logger } from '../libs/logger';
+
 const VALIDATE_PACKAGE = 'ValidatePackage';
 
 export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
@@ -41,7 +43,9 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
         services: { objectStoreService, archiveService, xmlService },
         loggerBuilder,
       } = context;
-      const logger = loggerBuilder.getLogger();
+      // const logger = loggerBuilder.getLogger();
+
+      const logger = new Logger('validation-handler');
 
       const usecase = new UnarchivePackageUsecase(
         objectStoreService,
@@ -59,31 +63,43 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
 
       logger.debug(`Package ${res.value.src} extracted`);
       const validateUsecase = new ValidatePackageUseCase(xmlService, logger);
+      const extractManuscriptMetadataUseCase =
+        new ExtractManuscriptMetadataUseCase(xmlService, logger);
 
       try {
         await validateUsecase.execute({
           definitionsPath: env.app.xmlDefinitionsLocation,
           packagePath: res.value.src,
         });
-      } catch (err) {
-        logger.error(err);
-        throw err;
-      }
-      logger.debug(`Package ${res.value.src} validated`);
 
-      const extractManuscriptMetadataUseCase =
-        new ExtractManuscriptMetadataUseCase(xmlService, logger);
+        logger.debug(`Package ${res.value.src} validated`);
 
-      try {
         const manuscript = await extractManuscriptMetadataUseCase.execute({
           definitionsPath: env.app.xmlDefinitionsLocation,
           packagePath: res.value.src,
         });
 
-        logger.debug(
+        logger.info(
           JSON.stringify(ManuscriptMapper.toPersistance(manuscript), null, 2)
         );
+
+        context.services.emailService.sendEmail(
+          [data.successContactEmail],
+          'import-manuscript@hindawi.com',
+          'Important Message',
+          logger.messages
+        );
       } catch (err) {
+        context.services.emailService.sendEmail(
+          [data.failContactEmail],
+          'import-manuscript@hindawi.com',
+          'Important Message',
+          `ERROR processing package:
+            ${err.message}
+            ${err.stack}
+          `
+        );
+
         logger.error(err);
         throw err;
       }

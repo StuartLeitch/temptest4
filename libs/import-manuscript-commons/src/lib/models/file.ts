@@ -8,6 +8,13 @@ import {
 import { Path } from './path';
 
 export enum FileType {
+  conflictOfInterestStatement = 'conflict-of-interest-statement',
+  supportingInformation = 'supporting-information',
+  reportsAndResponses = 'reports-and-responses',
+  manifestMetadata = 'manifest-metadata',
+  transferMetadata = 'transfer-metadata',
+  articleMetadata = 'article-metadata',
+  reviewMetadata = 'review-metadata',
   supplementary = 'supplementary',
   coverLetter = 'cover-letter',
   manuscript = 'manuscript',
