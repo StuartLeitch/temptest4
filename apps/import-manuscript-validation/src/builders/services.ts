@@ -3,8 +3,10 @@ import { LoggerBuilder } from '@hindawi/shared';
 
 import {
   ObjectStoreServiceContract,
+  SubmissionServiceContract,
   ArchiveServiceContract,
   XmlServiceContract,
+  SubmissionService,
   ArchiveService,
   XmlService,
   S3Service,
@@ -16,6 +18,7 @@ import { env } from '../env';
 
 export interface Services {
   objectStoreService: ObjectStoreServiceContract;
+  submissionService: SubmissionServiceContract;
   archiveService: ArchiveServiceContract;
   xmlService: XmlServiceContract;
   jobQueue: QueueEventConsumer;
@@ -43,6 +46,10 @@ export function buildServices(loggerBuilder: LoggerBuilder): Services {
       env.aws.ses.accessKey,
       env.aws.ses.secretKey,
       env.aws.region
+    ),
+    submissionService: new SubmissionService(
+      env.app.submissionGraphqlEndpoint,
+      env.app.submissionAuthToken
     ),
   };
 

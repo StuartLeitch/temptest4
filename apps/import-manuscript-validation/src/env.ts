@@ -19,6 +19,8 @@ export const env = {
     description: pkg.description,
     banner: toBool(getOsEnv('APP_BANNER')),
     xmlDefinitionsLocation: getOsEnv('IMPORT_MANUSCRIPT_XML_DEFINITION_PATH'),
+    submissionGraphqlEndpoint: getOsEnv('IMPORT_MANUSCRIPT_SUBMISSION_GRAPHQL'),
+    submissionAuthToken: getOsEnv('IMPORT_MANUSCRIPT_SUBMISSION_AUTH_TOKEN'),
   },
   log: {
     level: getOsEnv('LOG_LEVEL'),
