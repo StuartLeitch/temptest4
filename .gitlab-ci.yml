@@ -386,8 +386,8 @@ Trigger Acceptance Tests:
   trigger:
     project: hindawi/phenom-automation
     branch: main
-  only:
-    - merge_requests
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 Deploy:dev:
   tags:
@@ -429,6 +429,8 @@ Deploy:automation:
   interruptible: true
   when: on_success
   allow_failure: true
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   variables:
     TENANT: hindawi
     NODE_ENV: automation
