@@ -1,4 +1,5 @@
 import { Transform } from 'stream';
+import Knex from 'knex';
 
 import { Either, flatten, right, left } from '../../../../core/logic/Either';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
@@ -22,13 +23,13 @@ import { ErpReferenceRepoContract } from './../../../vendors/repos';
 import { InvoiceItemRepoContract } from '../invoiceItemRepo';
 import { InvoiceRepoContract } from '../invoiceRepo';
 
+import { calculateFiscalYearDateRange } from './fiscal-year-utils';
 import { applyFilters } from './utils';
-import Knex from "knex";
-
 
 export class KnexInvoiceRepo
   extends AbstractBaseDBRepo<Knex, Invoice>
-  implements InvoiceRepoContract {
+  implements InvoiceRepoContract
+{
   constructor(
     protected db: Knex,
     protected logger?: any,
@@ -243,41 +244,27 @@ export class KnexInvoiceRepo
     const { db, logger } = this;
 
     const today = new Date();
-    const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth();
+    const timeRange = calculateFiscalYearDateRange(today);
 
-    // * Hindawi fiscal year starts at 1st of January
-    let timeRange = [`${currentYear}-01-01`, `${currentYear + 1}-01-01`];
-
-    // * Wiley fiscal year starts at 1st of May
-    if (currentMonth < 5) {
-      timeRange = [`${currentYear - 1}-05-01`, `${currentYear}-04-30`];
-    } else {
-      timeRange = [`${currentYear}-05-01`, `${currentYear + 1}-04-30`];
-    }
-
-    const getLastInvoiceNumber = await db.raw(
-      `SELECT
-        COALESCE((
-          SELECT
-            max("invoiceNumber") AS max FROM (
-              SELECT
-                max("invoiceNumber") AS "invoiceNumber" FROM invoices
-              WHERE
-                "dateIssued" BETWEEN ?
-                AND ?
-              UNION
-              SELECT
-                "invoiceReferenceNumber" AS "invoiceNumber" FROM configurations) referenceNumbers), 1)
-      `,
-      timeRange
-    );
+    const getLastInvoiceNumber = await db(TABLES.INVOICES)
+      .max('invoiceNumber')
+      .whereBetween('dateIssued', timeRange)
+      .union(function () {
+        this.select('invoiceReferenceNumber AS invoiceNumber').from(
+          'configurations'
+        );
+      })
+      .union(function () {
+        this.select(0);
+      })
+      .orderByRaw('max DESC NULLS LAST')
+      .first();
 
     logger.debug('lastInvoiceNumber', {
       value: getLastInvoiceNumber,
     });
 
-    return getLastInvoiceNumber.rows[0].coalesce;
+    return getLastInvoiceNumber.max;
   }
 
   async getInvoicePaymentInfo(
@@ -408,7 +395,8 @@ export class KnexInvoiceRepo
     );
 
     // * SQL for retrieving results needed only for Sage registration
-    const filterInvoicesReadyForRevenueRecognition = this.filterReadyForRevenueRecognition();
+    const filterInvoicesReadyForRevenueRecognition =
+      this.filterReadyForRevenueRecognition();
 
     const prepareIdsSQL = filterArticlesByNotNullDatePublished(
       filterInvoicesReadyForRevenueRecognition(
@@ -476,7 +464,8 @@ export class KnexInvoiceRepo
     );
 
     // * SQL for retrieving results needed only for registration
-    const filterInvoicesReadyForRevenueRecognition = this.filterReadyForRegistration();
+    const filterInvoicesReadyForRevenueRecognition =
+      this.filterReadyForRegistration();
 
     const prepareIdsSQL = filterInvoicesReadyForRevenueRecognition(
       withErpReference(withInvoiceItems(erpReferencesQuery))
@@ -686,16 +675,18 @@ export class KnexInvoiceRepo
 
     const withCreditNoteDetails = this.withCreditNoteDetailsQuery();
 
-    const withRevenueRecognitionReversalErpReference = this.withErpReferenceQuery(
-      'revenuerecognitionreversalref',
-      'invoices.id',
-      'invoice',
-      'netsuite',
-      'revenueRecognitionReversal'
-    );
+    const withRevenueRecognitionReversalErpReference =
+      this.withErpReferenceQuery(
+        'revenuerecognitionreversalref',
+        'invoices.id',
+        'invoice',
+        'netsuite',
+        'revenueRecognitionReversal'
+      );
 
     // * SQL for retrieving results needed only for ERP registration
-    const filterRevenueRecognitionReadyForERP = this.filterRevenueRecognitionReadyForErpRegistration();
+    const filterRevenueRecognitionReadyForERP =
+      this.filterRevenueRecognitionReadyForErpRegistration();
 
     const withCreditNoteErpReference = this.withErpReferenceQuery(
       'creditnoteref',
@@ -705,7 +696,8 @@ export class KnexInvoiceRepo
       'creditNote'
     );
     // * SQL for retrieving already registerd credit notes
-    const filterRegisteredCreditNotesForERP = this.filterRegisteredCreditNotesForErpRegistration();
+    const filterRegisteredCreditNotesForERP =
+      this.filterRegisteredCreditNotesForErpRegistration();
 
     const withRevenueRecognitionErpReference = this.withErpReferenceQuery(
       'revenuerecognitionref',
@@ -715,7 +707,8 @@ export class KnexInvoiceRepo
       'revenueRecognition'
     );
     // * SQL for retrieving already registerd credit notes
-    const filterRegisteredRevenueRecognitionForERP = this.filterRegisteredRevenueRecognitionForErpRegistration();
+    const filterRegisteredRevenueRecognitionForERP =
+      this.filterRegisteredRevenueRecognitionForErpRegistration();
 
     const prepareIdsSQL = filterRegisteredRevenueRecognitionForERP(
       withRevenueRecognitionErpReference(
