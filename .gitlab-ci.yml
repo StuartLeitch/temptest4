@@ -429,6 +429,8 @@ Deploy:automation:
   interruptible: true
   when: on_success
   allow_failure: true
+  only:
+    - merge_requests
   variables:
     TENANT: hindawi
     NODE_ENV: automation
