@@ -5,6 +5,9 @@ stages:
   - reports
   - package
   - deploy
+  - deploy-invoicing
+  - deploy-import
+  - deploy-reporting
   - acceptance
   - deploy-prod
 
@@ -55,15 +58,13 @@ retire-js-dependency_scanning:
     when: always
 
 
-
-
 variables:
   # https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#docker-in-docker-with-tls-disabled
   DOCKER_HOST: tcp://docker:2375
   DOCKER_TLS_CERTDIR: ''
   NODE_VERSION: 14.4.0
   BUILD_IMAGE: $AWS_DEV_REGISTRY/belzebuth-runner:$CI_COMMIT_SHA
-  PACKAGE_IMAGE: $AWS_DEV_REGISTRY/belzebuth-package-base:$CI_COMMIT_SHA
+  PACKAGE_IMAGE: $AWS_DEV_REGISTRY/belzebuth-package:$CI_COMMIT_SHA
   AWS_REGION: 'eu-west-1'
   BT_ENVIRONMENT: 'sandbox'
   BT_MERCHANT_ID: 'test-merchant-id'
@@ -72,7 +73,6 @@ variables:
   VAT_VALIDATION_SERVICE_ENDPOINT: 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
   AFFECTED_COMMAND: ''
   AFFECTED_ARGS: '--base=remotes/origin/develop'
-  AFFECTED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend'
 
 Prepare Docker Runner:
   tags:
@@ -83,25 +83,22 @@ Prepare Docker Runner:
     GIT_SUBMODULE_STRATEGY: recursive
     GIT_DEPTH: 20
   allow_failure: false
-#  rules:
-#    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-#      changes:
-#        - Dockerfile.build
   stage: setup
-
   before_script:
     - apk add --no-cache py3-pip
     - pip3 install --no-cache-dir awscli
   services:
-    - name: docker:20.10.10-dind
+    - name: docker:20.10.14-dind
       command: ['--tls=false']
-  image: docker:20.10.10
+  image: docker:20.10.14
   script:
     - env
     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
     - cd $CI_PROJECT_DIR
-    - DOCKER_BUILDKIT=1 docker build -t $BUILD_IMAGE -f Dockerfile.build .
+    - DOCKER_BUILDKIT=1 docker build -t $BUILD_IMAGE  -f Dockerfile.build .
     - docker push $BUILD_IMAGE
+    - DOCKER_BUILDKIT=1 docker build -t $PACKAGE_IMAGE  -f Dockerfile.package .
+    - docker push $PACKAGE_IMAGE
 
 Build:
   image: $BUILD_IMAGE
@@ -117,6 +114,7 @@ Build:
     - job: 'Prepare Docker Runner'
       optional: true
   cache:
+#    why does this sometimes gets sufixed with _non_protected?
     key: node-modules-cache
     paths:
       - ./node_modules
@@ -177,82 +175,21 @@ Build:
       - reports
     expire_in: 30 days
 
-#pages:
-#  image: $BUILD_IMAGE
-#  tags:
-#    - 'cluster:hindawi-dev'
-#  interruptible: true
-#  stage: test
-#  needs: [Test]
-#  allow_failure: true
-#  cache:
-#    key: node-modules-cache
-#    paths:
-#      - ./node_modules
-#    policy: pull
-#    when: always
-#  script:
-#    - echo $CI_COMMIT_REF_SLUG
-#    - mkdir -p $CI_PROJECT_DIR/public/$CI_COMMIT_REF_SLUG
-#    - cd $CI_PROJECT_DIR
-#    - pwd
-#    - yarn install
-#    - yarn run ci:coverage
-#    - cp -r -a $CI_PROJECT_DIR/reports/* $CI_PROJECT_DIR/public/$CI_COMMIT_REF_SLUG
-#  coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
-#  artifacts:
-#    paths:
-#      - public
-#      - reports
-#    expire_in: 7 days
-
-
-#Build:
-#  image: $BUILD_IMAGE
-#  variables:
-#    KUBERNETES_MEMORY_REQUEST: 3Gi
-#    FF_USE_FASTZIP: "true" # enable fastzip - a faster zip implementation that also supports level configuration.
-#    ARTIFACT_COMPRESSION_LEVEL: "fastest" # can also be set to fastest, fast, slow and slowest. If just enabling fastzip is not enough try setting this to fastest or fast.
-#    CACHE_COMPRESSION_LEVEL: "fastest" # same as above, but for caches
-#    TRANSFER_METER_FREQUENCY: "5s" # will display transfer progress every 5 seconds for artifacts and remote caches.
-#  tags:
-#    - 'cluster:hindawi-dev'
-#  interruptible: true
-#  dependencies:
-#    - 'Test'
-#  needs: [Test]
-#  cache:
-#    key: node-modules-cache
-#    paths:
-#      - ./node_modules
-#    policy: pull
-#    when: always
-#  stage: test
-#  script:
-#    - cd $CI_PROJECT_DIR
-#    - git fetch
-#    - |
-#      if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
-#        AFFECTED_COMMAND="yarn run nx run-many --target=build --projects=$AFFECTED_APPS --configuration=production --parallel --maxParallel=2"
-#      else
-#       AFFECTED_COMMAND="yarn run affected:build $AFFECTED_ARGS --parallel --configuration=production --maxParallel=2"
-#      fi
-#    - eval $AFFECTED_COMMAND
-#    # artifacts can't be uploaded outside $CI_PROJECT_DIR
-#    - mkdir -p $CI_PROJECT_DIR/.ci_status
-#    - |
-#      if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
-#        AFFECTED_COMMAND="echo "${AFFECTED_APPS//,/ }" > $CI_PROJECT_DIR/.ci_status/affected_apps"
-#      else
-#       AFFECTED_COMMAND="yarn run affected:apps $AFFECTED_ARGS --plain 2>&1 | sed -e "s/sisif-test//" | sed -e "s/reporting-pull-historic-events//" | tail -2 | head -n 1 > $CI_PROJECT_DIR/.ci_status/affected_apps"
-#      fi
-#    - eval $AFFECTED_COMMAND
-#  #    - mkdir -p dist
-#  #    - cp -r dist $CI_PROJECT_DIR
-#  artifacts:
-#    paths:
-#      - .ci_status
-#      - dist
+pages:
+  image: $BUILD_IMAGE
+  tags:
+    - 'cluster:hindawi-dev'
+  interruptible: true
+  stage: deploy
+  needs: [Build]
+  allow_failure: true
+  artifacts:
+    paths:
+      - public
+      - reports
+    expire_in: 7 days
+  script:
+    - echo $CI_COMMIT_REF_SLUG
 
 
 Build Production Dependencies:
@@ -291,7 +228,7 @@ Build Production Dependencies:
   image: $BUILD_IMAGE
   needs:
     - Build
-  stage: test
+  stage: build
   cache:
     key: node-modules-cache
     paths:
@@ -323,7 +260,7 @@ Validate Schema:qa:
 
 
 Package Images:dev:
-  image: docker:20.10.10
+  image: $PACKAGE_IMAGE
   tags:
     - 'cluster:hindawi-dev'
   interruptible: true
@@ -336,6 +273,7 @@ Package Images:dev:
     policy: pull
     when: always
   variables:
+    KUBERNETES_MEMORY_REQUEST: 3Gi
     FF_USE_FASTZIP: 1 # enable fastzip - a faster zip implementation that also supports level configuration.
     ARTIFACT_COMPRESSION_LEVEL: "default" # can also be set to fastest, fast, slow and slowest. If just enabling fastzip is not enough try setting this to fastest or fast.
     CACHE_COMPRESSION_LEVEL: "default" # same as above, but for caches
@@ -347,7 +285,7 @@ Package Images:dev:
     - apk add --no-cache py3-pip
     - pip3 install --no-cache-dir awscli
   services:
-    - name: docker:20.10.10-dind
+    - name: docker:20.10.14-dind
       command: ['--tls=false']
   script:
     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
@@ -359,6 +297,14 @@ Package Images:dev:
     paths:
       - .ci_status
       - dist
+
+Trigger Acceptance Tests:
+  stage: acceptance
+  variables:
+    TRIGGERED_BY: invoicing
+  trigger:
+    project: hindawi/phenom-automation
+    branch: main
 
 .deploy_base: &script_deploy
   when: manual
@@ -377,27 +323,18 @@ Package Images:dev:
     - chmod +x ./kubectl
     - mv ./kubectl /usr/local/bin
   script:
-    - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
     - cd $CI_PROJECT_DIR
     - ls -al
-    - yarn install
+    - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
     - ./tools/scripts/deploy-ci.sh
   artifacts:
     paths:
       - dist-k8s
 
-Trigger Acceptance Tests:
-  stage: acceptance
-  variables:
-    TRIGGERED_BY: invoicing
-  trigger:
-    project: hindawi/phenom-automation
-    branch: main
-
-Deploy:dev:
+Deploy:dev-invoicing:
+  stage: deploy-invoicing
   tags:
     - 'cluster:hindawi-dev'
-  stage: deploy
   dependencies:
     - Package Images:dev
   <<: *script_deploy
@@ -408,11 +345,44 @@ Deploy:dev:
     CLUSTER: hindawi-dev
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
+    REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
 
-Deploy:qa:
+Deploy:dev-import:
+  stage: deploy-import
   tags:
     - 'cluster:hindawi-dev'
-  stage: deploy
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: hindawi
+    NODE_ENV: dev
+    NAMESPACE: dev
+    CLUSTER: hindawi-dev
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+
+Deploy:dev-reporting:
+  stage: deploy-reporting
+  tags:
+    - 'cluster:hindawi-dev'
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: hindawi
+    NODE_ENV: dev
+    NAMESPACE: dev
+    CLUSTER: hindawi-dev
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+    REQUIRED_APPS: 'reporting-backend'
+
+Deploy:qa-invoicing:
+  stage: deploy-invoicing
+  tags:
+    - 'cluster:hindawi-dev'
   dependencies:
     - Package Images:dev
   <<: *script_deploy
@@ -423,11 +393,44 @@ Deploy:qa:
     CLUSTER: hindawi-dev
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
+    REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
 
-Deploy:automation:
+Deploy:qa-import:
+  stage: deploy-import
   tags:
     - 'cluster:hindawi-dev'
-  stage: deploy
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: hindawi
+    NODE_ENV: qa
+    NAMESPACE: qa
+    CLUSTER: hindawi-dev
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+
+Deploy:qa-reporting:
+  stage: deploy-reporting
+  tags:
+    - 'cluster:hindawi-dev'
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: hindawi
+    NODE_ENV: qa
+    NAMESPACE: qa
+    CLUSTER: hindawi-dev
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+    REQUIRED_APPS: 'reporting-backend'
+
+Deploy:automation-invoicing:
+  stage: deploy-invoicing
+  tags:
+    - 'cluster:hindawi-dev'
   dependencies:
     - Package Images:dev
   <<: *script_deploy
@@ -441,11 +444,50 @@ Deploy:automation:
     CLUSTER: hindawi-dev
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
+    REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
 
-Deploy:hindawi-demo:
+Deploy:automation-import:
+  stage: deploy-import
   tags:
     - 'cluster:hindawi-dev'
-  stage: deploy
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  interruptible: true
+  when: on_success
+  allow_failure: true
+  variables:
+    TENANT: hindawi
+    NODE_ENV: automation
+    NAMESPACE: automation
+    CLUSTER: hindawi-dev
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+
+Deploy:automation-reporting:
+  stage: deploy-reporting
+  tags:
+    - 'cluster:hindawi-dev'
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  interruptible: true
+  when: on_success
+  allow_failure: true
+  variables:
+    TENANT: hindawi
+    NODE_ENV: automation
+    NAMESPACE: automation
+    CLUSTER: hindawi-dev
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+    REQUIRED_APPS: 'reporting-backend'
+
+Deploy:hindawi-demo-invoicing:
+  stage: deploy-invoicing
+  tags:
+    - 'cluster:hindawi-dev'
   dependencies:
     - Package Images:dev
   <<: *script_deploy
@@ -456,11 +498,45 @@ Deploy:hindawi-demo:
     CLUSTER: hindawi-dev
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
+    REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
 
-Deploy:hindawi-demo-sales:
+Deploy:hindawi-demo-import:
+  stage: deploy-import
   tags:
     - 'cluster:hindawi-dev'
-  stage: deploy
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: hindawi
+    NODE_ENV: demo
+    NAMESPACE: demo
+    CLUSTER: hindawi-dev
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+
+Deploy:hindawi-demo-reporting:
+  stage: deploy-reporting
+  tags:
+    - 'cluster:hindawi-dev'
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: hindawi
+    NODE_ENV: demo
+    NAMESPACE: demo
+    CLUSTER: hindawi-dev
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+    REQUIRED_APPS: 'reporting-backend'
+
+
+Deploy:hindawi-demo-sales-invoicing:
+  stage: deploy-invoicing
+  tags:
+    - 'cluster:hindawi-dev'
   dependencies:
     - Package Images:dev
   <<: *script_deploy
@@ -471,11 +547,44 @@ Deploy:hindawi-demo-sales:
     CLUSTER: hindawi-dev
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
+    REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
 
-Deploy:gsw-demo:
+Deploy:hindawi-demo-sales-import:
+  stage: deploy-import
   tags:
     - 'cluster:hindawi-dev'
-  stage: deploy
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: hindawi
+    NODE_ENV: demo-sales
+    NAMESPACE: demo-sales
+    CLUSTER: hindawi-dev
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+
+Deploy:hindawi-demo-sales-reporting:
+  stage: deploy-reporting
+  tags:
+    - 'cluster:hindawi-dev'
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: hindawi
+    NODE_ENV: demo-sales
+    NAMESPACE: demo-sales
+    CLUSTER: hindawi-dev
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+    REQUIRED_APPS: 'reporting-backend'
+
+Deploy:gsw-demo-invoicing:
+  stage: deploy-invoicing
+  tags:
+    - 'cluster:hindawi-dev'
   dependencies:
     - Package Images:dev
   <<: *script_deploy
@@ -486,11 +595,46 @@ Deploy:gsw-demo:
     CLUSTER: hindawi-dev
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
+    REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
 
-Deploy:gsw-prod:
+Deploy:gsw-demo-import:
+  stage: deploy-import
+  tags:
+    - 'cluster:hindawi-dev'
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: gsw
+    NODE_ENV: demo
+    NAMESPACE: demo-gsw
+    CLUSTER: hindawi-dev
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+
+Deploy:gsw-demo-reporting:
+  stage: deploy-reporting
+  tags:
+    - 'cluster:hindawi-dev'
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: gsw
+    NODE_ENV: demo
+    NAMESPACE: demo-gsw
+    CLUSTER: hindawi-dev
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+    REQUIRED_APPS: 'reporting-backend'
+
+Deploy:gsw-prod-invoicing:
+  stage: deploy-invoicing
+  only:
+    - develop
   tags:
     - 'cluster:hindawi-prod'
-  stage: deploy-prod
   dependencies:
     - Package Images:dev
   <<: *script_deploy
@@ -501,11 +645,48 @@ Deploy:gsw-prod:
     CLUSTER: hindawi-prod
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
+    REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
 
-Deploy:preproduction:
+Deploy:gsw-prod-import:
+  stage: deploy-import
+  only:
+    - develop
   tags:
     - 'cluster:hindawi-prod'
-  stage: deploy
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: gsw
+    NODE_ENV: prod
+    NAMESPACE: gsw-prod
+    CLUSTER: hindawi-prod
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+
+Deploy:gsw-prod-reporting:
+  stage: deploy-reporting
+  only:
+    - develop
+  tags:
+    - 'cluster:hindawi-prod'
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: gsw
+    NODE_ENV: prod
+    NAMESPACE: gsw-prod
+    CLUSTER: hindawi-prod
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+    REQUIRED_APPS: 'reporting-backend'
+
+Deploy:preproduction-invoicing:
+  stage: deploy-invoicing
+  tags:
+    - 'cluster:hindawi-prod'
   dependencies:
     - Package Images:dev
   <<: *script_deploy
@@ -516,11 +697,46 @@ Deploy:preproduction:
     CLUSTER: hindawi-prod
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
+    REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
 
-Deploy:hindawi-prod:
+Deploy:preproduction-import:
+  stage: deploy-import
   tags:
     - 'cluster:hindawi-prod'
-  stage: deploy-prod
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: hindawi
+    NODE_ENV: preproduction
+    NAMESPACE: preproduction
+    CLUSTER: hindawi-prod
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+
+Deploy:preproduction-reporting:
+  stage: deploy-reporting
+  tags:
+    - 'cluster:hindawi-prod'
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: hindawi
+    NODE_ENV: preproduction
+    NAMESPACE: preproduction
+    CLUSTER: hindawi-prod
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+    REQUIRED_APPS: 'reporting-backend'
+
+Deploy:hindawi-invoicing:
+  stage: deploy-invoicing
+  only:
+    - develop
+  tags:
+    - 'cluster:hindawi-prod'
   dependencies:
     - Package Images:dev
   <<: *script_deploy
@@ -531,4 +747,40 @@ Deploy:hindawi-prod:
     CLUSTER: hindawi-prod
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
+    REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
 
+Deploy:hindawi-import:
+  stage: deploy-import
+  only:
+    - develop
+  tags:
+    - 'cluster:hindawi-prod'
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: hindawi
+    NODE_ENV: prod
+    NAMESPACE: prod-hindawi
+    CLUSTER: hindawi-prod
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+
+Deploy:hindawi-reporting:
+  stage: deploy-reporting
+  only:
+    - develop
+  tags:
+    - 'cluster:hindawi-prod'
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  variables:
+    TENANT: hindawi
+    NODE_ENV: prod
+    NAMESPACE: prod-hindawi
+    CLUSTER: hindawi-prod
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+    REQUIRED_APPS: 'reporting-backend'

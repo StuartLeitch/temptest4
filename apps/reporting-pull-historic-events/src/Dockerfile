@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 FROM node:16-alpine as build
 
 RUN apk add --no-cache \
@@ -15,16 +16,15 @@ RUN curl -Ls "https://github.com/dustinblackman/phantomized/releases/download/${
 ENV HOME "/home/app"
 
 WORKDIR ${HOME}
-COPY package.json yarn.lock ./
-ADD node_modules_production ./node_modules
+COPY --link package.json yarn.lock ./
+COPY --link node_modules_production ./node_modules
 
 FROM node:16-alpine
 
-COPY --from=build /home/app/node_modules ./node_modules
-COPY package.json .
 # Copying the rest of the code to the working directory
-COPY config/ ./config/
-COPY dist/apps/reporting-pull-historic-events .
+COPY --link config/ ./config/
+COPY --link dist/apps/reporting-pull-historic-events .
+COPY --link --from=build /home/app/node_modules ./node_modules
 
 # Make port 3000 available to the world outside this container
 EXPOSE 3000

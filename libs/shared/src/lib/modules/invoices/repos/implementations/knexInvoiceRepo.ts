@@ -421,14 +421,14 @@ export class KnexInvoiceRepo
 
   public async getUnrecognizedSageErpInvoices(): Promise<
     Either<GuardFailure | RepoError, InvoiceId[]>
-  > {
+    > {
     const maybeIds = await this.getUnrecognizedInvoices('sage');
     return right(maybeIds);
   }
 
   public async getUnrecognizedNetsuiteErpInvoices(): Promise<
     Either<GuardFailure | RepoError, InvoiceId[]>
-  > {
+    > {
     const maybeIds = await this.getUnrecognizedInvoices('netsuite');
     return right(maybeIds);
   }
@@ -484,14 +484,14 @@ export class KnexInvoiceRepo
 
   public async getFailedNetsuiteErpInvoices(): Promise<
     Either<GuardFailure | RepoError, InvoiceId[]>
-  > {
+    > {
     const maybeIds = await this.getUnregisteredInvoices('netsuite');
     return right(maybeIds);
   }
 
   public async getFailedSageErpInvoices(): Promise<
     Either<GuardFailure | RepoError, InvoiceId[]>
-  > {
+    > {
     const maybeIds = await this.getUnregisteredInvoices('sage');
     return right(maybeIds);
   }
@@ -666,7 +666,7 @@ export class KnexInvoiceRepo
 
   public async getUnrecognizedReversalsNetsuiteErp(): Promise<
     Either<GuardFailure | RepoError, any[]>
-  > {
+    > {
     const { db, logger } = this;
 
     const erpReferencesQuery = db(TABLES.CREDIT_NOTES)

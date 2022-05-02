@@ -2,7 +2,6 @@ FROM node:16-alpine
 
 RUN apk add --no-cache bash g++ git make openssh python3 py3-pip
 RUN pip3 install --no-cache-dir awscli
-RUN npm install -g nx
 
 ENTRYPOINT [ "" ]
 

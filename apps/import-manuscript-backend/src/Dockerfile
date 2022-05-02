@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 FROM node:16-alpine as build
 
 ENV HOME "/home/app"
@@ -23,12 +24,11 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 
 # Copy package.json to the working directory
 # Install any needed packages specified in package.json
-COPY package.json yarn.lock ./
-ADD node_modules_production ./node_modules
 
-COPY apps/import-manuscript-backend/src/lib/infrastructure/database/knex/migrations ./migrations/
-COPY config/ ./config/
-COPY dist/apps/import-manuscript-backend ./
+COPY --link apps/import-manuscript-backend/src/lib/infrastructure/database/knex/migrations ./migrations/
+COPY --link config/ ./config/
+COPY --link dist/apps/import-manuscript-backend ./
+COPY --link node_modules_production ./node_modules
 
 # FROM node:14.7-alpine as dist
 # # Copying the rest of the code to the working directory

@@ -19,6 +19,7 @@ export const knexLoader: MicroframeworkLoader = async (
     client: 'pg',
     migrations: {
       directory: env.app.dirs.migrationsDir,
+      disableMigrationsListValidation: true
     },
     seeds: {
       directory: env.app.dirs.seedsDir,
@@ -30,7 +31,7 @@ export const knexLoader: MicroframeworkLoader = async (
       database: env.db.database,
     },
     asyncStackTraces: true,
-    debug: env.db.logQueries
+    debug: env.db.logQueries,
   };
 
   const knex = Knex(knexParams);
