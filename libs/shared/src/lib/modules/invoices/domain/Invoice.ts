@@ -425,8 +425,8 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
       referenceYear = getYear(this.props.dateIssued);
 
       // * getMonth returns a number corresponding to each month,
-      // * so January is 0, February is 1, May is 5
-      if (getMonth(this.props.dateIssued) >= 5) {
+      // * so January is 0, February is 1, May is 4
+      if (getMonth(this.props.dateIssued) >= 4) {
         referenceYear += 1;
       }
     }
