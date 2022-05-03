@@ -31,7 +31,8 @@ function makeAppEnum(app: string): App | null {
 interface EnvProps {
   tenant: string;
   environment: string;
-  apps: App[];
+  affectedApps: App[];
+  requiredApps: App[];
   tag: string;
   awsRegistry: string;
 }
@@ -47,11 +48,17 @@ export class BuildManifestsCommand implements Command {
       .map((a) => a.trim())
       .map(makeAppEnum)
       .filter((a) => a);
+    const requiredApps: App[] = getOsEnv('REQUIRED_APPS')
+      .split(/[\s,]/)
+      .map((a) => a.trim())
+      .map(makeAppEnum)
+      .filter((a) => a);
 
     return {
       tenant,
       environment,
-      apps,
+      affectedApps: apps,
+      requiredApps,
       tag,
       awsRegistry,
     };
@@ -60,12 +67,17 @@ export class BuildManifestsCommand implements Command {
   async run(...args: string[]): Promise<void> {
     const env = this.parseEnv();
     const rootConstruct = new Cdk8sApp({ outdir: 'dist-k8s' });
-    for (const app of env.apps) {
+    for (const app of env.requiredApps) {
       let appProps: WithAwsSecretsServiceProps;
       try {
         appProps = masterConfig[env.tenant][env.environment][app];
         appProps.serviceProps.image.repository = `${env.awsRegistry}/${app}`;
-        appProps.serviceProps.image.tag = env.tag;
+        //if one of the required apps for the deployment hasn't been affected by changes then we deploy latest
+        if(env.affectedApps.some(affectedApp => affectedApp === app)) {
+          appProps.serviceProps.image.tag = env.tag;
+        } else{
+          appProps.serviceProps.image.tag = 'latest'
+        }
         if (!appProps) {
           throw new Error('Not found configuration for app');
         }
@@ -81,6 +93,6 @@ export class BuildManifestsCommand implements Command {
       await HindawiServiceChart.withAwsSecrets(rootConstruct, app, appProps);
     }
     rootConstruct.synth();
-    console.log(`Successfully built: ${env.apps}`);
+    console.log(`Successfully built: ${env.affectedApps}`);
   }
 }

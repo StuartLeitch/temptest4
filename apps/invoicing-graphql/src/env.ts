@@ -103,6 +103,8 @@ export const env = {
     enabled: toBool(getOsEnv('GRAPHQL_ENABLED')),
     route: getOsEnv('GRAPHQL_ROUTE'),
     editor: toBool(getOsEnv('GRAPHQL_EDITOR')),
+    serviceUrl: getOsEnv('GRAPHQL_SERVICE_URL'),
+    schemaRegistryUrl: getOsEnv('SCHEMA_REGISTRY_URL')
   },
   monitor: {
     enabled: toBool(getOsEnv('MONITOR_ENABLED')),

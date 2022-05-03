@@ -6,6 +6,10 @@ import { CatalogItem } from '../../domain/CatalogItem';
 import * as Errors from './updateCatalogItemFieldsErrors';
 
 export type UpdateCatalogItemFieldsResponse = Either<
-  Errors.CatalogNotFound | UnexpectedError,
+  | Errors.CatalogNotFound
+  | Errors.AmountIsZeroError
+  | Errors.AmountIllegalFormatError
+  | Errors.AmountNotFoundError
+  | UnexpectedError,
   CatalogItem
 >;

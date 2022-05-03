@@ -8,8 +8,15 @@ import {
 import { Path } from './path';
 
 export enum FileType {
+  conflictOfInterestStatement = 'conflict-of-interest-statement',
+  supportingInformation = 'supporting-information',
+  reportsAndResponses = 'reports-and-responses',
+  manifestMetadata = 'manifest-metadata',
+  transferMetadata = 'transfer-metadata',
+  articleMetadata = 'article-metadata',
+  reviewMetadata = 'review-metadata',
   supplementary = 'supplementary',
-  coverLetter = 'coverLetter',
+  coverLetter = 'cover-letter',
   manuscript = 'manuscript',
 }
 
@@ -45,7 +52,6 @@ export class File extends ValueObject<FileProps> {
     const guardResult = Guard.againstNullOrUndefinedBulk([
       { argument: props.name, argumentName: 'name' },
       { argument: props.path, argumentName: 'path' },
-      { argument: props.size, argumentName: 'size' },
       { argument: props.type, argumentName: 'type' },
     ]);
 

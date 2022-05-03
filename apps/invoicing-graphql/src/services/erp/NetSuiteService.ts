@@ -185,7 +185,7 @@ export class NetSuiteService implements ErpServiceContract {
       await this.patchCreditNote({ ...data, creditNoteId });
     }
 
-    return creditNoteId;
+    return <any>creditNoteId;
   }
 
   public async registerPayment(

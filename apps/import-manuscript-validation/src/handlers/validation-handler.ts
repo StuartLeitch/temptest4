@@ -1,13 +1,17 @@
 import {
+  ExtractManuscriptMetadataUseCase,
   UnarchivePackageUsecase,
   ValidatePackageUseCase,
   ValidatePackageEvent,
+  ManuscriptMapper,
 } from '@hindawi/import-manuscript-commons';
 
 import { EventHandler } from './event-handler';
 import { Context } from '../builders';
 
 import { env } from '../env';
+
+import { Logger } from '../libs/logger';
 
 const VALIDATE_PACKAGE = 'ValidatePackage';
 
@@ -39,7 +43,9 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
         services: { objectStoreService, archiveService, xmlService },
         loggerBuilder,
       } = context;
-      const logger = loggerBuilder.getLogger();
+      // const logger = loggerBuilder.getLogger();
+
+      const logger = new Logger('validation-handler');
 
       const usecase = new UnarchivePackageUsecase(
         objectStoreService,
@@ -55,14 +61,45 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
         throw res.value;
       }
 
+      logger.debug(`Package ${res.value.src} extracted`);
       const validateUsecase = new ValidatePackageUseCase(xmlService, logger);
+      const extractManuscriptMetadataUseCase =
+        new ExtractManuscriptMetadataUseCase(xmlService, logger);
 
       try {
         await validateUsecase.execute({
           definitionsPath: env.app.xmlDefinitionsLocation,
           packagePath: res.value.src,
         });
+
+        logger.debug(`Package ${res.value.src} validated`);
+
+        const manuscript = await extractManuscriptMetadataUseCase.execute({
+          definitionsPath: env.app.xmlDefinitionsLocation,
+          packagePath: res.value.src,
+        });
+
+        logger.info(
+          JSON.stringify(ManuscriptMapper.toPersistance(manuscript), null, 2)
+        );
+
+        context.services.emailService.sendEmail(
+          [data.successContactEmail],
+          'import-manuscript@hindawi.com',
+          'Important Message',
+          logger.messages
+        );
       } catch (err) {
+        context.services.emailService.sendEmail(
+          [data.failContactEmail],
+          'import-manuscript@hindawi.com',
+          'Important Message',
+          `ERROR processing package:
+            ${err.message}
+            ${err.stack}
+          `
+        );
+
         logger.error(err);
         throw err;
       }

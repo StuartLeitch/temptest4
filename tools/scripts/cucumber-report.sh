@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-set -ex
+set -e
+set -x
+
 files=$(shopt -s nullglob dotglob; echo reports/cucumber/*.json)
 if (( ${#files} )); then
     node ./tools/scripts/cucumber/report.js

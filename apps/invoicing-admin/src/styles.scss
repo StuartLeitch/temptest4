@@ -88,29 +88,90 @@ span.anticon.edit-button {
 
 span.anticon.notification-input-icon {
   svg {
-    width: 40px !important;
-    height: 40px !important;
+    width: 42px !important;
+    height: 42px !important;
     margin-top: 0.5em;
   }
 }
 
-.modal-title-wrap {
+.modal-title-wrap-edit {
+  display: flex;
+  .notification-input-title-edit {
+    flex: 1;
+  }
+
+  .notification-input-icon-edit {
+    margin-right: 1em;
+  }
+
+  span.anticon.notification-input-icon-edit {
+    svg {
+      width: 42px !important;
+      height: 42px !important;
+      margin-top: 0.5em;
+    }
+  }
+
+  h2.ant-typography.primary {
+    font-size: 20px;
+    line-height: 64px;
+  }
+}
+
+.modal-title-wrap-upload {
   display: flex;
   .notification-input-title {
-    margin-top: 2em;
     flex: 1;
+  }
+
+  h3.ant-typography.small {
+    font-size: 20px;
+    line-height: 64px;
   }
 
   .notification-input-icon {
     margin-right: 1em;
   }
 
-  h2.ant-typography.primary {
-    font-size: 18px !important;
-    line-height: 60px !important;
+  .notification-input-title-error {
+    margin-top: 0.25em;
+  }
+  .notification-subtitle {
+    display: block;
+    font-size: 14px !important;
+    font-weight: 300 !important;
+    margin-top: 0.25em;
+    line-height: 18px !important;
   }
 }
 
 .ant-modal-body {
   padding: 18px !important;
+}
+.csv-upload {
+  .ant-upload-select-text {
+    background-color: #f5f5f5 !important;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+}
+
+.csv-upload-button {
+  .anticon.hdw-spinner {
+    line-height: 0px !important;
+  }
+}
+
+h2.ant-typography.primary.apc-header {
+  margin-bottom: 1em;
+  margin-top: 0.5em;
+  font-size: 4em;
+  font-weight: 300;
+  line-height: 64px;
+}
+
+.ant-modal-content {
+  .ant-modal-close {
+    visibility: hidden;
+  }
 }

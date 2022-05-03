@@ -10,13 +10,14 @@ import { CatalogItem } from './../../domain/CatalogItem';
 import { CatalogMap } from './../../mappers/CatalogMap';
 import { JournalId } from './../../domain/JournalId';
 
-import { CatalogRepoContract } from './../catalogRepo';
+import { CatalogRepoContract, JournalPriceUpdate } from './../catalogRepo';
 import { CatalogPaginated } from '../../domain/CatalogPaginated';
 import { applyFilters } from '../../../invoices/repos/implementations/utils';
 
 export class KnexCatalogRepo
   extends AbstractBaseDBRepo<Knex, CatalogItem>
-  implements CatalogRepoContract {
+  implements CatalogRepoContract
+{
   async getCatalogItemById(
     catalogId: UniqueEntityID
   ): Promise<Either<GuardFailure | RepoError, CatalogItem>> {
@@ -151,5 +152,29 @@ export class KnexCatalogRepo
     }
 
     return this.getCatalogItemById(catalogItem.id);
+  }
+
+  async bulkUpdate(
+    catalogItems: Array<JournalPriceUpdate>
+  ): Promise<Either<GuardFailure | RepoError, void>> {
+    const { db } = this;
+
+    const trx = await db.transaction();
+
+    try {
+      const updates = catalogItems.map((catalogItem) =>
+        trx(TABLES.CATALOG)
+          .update({ amount: catalogItem.amount })
+          .where({ journalId: catalogItem.journalId.id.toString() })
+      );
+      await Promise.all(updates);
+
+      await trx.commit();
+
+      return right(null);
+    } catch (error) {
+      await trx.rollback();
+      return left(RepoError.fromDBError(error));
+    }
   }
 }

@@ -2,8 +2,9 @@ import { Mapper, Email } from '@hindawi/shared';
 
 import { AuthorProps, Author } from '../author';
 
-interface RawAuthorProps {
+export interface RawAuthorProps {
   affiliationRorId?: string;
+  affiliationRinggoldId: string;
   isCorresponding: boolean;
   affiliationName: string;
   isSubmitting: boolean;
@@ -23,6 +24,7 @@ export class AuthorMapper extends Mapper<Author> {
 
     const props: AuthorProps = {
       affiliationRorId: raw.affiliationRorId || null,
+      affiliationRinggoldId: raw.affiliationRinggoldId || null,
       isCorresponding: raw.isCorresponding || false,
       affiliationName: raw.affiliationName || '',
       isSubmitting: raw.isSubmitting || false,
@@ -38,13 +40,14 @@ export class AuthorMapper extends Mapper<Author> {
   static toPersistance(author: Author): RawAuthorProps {
     return {
       affiliationRorId: author.affiliationRorId,
+      affiliationRinggoldId: author.affiliationRinggoldId,
       isCorresponding: author.isCorresponding,
       affiliationName: author.affiliationName,
       isSubmitting: author.isSubmitting,
       countryCode: author.countryCode,
+      email: author.email.toString(),
       givenName: author.givenName,
       surname: author.surname,
-      email: author.email.toString(),
     };
   }
 }

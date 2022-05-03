@@ -10,6 +10,8 @@ import {
   S3Service,
 } from '@hindawi/import-manuscript-commons';
 
+import { EmailService } from '../libs/email';
+
 import { env } from '../env';
 
 export interface Services {
@@ -17,6 +19,7 @@ export interface Services {
   archiveService: ArchiveServiceContract;
   xmlService: XmlServiceContract;
   jobQueue: QueueEventConsumer;
+  emailService: EmailService;
 }
 
 export function buildServices(loggerBuilder: LoggerBuilder): Services {
@@ -36,6 +39,11 @@ export function buildServices(loggerBuilder: LoggerBuilder): Services {
     ),
     archiveService: new ArchiveService(),
     xmlService: new XmlService(),
+    emailService: new EmailService(
+      env.aws.ses.accessKey,
+      env.aws.ses.secretKey,
+      env.aws.region
+    ),
   };
 
   return services;

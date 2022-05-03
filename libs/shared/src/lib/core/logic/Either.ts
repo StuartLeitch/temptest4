@@ -68,6 +68,7 @@ function combine<A, B, C, D, E, F, G, H, I, J>(...args: [Either<A, B>, Either<C,
 function combine<A, B, C, D, E, F, G, H>(...args: [Either<A, B>, Either<C, D>, Either<E, F>, Either<G, H>]): Either<A | C | E | G, [B, D, F, H]>;
 function combine<A, B, C, D, E, F>(...args: [Either<A, B>, Either<C, D>, Either<E, F>]): Either<A | C | E, [B, D, F]>;
 function combine<A, B, C, D>(...args: [Either<A, B>, Either<C, D>]): Either<A | C, [B, D]>;
+function combine<A, B>(...args: Array<Either<A, B>>): Either<A, Array<B>>;
 function combine(...args: Array<Either<unknown, unknown>>): Either<unknown, unknown> {
   const result = [];
 

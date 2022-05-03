@@ -2,6 +2,7 @@ import {
   ValueObjectProps,
   GuardArgument,
   ValueObject,
+  GuardFail,
   Guard,
 } from '@hindawi/shared';
 
@@ -34,6 +35,10 @@ export class Manifest extends ValueObject<ManifestProps> {
 
     const nullResult = Guard.againstNullOrUndefinedBulk(guardArgs);
     const emptyResult = Guard.againstEmpty(props.item, 'items');
+
+    if (!Array.isArray(props.item)) {
+      throw new GuardFail('There must be multiple items defined');
+    }
 
     const guardResult = Guard.combineResults([nullResult, emptyResult]);
 

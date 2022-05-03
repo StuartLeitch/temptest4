@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 FROM node:16-alpine as build
 
 RUN apk add --no-cache \
@@ -12,17 +13,14 @@ ENV HOME "/home/app"
 WORKDIR ${HOME}
 
 # Copy package.json to the working directory
-COPY package.json yarn.lock ./
+COPY --link node_modules_production ./node_modules
 
-# Install any needed packages specified in package.json
-RUN yarn install --frozen-lockfile --production
 
 FROM node:16-alpine
 
-COPY --from=build /home/app/node_modules ./node_modules
-COPY package.json .
-COPY config/ ./config/
-COPY dist/apps/reporting-backend .
+COPY --link config/ ./config/
+COPY --link dist/apps/reporting-backend .
+COPY --link --from=build /home/app/node_modules ./node_modules
 
 EXPOSE 3000
 

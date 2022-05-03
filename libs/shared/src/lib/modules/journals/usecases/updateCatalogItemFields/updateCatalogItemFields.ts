@@ -1,7 +1,7 @@
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { right, left, Either } from '../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../core/logic/AppError';
-import { right, left } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
@@ -46,11 +46,16 @@ export class UpdateCatalogItemFieldsUsecase
   @Authorize('journal:update')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const { amount, journalId: rawJournalId, publisherName } = request;
-
     try {
       const journalId: JournalId = JournalId.create(
         new UniqueEntityID(rawJournalId)
       );
+
+      // validate amount from request
+      const maybeRequestAmountValid = validateRequestAmount(amount);
+      if (maybeRequestAmountValid.isLeft()) {
+        return left(maybeRequestAmountValid.value);
+      }
 
       // getting catalog item by id
       const maybeCatalogItem = await this.catalogRepo.getCatalogItemByJournalId(
@@ -98,11 +103,6 @@ export class UpdateCatalogItemFieldsUsecase
 
       const updatedCatalogItem = maybeUpdatedCatalogItem.value;
 
-      // trigger the JOURNAL_APC_UPDATED event given it has a different value than one registered already
-
-      catalogItem.amount = amount;
-      await this.catalogRepo.save(catalogItem);
-
       // * Call knex update method from service for DB changes
       const maybeResult = await this.catalogRepo.updateCatalogItem(
         updatedCatalogItem
@@ -112,10 +112,10 @@ export class UpdateCatalogItemFieldsUsecase
         return left(new UnexpectedError(new Error(maybeResult.value.message)));
       }
 
-      DomainEvents.dispatchEventsForAggregate(catalogItem.id);
       // * PPBK_2715: if there's a price change, log it
       if (Number(catalogItem.amount) !== Number(updatedCatalogItem.amount)) {
         // * Save information as audit log
+
         this.auditLoggerService.log({
           action: 'edited',
           entity: 'journal',
@@ -125,9 +125,39 @@ export class UpdateCatalogItemFieldsUsecase
         });
       }
 
+      // trigger the JOURNAL_APC_UPDATED event given it has a different value than one registered already
+
+      catalogItem.amount = amount;
+      await this.catalogRepo.save(catalogItem);
+
+      DomainEvents.dispatchEventsForAggregate(catalogItem.id);
+
       return right(updatedCatalogItem);
     } catch (err) {
       return left(new UnexpectedError(err));
     }
   }
+}
+
+function validateRequestAmount(
+  amount: number
+): Either<
+  | Errors.AmountIsZeroError
+  | Errors.AmountIllegalFormatError
+  | Errors.AmountNotFoundError,
+  void
+> {
+  if (amount === 0) {
+    return left(new Errors.AmountIsZeroError());
+  }
+
+  if (!amount) {
+    return left(new Errors.AmountNotFoundError());
+  }
+
+  if (Number.isNaN(amount)) {
+    return left(new Errors.AmountIllegalFormatError());
+  }
+
+  return right(null);
 }

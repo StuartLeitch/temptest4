@@ -14,6 +14,7 @@ export const knexLoader: MicroframeworkLoader = async (
     client: 'pg',
     migrations: {
       directory: env.app.dirs.migrationsDir,
+      disableMigrationsListValidation: true
     },
     seeds: {
       directory: env.app.dirs.seedsDir,

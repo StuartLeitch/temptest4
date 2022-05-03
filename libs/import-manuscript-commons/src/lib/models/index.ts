@@ -1,5 +1,6 @@
 export * from './package-item';
 export * from './manuscript';
+export * from './founding';
 export * from './manifest';
 export * from './journal';
 export * from './author';

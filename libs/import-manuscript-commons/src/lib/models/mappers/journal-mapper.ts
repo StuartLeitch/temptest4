@@ -8,13 +8,13 @@ import {
   Journal,
 } from '../journal';
 
-interface RawJournalProps {
+export interface RawJournalProps {
   phenomId: string;
   name: string;
   code: string;
 }
 
-interface RawSourceJournalProps {
+export interface RawSourceJournalProps {
   phenomId: string;
   name: string;
   code: string;

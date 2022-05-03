@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE transfer SYSTEM "MECA_transfer.dtd">
+<transfer transfer-version="1.0" xmlns="https://manuscriptexchange.org/schema/transfer">
+
+  <transfer-source>
+    <service-provider>
+      <provider-name>Aries Systems</provider-name>
+    </service-provider>
+    <publication type="journal">
+      <publication-title>VCH Trial A Site</publication-title>
+      <acronym>vchtriala</acronym>
+      <contact contact-role="aaa">
+        <contact-name>
+          <surname />
+          <given-names />
+        </contact-name>
+        <email>trash101@ariessys.com</email>
+        <phone />
+      </contact>
+    </publication>
+  </transfer-source>
+
+  <destination>
+    <service-provider />
+    <publication>
+      <publication-title>Elisabeth's journal</publication-title>
+      <acronym />
+    </publication>
+    <security>
+      <authentication-code />
+    </security>
+  </destination>
+
+  <processing-instructions />
+</transfer>

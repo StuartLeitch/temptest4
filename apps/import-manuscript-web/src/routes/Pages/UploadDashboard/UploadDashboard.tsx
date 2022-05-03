@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useManualQuery, useMutation } from 'graphql-hooks';
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { useDispatch } from 'react-redux';
 import { useHistory } from "react-router-dom";
 
@@ -16,7 +16,7 @@ import {
 import { UPLOAD_FILE_MUTATION, UPLOAD_FILE_QUERY } from './graphql';
 import { upload } from '../../../uploadSlice';
 
-const controller = new AbortController();
+let controller = new AbortController();
 
 const UploadDashboard = () => {
   const [fileList, setFileList] = useState([]);
@@ -47,6 +47,7 @@ const UploadDashboard = () => {
     },
 
     async handleUpload({ onSuccess, onError, file, onProgress} : any) {
+      controller = new AbortController()
       const { error, data } = await createSignedUrl({
         variables: {
           fileName: file.name,
@@ -63,8 +64,8 @@ const UploadDashboard = () => {
 
       const { createSignedUrlForS3Upload } = data;
 
-      const config = {
-        headers: { 'content-type': 'application/zip' },
+      const config: AxiosRequestConfig = {
+        headers: { 'Content-Type': 'application/zip' },
         signal: controller.signal,
         onUploadProgress: (event) => {
           const percent = Math.floor((event.loaded / event.total) * 100);
@@ -112,6 +113,7 @@ const UploadDashboard = () => {
     },
 
     onRetry() {
+      controller = new AbortController();
       setUploadError(null)
       retryProps.onProgress({percent: 0})
       props.handleUpload(retryProps)

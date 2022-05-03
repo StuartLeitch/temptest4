@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 FROM node:16-alpine as build
 
 ENV HOME "/home/app"
@@ -18,14 +19,9 @@ RUN apk add --no-cache \
   python3 \
   ttf-freefont
 
-# Copy package.json to the working directory
-COPY package.json yarn.lock ./
-
-# Install any needed packages specified in package.json
-RUN yarn install --frozen-lockfile --production
-
-COPY config/ ./config/
-COPY dist/apps/invoicing-erp-invoice-registration ./
+COPY --link config/ ./config/
+COPY --link dist/apps/invoicing-erp-invoice-registration ./
+COPY --link node_modules_production ./node_modules
 
 # FROM node:14.7-alpine as dist
 # # Copying the rest of the code to the working directory

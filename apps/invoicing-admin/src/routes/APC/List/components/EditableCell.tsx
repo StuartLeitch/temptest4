@@ -54,7 +54,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
               rules={[
                 {
                   required: true,
-                  pattern: new RegExp(/^[0-9]+$/),
+                  pattern: new RegExp(/^[1-9][0-9]*$/),
                   message: '',
                   whitespace: false,
                 },

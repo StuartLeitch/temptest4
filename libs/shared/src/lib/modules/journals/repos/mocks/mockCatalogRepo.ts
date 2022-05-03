@@ -9,11 +9,12 @@ import { CatalogPaginated } from '../../domain/CatalogPaginated';
 import { CatalogItem } from '../../domain/CatalogItem';
 import { JournalId } from '../../domain/JournalId';
 
-import { CatalogRepoContract } from '../catalogRepo';
+import { CatalogRepoContract, JournalPriceUpdate } from '../catalogRepo';
 
 export class MockCatalogRepo
   extends BaseMockRepo<CatalogItem>
-  implements CatalogRepoContract {
+  implements CatalogRepoContract
+{
   constructor() {
     super();
   }
@@ -39,6 +40,12 @@ export class MockCatalogRepo
       catalogItems: this._items,
       totalCount: this._items.length,
     });
+  }
+
+  public async bulkUpdate(
+    catalogItems: Array<JournalPriceUpdate>
+  ): Promise<Either<GuardFailure | RepoError, void>> {
+    return right(null);
   }
 
   public async updateCatalogItem(

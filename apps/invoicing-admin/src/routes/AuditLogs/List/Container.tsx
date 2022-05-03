@@ -2,7 +2,9 @@ import React, { useEffect, useCallback, useState } from 'react';
 import { useManualQuery } from 'graphql-hooks';
 import { useQueryState } from 'react-router-use-location-state';
 import DatePicker, { setDefaultLocale } from 'react-datepicker';
+import axios from 'axios';
 import moment from 'moment';
+import { useAuth } from '../../../contexts/Auth';
 
 import { AUDIT_LOGS_QUERY } from '../graphql';
 
@@ -30,9 +32,11 @@ setDefaultLocale('en');
 const defaultPaginationSettings = { page: 1, offset: 0, limit: 10 };
 
 const AuditLogsContainer: React.FC = () => {
-  const [fetchLogs, { loading, error, data }] = useManualQuery(
-    AUDIT_LOGS_QUERY
-  );
+  const auth: any = useAuth();
+  const { token } = auth.data;
+
+  const [fetchLogs, { loading, error, data }] =
+    useManualQuery(AUDIT_LOGS_QUERY);
 
   const defaultFilters = {
     startDate: moment().subtract(5, 'days').toDate(),
@@ -108,14 +112,25 @@ const AuditLogsContainer: React.FC = () => {
     queryString += `startDate=${moment(startDate).format('yyyy-MM-DD')}&`;
     queryString += `endDate=${moment(endDate).format('yyyy-MM-DD')}&`;
 
-    const url = `${(window as any)._env_.API_ROOT}/logs${queryString}`;
+    const path = `${(window as any)._env_.API_ROOT}/logs${queryString}`;
 
-    const a = document.createElement('a');
-    a.setAttribute('download', url);
-    a.setAttribute('href', url);
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const config = {
+      headers: {
+        'content-type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    axios.get(path, config).then((response) => {
+      const url = window.URL.createObjectURL(
+        new Blob([response.data], { type: 'text/csv;charset=utf-8;' })
+      );
+      const link = document.createElement('a');
+      link.setAttribute('download', 'audit_logs.csv');
+      link.setAttribute('href', url);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
   };
 
   const Content = ({ loading, error, data }) => {

@@ -6,7 +6,11 @@ import { XMLParser } from 'fast-xml-parser';
 import { Path } from '../../models';
 import { FileUtils } from '../../utils';
 
-import { XmlServiceContract, ParsedXml } from '../contracts';
+import {
+  XPathSelectorContract,
+  XmlServiceContract,
+  ParsedXml,
+} from '../contracts';
 
 export class XmlService implements XmlServiceContract {
   readonly parser: XMLParser;
@@ -30,7 +34,7 @@ export class XmlService implements XmlServiceContract {
     const dtdsExist = await this.filesExist(...dtdPaths);
 
     if (!dtdsExist) {
-      throw new VError(`The DTD files %j do not exist`, xmlPath, dtdPaths);
+      throw new VError(`The DTD files %j do not exist`, dtdPaths, xmlPath);
     }
 
     try {
@@ -55,6 +59,10 @@ export class XmlService implements XmlServiceContract {
     const xmlFile = await readFile(xmlPath.src);
 
     return this.parser.parse(xmlFile);
+  }
+
+  getXPathSelector(): XPathSelectorContract {
+    return new LibXml();
   }
 
   private async filesExist(...paths: Array<Path>): Promise<boolean> {

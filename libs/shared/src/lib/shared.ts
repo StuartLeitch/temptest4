@@ -155,6 +155,7 @@ export * from './modules/journals/usecases/editorialBoards/assignEditorsToJourna
 export * from './modules/journals/usecases/addCatalogItemToCatalog';
 export * from './modules/journals/usecases/updateCatalogItemToCatalog';
 export * from './modules/journals/usecases/updateCatalogItemFields';
+export * from './modules/journals/usecases/catalogBulkUpdate';
 
 // * Export User Subdomain
 export { Roles } from './modules/users/domain/enums/Roles';

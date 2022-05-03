@@ -1,6 +1,5 @@
-import { ApolloServer } from 'apollo-server-express';
+import { ApolloServer, gql } from 'apollo-server-express';
 import Keycloak from 'keycloak-connect';
-import session from 'express-session';
 import {
   KeycloakSchemaDirectives,
   KeycloakContext,
@@ -13,31 +12,29 @@ import {
 
 import { resolvers } from '../graphql/resolvers';
 import { typeDefs } from '../graphql/schema';
+import { validateAndRegisterSchema } from '@phenom.pub/schema-registry-cli/lib/register-schema';
 
 import { env } from '../env';
 
-export const graphqlLoader: MicroframeworkLoader = (
+export const graphqlLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ) => {
   if (settings && env.graphql.enabled) {
     const context = settings.getData('context');
     const expressApp = settings.getData('express_app');
 
-    const memoryStore = new session.MemoryStore();
+    const keycloak: Keycloak.Keycloak = settings.getData('keycloak');
 
-    expressApp.use(
-      session({
-        secret: env.app.sessionSecret,
-        resave: false,
-        saveUninitialized: true,
-        store: memoryStore,
-      })
-    );
+    const service = {
+      name: env.app.name,
+      url: env.graphql.serviceUrl,
+    };
 
-    const { keycloak } = configureKeycloak(
-      expressApp,
-      memoryStore,
-      env.graphql.route
+    await validateAndRegisterSchema(
+      service,
+      gql`
+        ${typeDefs}
+      `
     );
 
     const graphqlServer = new ApolloServer({
