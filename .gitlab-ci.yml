@@ -73,6 +73,7 @@ variables:
   VAT_VALIDATION_SERVICE_ENDPOINT: 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
   AFFECTED_COMMAND: ''
   AFFECTED_ARGS: '--base=remotes/origin/develop'
+  AFFECTED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend'
 
 Prepare Docker Runner:
   tags:
@@ -136,7 +137,7 @@ Build:
     - git fetch
     - |
       if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
-        AFFECTED_COMMAND="yarn run nx run-many --target=n --passWithNoTests --projects=$AFFECTED_APPS --configuration=production --parallel"
+        AFFECTED_COMMAND="yarn run nx run-many --target=test --passWithNoTests --projects=$AFFECTED_APPS --configuration=production --parallel"
       else
        AFFECTED_COMMAND="yarn run affected:test $AFFECTED_ARGS --passWithNoTests --parallel --configuration=production"
       fi
@@ -290,7 +291,10 @@ Package Images:dev:
   script:
     - $(aws ecr get-login --no-include-email --region "${AWS_REGION}")
     - cd $CI_PROJECT_DIR
-    - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
+    - |
+      if [ "$CI_COMMIT_REF_NAME" != "develop" ]; then
+        export AFFECTED_APPS=$(cat .ci_status/affected_apps)      
+      fi
     - mv node_modules node_modules_production
     - ./tools/scripts/dockerize-apps.sh
   artifacts:
@@ -325,7 +329,10 @@ Trigger Acceptance Tests:
   script:
     - cd $CI_PROJECT_DIR
     - ls -al
-    - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
+    - |
+        if [ "$CI_COMMIT_REF_NAME" != "develop" ]; then
+          export AFFECTED_APPS=$(cat .ci_status/affected_apps)      
+        fi
     - ./tools/scripts/deploy-ci.sh
   artifacts:
     paths:
@@ -731,7 +738,7 @@ Deploy:preproduction-reporting:
     COMMAND: build-manifests
     REQUIRED_APPS: 'reporting-backend'
 
-Deploy:hindawi-invoicing:
+Deploy:hindawi-prod-invoicing:
   stage: deploy-invoicing
   only:
     - develop
@@ -749,7 +756,7 @@ Deploy:hindawi-invoicing:
     COMMAND: build-manifests
     REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
 
-Deploy:hindawi-import:
+Deploy:hindawi-prod-import:
   stage: deploy-import
   only:
     - develop
@@ -767,7 +774,7 @@ Deploy:hindawi-import:
     COMMAND: build-manifests
     REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
 
-Deploy:hindawi-reporting:
+Deploy:hindawi-prod-reporting:
   stage: deploy-reporting
   only:
     - develop
