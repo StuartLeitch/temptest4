@@ -24,6 +24,8 @@ import * as move_article_events from './migrations/20201012162115_move_article_e
 import * as move_peer_review_events from './migrations/20210112142215_move_peer_review_events';
 import * as remove_submission_data_dates from './migrations/20200304113458_remove_wrong_dates_from_submission_data';
 
+import * as fix_manuscripts_editorial_assistant_data_order_issue from './migrations/20220503115016_fix_manuscripts_editorial_assistant_data_order_issue';
+
 import Knex from 'knex';
 
 interface KnexMigration {
@@ -251,6 +253,8 @@ class KnexMigrationSource {
     apollo1_table_explosion_create,
     apollo1_views_triggers_functions_create,
     apollo1_views_triggers_functions_execute,
+    // Apollo1 Fixes
+    fix_manuscripts_editorial_assistant_data_order_issue,
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
