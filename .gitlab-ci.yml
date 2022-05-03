@@ -674,8 +674,8 @@ Deploy:gsw-prod-import:
 
 Deploy:gsw-prod-reporting:
   stage: deploy-reporting
-  only:
-    - develop
+  # only:
+  #   - develop
   tags:
     - 'cluster:hindawi-prod'
   dependencies:
@@ -776,8 +776,8 @@ Deploy:hindawi-prod-import:
 
 Deploy:hindawi-prod-reporting:
   stage: deploy-reporting
-  only:
-    - develop
+  # only:
+  #   - develop
   tags:
     - 'cluster:hindawi-prod'
   dependencies:
