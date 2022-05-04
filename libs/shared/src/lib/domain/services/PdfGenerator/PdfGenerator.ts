@@ -51,6 +51,14 @@ export class PdfGeneratorService {
     const logoUrl = process.env.LOGO_URL;
     const logoData = await PdfGeneratorService.convertLogo(logoUrl);
 
+    const logoTermination = logoUrl.substring(logoUrl.length - 3);
+    let imgType = 'png';
+
+    console.log(logoTermination);
+    if (logoTermination === 'svg') {
+      imgType = 'svg+xml';
+    }
+
     const browser = await puppeteer.launch({
       headless: true,
       args: ['--no-sandbox'],
@@ -74,7 +82,7 @@ export class PdfGeneratorService {
       vatNumber: process.env.COMPANY_VAT_NUMBER,
       assistanceEmail: process.env.ASSISTANCE_EMAIL,
       tenantAddress: process.env.TENANT_ADDRESS,
-      logo: `data:image/svg+xml;base64, ${logoData}`,
+      logo: `data:image/${imgType};base64, ${logoData}`,
       bankDetails: {
         accountName: process.env.BANK_ACCOUNT_NAME,
         accountType: process.env.BANK_ACCOUNT_TYPE,

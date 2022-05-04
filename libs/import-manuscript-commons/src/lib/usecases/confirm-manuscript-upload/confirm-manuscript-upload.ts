@@ -54,7 +54,7 @@ export class ConfirmManuscriptUploadUseCase
 
       if (!maybeIsUploaded.value) {
         this.logger.error(
-          `The manuscript package, with filename "${fileName}", is not available in s3 bucket.`
+          `The manuscript package, with filename "${fileName}", is not available in s3 bucket`
         );
         return left(createUploadFailError(fileName));
       }
@@ -100,7 +100,7 @@ export class ConfirmManuscriptUploadUseCase
 function createUploadFailError(fileName: string): UnexpectedError {
   return new UnexpectedError(
     new Error(
-      `The manuscript package file ${fileName} you are confirming is has not uploaded successfully.`
+      `The manuscript package file ${fileName} you are confirming is has not uploaded successfully`
     )
   );
 }
