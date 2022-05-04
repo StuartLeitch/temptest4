@@ -43,7 +43,7 @@ export class BuildManifestsCommand implements Command {
     const environment: string = getOsEnv('NODE_ENV');
     const tag: string = getOsEnv('CI_COMMIT_SHA');
     const awsRegistry: string = getOsEnv('AWS_REGISTRY');
-    const apps: App[] = getOsEnv('AFFECTED_APPS')
+    const apps: App[] = getOsEnv('AFFECTED_APPS', "")
       .split(/[\s,]/)
       .map((a) => a.trim())
       .map(makeAppEnum)

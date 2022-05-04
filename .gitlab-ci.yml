@@ -313,7 +313,7 @@ Trigger Acceptance Tests:
   image: $BUILD_IMAGE
   needs: [Package Images:dev]
   cache:
-    key: node-modules-cache
+    key: node-modules-production-cache
     paths:
       - ./node_modules
     policy: pull
@@ -327,6 +327,7 @@ Trigger Acceptance Tests:
   script:
     - cd $CI_PROJECT_DIR
     - ls -al
+    - yarn install --frozen-lockfile --production
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
     - ./tools/scripts/deploy-ci.sh
   artifacts:
