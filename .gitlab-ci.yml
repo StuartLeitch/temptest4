@@ -327,7 +327,7 @@ Trigger Acceptance Tests:
   script:
     - cd $CI_PROJECT_DIR
     - ls -al
-    - yarn install --frozen-lockfile --production
+    - yarn install
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
     - ./tools/scripts/deploy-ci.sh
   artifacts:
