@@ -727,7 +727,13 @@ dt {
   .timeline-item {
     .timeline-icon {
       i {
+        top: 5px !important;
         left: -21px !important;
+      }
+
+      &::before {
+        bottom: -21px !important;
+        left: -13px !important;
       }
     }
   }
@@ -750,7 +756,14 @@ dt {
 .ant-pagination {
   .ant-pagination-prev,
   .ant-pagination-next {
-    display: none;
+    display: inline-block;
+  }
+  .ant-pagination-item-link {
+    .anticon {
+      svg {
+        margin-bottom: 0.5em !important;
+      }
+    }
   }
 }
 
@@ -761,5 +774,5 @@ th {
 }
 
 .table-row-dark {
-  background-color: #ffff;
+  background-color: #f5f5f5;
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from 'graphql-hooks';
-import LoadingOverlay from 'react-loading-overlay';
+import { Tabs, IconUser, IconSettings, IconReports } from '@hindawi/phenom-ui';
 
 import {
   ButtonToolbar,
@@ -12,11 +12,12 @@ import {
   Row,
   Nav,
   NavItem,
-  Spinner,
-  TabPane,
+  // Spinner,
   UncontrolledButtonDropdown,
   UncontrolledTabs,
 } from '../../components';
+
+import { Loading } from '../components';
 
 import { HeaderMain } from '../components/HeaderMain'
 
@@ -24,6 +25,8 @@ import { CREDIT_NOTE_QUERY } from './graphql';
 import CreditNoteDetailsTab from './components/CreditNoteDetailsTab';
 import ArticleDetailsTab from '../Invoice/Details/components/ArticleDetailsTab'
 import PayerDetailsTab from '../Invoice/Details/components/PayerDetailsTab';
+
+const { TabPane } = Tabs;
 
 const Details: React.FC = () => {
   const { id } = useParams() as any;
@@ -33,26 +36,21 @@ const Details: React.FC = () => {
       id,
     },
   });
+
   if (loadingCreditNoteData)
     return (
-      <LoadingOverlay
-        active={loadingCreditNoteData}
-        spinner={
-          <Spinner style={{ width: '12em', height: '12em' }} color='primary' />
-        }
-      />
+      <Loading />
     );
 
 
   if (creditNoteDataError) return <div>Something Bad Happened</div>;
- 
 
- 
+
   const creditNote = creditNoteData?.getCreditNoteById
   const { invoice } = creditNote
   const { coupons, waivers, vat, price } = invoice?.invoiceItem;
   const reductions = [...coupons, ...waivers];
-  
+
   let totalDiscountFromReductions = reductions.reduce((acc, curr) => acc + curr.reduction, 0);
   totalDiscountFromReductions = totalDiscountFromReductions > 100 ? 100 : totalDiscountFromReductions;
 
@@ -96,8 +94,8 @@ const Details: React.FC = () => {
         </Row>
         <Row>
           <Col lg={8}>
-            <UncontrolledTabs initialActiveTabId='creditNote'>
-              {/* START Pills Nav */}
+            {/* <UncontrolledTabs initialActiveTabId='creditNote'>
+              {/* START Pills Nav *}
               <Nav tabs className='flex-column flex-md-row mt-4 mt-lg-0'>
                 <NavItem>
                   <UncontrolledTabs.NavLink tabId='creditNote'>
@@ -115,7 +113,7 @@ const Details: React.FC = () => {
                   </UncontrolledTabs.NavLink>
                 </NavItem>
               </Nav>
-              {/* END Pills Nav */}
+              {/* END Pills Nav *}
               <UncontrolledTabs.TabContent>
                 <TabPane tabId='creditNote'>
                   <CreditNoteDetailsTab
@@ -134,7 +132,46 @@ const Details: React.FC = () => {
                   <PayerDetailsTab invoice={invoice} />
                 </TabPane>
               </UncontrolledTabs.TabContent>
-            </UncontrolledTabs>
+            </UncontrolledTabs> */}
+            <Tabs defaultActiveKey='1'>
+              <TabPane
+                tab={
+                  <span>
+                    Credit Note Details
+                  </span>
+                }
+                key='1'
+              >
+                <CreditNoteDetailsTab
+                  invoiceId={creditNote.invoiceId}
+                  invoice={invoice}
+                  creditNote={creditNote}
+                  netCharges={netCharges}
+                  vat={vatAmount}
+                  total={total}
+                />
+              </TabPane>
+              <TabPane
+                tab={
+                  <span>
+                    Article Details
+                  </span>
+                }
+                key='2'
+              >
+                <ArticleDetailsTab invoice={invoice} />
+              </TabPane>
+              <TabPane
+                tab={
+                  <span>
+                    Payer Details
+                  </span>
+                }
+                key='3'
+              >
+                <PayerDetailsTab invoice={invoice} />
+              </TabPane>
+            </Tabs>
           </Col>
         </Row>
       </Container>

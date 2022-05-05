@@ -17,8 +17,10 @@ import {
   CardFooter,
   Card,
   ButtonToolbar,
-  Button,
+  // Button,
 } from '../../../components';
+
+import { Text, Table, Button, IconDownload } from '@hindawi/phenom-ui';
 
 import { HeaderMain } from '../../components/HeaderMain';
 import { Loading } from '../../components';
@@ -133,6 +135,45 @@ const AuditLogsContainer: React.FC = () => {
     });
   };
 
+  const columns = [
+    {
+      title: 'User Account',
+      dataIndex: 'userAccount',
+      key: 'userAccount',
+      width: '22%',
+    },
+    {
+      title: 'Timestamp',
+      dataIndex: 'timestamp',
+      key: 'timestamp',
+      width: '16%',
+    },
+    {
+      title: 'Action',
+      dataIndex: 'action',
+      key: 'action',
+      width: '11%',
+    },
+    {
+      title: 'Entity',
+      dataIndex: 'entity',
+      key: 'entity',
+      width: '11%',
+    },
+    {
+      title: 'Item Reference',
+      dataIndex: 'item_reference',
+      key: 'itemReference',
+      width: '20%',
+    },
+    {
+      title: 'Target Reference',
+      dataIndex: 'target',
+      key: 'targetReference',
+      width: '20%',
+    },
+  ];
+
   const Content = ({ loading, error, data }) => {
     if (loading) return <Loading />;
 
@@ -142,16 +183,24 @@ const AuditLogsContainer: React.FC = () => {
       return (
         <>
           <Card className='mb-0 mt-5'>
-            <List logs={data.auditlogs?.logs} />
-            <CardFooter className='d-flex justify-content-center pb-0'>
-              <ListPagination
-                totalRecords={data.auditlogs?.totalCount}
-                pageNeighbours={1}
-                onPageChanged={onPageChange}
-                pageLimit={defaultPaginationSettings.limit}
-                currentPage={page}
-              />
-            </CardFooter>
+            <Table
+              columns={columns}
+              rowKey={(record) => record.id}
+              rowClassName={'table-row-light'}
+              dataSource={data.auditlogs?.logs}
+              pagination={{
+                pageSize: 10,
+                total: data.auditlogs?.totalCount,
+                current: page,
+                onChange: (page, pageSize) =>
+                  onPageChange({ currentPage: page }),
+                showLessItems: true,
+                showSizeChanger: false,
+                showQuickJumper: false,
+                style: { paddingRight: '1em' },
+                position: ['bottomRight'],
+              }}
+            />
           </Card>
         </>
       );
@@ -164,7 +213,7 @@ const AuditLogsContainer: React.FC = () => {
       <Container fluid={true}>
         <HeaderMain title='Audit Logs' className='mb-1 mt-5' />
         <Col lg={12} className='d-flex mb-3 mr-0 pr-0 px-0 my-sm-0'>
-          <ButtonToolbar className='ml-auto'>
+          <ButtonToolbar className='ml-auto audit-toolbar'>
             <span className='pl-1 pr-0 mr-1 mt-2 font-weight-bold'>From</span>
             <DatePicker
               className='ml-2 mr-0'
@@ -190,9 +239,12 @@ const AuditLogsContainer: React.FC = () => {
               onChange={handleChangeEnd}
               maxDate={new Date()}
             />
-            <Button color='twitter' className='mr-0' onClick={downloadCSV}>
-              <i className='fas fa-download mr-2'></i>
-              Download CSV
+            <Button
+              type='secondary'
+              className='mr-0 audit-download-button'
+              onClick={downloadCSV}
+            >
+              Export CSV
             </Button>
           </ButtonToolbar>
         </Col>

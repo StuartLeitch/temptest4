@@ -1,42 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React from 'react';
-import useDebouncedCallback from "use-debounce/lib/useDebouncedCallback";
+import useDebouncedCallback from 'use-debounce/lib/useDebouncedCallback';
+import { Checkbox } from '@hindawi/phenom-ui';
 
-
-import {
-  Button,
-  CustomInput,
-  Input,
-  InputGroup,
-  InputGroupAddon,
-  Nav,
-  NavItem,
-  NavLink,
-} from '../../../components';
-import { JournalsSelections } from './JournalsSelections';
+import { Nav, NavItem, NavLink } from '../../../components';
 
 const InvoicesLeftNav = (props) => {
   const invoiceStatus = props?.filters?.invoiceStatus || [];
   const transactionStatus = props?.filters?.transactionStatus || [];
-  const journalId = props?.filters?.journalId || [];
-  const referenceNumber = props?.filters?.referenceNumber || '';
-  const customId = props?.filters?.customId || '';
-  const regexRef = new RegExp(/^[0-9/_-]*$/g)
+
+  const regexRef = new RegExp(/^[0-9/_-]*$/g);
 
   const onFilterHandler = useDebouncedCallback((eventTarget: any) => {
     const value =
       eventTarget?.type === 'checkbox'
         ? eventTarget.checked
         : eventTarget.value;
-      props.setFilter(eventTarget.name, value);
+    props.setFilter(eventTarget.name, value);
   }, 300);
-
-  const referenceFilter = (eventTarget: any) => {
-    const value = eventTarget.value;
-    const validatedValue = regexRef.test(value) ? value : eventTarget.preventDefault()
-    props.setFilter(eventTarget.name, validatedValue)
-  };
 
   return (
     <React.Fragment>
@@ -49,40 +31,37 @@ const InvoicesLeftNav = (props) => {
           </NavLink>
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
-          <CustomInput
+          <Checkbox
             onChange={(evt) => onFilterHandler.callback(evt.target)}
             name='invoiceStatus.DRAFT'
             checked={invoiceStatus.includes('DRAFT')}
             className='text-warning'
-            type='checkbox'
             id='invoice-status-draft'
-            label='Draft'
-            inline
-          />
+          >
+            Draft
+          </Checkbox>
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
-          <CustomInput
+          <Checkbox
             name='invoiceStatus.ACTIVE'
             onChange={(evt) => onFilterHandler.callback(evt.target)}
             checked={invoiceStatus.includes('ACTIVE')}
             className='text-primary'
-            type='checkbox'
             id='invoice-status-active'
-            label='Active'
-            inline
-          />
+          >
+            Active
+          </Checkbox>
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
-          <CustomInput
+          <Checkbox
             name='invoiceStatus.FINAL'
             onChange={(evt: any) => onFilterHandler.callback(evt.target)}
             checked={invoiceStatus.includes('FINAL')}
             className='text-success'
-            type='checkbox'
             id='invoice-status-final'
-            label='Final'
-            inline
-          />
+          >
+            Final
+          </Checkbox>
         </NavItem>
       </Nav>
       {/* END Invoice Status */}
@@ -95,129 +74,28 @@ const InvoicesLeftNav = (props) => {
           </NavLink>
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
-          <CustomInput
+          <Checkbox
             onChange={(evt) => onFilterHandler.callback(evt.target)}
             name='transactionStatus.DRAFT'
             checked={transactionStatus.includes('DRAFT')}
             className='text-warning'
-            type='checkbox'
             id='checkbox1'
-            label='Draft'
-            inline
-          />
+          >
+            Draft
+          </Checkbox>
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
-          <CustomInput
+          <Checkbox
             onChange={(evt) => onFilterHandler.callback(evt.target)}
             checked={transactionStatus.includes('ACTIVE')}
             name='transactionStatus.ACTIVE'
             className='text-primary'
-            type='checkbox'
             id='checkbox2'
-            label='Active'
-            inline
-          />
+          >
+            Active
+          </Checkbox>
         </NavItem>
       </Nav>
-      {/* END Transaction Status */}
-      {/* START Journal Title */}
-      {/* <Nav accent vertical className='mb-3'>
-        <NavItem className='mb-2'>
-          <NavLink href='#' className='d-flex px-1'>
-            <span>Journal Title</span>
-            <i className='fas fa-angle-down align-self-center ml-auto'></i>
-          </NavLink>
-        </NavItem>
-        <JournalsSelections
-          selected={journalId}
-          onChange={(selections: any) => {
-            const target = { name: 'journalTitle', value: selections };
-            onFilterHandler.callback(target);
-          }}
-        />
-        <NavItem className='d-flex p-0 form-control'>
-      </NavItem>
-      </Nav> */}
-      {/* END Journal Title */}
-      {/* START Reference Number */}
-      {/* <Nav accent vertical className='mb-3'>
-        <NavItem className='mb-2'>
-          <NavLink href='#' className='d-flex px-1'>
-            <span>Reference Number</span>
-            <i className='fas fa-angle-down align-self-center ml-auto'></i>
-          </NavLink>
-        </NavItem>
-        <NavItem className='d-flex p-0'>
-          <InputGroup>
-            <Input
-              className='form-control'
-              placeholder='Enter reference number..'
-              maxLength={11}
-              onFocus={(e) => (e.target.placeholder = 'reference/year')}
-              onBlur={(e) => (e.target.placeholder = 'Enter reference number..')}
-              name='referenceNumber'
-              type='text'
-              value={referenceNumber}
-              onChange={(evt: any) =>
-                referenceFilter({
-                  name: 'referenceNumber',
-                  value: evt.target.value,
-                })
-              }
-              id='referenceNumber'
-            />
-            <InputGroupAddon addonType='append'>
-              <Button
-                color='secondary'
-                outline
-                onClick={(evt: any) => {
-                  onFilterHandler.callback({ name: 'referenceNumber', value: '' });
-                }}
-              >
-                <i className='fa fa-times mr-2'></i>
-                Clear
-              </Button>
-            </InputGroupAddon>
-          </InputGroup>
-        </NavItem>
-      </Nav> */}
-      {/* END Reference Number */}
-      {/* START Custom ID */}
-      {/* <Nav accent vertical className='mb-3'>
-        <NavItem className='mb-2'>
-          <NavLink href='#' className='d-flex px-1'>
-            <span>Custom ID</span>
-            <i className='fas fa-angle-down align-self-center ml-auto'></i>
-          </NavLink>
-        </NavItem>
-        <NavItem className='d-flex p-0'>
-          <InputGroup>
-            <Input
-              name='customId'
-              onChange={(evt: any) =>
-                onFilterHandler.callback({ name: 'customId', value: evt.target.value })
-              }
-              className='form-control'
-              placeholder='Enter a custom ID'
-              id='customId'
-              value={customId}
-            />
-            <InputGroupAddon addonType='append'>
-              <Button
-                color='secondary'
-                outline
-                onClick={(evt: any) =>
-                  onFilterHandler.callback({ name: 'customId', value: '' })
-                }
-              >
-                <i className='fa fa-times mr-2'></i>
-                Clear
-              </Button>
-            </InputGroupAddon>
-          </InputGroup>
-        </NavItem>
-      </Nav> */}
-      {/* END Reference Number */}
     </React.Fragment>
   );
 };

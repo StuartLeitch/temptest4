@@ -4183,10 +4183,10 @@
   resolved "https://registry.yarnpkg.com/@hindawi/phenom-events/-/phenom-events-1.17.2.tgz#977fe539da3db5efa84784f12a9b311a673b5886"
   integrity sha512-kvnP1huYZMEp9D+8M87YBW4uynLej5kQZi6L0N2GVxkoRlsaQ9984EsO9ROkbRc0CyLb3Nr2LSPp1QPlqZ9Fxw==
 
-"@hindawi/phenom-ui@0.1.0-beta.58":
-  version "0.1.0-beta.58"
-  resolved "https://registry.yarnpkg.com/@hindawi/phenom-ui/-/phenom-ui-0.1.0-beta.58.tgz#8f25a0f71f9ea0403eab8b4070e3e4486709d65d"
-  integrity sha512-X9z8DsdHfh/VYARvLfGON+xuLYWpROS9/wL3g9H/D7SopyEWgNcWDWoKqC57HD4HV73aSbLFJom8yjzJJhjgtw==
+"@hindawi/phenom-ui@0.1.0-beta.61":
+  version "0.1.0-beta.61"
+  resolved "https://registry.yarnpkg.com/@hindawi/phenom-ui/-/phenom-ui-0.1.0-beta.61.tgz#90b9d3594a59cc66a2be34031aa9700213c32540"
+  integrity sha512-niFsKWBCgiBchSBPu0L8QVR+yiCkxucAEl3FvGP6tn9uNB7i1ZIegzXHzASonDThdCsb1WcaJfmaqk7Jk5LxOw==
   dependencies:
     "@ant-design/icons" "^4.6.2"
     antd "^4.14.1"

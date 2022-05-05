@@ -304,9 +304,7 @@ const ApcContainer: React.FC = () => {
                   },
                 }}
                 rowKey={(record) => record.id}
-                rowClassName={(record, index) =>
-                  index % 2 === 0 ? 'table-row-light' : 'table-row-dark'
-                }
+                rowClassName={'table-row-light'}
                 dataSource={data.invoicingJournals?.catalogItems}
                 pagination={{
                   pageSize: 50,
@@ -317,7 +315,8 @@ const ApcContainer: React.FC = () => {
                   showLessItems: true,
                   showSizeChanger: false,
                   showQuickJumper: false,
-                  position: ['bottomCenter'],
+                  position: ['bottomRight'],
+                  style: { paddingRight: '1em' },
                 }}
               />
             </Card>

@@ -78,12 +78,35 @@ span.anticon.edit-button {
   background-color: white !important;
 }
 
-.ant-table-cell:first-child {
-  padding-left: 32px !important;
-}
-
 .ant-table-content {
   border: 1px !important;
+}
+
+.invoices-table {
+  .ant-table-cell:first-child {
+    padding-left: 24px !important;
+  }
+  .ant-table-tbody > tr > td {
+    padding-right: 6px !important;
+  }
+
+  .ant-table-cell:last-child {
+    padding-right: 16px !important;
+  }
+}
+
+.creditNotes-table {
+  .ant-table-tbody > tr > td {
+    padding-right: 6px !important;
+  }
+
+  .ant-table-cell:last-child {
+    padding-right: 16px !important;
+  }
+}
+
+.ant-table-tbody > tr > td:first-child {
+  padding-left: 32px !important;
 }
 
 span.anticon.notification-input-icon {
@@ -174,4 +197,19 @@ h2.ant-typography.primary.apc-header {
   .ant-modal-close {
     visibility: hidden;
   }
+}
+
+.sidebar-menu__entry {
+  .anticon {
+    svg {
+      width: 24px;
+      height: 24px;
+      margin-bottom: 0.5em;
+    }
+  }
+}
+
+.ant-table {
+  border-bottom: 1px solid #e0e0e0;
+  border-radius: 2% 2% 0% 0% !important;
 }

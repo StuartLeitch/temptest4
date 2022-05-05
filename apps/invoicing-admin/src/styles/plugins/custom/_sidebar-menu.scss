@@ -27,11 +27,12 @@
       > .sidebar-menu__entry__link {
         @include sidebar-menu-item--active;
 
-        background-color: #F5F5F5 !important;
+        background-color: #f5f5f5 !important;
         color: #333333 !important;
+        height: 86px !important;
         /* Neutrals/Grey 30 */
 
-        border: 2px solid #E0E0E0;
+        border: 2px solid #e0e0e0;
 
         > .sidebar-menu__entry__icon {
           color: #333 !important;
@@ -42,6 +43,12 @@
           box-shadow: none !important;
         }
       }
+    }
+
+    .sidebar-menu__entry__link {
+      color: #fff;
+      height: 86px !important;
+      padding-top: 1.25em;
     }
 
     &__link {
@@ -63,6 +70,8 @@
           display: block;
           text-align: center;
           align-items: center;
+          font-size: 12px !important;
+          font-weight: 700;
         }
       }
 

@@ -1,40 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React from 'react';
-import useDebouncedCallback from "use-debounce/lib/useDebouncedCallback";
+import useDebouncedCallback from 'use-debounce/lib/useDebouncedCallback';
+import { Checkbox } from '@hindawi/phenom-ui';
 
-import {
-  // Button,
-  CustomInput,
-  // Input,
-  // InputGroup,
-  // InputGroupAddon,
-  Nav,
-  NavItem,
-  NavLink,
-} from '../../../components';
+import { Nav, NavItem, NavLink } from '../../../components';
 
 const CreditNotesLeftNav = (props) => {
   const reason = props?.filters?.reason || [];
-  // const transactionStatus = props?.filters?.transactionStatus || [];
-  // const journalId = props?.filters?.journalId || [];
-  // const referenceNumber = props?.filters?.referenceNumber || '';
-  // const customId = props?.filters?.customId || '';
-  const regexRef = new RegExp(/^[0-9/_-]*$/g)
+
+  const regexRef = new RegExp(/^[0-9/_-]*$/g);
 
   const onFilterHandler = useDebouncedCallback((eventTarget: any) => {
     const value =
       eventTarget?.type === 'checkbox'
         ? eventTarget.checked
         : eventTarget.value;
-      props.setFilter(eventTarget.name, value);
+    props.setFilter(eventTarget.name, value);
   }, 300);
-
-  const referenceFilter = (eventTarget: any) => {
-    const value = eventTarget.value;
-    const validatedValue = regexRef.test(value) ? value : eventTarget.preventDefault()
-    props.setFilter(eventTarget.name, validatedValue)
-  };
 
   return (
     <React.Fragment>
@@ -47,70 +30,64 @@ const CreditNotesLeftNav = (props) => {
           </NavLink>
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
-          <CustomInput
+          <Checkbox
             onChange={(evt) => onFilterHandler.callback(evt.target)}
             name='reason.WITHDRAWN_MANUSCRIPT'
             checked={reason.includes('WITHDRAWN_MANUSCRIPT')}
-            type='checkbox'
             id='creditnote-reason-withdrawn-manuscript'
-            label='Withdrawn Manuscript'
-            inline
-          />
+          >
+            Withdrawn Manuscript
+          </Checkbox>
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
-          <CustomInput
+          <Checkbox
             name='reason.REDUCTION_APPLIED'
             onChange={(evt) => onFilterHandler.callback(evt.target)}
             checked={reason.includes('REDUCTION_APPLIED')}
-            type='checkbox'
             id='creditnote-reason-reduction-applied'
-            label='Reduction Applied'
-            inline
-          />
+          >
+            Reduction Applied
+          </Checkbox>
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
-          <CustomInput
+          <Checkbox
             name='reason.WAIVED_MANUSCRIPT'
             onChange={(evt: any) => onFilterHandler.callback(evt.target)}
             checked={reason.includes('WAIVED_MANUSCRIPT')}
-            type='checkbox'
             id='creditnote-reason-waived-manuscript'
-            label='Waived Manuscript'
-            inline
-          />
+          >
+            Waived Manuscript
+          </Checkbox>
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
-          <CustomInput
+          <Checkbox
             name='reason.CHANGE_PAYER_DETAILS'
             onChange={(evt: any) => onFilterHandler.callback(evt.target)}
             checked={reason.includes('CHANGE_PAYER_DETAILS')}
-            type='checkbox'
             id='creditnote-reason-change-payer-details'
-            label='Change Payer Details'
-            inline
-          />
+          >
+            Change Payer Details
+          </Checkbox>
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
-          <CustomInput
+          <Checkbox
             name='reason.BAD_DEBT'
             onChange={(evt: any) => onFilterHandler.callback(evt.target)}
             checked={reason.includes('BAD_DEBT')}
-            type='checkbox'
             id='creditnote-reason-bad-debt'
-            label='Bad Debt'
-            inline
-          />
+          >
+            Bad Debt
+          </Checkbox>
         </NavItem>
         <NavItem className='d-flex px-2 mb-2'>
-          <CustomInput
+          <Checkbox
             name='reason.OTHER'
             onChange={(evt: any) => onFilterHandler.callback(evt.target)}
             checked={reason.includes('OTHER')}
-            type='checkbox'
             id='creditnote-reason-other'
-            label='Other'
-            inline
-          />
+          >
+            Other
+          </Checkbox>
         </NavItem>
       </Nav>
       {/* END Reason */}

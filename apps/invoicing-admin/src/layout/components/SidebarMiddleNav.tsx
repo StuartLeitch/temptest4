@@ -1,11 +1,19 @@
 import React from 'react';
 
 import { SidebarMenu } from '../../components';
+import {
+  IconInvoices,
+  IconAPC,
+  IconAuditLogs,
+  IconCreditNote,
+  IconCoupon,
+} from '@hindawi/phenom-ui';
 
 export const SidebarMiddleNav: React.FC = () => (
   <SidebarMenu>
     <SidebarMenu.Item
-      icon={<i className='fas fa-fw fa-file-invoice-dollar'></i>}
+      className='invoices'
+      icon={<IconInvoices className='invoices-icon' />}
       title='Invoices'
       to='/invoices/list'
       exact
@@ -14,7 +22,7 @@ export const SidebarMiddleNav: React.FC = () => (
     </SidebarMenu.Item>
 
     <SidebarMenu.Item
-      icon={<i className='fas fa-fw fa-minus-square'></i>}
+      icon={<IconCreditNote />}
       title='Credit Notes'
       to='/credit-notes/list'
       exact
@@ -23,7 +31,7 @@ export const SidebarMiddleNav: React.FC = () => (
     </SidebarMenu.Item>
 
     <SidebarMenu.Item
-      icon={<i className='fas fa-ticket-alt'></i>}
+      icon={<IconCoupon />}
       title='Coupons'
       to='/coupons/list'
       exact
@@ -35,11 +43,11 @@ export const SidebarMiddleNav: React.FC = () => (
       title='APC'
       to='/dashboards/apc'
       exact
-      icon={<i className='fas fa-landmark'></i>}
+      icon={<IconAPC />}
     />
 
     <SidebarMenu.Item
-      icon={<i className='fas fa-folder-open'></i>}
+      icon={<IconAuditLogs />}
       title='Audit'
       to='/dashboards/audit_logs'
       exact

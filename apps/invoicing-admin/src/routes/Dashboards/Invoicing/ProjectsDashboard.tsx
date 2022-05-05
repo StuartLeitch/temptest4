@@ -50,11 +50,11 @@ const ProjectsDashboard: React.FC = () => {
     (defaultFilters as any).customId
   );
 
-  let queryParams = new URLSearchParams(window.location.search)
+  const queryParams = new URLSearchParams(window.location.search)
 
-  let customIdParam = queryParams.get('customId')
-  let referenceNumberParam = queryParams.get('referenceNumber')
-  let pageParam = queryParams.get('page')
+  const customIdParam = queryParams.get('customId')
+  const referenceNumberParam = queryParams.get('referenceNumber')
+  const pageParam = queryParams.get('page')
 
   let queryParamsFilter = {
     referenceNumber: referenceNumberParam,
@@ -101,10 +101,10 @@ const ProjectsDashboard: React.FC = () => {
   };
 
   const handleSearch = useCallback(async (ev: any) => {
-    
+
     ev.preventDefault();
-    
-    
+
+
     const searchValue = (document.getElementById('search') as any).value;
     const isSearchByRefNumberChecked = (document.getElementById('searchByReferenceNumber') as any).checked;
     const isSearchByManuscriptIdChecked = (document.getElementById('searchByManuscriptId') as any).checked;
@@ -115,14 +115,14 @@ const ProjectsDashboard: React.FC = () => {
       delete queryParamsFilter['customId'];
       queryParamsFilter['referenceNumber'] = searchValue;
       setFilter('referenceNumber', searchValue);
-     
+
     }
 
     if (isSearchByManuscriptIdChecked) {
       delete queryParamsFilter['referenceNumber'];
       queryParamsFilter['customId'] = searchValue;
       setFilter('customId', searchValue)
-    
+
     }
 
     setSearchFilters(queryParamsFilter);
@@ -140,10 +140,10 @@ const ProjectsDashboard: React.FC = () => {
 
     fetchData();
   }, [searchFilters]);
- 
+
   useEffect(() => {
     async function fetchData() {
-      
+
       const customId = queryParams.get('customId')
       const referenceNumber = queryParams.get('referenceNumber')
 
@@ -166,7 +166,7 @@ const ProjectsDashboard: React.FC = () => {
 }, [searchFilters]);
 
   return (
-    <Container>
+    <Container className="mt-4">
       <Row className='mb-5'>
         <Col lg={12}>
           <HeaderMain title='Invoicing' className='mb-4 mb-lg-5' />
@@ -268,7 +268,7 @@ function setFilter(key: string, value: boolean | string | any[]) {
 
   switch (name) {
     case 'page':
-      setPage(value as string); 
+      setPage(value as string);
       break;
 
     case 'referenceNumber':

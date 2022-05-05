@@ -2,19 +2,16 @@ import React, { useEffect, useCallback } from 'react';
 import { useManualQuery } from 'graphql-hooks';
 import { useQueryState } from 'react-router-use-location-state';
 import { Filters } from '@utils';
+
 import { useLocalStorage } from '@rehooks/local-storage';
+import { Table, Tag } from '@hindawi/phenom-ui';
+import { Link } from 'react-router-dom';
+import numeral from 'numeral';
 
-import {
-  Card,
-  CardFooter,
-  Error,
-  ListPagination,
-  Table,
-} from '../../../components';
+import { Card, Error } from '../../../components';
 
-// import { TrTableInvoicesList } from './components/TrTableList';
-import { InvoicesTableBody } from './components/TableBody';
 import { Loading } from '../../components';
+import { formatDate } from '../../../utils/date';
 
 import { INVOICES_QUERY } from './graphql';
 
@@ -25,9 +22,8 @@ const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
     pagination: defaultPaginator,
   });
 
-  const [fetchInvoices, { loading, error, data }] = useManualQuery(
-    INVOICES_QUERY
-  );
+  const [fetchInvoices, { loading, error, data }] =
+    useManualQuery(INVOICES_QUERY);
 
   const [page, setPageInUrl] = useQueryState('page', defaultPaginator.page);
 
@@ -62,18 +58,123 @@ const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
 
   if (error) return <Error data={error as any} />;
 
+  /*eslint-disable */
+  const INVOICE_STATUS = {
+    FINAL: (
+      <Tag
+        label='FINAL'
+        style={{ background: 'transparent', color: '#1BD2AD' }}
+      />
+    ),
+    ACTIVE: <Tag label='ACTIVE' status='success' />,
+    DRAFT: <Tag label='DRAFT' status='info' />,
+  };
+
+  const columns = [
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      width: '9%',
+      align: 'left' as const,
+      render: (status) => INVOICE_STATUS[status],
+    },
+    {
+      title: 'Manuscript Custom ID',
+      dataIndex: 'id',
+      key: 'customId',
+      align: 'center' as const,
+      width: '22%',
+      render: (id, record) => (
+        <Link to={`/invoices/details/${id}`} className='text-decoration-none'>
+          {record?.invoiceItem?.article?.customId}
+        </Link>
+      ),
+    },
+    {
+      title: 'Reference Number',
+      dataIndex: 'referenceNumber',
+      key: 'referenceNumber',
+      align: 'center' as const,
+      width: '20%',
+      render: (referenceNumber, record) => (
+        <Link
+          to={`/invoices/details/${record.id}`}
+          className='text-decoration-none'
+        >
+          {referenceNumber}
+        </Link>
+      ),
+    },
+    {
+      title: 'Total',
+      dataIndex: 'price',
+      key: 'price',
+      align: 'right' as const,
+      width: '15%',
+      render: (price, record) => {
+        // * applied coupons
+        let coupons = 0;
+        record.invoiceItem.coupons.forEach((c) => {
+          coupons += c.reduction;
+        });
+
+        // * applied waivers
+        let waivers = 0;
+        record.invoiceItem.waivers.forEach((w) => {
+          waivers += w.reduction;
+        });
+
+        const netCharges =
+          record.invoiceItem.price * (1 - (coupons + waivers) / 100) * 100;
+        const total = netCharges + (netCharges * record.invoiceItem.vat) / 100;
+        record.total = Math.round(total) / 100;
+
+        return (
+          <Tag
+            label={numeral(record.total).format('$0.00')}
+            status='success'
+            large
+          />
+        );
+      },
+    },
+    {
+      title: 'Issued',
+      dataIndex: 'dateIssued',
+      key: 'dateIssued',
+      align: 'right' as const,
+      width: '17%',
+      render: (date) => date && formatDate(new Date(date)),
+    },
+    {
+      title: 'Accepted',
+      dataIndex: 'dateAccepted',
+      key: 'dateAccepted',
+      align: 'right' as const,
+      width: '17%',
+      render: (date) => date && formatDate(new Date(date)),
+    },
+  ];
+
   return (
     <Card className='mb-0'>
-      <InvoicesTableBody data={data?.invoices} />
-      <CardFooter className='d-flex justify-content-center pb-0'>
-        <ListPagination
-          totalRecords={data?.invoices?.totalCount}
-          pageNeighbours={1}
-          onPageChanged={onPageChange}
-          pageLimit={defaultPaginator.limit}
-          currentPage={page}
-        />
-      </CardFooter>
+      <Table
+        className='invoices-table'
+        columns={columns}
+        rowKey={(record) => record.id}
+        rowClassName={'table-row-light'}
+        dataSource={data?.invoices?.invoices}
+        pagination={{
+          pageSize: 10,
+          total: data?.invoices?.totalCount,
+          current: page,
+          onChange: (page, pageSize) => onPageChange({ currentPage: page }),
+          showSizeChanger: false,
+          position: ['bottomRight'],
+          style: { paddingRight: '1em' },
+        }}
+      />
     </Card>
   );
 };

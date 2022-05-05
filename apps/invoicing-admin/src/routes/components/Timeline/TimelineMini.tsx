@@ -1,8 +1,9 @@
 import React from 'react';
 import faker from 'faker/locale/en_US';
 import PropTypes from 'prop-types';
+import { Tag } from '@hindawi/phenom-ui';
 
-import { Badge } from '../../../components';
+// import { Badge } from '../../../components';
 
 const TimelineMini = props => (
   <React.Fragment>
@@ -12,7 +13,7 @@ const TimelineMini = props => (
         <React.Fragment>
           {/* START PILL Date */}
           <div className='timeline-date'>
-            <Badge pill>{props.pillDate}</Badge>
+            <Tag label={props.pillDate} />
           </div>
           {/* END PILL Date */}
         </React.Fragment>
