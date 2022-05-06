@@ -1,6 +1,8 @@
 import { UniqueEntityID } from '@hindawi/shared';
 
 import { Manuscript, Author, File, Journal } from '../../models';
+import {ActiveJournal} from "../../models/submission-system-models/active-journal";
+import {SourceJournal} from "../../models/submission-system-models/source-journal";
 
 export interface SubmissionServiceContract {
   createNewDraftSubmission(): Promise<UniqueEntityID>;
@@ -13,5 +15,7 @@ export interface SubmissionServiceContract {
     authors: Array<Author>
   ): Promise<void>;
   uploadFiles(submissionId: UniqueEntityID, files: Array<File>): Promise<void>;
-  getAllActiveJournals(): Promise<Array<Journal>>;
+  getAllActiveJournals(): Promise<Array<ActiveJournal>>;
+  getSourceJournals(): Promise<SourceJournal[]>;
+
 }

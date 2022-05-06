@@ -5,11 +5,15 @@ import {MultiError} from 'verror';
 import gql from 'graphql-tag';
 
 import {Manuscript, Author, File, Journal} from '../../models';
-import {JournalMapper} from '../../models/mappers';
 
 import {SubmissionServiceContract} from '../contracts';
 import {KeycloakAuthenticator} from "./keycloakAuthenticator";
 import {env} from "@hindawi/import-manuscript-validation/env";
+import {JournalMapper} from "../../models/mappers";
+import {ActiveJournal} from "../../models/submission-system-models/active-journal";
+import {ActiveJournalMapper} from "../../models/mappers/active-journal-mapper";
+import {SourceJournal} from "../../models/submission-system-models/source-journal";
+import {SourceJournalMapper} from "../../models/mappers/source-journal-mapper";
 
 type GqlVariables = Record<string, unknown>;
 type GqlResponse<T = unknown> = {
@@ -33,6 +37,7 @@ type GqlErrorResponse = {
 };
 
 export class SubmissionService implements SubmissionServiceContract {
+
   private logger: LoggerContract = new LoggerBuilder('Import/Manuscript/Backend/SubmissionService', {
     isDevelopment: env.isDevelopment,
     logLevel: env.log.level,
@@ -44,8 +49,8 @@ export class SubmissionService implements SubmissionServiceContract {
   ) {
   }
 
-  async getAllActiveJournals(): Promise<Journal[]> {
-    const aa = gql`
+  async getAllActiveJournals(): Promise<ActiveJournal[]> {
+    const activeJournalsQuery = gql`
       query getActiveJournals {
         getActiveJournals {
           id
@@ -62,13 +67,32 @@ export class SubmissionService implements SubmissionServiceContract {
         }
       }
     `;
-
     const response = await this.callGraphql<{ getActiveJournals: Array<any> }>(
+      activeJournalsQuery
+    );
+    return response.getActiveJournals.map(ActiveJournalMapper.toDomain);
+  }
+
+  async getSourceJournals(): Promise<SourceJournal[]> {
+    const aa = gql`
+      query getSourceJournals {
+        getSourceJournals {
+          id
+          name
+#          eissn must change review api to return eissn
+#          pissn must change review api to return pissn
+          __typename
+        }
+      }
+    `;
+
+    const response = await this.callGraphql<{ getSourceJournals: Array<any> }>(
       aa
     );
 
-    return response.getActiveJournals.map(JournalMapper.toDomain);
+    return response.getSourceJournals.map(SourceJournalMapper.toDomain);
   }
+
 
   async createNewDraftSubmission(): Promise<UniqueEntityID> {
     return null;

@@ -1,9 +1,9 @@
 import Knex from "knex";
-import {ManuscriptUploadInfo} from "../../models/manuscriptUploadInfo";
 import {LoggerBuilder, LoggerContract} from "@hindawi/shared";
 import {ManuscriptUploadInfoRepoContract} from "../contracts/manuscriptUploadInfoRepoContract";
-import {ManuscriptUploadInfoMapper} from "../../mappers/manuscriptInfoMapper";
 import {RepoError} from "../../../../../shared/src/lib/infrastructure/RepoError";
+import {ManuscriptUploadInfo} from "../../models/manuscript-upload-info";
+import {ManuscriptUploadInfoMapper} from "../../models/mappers/manuscript-upload-info-mapper";
 
 export enum TABLES {
   IMPORTED_MANUSCRIPTS = 'imported_manuscripts',

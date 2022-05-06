@@ -65,5 +65,9 @@ export function buildServices(): Services {
     ),
   };
 
+  services.submissionService.getSourceJournals()
+    .then(result => console.log(JSON.stringify(result, null, 2)))
+    .catch(exception => console.log(exception))
+
   return services;
 }

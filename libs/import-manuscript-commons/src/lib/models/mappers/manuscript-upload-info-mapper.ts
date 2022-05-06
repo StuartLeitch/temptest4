@@ -1,5 +1,5 @@
 import {GuardFailure, Mapper, UniqueEntityID} from "@hindawi/shared";
-import {ManuscriptUploadInfo} from "../models/manuscriptUploadInfo";
+import {ManuscriptUploadInfo} from "../manuscript-upload-info";
 
 export class ManuscriptUploadInfoMapper extends Mapper<ManuscriptUploadInfo> {
   /**
