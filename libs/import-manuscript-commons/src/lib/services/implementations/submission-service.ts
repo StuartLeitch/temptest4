@@ -1,13 +1,15 @@
-import axios, { AxiosRequestHeaders, AxiosError } from 'axios';
-import { UniqueEntityID } from '@hindawi/shared';
-import { ASTNode, print } from 'graphql';
-import { MultiError } from 'verror';
+import axios, {AxiosRequestHeaders, AxiosError} from 'axios';
+import {LoggerBuilder, LoggerContract, UniqueEntityID} from '@hindawi/shared';
+import {ASTNode, print} from 'graphql';
+import {MultiError} from 'verror';
 import gql from 'graphql-tag';
 
-import { Manuscript, Author, File, Journal } from '../../models';
-import { JournalMapper } from '../../models/mappers';
+import {Manuscript, Author, File, Journal} from '../../models';
+import {JournalMapper} from '../../models/mappers';
 
-import { SubmissionServiceContract } from '../contracts';
+import {SubmissionServiceContract} from '../contracts';
+import {KeycloakAuthenticator} from "./keycloakAuthenticator";
+import {env} from "@hindawi/import-manuscript-validation/env";
 
 type GqlVariables = Record<string, unknown>;
 type GqlResponse<T = unknown> = {
@@ -31,10 +33,16 @@ type GqlErrorResponse = {
 };
 
 export class SubmissionService implements SubmissionServiceContract {
+  private logger: LoggerContract = new LoggerBuilder('Import/Manuscript/Backend/SubmissionService', {
+    isDevelopment: env.isDevelopment,
+    logLevel: env.log.level,
+  }).getLogger();
+
   constructor(
     private readonly submissionEndpoint: string,
-    private readonly authToken: string
-  ) {}
+    private readonly keycloakAuthenticator: KeycloakAuthenticator,
+  ) {
+  }
 
   async getAllActiveJournals(): Promise<Journal[]> {
     const aa = gql`
@@ -91,16 +99,16 @@ export class SubmissionService implements SubmissionServiceContract {
     request: ASTNode,
     variable?: GqlVariables
   ): Promise<T> {
+
+    const authorizationToken = await this.keycloakAuthenticator.getAuthorizationToken();
     const headers: AxiosRequestHeaders = {
-      Authorization: `Bearer ${this.authToken}`,
+      Authorization: `Bearer ${authorizationToken}`,
       'content-type': 'application/json',
     };
-
     const graphqlQuery = {
       query: print(request),
       variables: variable,
     };
-
     try {
       const resp = await axios.post<GqlResponse<T>>(
         this.submissionEndpoint,
@@ -110,7 +118,8 @@ export class SubmissionService implements SubmissionServiceContract {
         }
       );
 
-      return resp.data.data;
+      const response = resp.data.data;
+      return response;
     } catch (err) {
       throw parseGqlErrors(err);
     }

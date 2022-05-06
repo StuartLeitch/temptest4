@@ -15,6 +15,10 @@ import {
 import { EmailService } from '../libs/email';
 
 import { env } from '../env';
+import {
+  KeycloakAuthenticator
+} from "../../../../libs/import-manuscript-commons/src/lib/services/implementations/keycloakAuthenticator";
+import Keycloak from "keycloak-connect";
 
 export interface Services {
   objectStoreService: ObjectStoreServiceContract;
@@ -25,7 +29,15 @@ export interface Services {
   emailService: EmailService;
 }
 
-export function buildServices(loggerBuilder: LoggerBuilder): Services {
+export function buildServices(): Services {
+  const keycloak = new Keycloak({}, env.app.submissionKeycloakConfig);
+
+  const reviewSystemAuthenticator: KeycloakAuthenticator = new KeycloakAuthenticator(
+    env.app.submissionAdminUsername,
+    env.app.submissionAdminPassword,
+    keycloak
+  )
+
   const services: Services = {
     objectStoreService: new S3Service(
       env.aws.s3.zipBucket,
@@ -49,7 +61,7 @@ export function buildServices(loggerBuilder: LoggerBuilder): Services {
     ),
     submissionService: new SubmissionService(
       env.app.submissionGraphqlEndpoint,
-      env.app.submissionAuthToken
+      reviewSystemAuthenticator
     ),
   };
 

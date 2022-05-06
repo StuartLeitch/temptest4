@@ -727,7 +727,7 @@
         }
       }
     },
-    "lib-import-manuscript-commons": {
+    "import-manuscript-commons": {
       "root": "libs/import-manuscript-commons",
       "sourceRoot": "libs/import-manuscript-commons/src",
       "projectType": "library",
@@ -760,6 +760,7 @@
           "builder": "@nrwl/jest:jest",
           "options": {
             "jestConfig": "libs/import-manuscript-commons/jest.config.js",
+            "tsConfig": "libs/import-manuscript-commons/tsconfig.spec.json",
             "passWithNoTests": true
           }
         }

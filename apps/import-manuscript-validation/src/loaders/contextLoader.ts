@@ -12,17 +12,16 @@ export const contextLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ) => {
   if (settings) {
-    const loggerBuilder = new LoggerBuilder('Import/Manuscript/Backend', {
+    const loggerBuilder = new LoggerBuilder('Import/Manuscript/Validation', {
       isDevelopment: env.isDevelopment,
       logLevel: env.log.level,
     });
 
-    const services = await buildServices(loggerBuilder);
+    const services = await buildServices();
 
     const context: Context = {
       services,
       loggerBuilder,
-      keycloakAuth: null,
     };
 
     settings.setData('context', context);

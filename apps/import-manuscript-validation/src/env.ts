@@ -4,7 +4,7 @@ import {
   getOsEnvOptionalIfOtherExists,
   getOsEnvOptional,
   getOsEnv,
-  toBool,
+  toBool, toObject,
 } from '@hindawi/env-utils';
 
 export const env = {
@@ -20,7 +20,10 @@ export const env = {
     banner: toBool(getOsEnv('APP_BANNER')),
     xmlDefinitionsLocation: getOsEnv('IMPORT_MANUSCRIPT_XML_DEFINITION_PATH'),
     submissionGraphqlEndpoint: getOsEnv('IMPORT_MANUSCRIPT_SUBMISSION_GRAPHQL'),
-    submissionAuthToken: getOsEnv('IMPORT_MANUSCRIPT_SUBMISSION_AUTH_TOKEN'),
+    submissionAdminUsername: getOsEnv('IMPORT_MANUSCRIPT_SUBMISSION_ADMIN_USERNAME'),
+    submissionAdminPassword: getOsEnv('IMPORT_MANUSCRIPT_SUBMISSION_ADMIN_PASSWORD'),
+    submissionKeycloakConfig: toObject(getOsEnv('IMPORT_MANUSCRIPT_SUBMISSION_KEYCLOAK_CONFIG')),
+    submissionKeycloakClientId: getOsEnv('IMPORT_MANUSCRIPT_SUBMISSION_KEYCLOAK_CLIENT_ID'),
   },
   log: {
     level: getOsEnv('LOG_LEVEL'),
