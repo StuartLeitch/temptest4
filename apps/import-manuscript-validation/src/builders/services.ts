@@ -15,10 +15,8 @@ import {
 import { EmailService } from '../libs/email';
 
 import { env } from '../env';
-import {
-  KeycloakAuthenticator
-} from "../../../../libs/import-manuscript-commons/src/lib/services/implementations/keycloakAuthenticator";
-import Keycloak from "keycloak-connect";
+import { KeycloakAuthenticator } from '../../../../libs/import-manuscript-commons/src/lib/services/implementations/keycloakAuthenticator';
+import Keycloak from 'keycloak-connect';
 
 export interface Services {
   objectStoreService: ObjectStoreServiceContract;
@@ -32,11 +30,12 @@ export interface Services {
 export function buildServices(): Services {
   const keycloak = new Keycloak({}, env.app.submissionKeycloakConfig);
 
-  const reviewSystemAuthenticator: KeycloakAuthenticator = new KeycloakAuthenticator(
-    env.app.submissionAdminUsername,
-    env.app.submissionAdminPassword,
-    keycloak
-  )
+  const reviewSystemAuthenticator: KeycloakAuthenticator =
+    new KeycloakAuthenticator(
+      env.app.submissionAdminUsername,
+      env.app.submissionAdminPassword,
+      keycloak
+    );
 
   const services: Services = {
     objectStoreService: new S3Service(
@@ -65,9 +64,10 @@ export function buildServices(): Services {
     ),
   };
 
-  services.submissionService.getSourceJournals()
-    .then(result => console.log(JSON.stringify(result, null, 2)))
-    .catch(exception => console.log(exception))
+  services.submissionService
+    .createNewDraftSubmission('2', '2', '2', '2')
+    .then((result) => console.log(JSON.stringify(result, null, 2)))
+    .catch((exception) => console.log(exception));
 
   return services;
 }

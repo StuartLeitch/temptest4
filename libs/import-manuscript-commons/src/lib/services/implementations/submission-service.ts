@@ -1,19 +1,24 @@
-import axios, {AxiosRequestHeaders, AxiosError} from 'axios';
-import {LoggerBuilder, LoggerContract, UniqueEntityID} from '@hindawi/shared';
-import {ASTNode, print} from 'graphql';
-import {MultiError} from 'verror';
+import axios, { AxiosRequestHeaders, AxiosError } from 'axios';
+import { LoggerBuilder, LoggerContract, UniqueEntityID } from '@hindawi/shared';
+import { ASTNode, print } from 'graphql';
+import { MultiError } from 'verror';
 import gql from 'graphql-tag';
 
-import {Manuscript, Author, File, Journal} from '../../models';
+import { Manuscript, Author, File, Journal } from '../../models';
 
-import {SubmissionServiceContract} from '../contracts';
-import {KeycloakAuthenticator} from "./keycloakAuthenticator";
-import {env} from "@hindawi/import-manuscript-validation/env";
-import {JournalMapper} from "../../models/mappers";
-import {ActiveJournal} from "../../models/submission-system-models/active-journal";
-import {ActiveJournalMapper} from "../../models/mappers/active-journal-mapper";
-import {SourceJournal} from "../../models/submission-system-models/source-journal";
-import {SourceJournalMapper} from "../../models/mappers/source-journal-mapper";
+import { SubmissionServiceContract } from '../contracts';
+import { KeycloakAuthenticator } from './keycloakAuthenticator';
+import { env } from '@hindawi/import-manuscript-validation/env';
+import { JournalMapper } from '../../models/mappers';
+import { ActiveJournal } from '../../models/submission-system-models/active-journal';
+import { ActiveJournalMapper } from '../../models/mappers/active-journal-mapper';
+import { SourceJournal } from '../../models/submission-system-models/source-journal';
+import { SourceJournalMapper } from '../../models/mappers/source-journal-mapper';
+import {
+  DraftSubmissionMapper,
+  RawDraftSubmissionProps,
+} from '../../models/mappers/draft-submission-mapper';
+import { DraftSubmission } from '../../models/submission-system-models/draft-submission';
 
 type GqlVariables = Record<string, unknown>;
 type GqlResponse<T = unknown> = {
@@ -37,17 +42,18 @@ type GqlErrorResponse = {
 };
 
 export class SubmissionService implements SubmissionServiceContract {
-
-  private logger: LoggerContract = new LoggerBuilder('Import/Manuscript/Backend/SubmissionService', {
-    isDevelopment: env.isDevelopment,
-    logLevel: env.log.level,
-  }).getLogger();
+  private logger: LoggerContract = new LoggerBuilder(
+    'Import/Manuscript/Backend/SubmissionService',
+    {
+      isDevelopment: env.isDevelopment,
+      logLevel: env.log.level,
+    }
+  ).getLogger();
 
   constructor(
     private readonly submissionEndpoint: string,
-    private readonly keycloakAuthenticator: KeycloakAuthenticator,
-  ) {
-  }
+    private readonly keycloakAuthenticator: KeycloakAuthenticator
+  ) {}
 
   async getAllActiveJournals(): Promise<ActiveJournal[]> {
     const activeJournalsQuery = gql`
@@ -79,8 +85,8 @@ export class SubmissionService implements SubmissionServiceContract {
         getSourceJournals {
           id
           name
-#          eissn must change review api to return eissn
-#          pissn must change review api to return pissn
+          #          eissn must change review api to return eissn
+          #          pissn must change review api to return pissn
           __typename
         }
       }
@@ -93,9 +99,28 @@ export class SubmissionService implements SubmissionServiceContract {
     return response.getSourceJournals.map(SourceJournalMapper.toDomain);
   }
 
+  async createNewDraftSubmission(
+    journalId: string,
+    sectionId: string,
+    specialIssuedId: string,
+    customId: string
+  ): Promise<string> {
+    const createNewDraftManuscriptMutation = gql`
+      mutation createNewDraftManuscript {
+        createNewDraftManuscript {
+          journalId
+          sectionId
+          specialIssueId
+          customId
+        }
+      }
+    `;
 
-  async createNewDraftSubmission(): Promise<UniqueEntityID> {
-    return null;
+    const response = await this.callGraphql<{
+      createNewDraftSubmission: RawDraftSubmissionProps;
+    }>(createNewDraftManuscriptMutation);
+
+    return DraftSubmissionMapper.toDomain(response.createNewDraftSubmission).id;
   }
 
   async setSubmissionAuthors(
@@ -123,8 +148,8 @@ export class SubmissionService implements SubmissionServiceContract {
     request: ASTNode,
     variable?: GqlVariables
   ): Promise<T> {
-
-    const authorizationToken = await this.keycloakAuthenticator.getAuthorizationToken();
+    const authorizationToken =
+      await this.keycloakAuthenticator.getAuthorizationToken();
     const headers: AxiosRequestHeaders = {
       Authorization: `Bearer ${authorizationToken}`,
       'content-type': 'application/json',
