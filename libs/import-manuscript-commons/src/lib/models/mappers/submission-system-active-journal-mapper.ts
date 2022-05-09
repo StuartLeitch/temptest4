@@ -19,7 +19,7 @@ export interface RawJournalProps {
   apc: number;
 }
 
-export class ActiveJournalMapper extends Mapper<ActiveJournal> {
+export class SubmissionSystemActiveJournalMapper extends Mapper<ActiveJournal> {
   static toDomain(raw: RawJournalProps): ActiveJournal {
     const props: ActiveJournalProps = {
       apc: raw.apc,

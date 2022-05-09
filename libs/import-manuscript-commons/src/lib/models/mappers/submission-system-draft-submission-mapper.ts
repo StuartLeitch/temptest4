@@ -8,8 +8,9 @@ export interface RawDraftSubmissionProps {
   id: string;
 }
 
-export class DraftSubmissionMapper extends Mapper<DraftSubmission> {
+export class SubmissionSystemDraftSubmissionMapper extends Mapper<DraftSubmission> {
   static toDomain(raw: Partial<RawDraftSubmissionProps>): DraftSubmission {
+    console.log(raw)
     const props: DraftSubmissionProps = {
       id: raw.id,
     };

@@ -1,25 +1,43 @@
-import { UniqueEntityID } from '@hindawi/shared';
+import {UniqueEntityID, ValueObjectProps} from '@hindawi/shared';
 
-import { Manuscript, Author, File, Journal } from '../../models';
-import { ActiveJournal } from '../../models/submission-system-models/active-journal';
-import { SourceJournal } from '../../models/submission-system-models/source-journal';
+import {Manuscript, File, Journal} from '../../models';
+import {ActiveJournal} from '../../models/submission-system-models/active-journal';
+import {SourceJournal} from '../../models/submission-system-models/source-journal';
+
+export type CreateDraftManuscriptInput = {
+  journalId: string;
+  sectionId: string;
+  specialIssueId: string;
+  customId: string;
+}
+
+export interface AuthorInput{
+  email: string;
+  givenNames: string;
+  surname: string;
+  affRorId: string;
+  country: string;
+  isSubmitting: boolean;
+  isCorresponding: boolean;
+  aff: string;
+}
+
 
 export interface SubmissionServiceContract {
-  createNewDraftSubmission(
-    journalId: string,
-    sectionId: string,
-    specialIssuedId: string,
-    customId: string
-  ): Promise<string>;
+  createNewDraftSubmission(input: CreateDraftManuscriptInput): Promise<string>;
   setSubmissionManuscriptDetails(
     submissionId: UniqueEntityID,
     manuscript: Manuscript
   ): Promise<void>;
+
   setSubmissionAuthors(
-    submissionId: UniqueEntityID,
-    authors: Array<Author>
-  ): Promise<void>;
+    manuscriptId: string,
+    authors: Array<AuthorInput>
+  ): Promise<string>;
+
   uploadFiles(submissionId: UniqueEntityID, files: Array<File>): Promise<void>;
+
   getAllActiveJournals(): Promise<Array<ActiveJournal>>;
+
   getSourceJournals(): Promise<SourceJournal[]>;
 }

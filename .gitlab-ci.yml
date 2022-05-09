@@ -197,6 +197,8 @@ pages:
 Build Production Dependencies:
   image: $BUILD_IMAGE
   variables:
+    KUBERNETES_MEMORY_REQUEST: 4Gi
+    KUBERNETES_CPU_REQUEST: 4
     FF_USE_FASTZIP: 1 # enable fastzip - a faster zip implementation that also supports level configuration.
     ARTIFACT_COMPRESSION_LEVEL: 'default' # can also be set to fastest, fast, slow and slowest. If just enabling fastzip is not enough try setting this to fastest or fast.
     CACHE_COMPRESSION_LEVEL: 'default' # same as above, but for caches

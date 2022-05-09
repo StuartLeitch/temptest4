@@ -1,45 +1,38 @@
-import axios, { AxiosRequestHeaders, AxiosError } from 'axios';
-import { LoggerBuilder, LoggerContract, UniqueEntityID } from '@hindawi/shared';
-import { ASTNode, print } from 'graphql';
-import { MultiError } from 'verror';
+import axios, {AxiosError, AxiosRequestHeaders} from 'axios';
+import {LoggerBuilder, LoggerContract, UniqueEntityID} from '@hindawi/shared';
+import {ASTNode, print} from 'graphql';
+import VError, {MultiError} from 'verror';
 import gql from 'graphql-tag';
 
-import { Manuscript, Author, File, Journal } from '../../models';
+import {File, Manuscript,} from '../../models';
 
-import { SubmissionServiceContract } from '../contracts';
-import { KeycloakAuthenticator } from './keycloakAuthenticator';
-import { env } from '@hindawi/import-manuscript-validation/env';
-import { JournalMapper } from '../../models/mappers';
-import { ActiveJournal } from '../../models/submission-system-models/active-journal';
-import { ActiveJournalMapper } from '../../models/mappers/active-journal-mapper';
-import { SourceJournal } from '../../models/submission-system-models/source-journal';
-import { SourceJournalMapper } from '../../models/mappers/source-journal-mapper';
+import {AuthorInput, CreateDraftManuscriptInput, SubmissionServiceContract} from '../contracts';
+import {KeycloakAuthenticator} from './keycloakAuthenticator';
+import {env} from '@hindawi/import-manuscript-validation/env';
+import {ActiveJournal} from '../../models/submission-system-models/active-journal';
+import {SubmissionSystemActiveJournalMapper} from '../../models/mappers/submission-system-active-journal-mapper';
+import {SourceJournal} from '../../models/submission-system-models/source-journal';
+import {SourceJournalMapper} from '../../models/mappers/source-journal-mapper';
 import {
-  DraftSubmissionMapper,
   RawDraftSubmissionProps,
-} from '../../models/mappers/draft-submission-mapper';
-import { DraftSubmission } from '../../models/submission-system-models/draft-submission';
+  SubmissionSystemDraftSubmissionMapper,
+} from '../../models/mappers/submission-system-draft-submission-mapper';
+import {
+  RawTeamMemberProps,
+  SubmissionSystemTeamMemberMapper
+} from "../../models/mappers/submission-system-team-member-mapper";
 
 type GqlVariables = Record<string, unknown>;
 type GqlResponse<T = unknown> = {
   data: T;
 };
 
-type GqlErrorLocation = { line: number; column: number };
-type GqlError = {
-  message: string;
-  locations: Array<GqlErrorLocation>;
-  extensions: {
-    code: string;
-    exception: {
-      stacktrace: Array<string>;
-    };
-  };
-};
+class GqlError extends Error {
+  constructor(public message: string, public serviceName: string, public code: string) {
+    super(message);
+  }
+}
 
-type GqlErrorResponse = {
-  errors: Array<GqlError>;
-};
 
 export class SubmissionService implements SubmissionServiceContract {
   private logger: LoggerContract = new LoggerBuilder(
@@ -76,7 +69,7 @@ export class SubmissionService implements SubmissionServiceContract {
     const response = await this.callGraphql<{ getActiveJournals: Array<any> }>(
       activeJournalsQuery
     );
-    return response.getActiveJournals.map(ActiveJournalMapper.toDomain);
+    return response.getActiveJournals.map(SubmissionSystemActiveJournalMapper.toDomain);
   }
 
   async getSourceJournals(): Promise<SourceJournal[]> {
@@ -99,35 +92,43 @@ export class SubmissionService implements SubmissionServiceContract {
     return response.getSourceJournals.map(SourceJournalMapper.toDomain);
   }
 
-  async createNewDraftSubmission(
-    journalId: string,
-    sectionId: string,
-    specialIssuedId: string,
-    customId: string
-  ): Promise<string> {
+  async createNewDraftSubmission(input: CreateDraftManuscriptInput): Promise<string> {
     const createNewDraftManuscriptMutation = gql`
-      mutation createNewDraftManuscript {
-        createNewDraftManuscript {
-          journalId
-          sectionId
-          specialIssueId
-          customId
+      mutation createDraftManuscript($input: CreateDraftManuscriptInput!) {
+        createDraftManuscript(input: $input) {
+          id
         }
       }
     `;
 
     const response = await this.callGraphql<{
-      createNewDraftSubmission: RawDraftSubmissionProps;
-    }>(createNewDraftManuscriptMutation);
+      createDraftManuscript: RawDraftSubmissionProps;
+    }>(createNewDraftManuscriptMutation, {input});
 
-    return DraftSubmissionMapper.toDomain(response.createNewDraftSubmission).id;
+    return SubmissionSystemDraftSubmissionMapper.toDomain(response.createDraftManuscript).id;
   }
 
   async setSubmissionAuthors(
-    submissionId: UniqueEntityID,
-    authors: Author[]
-  ): Promise<void> {
-    return null;
+    manuscriptId: string,
+    authors: AuthorInput[]
+  ): Promise<string> {
+
+    const addAuthorToManuscriptMutation = gql`
+      mutation addAuthorToManuscript($manuscriptId: String!, $authorInput: AuthorInput!) {
+        addAuthorToManuscript(manuscriptId: $manuscriptId, authorInput: $authorInput) {
+          id
+        }
+      }
+    `;
+
+    for (const authorInput of authors) {
+      const response = await this.callGraphql<{
+        addAuthorToManuscript: RawTeamMemberProps[];
+      }>(addAuthorToManuscriptMutation, {manuscriptId, authorInput});
+      return SubmissionSystemTeamMemberMapper.toDomain(response.addAuthorToManuscript).id
+    }
+
+    return;
   }
 
   async setSubmissionManuscriptDetails(
@@ -144,12 +145,8 @@ export class SubmissionService implements SubmissionServiceContract {
     return null;
   }
 
-  private async callGraphql<T = unknown>(
-    request: ASTNode,
-    variable?: GqlVariables
-  ): Promise<T> {
-    const authorizationToken =
-      await this.keycloakAuthenticator.getAuthorizationToken();
+  private async callGraphql<T = unknown>(request: ASTNode, variable?: GqlVariables): Promise<T> {
+    const authorizationToken = await this.keycloakAuthenticator.getAuthorizationToken();
     const headers: AxiosRequestHeaders = {
       Authorization: `Bearer ${authorizationToken}`,
       'content-type': 'application/json',
@@ -167,27 +164,21 @@ export class SubmissionService implements SubmissionServiceContract {
         }
       );
 
-      const response = resp.data.data;
-      return response;
+      if(resp.data["errors"]){
+        throw this.parseGqlErrors(resp.data["errors"])
+      }
+      return resp.data.data;
     } catch (err) {
-      throw parseGqlErrors(err);
+      throw new VError(err)
     }
+  }
+
+  private parseGqlErrors(errs: any[]): MultiError {
+    const gqlErrors: Array<GqlError> = new Array<GqlError>()
+    for (const err of errs) {
+      gqlErrors.push(new GqlError(err["message"], err["extensions"]["serviceName"], err["extensions"]["code"]))
+    }
+    return new MultiError(gqlErrors)
   }
 }
 
-function parseLocation(loc: GqlErrorLocation): string {
-  return `line: ${loc.line} column: ${loc.column}`;
-}
-
-function processError(err: GqlError): Error {
-  const errLocation = err.locations.map(parseLocation).join(' ');
-  const error = new Error(`${err.message} ${errLocation}`);
-
-  error.stack = err.extensions.exception.stacktrace.join('\n');
-
-  return error;
-}
-
-function parseGqlErrors(err: AxiosError<GqlErrorResponse>): Error {
-  return new MultiError(err.response.data.errors.map(processError));
-}

@@ -9,7 +9,7 @@ import {
   SubmissionService,
   ArchiveService,
   XmlService,
-  S3Service,
+  S3Service, AuthorInput,
 } from '@hindawi/import-manuscript-commons';
 
 import { EmailService } from '../libs/email';
@@ -64,8 +64,12 @@ export function buildServices(): Services {
     ),
   };
 
+  const authors: Array<AuthorInput> = [
+    {aff:"affiliation", email: "chuck" + Math.floor(Math.random() * 1000)  + "@norris.com", country: "deUndevaDaEroare", affRorId: "ceva", givenNames:"conan", surname:"siatat", isSubmitting:true, isCorresponding: true}
+  ]
+
   services.submissionService
-    .createNewDraftSubmission('2', '2', '2', '2')
+    .setSubmissionAuthors("4ab5efd7-4d87-4284-bfd2-1fc757c4ed8c", authors)
     .then((result) => console.log(JSON.stringify(result, null, 2)))
     .catch((exception) => console.log(exception));
 
