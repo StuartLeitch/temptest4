@@ -9,7 +9,7 @@ import { File, Manuscript } from '../../models';
 import {
   AuthorInput,
   CreateDraftManuscriptInput,
-  SubmissionServiceContract,
+  SubmissionServiceContract, SubmissionUploadFile,
 } from '../contracts';
 import { KeycloakAuthenticator } from './keycloakAuthenticator';
 import { env } from '@hindawi/import-manuscript-validation/env';
@@ -25,11 +25,12 @@ import {
   RawTeamMemberProps,
   SubmissionSystemTeamMemberMapper,
 } from '../../models/mappers/submission-system-team-member-mapper';
-import { SubmissionFile } from '../../models/submission-system-models/file-submission';
 import {
   RawSubmissionFileProps,
   SubmissionSystemFileMapper,
 } from '../../models/mappers/submission-system-file-mapper';
+import {SubmissionFile} from "../../models/submission-system-models";
+import {ReadStream} from "fs";
 
 type GqlVariables = Record<string, unknown>;
 type GqlResponse<T = unknown> = {
@@ -158,14 +159,14 @@ export class SubmissionService implements SubmissionServiceContract {
 
   async uploadFile(
     entityId: string,
-    fileInput: SubmissionFile,
-    file: any
+    fileInput: SubmissionUploadFile,
+    file: ReadStream
   ): Promise<string> {
     const uploadFileMutation = gql`
       mutation uploadFile(
         $entityId: String!
-        $fileInput: SubmissionFile
-        $file: any
+        $fileInput: FileInput
+        $file: Upload!
       ) {
         uploadFile(entityId: $entityId, fileInput: $fileInput, file: $file) {
           id
@@ -202,7 +203,7 @@ export class SubmissionService implements SubmissionServiceContract {
       await this.keycloakAuthenticator.getAuthorizationToken();
     const headers: AxiosRequestHeaders = {
       Authorization: `Bearer ${authorizationToken}`,
-      'content-type': 'form-data',
+      'content-type': 'application/json',
     };
     const graphqlQuery = {
       query: print(request),
@@ -220,6 +221,7 @@ export class SubmissionService implements SubmissionServiceContract {
       if (resp.data['errors']) {
         throw this.parseGqlErrors(resp.data['errors']);
       }
+      console.log(resp.data)
       return resp.data.data;
     } catch (err) {
       throw new VError(err);

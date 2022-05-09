@@ -10,7 +10,7 @@ import {
   ArchiveService,
   XmlService,
   S3Service,
-  AuthorInput,
+  AuthorInput, SubmissionUploadFile,
 } from '@hindawi/import-manuscript-commons';
 
 import { EmailService } from '../libs/email';
@@ -19,6 +19,7 @@ import { env } from '../env';
 import { KeycloakAuthenticator } from '../../../../libs/import-manuscript-commons/src/lib/services/implementations/keycloakAuthenticator';
 import Keycloak from 'keycloak-connect';
 import { SubmissionFile } from '../../../../libs/import-manuscript-commons/src/lib/models/submission-system-models/file-submission';
+import * as fs from "fs";
 
 export interface Services {
   objectStoreService: ObjectStoreServiceContract;
@@ -66,15 +67,15 @@ export function buildServices(): Services {
     ),
   };
 
-  const fileInput = SubmissionFile.create({
+  const fileInput :SubmissionUploadFile = {
     id: 'testId',
     size: 2,
-    name: 'test-manuscript',
+    name: 'test-manuscript.pdf',
     type: 'manuscript',
-  });
+  };
 
   services.submissionService
-    .uploadFile('4ab5efd7-4d87-4284-bfd2-1fc757c4ed8c', fileInput, 'file')
+    .uploadFile('4ab5efd7-4d87-4284-bfd2-1fc757c4ed8c', fileInput, fs.createReadStream('/home/andrei/Downloads/thing.pdf', ))
     .then((result) => console.log(JSON.stringify(result, null, 2)))
     .catch((exception) => console.log(exception));
 

@@ -4,6 +4,7 @@ import { Manuscript, File, Journal } from '../../models';
 import { ActiveJournal } from '../../models/submission-system-models/active-journal';
 import { SubmissionFile } from '../../models/submission-system-models/file-submission';
 import { SourceJournal } from '../../models/submission-system-models/source-journal';
+import {ReadStream} from "fs";
 
 export type CreateDraftManuscriptInput = {
   journalId: string;
@@ -22,6 +23,14 @@ export interface AuthorInput {
   isCorresponding: boolean;
   aff: string;
 }
+
+export interface SubmissionUploadFile {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+}
+
 
 export interface SubmissionServiceContract {
   createNewDraftSubmission(input: CreateDraftManuscriptInput): Promise<string>;
@@ -43,7 +52,7 @@ export interface SubmissionServiceContract {
 
   uploadFile(
     entityId: string,
-    fileInput: SubmissionFile,
-    file: any
+    fileInput: SubmissionUploadFile,
+    file: ReadStream
   ): Promise<string>;
 }
