@@ -1,17 +1,18 @@
-import {UniqueEntityID, ValueObjectProps} from '@hindawi/shared';
+import { UniqueEntityID, ValueObjectProps } from '@hindawi/shared';
 
-import {Manuscript, File, Journal} from '../../models';
-import {ActiveJournal} from '../../models/submission-system-models/active-journal';
-import {SourceJournal} from '../../models/submission-system-models/source-journal';
+import { Manuscript, File, Journal } from '../../models';
+import { ActiveJournal } from '../../models/submission-system-models/active-journal';
+import { SubmissionFile } from '../../models/submission-system-models/file-submission';
+import { SourceJournal } from '../../models/submission-system-models/source-journal';
 
 export type CreateDraftManuscriptInput = {
   journalId: string;
   sectionId: string;
   specialIssueId: string;
   customId: string;
-}
+};
 
-export interface AuthorInput{
+export interface AuthorInput {
   email: string;
   givenNames: string;
   surname: string;
@@ -21,7 +22,6 @@ export interface AuthorInput{
   isCorresponding: boolean;
   aff: string;
 }
-
 
 export interface SubmissionServiceContract {
   createNewDraftSubmission(input: CreateDraftManuscriptInput): Promise<string>;
@@ -40,4 +40,10 @@ export interface SubmissionServiceContract {
   getAllActiveJournals(): Promise<Array<ActiveJournal>>;
 
   getSourceJournals(): Promise<SourceJournal[]>;
+
+  uploadFile(
+    entityId: string,
+    fileInput: SubmissionFile,
+    file: any
+  ): Promise<string>;
 }
