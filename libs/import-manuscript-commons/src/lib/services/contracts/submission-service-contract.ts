@@ -25,8 +25,6 @@ export interface AuthorInput {
 }
 
 export interface SubmissionUploadFile {
-  id: string;
-  name: string;
   size: number;
   type: string;
 }
@@ -53,6 +51,6 @@ export interface SubmissionServiceContract {
   uploadFile(
     entityId: string,
     fileInput: SubmissionUploadFile,
-    file: ReadStream
+    fileName: string
   ): Promise<string>;
 }

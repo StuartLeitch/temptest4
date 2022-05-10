@@ -2,8 +2,7 @@ curl 'https://gateway.qa.phenom.pub/' \
 -H 'authority: gateway.qa.phenom.pub' \
 -H 'accept: */*' \
 -H 'accept-language: en-US,en;q=0.9' \
--H 'authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJ6cldrb0VzTS1ZS0MyZWdxRC16NzdwcTlWM2lnWklaRG9jMmFDZFBaVWZNIn0.eyJleHAiOjE2NTE4Mzc1NzEsImlhdCI6MTY1MTY2NDc3MiwiYXV0aF90aW1lIjoxNjUxNjY0NzcxLCJqdGkiOiJiNDhjMWRhZC0yNzNkLTQ5ZjMtOWIxYy0wNTI2OTYzY2FiZTMiLCJpc3MiOiJodHRwczovL3Nzby5kZXYucGhlbm9tLnB1Yi9hdXRoL3JlYWxtcy9QaGVub20iLCJhdWQiOlsicWEtcmV2aWV3IiwiaW52b2ljaW5nLWFkbWluIiwic3luZGljYXRpb24iLCJhY2NvdW50Il0sInN1YiI6Ijc2OWQzNjYzLWYyYWEtNDgwOS1iNDMzLTlkM2ZkMDJjNTA4MyIsInR5cCI6IkJlYXJlciIsImF6cCI6InFhLXJldmlldyIsIm5vbmNlIjoiMDMzYzUyNmQtMTJkMy00MjQxLWEyMmEtMTdhMTVkZTNjOTgxIiwic2Vzc2lvbl9zdGF0ZSI6Ijg0OTA5MDIzLTFmN2YtNGYyMy05NzBmLTRmZWY4YjhjZDM2MyIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL3FhLnJldmlldy5oaW5kYXdpLmNvbSIsImh0dHBzOi8vaW1wb3J0LW1hbnVzY3JpcHQucWEucGhlbm9tLnB1YiIsImh0dHBzOi8vcWEucmV2aWV3LmhpbmRhd2kuY29tIiwiaHR0cDovL2xvY2FsaG9zdCIsImh0dHBzOi8vcmV2aWV3LnFhLnBoZW5vbS5wdWIiLCJodHRwOi8vbG9jYWxob3N0OjQyMDAiLCJodHRwczovL3Jldmlldy5hdXRvbWF0aW9uLnBoZW5vbS5wdWIiLCJodHRwOi8vbG9jYWxob3N0OjMwMDAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJpbnZvaWNpbmctYWRtaW4iOnsicm9sZXMiOlsiYWRtaW4iXX0sInN5bmRpY2F0aW9uIjp7InJvbGVzIjpbImFkbWluIl19LCJxYS1yZXZpZXciOnsicm9sZXMiOlsiYWRtaW4iXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUiLCJzaWQiOiI4NDkwOTAyMy0xZjdmLTRmMjMtOTcwZi00ZmVmOGI4Y2QzNjMiLCJjb3VudHJ5IjoiUk8iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiYWZmaWxpYXRpb24iOiJoaW5kYXdpIiwibmFtZSI6IlJveGFuYSBMdWNhbiIsInByZWZlcnJlZF91c2VybmFtZSI6InJveGFuYS5sdWNhbkBoaW5kYXdpLmNvbSIsImdpdmVuX25hbWUiOiJSb3hhbmEiLCJ0aXRsZSI6Im1pc3MiLCJwaGVub21JZCI6Ijc2OWQzNjYzLWYyYWEtNDgwOS1iNDMzLTlkM2ZkMDJjNTA4MyIsImZhbWlseV9uYW1lIjoiTHVjYW4iLCJlbWFpbCI6InJveGFuYS5sdWNhbkBoaW5kYXdpLmNvbSIsInVzZXJuYW1lIjoicm94YW5hLmx1Y2FuQGhpbmRhd2kuY29tIn0.L_c1eeO4d21rzvJKt-D7DGY6SxaR4wyJyJsHhzago6xr2yu09MwwHJqNVlcGKRKyoItd2IeWqWsKjOXYgfoXKlp0nZ6S3VAXSwzX5z3n7fNuWP8g5PnxniNTpjslY_RVe41oq9GNolbVxCsQrgm4OGJMpl2MfcMcUWLkIdG0eP-A1e8vpoTcZ28kN4eVnr40Kx6aNCQYaA4tNJiDdr7s_X_GCxTWCtndajM_JLeOH9nnZQcJ5P1D4-AupOST62KRrQa3-GKWLi8-ewJONGmTSBo_KqBz12bo6SY0qcP3sCwIgeK-RM9oRiJmb9X8AYFmAOCJ0T2MmwdJQ6uUu-48og' \
--H 'content-type: application/json' \
+-H "Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJ6cldrb0VzTS1ZS0MyZWdxRC16NzdwcTlWM2lnWklaRG9jMmFDZFBaVWZNIn0.eyJleHAiOjE2NTIzNTAzMzksImlhdCI6MTY1MjE3NzUzOSwianRpIjoiNDc2NzY2NDgtOThlNS00NWQxLTg5OTMtNjg1MTg0NDRjYjViIiwiaXNzIjoiaHR0cHM6Ly9zc28uZGV2LnBoZW5vbS5wdWIvYXV0aC9yZWFsbXMvUGhlbm9tIiwiYXVkIjpbInFhLXJldmlldyIsImF1dG9tYXRpb24tcmV2aWV3IiwiaW52b2ljaW5nLWFkbWluIiwicWEtZ2FtbWEtcmV2aWV3IiwiaW52b2ljaW5nIiwicGhlbm9tIiwiYWNjb3VudCIsImRlbW8tcmV2aWV3Il0sInN1YiI6IjMyY2ZlNWIwLWFiZTItNDQ0Mi05YmNkLWE2ODRmMjc3YjM4MyIsInR5cCI6IkJlYXJlciIsImF6cCI6InFhLXJldmlldyIsInNlc3Npb25fc3RhdGUiOiJlYzMyMjA3NC00MDE5LTRiNmYtOTNhZC0wOTI5NjA2MmRkMWMiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9xYS5yZXZpZXcuaGluZGF3aS5jb20iLCJodHRwczovL2ltcG9ydC1tYW51c2NyaXB0LnFhLnBoZW5vbS5wdWIiLCJodHRwczovL3FhLnJldmlldy5oaW5kYXdpLmNvbSIsImh0dHA6Ly9sb2NhbGhvc3QiLCJodHRwczovL3Jldmlldy5xYS5waGVub20ucHViIiwiaHR0cDovL2xvY2FsaG9zdDo0MjAwIiwiaHR0cHM6Ly9yZXZpZXcuYXV0b21hdGlvbi5waGVub20ucHViIiwiaHR0cDovL2xvY2FsaG9zdDozMDAwIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJlZGl0b3JpYWxfYXNzaXN0YW50Iiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImF1dG9tYXRpb24tcmV2aWV3Ijp7InJvbGVzIjpbImFkbWluIl19LCJpbnZvaWNpbmctYWRtaW4iOnsicm9sZXMiOlsic3VwZXJfYWRtaW4iXX0sInFhLWdhbW1hLXJldmlldyI6eyJyb2xlcyI6WyJhZG1pbiJdfSwiaW52b2ljaW5nIjp7InJvbGVzIjpbImFkbWluIl19LCJwaGVub20iOnsicm9sZXMiOlsiYWRtaW4iXX0sInFhLXJldmlldyI6eyJyb2xlcyI6WyJlZGl0b3JpYWxfYXNzaXN0YW50IiwiYWNhZGVtaWNfZWRpdG9yIiwiYWRtaW4iXX0sImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfSwiZGVtby1yZXZpZXciOnsicm9sZXMiOlsiYWRtaW4iXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwic2lkIjoiZWMzMjIwNzQtNDAxOS00YjZmLTkzYWQtMDkyOTYwNjJkZDFjIiwiY291bnRyeSI6IlJPIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImFmZmlsaWF0aW9uIjoiUGhlbm9tIiwibmFtZSI6IkVuYWNoZSBBbmRyZWkiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJhbmRyZWkuZW5hY2hlQGhpbmRhd2kuY29tIiwiZ2l2ZW5fbmFtZSI6IkVuYWNoZSIsInRpdGxlIjoibXIiLCJwaGVub21JZCI6IjMyY2ZlNWIwLWFiZTItNDQ0Mi05YmNkLWE2ODRmMjc3YjM4MyIsImZhbWlseV9uYW1lIjoiQW5kcmVpIiwiZW1haWwiOiJhbmRyZWkuZW5hY2hlQGhpbmRhd2kuY29tIiwidXNlcm5hbWUiOiJhbmRyZWkuZW5hY2hlQGhpbmRhd2kuY29tIn0.LoDcHvOiKkDlLO5GcYYju1HjGiniG0O1PYIBpuOeWBVLxRBJLVVhNrMJalJMomsRZlahTE3rDLEY7q7aXRkyHKxhM7dRbNkMFyR1NxyNTvXISgOgZIXREgq8bRjq_pRkDVDgX6pGRCD9vv1T8s8K-UUAYfUlJ5XT8Xh3tNd7oi8YSui_jz4y7QHvGBumO4XalsAe1Jo9bFSBHuzjqeE8GjzYY5jYii3jt47xUck9iAo5TL9wzcXE1-92Mc6WghmmrLXjBbisYNYXsdBn4NgQHYnPsMivesrXCI5h6c33QAPZiXc_yGs8jXOV9_mWxDjcpFyxqfz63iiD-_B3jwU13Q" \
 -H 'cookie: _gcl_au=1.1.2100368686.1651664312; _ga=GA1.2.501747285.1651664312; _gid=GA1.2.707006853.1651664312; puid=769d3663-f2aa-4809-b433-9d3fd02c5083; _uetsid=b9a95210cb9e11ec94d52dc7d45193a1; _uetvid=b9a968d0cb9e11ecb42c0df7d8ce80a6' \
 -H 'origin: https://review.qa.phenom.pub' \
 -H 'referer: https://review.qa.phenom.pub/' \
@@ -14,5 +13,50 @@ curl 'https://gateway.qa.phenom.pub/' \
 -H 'sec-fetch-mode: cors' \
 -H 'sec-fetch-site: same-site' \
 -H 'user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36' \
---data-raw '{"operationName":null,"variables":{},"query":"{\n  getJournals {\n    ...adminPanelJournalFragment\n    __typename\n  }\n}\n\nfragment adminPanelJournalFragment on Journal {\n  id\n  name\n  code\n  apc\n  issn\n  email\n  isActive\n  activationDate\n  articleTypes {\n    id\n    name\n    __typename\n  }\n  peerReviewModel {\n    id\n    name\n    __typename\n  }\n  __typename\n}\n"}' \
---compressed | jq
+-F operations='{"variables":{"fileInput":{"type":"manuscript","size":12166},"entityId":"92f3e4ef-32bb-45bb-b968-eefaf76a8d21","file":null},"query":"mutation uploadFile($entityId: String!, $fileInput: FileInput, $file: Upload!) {\n  uploadFile(entityId: $entityId, fileInput: $fileInput, file: $file) {\n    ...fileDetails\n    __typename\n  }\n}\n\nfragment fileDetails on File {\n  id\n  type\n  size\n  originalName\n  filename\n  mimeType\n  __typename\n}\n"}' \
+-F map='{ "0": ["variables.file"] }' \
+-F 0=@/home/andrei/Downloads/thing.pdf
+
+{
+    "operationName":"uploadFile",
+    "variables":{"fileInput":{"type":"manuscript","size":12166},"entityId":"92f3e4ef-32bb-45bb-b968-eefaf76a8d21","file":null},
+    "query":"mutation uploadFile($entityId: String!, $fileInput: FileInput, $file: Upload!) {  uploadFile(entityId: $entityId, fileInput: $fileInput, file: $file){    ...fileDetails    __typename  }}fragment fileDetails on File {  id  type  size  originalName  filename  mimeType  __typename}
+}
+
+{
+    "operationName":"uploadFile",
+    "variables":{"fileInput":{"size":2,"type":"manuscript"},"entityId":"4ab5efd7-4d87-4284-bfd2-1fc757c4ed8c","file":null},
+    "query":"mutation uploadFile($entityId: String!, $fileInput: FileInput, $file: Upload!) {  uploadFile(entityId: $entityId, fileInput: $fileInput, file: $file) {    id    type    size    originalName    filename    mimeType  }}"
+}
+
+
+"----------------------------508608917107449103613549
+Content-Disposition: form-data; name="operation"",
+"{"operationName":"uploadFile","variables":{"fileInput":{"size":2,"type":"manuscript"},"entityId":"4ab5efd7-4d87-4284-bfd2-1fc757c4ed8c","file":null},"query":"mutation uploadFile($entityId: String!, $fileInput: FileInput, $file: Upload!) {  uploadFile(entityId: $entityId, fileInput: $fileInput, file: $file) {    id    type    size    originalName    filename    mimeType    __typename  }}"}",
+null,
+"----------------------------508608917107449103613549
+Content-Disposition: form-data; name="map"",
+"{"1":["file"]}",
+null,
+"----------------------------508608917107449103613549
+Content-Disposition: form-data; name="1"; filename="/home/andrei/Downloads/thing.pdf"
+Content-Type: application/pdf",
+"fs.readFileSync(fileName)",
+null
+
+
+
+------WebKitFormBoundaryPM360VPA4l14RWFN
+Content-Disposition: form-data; name="operations"
+
+{"operationName":"uploadFile","variables":{"fileInput":{"type":"manuscript","size":12166},"entityId":"92f3e4ef-32bb-45bb-b968-eefaf76a8d21","file":null},"query":"mutation uploadFile($entityId: String!, $fileInput: FileInput, $file: Upload!) {\n  uploadFile(entityId: $entityId, fileInput: $fileInput, file: $file) {\n    ...fileDetails\n    __typename\n  }\n}\n\nfragment fileDetails on File {\n  id\n  type\n  size\n  originalName\n  filename\n  mimeType\n  __typename\n}\n"}
+------WebKitFormBoundaryPM360VPA4l14RWFN
+Content-Disposition: form-data; name="map"
+
+{"1":["variables.file"]}
+------WebKitFormBoundaryPM360VPA4l14RWFN
+Content-Disposition: form-data; name="1"; filename="Manuscript.docx"
+Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+
+
+------WebKitFormBoundaryPM360VPA4l14RWFN--

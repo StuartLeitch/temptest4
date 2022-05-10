@@ -67,15 +67,24 @@ export function buildServices(): Services {
     ),
   };
 
+
+  /*
+      figure: 'figure',
+      manuscript: 'manuscript',
+      supplementary: 'supplementary',
+      coverLetter: 'coverLetter',
+      reviewComment: 'reviewComment',
+      responseToReviewers: 'responseToReviewers',
+  */
+
+
   const fileInput :SubmissionUploadFile = {
-    id: 'testId',
     size: 2,
-    name: 'test-manuscript.pdf',
-    type: 'manuscript',
+    type: 'supplementary', //manuscript, //
   };
 
   services.submissionService
-    .uploadFile('4ab5efd7-4d87-4284-bfd2-1fc757c4ed8c', fileInput, fs.createReadStream('/home/andrei/Downloads/thing.pdf', ))
+    .uploadFile('4ab5efd7-4d87-4284-bfd2-1fc757c4ed8c', fileInput, '/home/andrei/Downloads/thing.pdf')
     .then((result) => console.log(JSON.stringify(result, null, 2)))
     .catch((exception) => console.log(exception));
 
