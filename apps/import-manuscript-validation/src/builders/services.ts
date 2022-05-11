@@ -10,7 +10,10 @@ import {
   ArchiveService,
   XmlService,
   S3Service,
-  AuthorInput, SubmissionUploadFile,
+  AuthorInput,
+  SubmissionUploadFile,
+  UpdateDraftManuscriptInput,
+  CreateDraftManuscriptInput,
 } from '@hindawi/import-manuscript-commons';
 
 import { EmailService } from '../libs/email';
@@ -19,7 +22,7 @@ import { env } from '../env';
 import { KeycloakAuthenticator } from '../../../../libs/import-manuscript-commons/src/lib/services/implementations/keycloakAuthenticator';
 import Keycloak from 'keycloak-connect';
 import { SubmissionFile } from '../../../../libs/import-manuscript-commons/src/lib/models/submission-system-models/file-submission';
-import * as fs from "fs";
+import * as fs from 'fs';
 
 export interface Services {
   objectStoreService: ObjectStoreServiceContract;
@@ -67,7 +70,6 @@ export function buildServices(): Services {
     ),
   };
 
-
   /*
       figure: 'figure',
       manuscript: 'manuscript',
@@ -77,14 +79,48 @@ export function buildServices(): Services {
       responseToReviewers: 'responseToReviewers',
   */
 
+  // const fileInput :SubmissionUploadFile = {
+  //   size: 2,
+  //   type: 'supplementary', //manuscript, //
+  // };
 
-  const fileInput :SubmissionUploadFile = {
-    size: 2,
-    type: 'supplementary', //manuscript, //
+  const autoSaveInput: UpdateDraftManuscriptInput = {
+    meta: {
+      title: 'Ree',
+      abstract: '',
+      agreeTc: true,
+      conflictOfInterest: '',
+      dataAvailability: '',
+      fundingStatement: '',
+      articleTypeId: '',
+      fromJournal: '',
+    },
+    authors: [],
+    files: [],
+    journalId: '03c3c41e-bded-4323-a482-88d805ba35bb',
+    sectionId: null,
+    preprintValue: null,
+    sourceJournalId: null,
+    sourceJournalManuscriptId: null,
+  };
+
+  const input: CreateDraftManuscriptInput = {
+    journalId: '03c3c41e-bded-4323-a482-88d805ba35bb',
+    sectionId: '',
+    specialIssueId: '',
+    customId: '5108482',
   };
 
   services.submissionService
-    .uploadFile('4ab5efd7-4d87-4284-bfd2-1fc757c4ed8c', fileInput, '/home/andrei/Downloads/thing.pdf')
+    .createNewDraftSubmission(input)
+    .then((result) => console.log(JSON.stringify(result, null, 2)))
+    .catch((exception) => console.log(exception));
+
+  services.submissionService
+    .updateDraftManuscript(
+      'ec17ead8-e79d-40ca-8c2b-be548764e2be',
+      autoSaveInput
+    )
     .then((result) => console.log(JSON.stringify(result, null, 2)))
     .catch((exception) => console.log(exception));
 

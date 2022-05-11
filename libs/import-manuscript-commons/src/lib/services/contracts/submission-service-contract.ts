@@ -4,7 +4,7 @@ import { Manuscript, File, Journal } from '../../models';
 import { ActiveJournal } from '../../models/submission-system-models/active-journal';
 import { SubmissionFile } from '../../models/submission-system-models/file-submission';
 import { SourceJournal } from '../../models/submission-system-models/source-journal';
-import {ReadStream} from "fs";
+import { ReadStream } from 'fs';
 
 export type CreateDraftManuscriptInput = {
   journalId: string;
@@ -29,6 +29,35 @@ export interface SubmissionUploadFile {
   type: string;
 }
 
+// export interface DraftManuscriptMetadataInput {
+//   title: string;
+//   abstrect: string;
+//   agreeTc: boolean;
+//   conflictOfInterest: string;
+//   dataAvailability: string;
+//   fundingStatement: string;
+//   articleTypeId: string;
+//   fromJournal: string;
+// }
+export interface UpdateDraftManuscriptInput {
+  meta: {
+    title: string;
+    abstract: string;
+    agreeTc: boolean;
+    conflictOfInterest: string;
+    dataAvailability: string;
+    fundingStatement: string;
+    articleTypeId: string;
+    fromJournal: string;
+  };
+  authors: [];
+  files: [];
+  journalId: string;
+  sectionId: string;
+  preprintValue: string;
+  sourceJournalId: string;
+  sourceJournalManuscriptId: string;
+}
 
 export interface SubmissionServiceContract {
   createNewDraftSubmission(input: CreateDraftManuscriptInput): Promise<string>;
@@ -52,5 +81,10 @@ export interface SubmissionServiceContract {
     entityId: string,
     fileInput: SubmissionUploadFile,
     fileName: string
+  ): Promise<string>;
+
+  updateDraftManuscript(
+    manuscriptId: string,
+    draftManuscriptInput: UpdateDraftManuscriptInput
   ): Promise<string>;
 }

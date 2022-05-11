@@ -1,17 +1,23 @@
-import axios, {AxiosRequestHeaders} from 'axios';
-import {LoggerBuilder, LoggerContract, UniqueEntityID} from '@hindawi/shared';
-import {ASTNode, print} from 'graphql';
-import VError, {MultiError} from 'verror';
+import axios, { AxiosRequestHeaders } from 'axios';
+import { LoggerBuilder, LoggerContract, UniqueEntityID } from '@hindawi/shared';
+import { ASTNode, print } from 'graphql';
+import VError, { MultiError } from 'verror';
 import gql from 'graphql-tag';
-import {File, Manuscript} from '../../models';
+import { File, Manuscript } from '../../models';
 
-import {AuthorInput, CreateDraftManuscriptInput, SubmissionServiceContract, SubmissionUploadFile,} from '../contracts';
-import {KeycloakAuthenticator} from './keycloakAuthenticator';
-import {env} from '@hindawi/import-manuscript-validation/env';
-import {ActiveJournal} from '../../models/submission-system-models/active-journal';
-import {SubmissionSystemActiveJournalMapper} from '../../models/mappers/submission-system-active-journal-mapper';
-import {SourceJournal} from '../../models/submission-system-models/source-journal';
-import {SourceJournalMapper} from '../../models/mappers/source-journal-mapper';
+import {
+  AuthorInput,
+  CreateDraftManuscriptInput,
+  SubmissionServiceContract,
+  SubmissionUploadFile,
+  UpdateDraftManuscriptInput,
+} from '../contracts';
+import { KeycloakAuthenticator } from './keycloakAuthenticator';
+import { env } from '@hindawi/import-manuscript-validation/env';
+import { ActiveJournal } from '../../models/submission-system-models/active-journal';
+import { SubmissionSystemActiveJournalMapper } from '../../models/mappers/submission-system-active-journal-mapper';
+import { SourceJournal } from '../../models/submission-system-models/source-journal';
+import { SourceJournalMapper } from '../../models/mappers/source-journal-mapper';
 import {
   RawDraftSubmissionProps,
   SubmissionSystemDraftSubmissionMapper,
@@ -20,11 +26,14 @@ import {
   RawTeamMemberProps,
   SubmissionSystemTeamMemberMapper,
 } from '../../models/mappers/submission-system-team-member-mapper';
-import {RawSubmissionFileProps, SubmissionSystemFileMapper,} from '../../models/mappers/submission-system-file-mapper';
+import {
+  RawSubmissionFileProps,
+  SubmissionSystemFileMapper,
+} from '../../models/mappers/submission-system-file-mapper';
 
-import FormData from "form-data";
-import * as fs from "fs";
-import {readFile} from "fs";
+import FormData from 'form-data';
+import * as fs from 'fs';
+import { readFile } from 'fs';
 
 type GqlVariables = Record<string, unknown>;
 type GqlResponse<T = unknown> = {
@@ -54,15 +63,14 @@ export class SubmissionService implements SubmissionServiceContract {
     private readonly submissionEndpoint: string,
     private readonly keycloakAuthenticator: KeycloakAuthenticator
   ) {
-    axios.interceptors.request.use(request => {
-      console.log('Starting Request', JSON.stringify(request, null, 2))
-      return request
-    })
-
-    // axios.interceptors.response.use(response => {
-    //   console.log('Response:', JSON.stringify(response, null, 2))
-    //   return response
-    // })
+    axios.interceptors.request.use((request) => {
+      console.log('Starting Request', JSON.stringify(request, null, 2));
+      return request;
+    });
+    // axios.interceptors.response.use((response) => {
+    //   console.log('Response:', JSON.stringify(response, null, 2));
+    //   return response;
+    // });
   }
 
   async getAllActiveJournals(): Promise<ActiveJournal[]> {
@@ -123,12 +131,35 @@ export class SubmissionService implements SubmissionServiceContract {
     `;
 
     const response = await this.callGraphql<{
-      createDraftManuscript: RawDraftSubmissionProps;
-    }>(createNewDraftManuscriptMutation, {input});
+      createDraftManuscript: string;
+    }>(createNewDraftManuscriptMutation, { input });
 
-    return SubmissionSystemDraftSubmissionMapper.toDomain(
-      response.createDraftManuscript
-    ).id;
+    return response.createDraftManuscript['id'] || '';
+  }
+
+  async updateDraftManuscript(
+    manuscriptId: string,
+    autosaveInput: UpdateDraftManuscriptInput
+  ): Promise<string> {
+    const updateDraftManuscriptMutation = gql`
+      mutation updateDraftManuscript(
+        $manuscriptId: String!
+        $autosaveInput: DraftAutosaveInput
+      ) {
+        updateDraftManuscript(
+          manuscriptId: $manuscriptId
+          autosaveInput: $autosaveInput
+        ) {
+          id
+        }
+      }
+    `;
+
+    const response = await this.callGraphql<{
+      updateDraftManuscript: string;
+    }>(updateDraftManuscriptMutation, { manuscriptId, autosaveInput });
+
+    return response.updateDraftManuscript['id'] || '';
   }
 
   async setSubmissionAuthors(
@@ -152,13 +183,11 @@ export class SubmissionService implements SubmissionServiceContract {
     for (const authorInput of authors) {
       const response = await this.callGraphql<{
         addAuthorToManuscript: RawTeamMemberProps[];
-      }>(addAuthorToManuscriptMutation, {manuscriptId, authorInput});
+      }>(addAuthorToManuscriptMutation, { manuscriptId, authorInput });
       return SubmissionSystemTeamMemberMapper.toDomain(
         response.addAuthorToManuscript
       ).id;
     }
-
-    return;
   }
 
   async uploadFile(
@@ -184,12 +213,11 @@ export class SubmissionService implements SubmissionServiceContract {
       }
     `;
 
-    const response = await this.uploadFileGraphql<{ uploadFile: RawSubmissionFileProps; }>(
-      uploadFileMutation,
-      fileName,
-      {fileInput, entityId, file: null});
+    const response = await this.uploadFileGraphql<{
+      uploadFile: RawSubmissionFileProps;
+    }>(uploadFileMutation, fileName, { fileInput, entityId, file: null });
 
-    return SubmissionSystemFileMapper.toDomain(response.uploadFile).id;
+    return response.uploadFile['id'] || '';
   }
 
   async setSubmissionManuscriptDetails(
@@ -216,10 +244,13 @@ export class SubmissionService implements SubmissionServiceContract {
       Authorization: `Bearer ${authorizationToken}`,
       'content-type': 'application/json',
     };
+
     const graphqlQuery = {
+      // operationName: 'updateDraftManuscript',
       query: print(request),
       variables: variable,
     };
+
     try {
       const resp = await axios.post<GqlResponse<T>>(
         this.submissionEndpoint,
@@ -228,12 +259,13 @@ export class SubmissionService implements SubmissionServiceContract {
           headers,
         }
       );
-
       if (resp.data['errors']) {
         throw this.parseGqlErrors(resp.data['errors']);
       }
+
       return resp.data.data;
     } catch (err) {
+      console.log('------------', JSON.stringify(err, null, 2));
       throw new VError(err);
     }
   }
@@ -241,27 +273,27 @@ export class SubmissionService implements SubmissionServiceContract {
   private async uploadFileGraphql<T = unknown>(
     request: ASTNode,
     fileName: string,
-    variable?: GqlVariables,
+    variable?: GqlVariables
   ): Promise<T> {
-    const authorizationToken = await this.keycloakAuthenticator.getAuthorizationToken();
+    const authorizationToken =
+      await this.keycloakAuthenticator.getAuthorizationToken();
 
     const graphqlQuery = {
       variables: variable,
-      query: print(request)
+      query: print(request),
     };
-    const formData: FormData = new FormData()
+    const formData: FormData = new FormData();
 
-
-    const file = await fs.promises.readFile('/home/andrei/Downloads/thing.pdf')
+    const file = await fs.promises.readFile('/home/andrei/Downloads/thing.pdf');
 
     const headers: AxiosRequestHeaders = {
       Authorization: `Bearer ${authorizationToken}`,
       'content-type': `multipart/form-data; boundary=${formData.getBoundary()}`,
     };
 
-    formData.append("operations", JSON.stringify(graphqlQuery))
-    formData.append("map", JSON.stringify({"0": ["variables.file"]}))
-    formData.append("0", file, {filepath: fileName, filename: fileName})
+    formData.append('operations', JSON.stringify(graphqlQuery));
+    formData.append('map', JSON.stringify({ '0': ['variables.file'] }));
+    formData.append('0', file, { filepath: fileName, filename: fileName });
     try {
       const resp = await axios.post<GqlResponse<T>>(
         this.submissionEndpoint,
@@ -280,7 +312,6 @@ export class SubmissionService implements SubmissionServiceContract {
       throw new VError(err);
     }
   }
-
 
   private parseGqlErrors(errs: any[]): MultiError {
     const gqlErrors: Array<GqlError> = new Array<GqlError>();
