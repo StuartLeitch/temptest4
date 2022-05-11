@@ -5,13 +5,14 @@ import { ActiveJournal } from '../../models/submission-system-models/active-jour
 import { SubmissionFile } from '../../models/submission-system-models/file-submission';
 import { SourceJournal } from '../../models/submission-system-models/source-journal';
 import { ReadStream } from 'fs';
+import { DraftSubmission } from '../../models/submission-system-models';
 
 export interface CreateDraftManuscriptInput {
   journalId: string;
   sectionId: string;
   specialIssueId: string;
   customId: string;
-};
+}
 
 export interface AuthorInput {
   email: string;
@@ -62,7 +63,9 @@ export interface UpdateDraftManuscriptInput {
 export interface ReviewClientContract {
   getRemoteUrl(): string;
 
-  createNewDraftSubmission(input: CreateDraftManuscriptInput): Promise<{ manuscriptId: string, submissionId: string}>;
+  createNewDraftSubmission(
+    input: CreateDraftManuscriptInput
+  ): Promise<DraftSubmission>;
   setSubmissionManuscriptDetails(
     submissionId: UniqueEntityID,
     manuscript: Manuscript

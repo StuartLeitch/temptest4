@@ -8,6 +8,7 @@ import { File, Manuscript } from '../../models';
 import {
   AuthorInput,
   CreateDraftManuscriptInput,
+  DraftManuscript,
   ReviewClientContract,
   SubmissionUploadFile,
   UpdateDraftManuscriptInput,
@@ -34,6 +35,7 @@ import {
 import FormData from 'form-data';
 import * as fs from 'fs';
 import { readFile } from 'fs';
+import { DraftSubmission } from '../../models/submission-system-models/draft-submission';
 
 type GqlVariables = Record<string, unknown>;
 type GqlResponse<T = unknown> = {
@@ -125,7 +127,7 @@ export class ReviewClient implements ReviewClientContract {
 
   async createNewDraftSubmission(
     input: CreateDraftManuscriptInput
-  ): Promise<{ manuscriptId: string, submissionId: string}> {
+  ): Promise<DraftSubmission> {
     const createNewDraftManuscriptMutation = gql`
       mutation createDraftManuscript($input: CreateDraftManuscriptInput!) {
         createDraftManuscript(input: $input) {
@@ -136,10 +138,12 @@ export class ReviewClient implements ReviewClientContract {
     `;
 
     const response = await this.callGraphql<{
-      createDraftManuscript: string;
+      createDraftManuscript: RawDraftSubmissionProps;
     }>(createNewDraftManuscriptMutation, { input });
 
-    return { manuscriptId: response.createDraftManuscript['id'] || '', submissionId: response.createDraftManuscript['submissionId'] || ''};
+    return SubmissionSystemDraftSubmissionMapper.toDomain(
+      response.createDraftManuscript
+    );
   }
 
   async updateDraftManuscript(
@@ -236,7 +240,7 @@ export class ReviewClient implements ReviewClientContract {
     submissionId: UniqueEntityID,
     files: File[]
   ): Promise<void> {
-    throw new VError("Not implemented");
+    throw new VError('Not implemented');
   }
 
   private async callGraphql<T = unknown>(
@@ -265,14 +269,16 @@ export class ReviewClient implements ReviewClientContract {
         }
       );
 
-
       if (resp.data['errors']) {
         throw this.parseGqlErrors(resp.data['errors']);
       }
       return resp.data.data;
     } catch (err) {
-      if(err.response?.data?.errors){
-        throw new VError(err, JSON.stringify(err.response.data.errors, null ,2));
+      if (err.response?.data?.errors) {
+        throw new VError(
+          err,
+          JSON.stringify(err.response.data.errors, null, 2)
+        );
       }
       throw new VError(err);
     }

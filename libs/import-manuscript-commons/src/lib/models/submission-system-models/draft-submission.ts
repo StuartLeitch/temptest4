@@ -1,12 +1,17 @@
 import { ValueObject, ValueObjectProps } from '@hindawi/shared';
 
 export interface DraftSubmissionProps extends ValueObjectProps {
-  id: string;
+  manuscriptId: string;
+  submissionId: string;
 }
 
 export class DraftSubmission extends ValueObject<DraftSubmissionProps> {
-  get id(): string {
-    return this.props.id;
+  get manuscriptId(): string {
+    return this.props.manuscriptId;
+  }
+
+  get submissionId(): string {
+    return this.props.submissionId;
   }
 
   private constructor(props: DraftSubmissionProps) {

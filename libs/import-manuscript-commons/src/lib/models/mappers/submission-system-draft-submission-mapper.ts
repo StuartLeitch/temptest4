@@ -5,14 +5,15 @@ import {
 } from '../submission-system-models/draft-submission';
 
 export interface RawDraftSubmissionProps {
-  id: string;
+  manuscriptId: string;
+  submissionId: string;
 }
 
 export class SubmissionSystemDraftSubmissionMapper extends Mapper<DraftSubmission> {
   static toDomain(raw: Partial<RawDraftSubmissionProps>): DraftSubmission {
-    console.log(raw)
     const props: DraftSubmissionProps = {
-      id: raw.id,
+      manuscriptId: raw.manuscriptId,
+      submissionId: raw.submissionId,
     };
 
     return DraftSubmission.create(props);
@@ -22,7 +23,8 @@ export class SubmissionSystemDraftSubmissionMapper extends Mapper<DraftSubmissio
     draftSubmission: DraftSubmission
   ): RawDraftSubmissionProps {
     return {
-      id: draftSubmission.id,
+      manuscriptId: draftSubmission.manuscriptId,
+      submissionId: draftSubmission.submissionId,
     };
   }
 }
