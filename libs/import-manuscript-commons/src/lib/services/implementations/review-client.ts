@@ -8,7 +8,7 @@ import { File, Manuscript } from '../../models';
 import {
   AuthorInput,
   CreateDraftManuscriptInput,
-  SubmissionServiceContract,
+  ReviewClientContract,
   SubmissionUploadFile,
   UpdateDraftManuscriptInput,
 } from '../contracts';
@@ -50,9 +50,9 @@ class GqlError extends Error {
   }
 }
 
-export class SubmissionService implements SubmissionServiceContract {
+export class ReviewClient implements ReviewClientContract {
   private logger: LoggerContract = new LoggerBuilder(
-    'Import/Manuscript/Backend/SubmissionService',
+    'Import/Manuscript/Backend/ReviewClient',
     {
       isDevelopment: env.isDevelopment,
       logLevel: env.log.level,
@@ -63,14 +63,18 @@ export class SubmissionService implements SubmissionServiceContract {
     private readonly submissionEndpoint: string,
     private readonly keycloakAuthenticator: KeycloakAuthenticator
   ) {
-    axios.interceptors.request.use((request) => {
-      console.log('Starting Request', JSON.stringify(request, null, 2));
-      return request;
-    });
+    // axios.interceptors.request.use((request) => {
+    //   console.log('Starting Request', JSON.stringify(request, null, 2));
+    //   return request;
+    // });
     // axios.interceptors.response.use((response) => {
     //   console.log('Response:', JSON.stringify(response, null, 2));
     //   return response;
     // });
+  }
+
+  getRemoteUrl(): string {
+    return this.submissionEndpoint;
   }
 
   async getAllActiveJournals(): Promise<ActiveJournal[]> {
@@ -121,11 +125,12 @@ export class SubmissionService implements SubmissionServiceContract {
 
   async createNewDraftSubmission(
     input: CreateDraftManuscriptInput
-  ): Promise<string> {
+  ): Promise<{ manuscriptId: string, submissionId: string}> {
     const createNewDraftManuscriptMutation = gql`
       mutation createDraftManuscript($input: CreateDraftManuscriptInput!) {
         createDraftManuscript(input: $input) {
           id
+          submissionId
         }
       }
     `;
@@ -134,7 +139,7 @@ export class SubmissionService implements SubmissionServiceContract {
       createDraftManuscript: string;
     }>(createNewDraftManuscriptMutation, { input });
 
-    return response.createDraftManuscript['id'] || '';
+    return { manuscriptId: response.createDraftManuscript['id'] || '', submissionId: response.createDraftManuscript['submissionId'] || ''};
   }
 
   async updateDraftManuscript(
@@ -231,7 +236,7 @@ export class SubmissionService implements SubmissionServiceContract {
     submissionId: UniqueEntityID,
     files: File[]
   ): Promise<void> {
-    return null;
+    throw new VError("Not implemented");
   }
 
   private async callGraphql<T = unknown>(
@@ -259,13 +264,16 @@ export class SubmissionService implements SubmissionServiceContract {
           headers,
         }
       );
+
+
       if (resp.data['errors']) {
         throw this.parseGqlErrors(resp.data['errors']);
       }
-
       return resp.data.data;
     } catch (err) {
-      console.log('------------', JSON.stringify(err, null, 2));
+      if(err.response?.data?.errors){
+        throw new VError(err, JSON.stringify(err.response.data.errors, null ,2));
+      }
       throw new VError(err);
     }
   }

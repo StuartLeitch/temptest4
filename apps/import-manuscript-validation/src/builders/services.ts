@@ -3,10 +3,10 @@ import { LoggerBuilder } from '@hindawi/shared';
 
 import {
   ObjectStoreServiceContract,
-  SubmissionServiceContract,
+  ReviewClientContract,
   ArchiveServiceContract,
   XmlServiceContract,
-  SubmissionService,
+  ReviewClient,
   ArchiveService,
   XmlService,
   S3Service,
@@ -26,7 +26,7 @@ import * as fs from 'fs';
 
 export interface Services {
   objectStoreService: ObjectStoreServiceContract;
-  submissionService: SubmissionServiceContract;
+  reviewClient: ReviewClientContract;
   archiveService: ArchiveServiceContract;
   xmlService: XmlServiceContract;
   jobQueue: QueueEventConsumer;
@@ -64,7 +64,7 @@ export function buildServices(): Services {
       env.aws.ses.secretKey,
       env.aws.region
     ),
-    submissionService: new SubmissionService(
+    reviewClient: new ReviewClient(
       env.app.submissionGraphqlEndpoint,
       reviewSystemAuthenticator
     ),
@@ -89,11 +89,10 @@ export function buildServices(): Services {
       title: 'Ree',
       abstract: '',
       agreeTc: true,
-      conflictOfInterest: '',
-      dataAvailability: '',
-      fundingStatement: '',
-      articleTypeId: '',
-      fromJournal: '',
+      conflictOfInterest: null,
+      dataAvailability: null,
+      fundingStatement: null,
+      articleTypeId: null,
     },
     authors: [],
     files: [],
@@ -102,27 +101,28 @@ export function buildServices(): Services {
     preprintValue: null,
     sourceJournalId: null,
     sourceJournalManuscriptId: null,
+    linkedSubmissionCustomId: null
   };
 
   const input: CreateDraftManuscriptInput = {
     journalId: '03c3c41e-bded-4323-a482-88d805ba35bb',
-    sectionId: '',
-    specialIssueId: '',
+    sectionId: null,
+    specialIssueId: null,
     customId: '5108482',
   };
 
-  services.submissionService
+  services.reviewClient
     .createNewDraftSubmission(input)
-    .then((result) => console.log(JSON.stringify(result, null, 2)))
+    .then(({manuscriptId, submissionId}) => {
+      console.log(JSON.stringify(manuscriptId, null, 2))
+      services.reviewClient
+        .updateDraftManuscript(manuscriptId, autoSaveInput)
+        .then((updatedManuscriptId) => console.log(JSON.stringify(updatedManuscriptId, null, 2)))
+        .catch((exception) => console.log(exception));
+
+    })
     .catch((exception) => console.log(exception));
 
-  services.submissionService
-    .updateDraftManuscript(
-      'ec17ead8-e79d-40ca-8c2b-be548764e2be',
-      autoSaveInput
-    )
-    .then((result) => console.log(JSON.stringify(result, null, 2)))
-    .catch((exception) => console.log(exception));
 
   return services;
 }

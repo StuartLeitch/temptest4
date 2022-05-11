@@ -1,4 +1,4 @@
-export * from './submission-service';
+export * from './review-client';
 export * from './uploadService';
 export * from './xml-service';
 export * from './s3-service';

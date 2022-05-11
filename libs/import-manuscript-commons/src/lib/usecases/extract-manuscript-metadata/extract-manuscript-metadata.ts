@@ -1,6 +1,6 @@
 import { LoggerContract, UseCase } from '@hindawi/shared';
 
-import { ManuscriptMapper } from '../../models/mappers';
+import {ManuscriptMapper, RawManuscriptProps} from '../../models/mappers';
 import { Path } from '../../models';
 
 import { XmlServiceContract } from '../../services';
@@ -29,7 +29,7 @@ export class ExtractManuscriptMetadataUseCase
       this.logger
     );
 
-    const rawManuscriptProps = await dataExtractor.extract(
+    const rawManuscriptProps: RawManuscriptProps = await dataExtractor.extract(
       manifestPath,
       transferPath,
       articlePath,

@@ -6,7 +6,7 @@ import { SubmissionFile } from '../../models/submission-system-models/file-submi
 import { SourceJournal } from '../../models/submission-system-models/source-journal';
 import { ReadStream } from 'fs';
 
-export type CreateDraftManuscriptInput = {
+export interface CreateDraftManuscriptInput {
   journalId: string;
   sectionId: string;
   specialIssueId: string;
@@ -48,7 +48,6 @@ export interface UpdateDraftManuscriptInput {
     dataAvailability: string;
     fundingStatement: string;
     articleTypeId: string;
-    fromJournal: string;
   };
   authors: [];
   files: [];
@@ -57,10 +56,13 @@ export interface UpdateDraftManuscriptInput {
   preprintValue: string;
   sourceJournalId: string;
   sourceJournalManuscriptId: string;
+  linkedSubmissionCustomId: string;
 }
 
-export interface SubmissionServiceContract {
-  createNewDraftSubmission(input: CreateDraftManuscriptInput): Promise<string>;
+export interface ReviewClientContract {
+  getRemoteUrl(): string;
+
+  createNewDraftSubmission(input: CreateDraftManuscriptInput): Promise<{ manuscriptId: string, submissionId: string}>;
   setSubmissionManuscriptDetails(
     submissionId: UniqueEntityID,
     manuscript: Manuscript
