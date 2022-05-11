@@ -19,4 +19,5 @@ export interface Item {
   publisherId: string;
   issn: string;
   amount: string;
+  zeroPriced: string;
 }

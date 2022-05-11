@@ -45,14 +45,19 @@ export class UpdateCatalogItemFieldsUsecase
 
   @Authorize('journal:update')
   public async execute(request: DTO, context?: Context): Promise<Response> {
-    const { amount, journalId: rawJournalId, publisherName } = request;
+    const {
+      amount,
+      journalId: rawJournalId,
+      publisherName,
+      zeroPriced,
+    } = request;
     try {
       const journalId: JournalId = JournalId.create(
         new UniqueEntityID(rawJournalId)
       );
 
       // validate amount from request
-      const maybeRequestAmountValid = validateRequestAmount(amount);
+      const maybeRequestAmountValid = validateRequestAmount(amount, zeroPriced);
       if (maybeRequestAmountValid.isLeft()) {
         return left(maybeRequestAmountValid.value);
       }
@@ -93,6 +98,7 @@ export class UpdateCatalogItemFieldsUsecase
         isActive: catalogItem.isActive,
         journalId: rawJournalId,
         publisherId: publisherId.id.toString(),
+        zeroPriced: request.zeroPriced,
       });
 
       if (maybeUpdatedCatalogItem.isLeft()) {
@@ -140,13 +146,17 @@ export class UpdateCatalogItemFieldsUsecase
 }
 
 function validateRequestAmount(
-  amount: number
+  amount: number,
+  zeroPriced: boolean
 ): Either<
   | Errors.AmountIsZeroError
   | Errors.AmountIllegalFormatError
   | Errors.AmountNotFoundError,
   void
 > {
+  if (zeroPriced) {
+    return right(null);
+  }
   if (amount === 0) {
     return left(new Errors.AmountIsZeroError());
   }

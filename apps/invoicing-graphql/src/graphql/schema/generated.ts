@@ -39,6 +39,7 @@ export type CatalogInput = {
   journalId?: Maybe<Scalars['ID']>;
   publisherName?: Maybe<Scalars['String']>;
   amount?: Maybe<Scalars['Float']>;
+  zeroPriced: Scalars['Boolean'];
 };
 
 export type ClientToken = {
@@ -222,8 +223,8 @@ export type InvoicingArticleFilters = {
 
 export type InvoicingJournal = {
   __typename?: 'InvoicingJournal';
-  id?: Maybe<Scalars['String']>;
-  journalId?: Maybe<Scalars['ID']>;
+  id: Scalars['String'];
+  journalId: Scalars['ID'];
   journalTitle?: Maybe<Scalars['String']>;
   amount?: Maybe<Scalars['Float']>;
   issn?: Maybe<Scalars['String']>;
@@ -231,6 +232,7 @@ export type InvoicingJournal = {
   publisher?: Maybe<InvoicingPublisher>;
   publisherName?: Maybe<Scalars['String']>;
   code?: Maybe<Scalars['String']>;
+  zeroPriced: Scalars['Boolean'];
 };
 
 
@@ -761,6 +763,7 @@ export type ResolversTypes = {
   AddressInput: AddressInput;
   CatalogInput: CatalogInput;
   Float: ResolverTypeWrapper<Scalars['Float']>;
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   ClientToken: ResolverTypeWrapper<ClientToken>;
   Coupon: ResolverTypeWrapper<Coupon>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
@@ -791,7 +794,6 @@ export type ResolversTypes = {
   MigratePayer: MigratePayer;
   MigratePayerAddress: MigratePayerAddress;
   Mutation: ResolverTypeWrapper<{}>;
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   PaginatedCatalog: ResolverTypeWrapper<PaginatedCatalog>;
   PaginatedCoupons: ResolverTypeWrapper<PaginatedCoupons>;
   PaginatedCreditNotes: ResolverTypeWrapper<PaginatedCreditNotes>;
@@ -823,6 +825,7 @@ export type ResolversParentTypes = {
   AddressInput: AddressInput;
   CatalogInput: CatalogInput;
   Float: Scalars['Float'];
+  Boolean: Scalars['Boolean'];
   ClientToken: ClientToken;
   Coupon: Coupon;
   Int: Scalars['Int'];
@@ -851,7 +854,6 @@ export type ResolversParentTypes = {
   MigratePayer: MigratePayer;
   MigratePayerAddress: MigratePayerAddress;
   Mutation: {};
-  Boolean: Scalars['Boolean'];
   PaginatedCatalog: PaginatedCatalog;
   PaginatedCoupons: PaginatedCoupons;
   PaginatedCreditNotes: PaginatedCreditNotes;
@@ -1020,8 +1022,8 @@ export type InvoicingArticleResolvers<ContextType = any, ParentType extends Reso
 };
 
 export type InvoicingJournalResolvers<ContextType = any, ParentType extends ResolversParentTypes['InvoicingJournal'] = ResolversParentTypes['InvoicingJournal']> = {
-  id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  journalId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  journalId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   journalTitle?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   amount?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   issn?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -1029,6 +1031,7 @@ export type InvoicingJournalResolvers<ContextType = any, ParentType extends Reso
   publisher?: Resolver<Maybe<ResolversTypes['InvoicingPublisher']>, ParentType, ContextType>;
   publisherName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   code?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  zeroPriced?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

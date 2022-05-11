@@ -25,6 +25,7 @@ import { MockInvoiceItemRepo } from '../../../../../../src/lib/modules/invoices/
 import { ArticleRepoContract } from '../../../../../../src/lib/modules/manuscripts/repos/articleRepo';
 import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
 import { ArticleMap } from '../../../../../../src/lib/modules/manuscripts/mappers/ArticleMap';
+import {MockLogger} from "../../../../../../src/lib/infrastructure/logging/mocks/MockLogger";
 
 const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.QUEUE_EVENT_HANDLER],
@@ -39,7 +40,8 @@ const usecase: SoftDeleteDraftTransactionUsecase = new SoftDeleteDraftTransactio
   mockTransactionRepo,
   mockInvoiceItemRepo,
   mockInvoiceRepo,
-  mockArticleRepo
+  mockArticleRepo,
+  new MockLogger()
 );
 
 let manuscriptId;

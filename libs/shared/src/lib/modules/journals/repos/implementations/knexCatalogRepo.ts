@@ -12,7 +12,6 @@ import { JournalId } from './../../domain/JournalId';
 
 import { CatalogRepoContract, JournalPriceUpdate } from './../catalogRepo';
 import { CatalogPaginated } from '../../domain/CatalogPaginated';
-import { applyFilters } from '../../../invoices/repos/implementations/utils';
 
 export class KnexCatalogRepo
   extends AbstractBaseDBRepo<Knex, CatalogItem>
@@ -80,18 +79,19 @@ export class KnexCatalogRepo
 
     const getModel = () => db(TABLES.CATALOG);
 
-    const totalCount = await applyFilters(getModel(), filters).count(
+    const totalCount = await getModel().count(
       `${TABLES.CATALOG}.id`
     );
 
     const offset = pagination.offset * pagination.limit;
 
-    const sql = applyFilters(getModel(), filters)
+    const sql = getModel()
       .orderBy(`${TABLES.CATALOG}.journalTitle`, 'asc')
       .offset(offset < totalCount[0].count ? offset : 0)
       .limit(pagination.limit)
       .select([`${TABLES.CATALOG}.*`]);
-    console.info(sql.toString());
+
+    console.log(sql.toString());
 
     const catalogsItems: Array<any> = await sql;
 
@@ -103,7 +103,7 @@ export class KnexCatalogRepo
 
     return right({
       catalogItems: maybeCatalogItems.value,
-      totalCount: totalCount[0]['count'],
+      totalCount: totalCount[0]['count'] as number
     });
   }
 

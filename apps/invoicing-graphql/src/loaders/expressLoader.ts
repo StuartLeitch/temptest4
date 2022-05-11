@@ -277,6 +277,7 @@ export const expressLoader: MicroframeworkLoader = (
         'journalTitle',
         { label: 'journalCode', value: 'code' },
         { label: 'apc', value: 'amount' },
+        'zeroPriced',
       ];
       const opts = { fields };
       const csvConverter = new Parser(opts);

@@ -153,8 +153,8 @@ input PayerInput {
 }
 
 type InvoicingJournal {
-  id: String
-  journalId: ID
+  id: String!
+  journalId: ID!
   journalTitle: String
   amount: Float
   issn: String
@@ -162,6 +162,7 @@ type InvoicingJournal {
   publisher: InvoicingPublisher
   publisherName: String
   code: String
+  zeroPriced: Boolean!
   # ... (TODO: add missing fields here)
 }
 
@@ -267,6 +268,7 @@ input CatalogInput {
   journalId: ID
   publisherName: String
   amount: Float
+  zeroPriced: Boolean!
 }
 
 type Waiver {

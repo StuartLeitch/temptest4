@@ -1,56 +1,54 @@
-import React, { useEffect, useCallback, useState } from 'react';
-import { useManualQuery, useMutation } from 'graphql-hooks';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useQueryState } from 'react-router-use-location-state';
+import { useManualQuery, useMutation } from 'graphql-hooks';
 import axios, { AxiosError } from 'axios';
-import { useAuth } from '../../../contexts/Auth';
+import { Upload, Switch } from 'antd';
 
+import { Preset } from '@hindawi/phenom-ui/dist/Typography/Text';
 import {
-  APC_QUERY,
-  APC_PUBLISHER_LIST_QUERY,
-  CATALOG_ITEM_UPDATE,
-} from '../graphql';
-
-import {
-  Container,
-  Row,
-  Col,
-  Error,
-  Card,
-  ButtonToolbar,
-} from '../../../components';
-
-import Restricted from '../../../contexts/Restricted';
-import NotAuthorized from '../../components/NotAuthorized';
-import { Loading } from '../../components';
-
-import { Upload } from 'antd';
-
-import {
-  Form,
-  Text,
-  Table,
-  Space,
-  Button,
-  IconEdit,
-  IconSave,
-  IconRemove,
-  Modal,
+  IconNotificationSuccess,
   IconNotificationAlert,
   IconNotificationError,
-  IconNotificationSuccess,
+  IconCheck,
+  IconRemove,
+  IconEdit,
+  IconSave,
+  Button,
+  Modal,
+  Space,
+  Table,
   Title,
+  Form,
+  Text,
 } from '@hindawi/phenom-ui';
 
-import EditableCell from './components/EditableCell';
-import { Item } from '../types';
+import Restricted from '../../../contexts/Restricted';
+import { useAuth } from '../../../contexts/Auth';
 
-import _ from 'lodash';
-import { Preset } from '@hindawi/phenom-ui/dist/Typography/Text';
+import NotAuthorized from '../../components/NotAuthorized';
+import { Loading } from '../../components';
+import {
+  ButtonToolbar,
+  Container,
+  Error,
+  Card,
+  Col,
+  Row,
+} from '../../../components';
+
+import { Item } from '../types';
+import {
+  APC_PUBLISHER_LIST_QUERY,
+  CATALOG_ITEM_UPDATE,
+  APC_QUERY,
+} from '../graphql';
+
+import EditableCell from './components/EditableCell';
 
 const defaultPaginationSettings = { page: 1, offset: 0, limit: 50 };
 
 const ApcContainer: React.FC = () => {
-  const auth: any = useAuth();
+  const auth = useAuth();
   const { token } = auth.data;
 
   const [fetchJournals, { loading, error, data }] = useManualQuery(APC_QUERY);
@@ -61,15 +59,20 @@ const ApcContainer: React.FC = () => {
   const [form] = Form.useForm();
   const [editingKey, setEditingKey] = useState('');
   const [modalError, setModalError] = useState('');
-  const [fileList, setFileList] = useState([]);
   const [hasFile, setHasFile] = useState(false);
   const [hasSucceed, setHasSucceed] = useState(false);
   const [hasNoUpdate, setHasNoUpdate] = useState(false);
+  const [disabledAmount, setDisabledAmount] = useState(true);
   const [page, setPageInUrl] = useQueryState(
     'page',
     defaultPaginationSettings.page
   );
 
+  const zeroPricedStatus = form.getFieldValue('zeroPriced');
+
+  const handleDisable = () => {
+    setDisabledAmount(!disabledAmount);
+  };
   const fetchPublisherList = useCallback(
     async (currentPage) => {
       await fetchPublishers({
@@ -116,7 +119,7 @@ const ApcContainer: React.FC = () => {
 
   const isEditing = (record: Item) => record.id === editingKey;
 
-  const edit = (record: Partial<Item> & { id: string }) => {
+  const edit = (record: Partial<Item>) => {
     form.setFieldsValue({ amount: '', ...record });
     setEditingKey(record.id);
   };
@@ -128,14 +131,15 @@ const ApcContainer: React.FC = () => {
   const save = async (journalId: string) => {
     try {
       const row = await form.validateFields();
-
       setEditingKey('');
+
       try {
         const updateCatalogItemResult = await updateCatalogItem({
           variables: {
             catalogItem: {
-              amount: parseInt(row.amount),
+              amount: zeroPricedStatus ? 0 : parseInt(row.amount),
               publisherName: row.publisher.name,
+              zeroPriced: row.zeroPriced,
               journalId,
             },
           },
@@ -160,6 +164,9 @@ const ApcContainer: React.FC = () => {
 
   const modalValidator = async () => {
     try {
+      if (zeroPricedStatus) {
+        setIsEditModalVisible(true);
+      }
       await form.validateFields();
       setIsEditModalVisible(true);
     } catch (errInfo) {
@@ -175,31 +182,30 @@ const ApcContainer: React.FC = () => {
   const handleCancel = () => {
     setIsEditModalVisible(false);
   };
-
   const columns = [
     {
       title: 'Journal Name',
       dataIndex: 'journalTitle',
       key: 'journalName',
-      width: '34%',
+      width: '36%',
     },
     {
       title: 'Journal Code',
       dataIndex: 'code',
       key: 'code',
-      width: '17%',
+      width: '11%',
     },
     {
       title: 'ISSN',
       dataIndex: 'issn',
       key: 'issn',
-      with: '17%',
+      with: '12%',
     },
     {
       title: 'Publisher',
       dataIndex: ['publisher', 'name'],
       key: 'publisher',
-      width: '11%',
+      width: '12%',
       editable: true,
       render: (publisher: any) => <Text>{publisher}</Text>,
     },
@@ -209,7 +215,7 @@ const ApcContainer: React.FC = () => {
       key: 'amount',
       editable: true,
       align: 'right' as const,
-      width: '11%',
+      width: '10%',
       render: (apc: React.ReactNode) => (
         <Text type='success' strong>
           ${apc}
@@ -217,9 +223,19 @@ const ApcContainer: React.FC = () => {
       ),
     },
     {
+      title: 'Zero Priced',
+      dataIndex: 'zeroPriced',
+      key: 'zeroPriced',
+      editable: true,
+      align: 'center' as const,
+      width: '10%',
+      render: (zeroPriced: boolean) =>
+        zeroPriced ? <IconCheck className='zero-check' /> : null,
+    },
+    {
       title: '',
       dataIndex: 'action',
-      width: '10%',
+      width: '9%',
       render: (_: any, record: Item) => {
         const editable = isEditing(record);
         return editable ? (
@@ -287,11 +303,13 @@ const ApcContainer: React.FC = () => {
           title: col.title,
           editing: isEditing(record),
           publishers,
+          colKey: col.key,
+          formState: form,
+          handleDisable: handleDisable,
         }),
       };
     });
-
-    if (data)
+    if (data) {
       return (
         <>
           <Form form={form} component={false}>
@@ -323,6 +341,7 @@ const ApcContainer: React.FC = () => {
           </Form>
         </>
       );
+    }
 
     return <Loading />;
   };
@@ -374,8 +393,7 @@ const ApcContainer: React.FC = () => {
       setIsUploadModalVisible(true);
     },
 
-    handleChange({ fileList }) {
-      setFileList(fileList);
+    handleChange() {
       setHasFile(true);
     },
   };

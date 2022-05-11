@@ -1,114 +1,77 @@
-import React, { useState } from 'react';
-
-import {
-  Select,
-  Input,
-  Form,
-  IconCaretUp,
-  IconCaretDown,
-} from '@hindawi/phenom-ui';
+import React from 'react';
 
 import { Item } from '../../types';
 
-import _ from 'lodash';
-
-const { Option } = Select;
+import AmountCell from './AmountCell';
+import PublisherCell from './PublisherCell';
+import CheckboxCell from './CheckboxCell';
 
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   editing: boolean;
-  dataIndex: string;
+  dataIndex: string | string[];
   title: any;
   inputType: 'number' | 'text';
   record: Item;
   index: number;
   publishers: any;
+  colKey: string;
   children: React.ReactNode;
+  formState: any;
+  handleDisable: any;
 }
+
+const dynamicCell = (
+  children: React.ReactNode,
+  index: number,
+  publishers: any,
+  colKey: string,
+  formState: any,
+  handleDisable: any
+) => {
+  switch (colKey) {
+    case 'amount':
+      return (
+        <AmountCell dataIndex='amount' index={index} formState={formState} />
+      );
+    case 'publisher':
+      return (
+        <PublisherCell
+          dataIndex={['publisher', 'name']}
+          publishers={publishers}
+          index={index}
+        />
+      );
+    case 'zeroPriced':
+      return (
+        <CheckboxCell handleDisabled={handleDisable} dataIndex={'zeroPriced'} />
+      );
+    default:
+      return <td>{children}</td>;
+  }
+};
 
 const EditableCell: React.FC<EditableCellProps> = ({
   editing,
-  dataIndex,
-  title,
-  inputType,
-  record,
+  formState,
   index,
   children,
   publishers,
+  colKey,
+  handleDisable,
   ...restProps
 }) => {
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState('');
-
-  const handleChange = (e) => {
-    setValue(e.target.value.replace(/[^\w\s]/gi, ''));
-  };
   return (
     <td {...restProps}>
-      {editing ? (
-        <React.Fragment>
-          {dataIndex === 'amount' ? (
-            <Form.Item
-              className='amount-field'
-              name={dataIndex}
-              style={{ margin: 0 }}
-              rules={[
-                {
-                  required: true,
-                  pattern: new RegExp(/^[1-9][0-9]*$/),
-                  message: '',
-                  whitespace: false,
-                },
-              ]}
-            >
-              <Input
-                className='amount-input'
-                prefix={'$'}
-                maxLength={6}
-                onChange={handleChange}
-                value={value}
-                style={{ width: 80 }}
-              />
-            </Form.Item>
-          ) : (
-            <Form.Item
-              name={dataIndex}
-              style={{ margin: 0 }}
-              rules={[
-                {
-                  required: true,
-                },
-              ]}
-            >
-              <Select
-                onClick={() => setOpen(!open)}
-                suffixIcon={
-                  open ? (
-                    <IconCaretUp onClick={() => setOpen(!open)} />
-                  ) : (
-                    <IconCaretDown onClick={() => setOpen(!open)} />
-                  )
-                }
-                open={open}
-                style={{ width: 100 }}
-              >
-                {publishers &&
-                  publishers.map((publisher, index) => {
-                    const { name, id } = publisher;
-
-                    return (
-                      <Option key={index} value={name}>
-                        {' '}
-                        {name}
-                      </Option>
-                    );
-                  })}
-              </Select>
-            </Form.Item>
-          )}
-        </React.Fragment>
-      ) : (
-        children
-      )}
+      {editing
+        ? dynamicCell(
+            children,
+            index,
+            publishers,
+            colKey,
+            formState,
+            handleDisable
+          )
+        : children}
     </td>
   );
 };

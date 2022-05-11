@@ -57,7 +57,6 @@ retire-js-dependency_scanning:
     policy: pull
     when: always
 
-
 variables:
   # https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#docker-in-docker-with-tls-disabled
   DOCKER_HOST: tcp://docker:2375
@@ -104,18 +103,21 @@ Prepare Docker Runner:
 Build:
   image: $BUILD_IMAGE
   variables:
-    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_MEMORY_REQUEST: 4Gi
+    KUBERNETES_CPU_REQUEST: 4
+    KUBERNETES_MEMORY_LIMIT: 4Gi
+    KUBERNETES_CPU_LIMIT: 4
     FF_USE_FASTZIP: 1 # enable fastzip - a faster zip implementation that also supports level configuration.
-    ARTIFACT_COMPRESSION_LEVEL: "default" # can also be set to fastest, fast, slow and slowest. If just enabling fastzip is not enough try setting this to fastest or fast.
-    CACHE_COMPRESSION_LEVEL: "default" # same as above, but for caches
-    TRANSFER_METER_FREQUENCY: "5s" # will display transfer progress every 5 seconds for artifacts and remote caches.
+    ARTIFACT_COMPRESSION_LEVEL: 'default' # can also be set to fastest, fast, slow and slowest. If just enabling fastzip is not enough try setting this to fastest or fast.
+    CACHE_COMPRESSION_LEVEL: 'default' # same as above, but for caches
+    TRANSFER_METER_FREQUENCY: '5s' # will display transfer progress every 5 seconds for artifacts and remote caches.
   tags:
     - 'cluster:hindawi-dev'
   needs:
     - job: 'Prepare Docker Runner'
       optional: true
   cache:
-#    why does this sometimes gets sufixed with _non_protected?
+    #    why does this sometimes gets sufixed with _non_protected?
     key: node-modules-cache
     paths:
       - ./node_modules
@@ -142,7 +144,6 @@ Build:
        AFFECTED_COMMAND="yarn run affected:test $AFFECTED_ARGS --passWithNoTests --parallel --configuration=production"
       fi
     - eval $AFFECTED_COMMAND
-
     - |
       if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
         AFFECTED_COMMAND="yarn run nx run-many --target=build --projects=$AFFECTED_APPS --configuration=production --parallel --maxParallel=2"
@@ -193,14 +194,13 @@ pages:
   script:
     - echo $CI_COMMIT_REF_SLUG
 
-
 Build Production Dependencies:
   image: $BUILD_IMAGE
   variables:
     FF_USE_FASTZIP: 1 # enable fastzip - a faster zip implementation that also supports level configuration.
-    ARTIFACT_COMPRESSION_LEVEL: "default" # can also be set to fastest, fast, slow and slowest. If just enabling fastzip is not enough try setting this to fastest or fast.
-    CACHE_COMPRESSION_LEVEL: "default" # same as above, but for caches
-    TRANSFER_METER_FREQUENCY: "5s" # will display transfer progress every 5 seconds for artifacts and remote caches.
+    ARTIFACT_COMPRESSION_LEVEL: 'default' # can also be set to fastest, fast, slow and slowest. If just enabling fastzip is not enough try setting this to fastest or fast.
+    CACHE_COMPRESSION_LEVEL: 'default' # same as above, but for caches
+    TRANSFER_METER_FREQUENCY: '5s' # will display transfer progress every 5 seconds for artifacts and remote caches.
   tags:
     - 'cluster:hindawi-dev'
   needs:
@@ -260,7 +260,6 @@ Validate Schema:qa:
     FILE_PATH: './src/graphql/schema/schema.graphql'
     SCHEMA_REGISTRY_URL: $QA_SCHEMA_REGISTRY_URL
 
-
 Package Images:dev:
   image: $PACKAGE_IMAGE
   tags:
@@ -275,11 +274,14 @@ Package Images:dev:
     policy: pull
     when: always
   variables:
-    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_MEMORY_REQUEST: 4Gi
+    KUBERNETES_CPU_REQUEST: 4
+    KUBERNETES_MEMORY_LIMIT: 4Gi
+    KUBERNETES_CPU_LIMIT: 4
     FF_USE_FASTZIP: 1 # enable fastzip - a faster zip implementation that also supports level configuration.
-    ARTIFACT_COMPRESSION_LEVEL: "default" # can also be set to fastest, fast, slow and slowest. If just enabling fastzip is not enough try setting this to fastest or fast.
-    CACHE_COMPRESSION_LEVEL: "default" # same as above, but for caches
-    TRANSFER_METER_FREQUENCY: "5s" # will display transfer progress every 5 seconds for artifacts and remote caches.
+    ARTIFACT_COMPRESSION_LEVEL: 'default' # can also be set to fastest, fast, slow and slowest. If just enabling fastzip is not enough try setting this to fastest or fast.
+    CACHE_COMPRESSION_LEVEL: 'default' # same as above, but for caches
+    TRANSFER_METER_FREQUENCY: '5s' # will display transfer progress every 5 seconds for artifacts and remote caches.
     AWS_ACCESS_KEY_ID: $AWS_DEV_ACCESS_KEY_ID
     AWS_SECRET_ACCESS_KEY: $AWS_DEV_SECRET_ACCESS_KEY
     AWS_REGISTRY: $AWS_DEV_REGISTRY
@@ -534,7 +536,6 @@ Deploy:hindawi-demo-reporting:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'reporting-backend'
-
 
 Deploy:hindawi-demo-sales-invoicing:
   stage: deploy-invoicing

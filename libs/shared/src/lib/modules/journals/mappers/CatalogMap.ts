@@ -24,6 +24,7 @@ export class CatalogMap extends Mapper<CatalogItem> {
           : null,
         issn: raw.issn,
         code: raw.code,
+        zeroPriced: raw.zeroPriced
       },
       new UniqueEntityID(raw.id)
     );
@@ -43,6 +44,7 @@ export class CatalogMap extends Mapper<CatalogItem> {
       publisherId: catalogItem.publisherId.id.toString(),
       issn: catalogItem.issn,
       code: catalogItem.code,
+      zeroPriced: catalogItem.isZeroPriced
     };
   }
 }

@@ -76,6 +76,7 @@ export * from './modules/invoices/usecases/getItemsForInvoice/getItemsForInvoice
 export * from './modules/invoices/usecases/generateInvoiceCompensatoryEvents';
 export * from './modules/invoices/usecases/generateInvoiceDraftCompensatoryEvents';
 export * from './modules/invoices/usecases/getInvoicesIds';
+export * from './modules/invoices/usecases/isInvoiceDeleted';
 export * from './modules/invoices/usecases/getRecentInvoices/getRecentInvoices';
 export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
 export * from './modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomIdDTO';

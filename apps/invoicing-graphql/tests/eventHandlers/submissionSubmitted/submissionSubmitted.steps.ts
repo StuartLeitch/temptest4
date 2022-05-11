@@ -344,7 +344,8 @@ Given(
       context.repos.transaction,
       context.repos.invoiceItem,
       context.repos.invoice,
-      context.repos.manuscript
+      context.repos.manuscript,
+      context.services.logger
     );
 
     const maybeResult = await usecase.execute(

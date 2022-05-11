@@ -24,6 +24,7 @@ import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/I
 
 import { RestoreSoftDeleteDraftTransactionUsecase } from '../../../../../../src/lib/modules/transactions/usecases/restoreSoftDeleteDraftTransaction/restoreSoftDeleteDraftTransaction';
 import { SoftDeleteDraftTransactionUsecase } from '../../../../../../src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
+import {MockLogger} from "../../../../../../src/lib/infrastructure/logging/mocks/MockLogger";
 
 let manuscript: Manuscript;
 
@@ -129,7 +130,8 @@ Given(
       mockTransactionRepo,
       mockInvoiceItemRepo,
       mockInvoiceRepo,
-      mockArticleRepo
+      mockArticleRepo,
+      new MockLogger()
     );
 
     const maybeDelete = await usecase.execute({ manuscriptId }, defaultContext);

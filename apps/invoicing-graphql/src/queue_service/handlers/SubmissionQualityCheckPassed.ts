@@ -1,21 +1,19 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
-// * Domain imports
 import { SubmissionQualityCheckPassed as SQCP } from '@hindawi/phenom-events';
 import {
   GetTransactionDetailsByManuscriptCustomIdUsecase,
   UpdateTransactionOnAcceptManuscriptUsecase,
+  ManuscriptTypeNotInvoiceable,
   UsecaseAuthorizationContext,
   TransactionStatus,
   VersionCompare,
   Roles,
 } from '@hindawi/shared';
-import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/lib/modules/manuscripts/domain/ManuscriptTypes';
 
 import { Context } from '../../builders';
 
 import { EventHandler } from '../event-handler';
-import { SubmissionSubmittedHelpers } from './submission-submitted/helpers';
+
+import { EventHandlerHelpers } from './helpers';
 
 import { env } from '../../env';
 
@@ -53,14 +51,33 @@ export const SubmissionQualityCheckPassed: EventHandler<SQCP> = {
         return;
       }
 
-      const helpers = new SubmissionSubmittedHelpers(context);
+      const helpers = new EventHandlerHelpers(context);
       const manuscript = await helpers.getExistingManuscript(submissionId);
+
       if (manuscript) {
         const { journalId } = manuscripts[0];
+
+        const invoiceId = await helpers.getInvoiceId(manuscript.customId);
+
+        const isDeleted = await helpers.checkIsInvoiceDeleted(
+          invoiceId.id.toString()
+        );
+
+        if (isDeleted) {
+          logger.info(
+            `PeerReviewCheckedMessage invoice with id: ${invoiceId} is deleted.`
+          );
+          return;
+        }
 
         if (journalId !== manuscript.journalId) {
           await helpers.updateInvoicePrice(manuscript.customId, journalId);
         }
+      } else {
+        logger.info(
+          `PeerReviewCheckedMessage ignored for manuscript with id: '${data.manuscripts[0].id}' because the journal with id: ${data.manuscripts[0].journalId} is zero priced.`
+        );
+        return;
       }
 
       const maxVersion = manuscripts.reduce((max, m) => {
@@ -81,12 +98,13 @@ export const SubmissionQualityCheckPassed: EventHandler<SQCP> = {
         (a) => a.isCorresponding
       );
 
-      const getTransactionUsecase = new GetTransactionDetailsByManuscriptCustomIdUsecase(
-        invoiceItemRepo,
-        transactionRepo,
-        manuscriptRepo,
-        invoiceRepo
-      );
+      const getTransactionUsecase =
+        new GetTransactionDetailsByManuscriptCustomIdUsecase(
+          invoiceItemRepo,
+          transactionRepo,
+          manuscriptRepo,
+          invoiceRepo
+        );
 
       const maybeTransaction = await getTransactionUsecase.execute(
         { customId },
@@ -102,21 +120,22 @@ export const SubmissionQualityCheckPassed: EventHandler<SQCP> = {
         return;
       }
 
-      const updateTransactionOnAcceptManuscript = new UpdateTransactionOnAcceptManuscriptUsecase(
-        addressRepo,
-        catalogRepo,
-        transactionRepo,
-        invoiceItemRepo,
-        invoiceRepo,
-        manuscriptRepo,
-        waiverRepo,
-        payerRepo,
-        couponRepo,
-        waiverService,
-        emailService,
-        vatService,
-        logger
-      );
+      const updateTransactionOnAcceptManuscript =
+        new UpdateTransactionOnAcceptManuscriptUsecase(
+          addressRepo,
+          catalogRepo,
+          transactionRepo,
+          invoiceItemRepo,
+          invoiceRepo,
+          manuscriptRepo,
+          waiverRepo,
+          payerRepo,
+          couponRepo,
+          waiverService,
+          emailService,
+          vatService,
+          logger
+        );
 
       const result = await updateTransactionOnAcceptManuscript.execute(
         {

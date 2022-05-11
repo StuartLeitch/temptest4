@@ -11,6 +11,7 @@ export const JOURNAL_FRAGMENT = `
       name
       id
     }
+    zeroPriced
   }
 `;
 

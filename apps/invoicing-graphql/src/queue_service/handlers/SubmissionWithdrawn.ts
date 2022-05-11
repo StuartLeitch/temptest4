@@ -54,7 +54,8 @@ export const SubmissionWithdrawn: EventHandler<SubmissionWithdrawnPayload> = {
         transactionRepo,
         invoiceItemRepo,
         invoiceRepo,
-        manuscriptRepo
+        manuscriptRepo,
+        context.services.logger
       );
 
       const result = await softDeleteDraftTransactionUsecase.execute(

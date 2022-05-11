@@ -20,6 +20,7 @@ export interface CatalogItemProps {
   updated?: Date;
   publisherId?: PublisherId;
   isActive?: boolean;
+  zeroPriced: boolean;
 }
 
 export class CatalogItem extends AggregateRoot<CatalogItemProps> {
@@ -133,6 +134,14 @@ export class CatalogItem extends AggregateRoot<CatalogItemProps> {
 
   set publisherId(publisherId: PublisherId) {
     this.props.publisherId = publisherId;
+  }
+
+  get isZeroPriced(): boolean {
+    return this.props.zeroPriced;
+  }
+
+  set isZeroPriced(zeroPriced: boolean){
+    this.props.zeroPriced = zeroPriced;
   }
 
   public generateCatalogUpdatedEvent(): void {

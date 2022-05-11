@@ -1,22 +1,20 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-/* eslint-disable max-len */
-
-// * Domain imports
 import { SubmissionPeerReviewCycleCheckPassed as SPRCCP } from '@hindawi/phenom-events';
+
 import {
   GetTransactionDetailsByManuscriptCustomIdUsecase,
   UpdateTransactionOnAcceptManuscriptUsecase,
+  ManuscriptTypeNotInvoiceable,
   UsecaseAuthorizationContext,
   TransactionStatus,
   VersionCompare,
   Roles,
 } from '@hindawi/shared';
-import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/lib/modules/manuscripts/domain/ManuscriptTypes';
 
 import { Context } from '../../builders';
 
+import { EventHandlerHelpers } from './helpers';
+
 import { EventHandler } from '../event-handler';
-import { SubmissionSubmittedHelpers } from './submission-submitted/helpers';
 
 import { env } from '../../env';
 
@@ -57,18 +55,34 @@ export const SubmissionPeerReviewCycleCheckPassed: EventHandler<SPRCCP> = {
         return;
       }
 
-      const helpers = new SubmissionSubmittedHelpers(context);
-      const manuscript = await helpers.getExistingManuscript(submissionId);
+      const eventHelpers = new EventHandlerHelpers(context);
+      const manuscript = await eventHelpers.getExistingManuscript(submissionId);
+
       if (manuscript) {
         const { journalId } = manuscripts[0];
 
-        await helpers.restore(manuscript.id.toString());
+        const invoiceId = await eventHelpers.getInvoiceId(manuscript.customId);
 
-        if (journalId !== manuscript.journalId) {
-          await helpers.updateInvoicePrice(manuscript.customId, journalId);
+        const isDeleted = await eventHelpers.checkIsInvoiceDeleted(
+          invoiceId.id.toString()
+        );
+
+        if (isDeleted) {
+          logger.info(
+            `PeerReviewCheckedMessage invoice with id: ${invoiceId} is deleted.`
+          );
+          return;
         }
 
-        await helpers.updateManuscript(manuscript, data);
+        if (journalId !== manuscript.journalId) {
+          await eventHelpers.updateInvoicePrice(manuscript.customId, journalId);
+        }
+        await eventHelpers.updateManuscript(manuscript, data);
+      } else {
+        logger.info(
+          `PeerReviewCheckedMessage ignored for manuscript with id: '${data.manuscripts[0].id}' because the journal with id: ${data.manuscripts[0].journalId} is zero priced.`
+        );
+        return;
       }
 
       const maxVersion = manuscripts.reduce((max, m) => {
@@ -89,12 +103,13 @@ export const SubmissionPeerReviewCycleCheckPassed: EventHandler<SPRCCP> = {
         (a) => a.isCorresponding
       );
 
-      const getTransactionUsecase = new GetTransactionDetailsByManuscriptCustomIdUsecase(
-        invoiceItemRepo,
-        transactionRepo,
-        manuscriptRepo,
-        invoiceRepo
-      );
+      const getTransactionUsecase =
+        new GetTransactionDetailsByManuscriptCustomIdUsecase(
+          invoiceItemRepo,
+          transactionRepo,
+          manuscriptRepo,
+          invoiceRepo
+        );
 
       const maybeTransaction = await getTransactionUsecase.execute(
         { customId },
@@ -110,21 +125,22 @@ export const SubmissionPeerReviewCycleCheckPassed: EventHandler<SPRCCP> = {
         return;
       }
 
-      const updateTransactionOnAcceptManuscript: UpdateTransactionOnAcceptManuscriptUsecase = new UpdateTransactionOnAcceptManuscriptUsecase(
-        addressRepo,
-        catalogRepo,
-        transactionRepo,
-        invoiceItemRepo,
-        invoiceRepo,
-        manuscriptRepo,
-        waiverRepo,
-        payerRepo,
-        couponRepo,
-        waiverService,
-        emailService,
-        vatService,
-        logger
-      );
+      const updateTransactionOnAcceptManuscript: UpdateTransactionOnAcceptManuscriptUsecase =
+        new UpdateTransactionOnAcceptManuscriptUsecase(
+          addressRepo,
+          catalogRepo,
+          transactionRepo,
+          invoiceItemRepo,
+          invoiceRepo,
+          manuscriptRepo,
+          waiverRepo,
+          payerRepo,
+          couponRepo,
+          waiverService,
+          emailService,
+          vatService,
+          logger
+        );
 
       const result = await updateTransactionOnAcceptManuscript.execute(
         {

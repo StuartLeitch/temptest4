@@ -6,6 +6,7 @@ import { Context } from '../../../builders';
 import { EventHandler } from '../../event-handler';
 
 import { SubmissionSubmittedHelpers } from './helpers';
+import { EventHandlerHelpers } from '../helpers';
 
 const SUBMISSION_SUBMITTED = 'SubmissionSubmitted';
 
@@ -17,6 +18,7 @@ export const SubmissionSubmittedHandler: EventHandler<SubmissionSubmitted> = {
         services: { logger },
       } = context;
       const helpers = new SubmissionSubmittedHelpers(context);
+      const eventHelpers = new EventHandlerHelpers(context);
 
       logger.setScope(`PhenomEvent:${SUBMISSION_SUBMITTED}`);
       logger.info(`Incoming Event Data`, data);
@@ -28,36 +30,55 @@ export const SubmissionSubmittedHandler: EventHandler<SubmissionSubmitted> = {
             journalId,
             authors,
             articleType: { name: articleType },
+            id,
+            title,
           },
         ],
       } = data;
 
-      const manuscript = await helpers.getExistingManuscript(submissionId);
+      const manuscript = await eventHelpers.getExistingManuscript(submissionId);
+      const journal = await helpers.getJournal(journalId);
 
-      if (manuscript) {
-        if (articleType in ManuscriptTypeNotInvoiceable) {
+      if (journal.isZeroPriced) {
+        logger.info(
+          `Zero priced submission detected for: journalId: '${journalId}', manuscriptId: '${id}', manuscriptTitle: '${title}'`
+        );
+        if (manuscript) {
           await helpers.softDelete(submissionId);
         } else {
-          await helpers.restore(manuscript.id.toString());
-
-          if (journalId !== manuscript.journalId) {
-            await helpers.updateInvoicePrice(manuscript.customId, journalId);
-          }
-
-          await helpers.updateManuscript(manuscript, data);
+          //do nothing. Ignore the manuscript if it is submitted to a zero priced journal
         }
       } else {
-        if (!(articleType in ManuscriptTypeNotInvoiceable)) {
-          const newManuscript = await helpers.createManuscript(data);
+        if (manuscript) {
+          //if article type changed
+          if (articleType in ManuscriptTypeNotInvoiceable) {
+            await helpers.softDelete(submissionId);
+          } else {
+            await helpers.restore(manuscript.id.toString());
 
-          logger.info('Manuscript Data', newManuscript);
+            //if journal id changed
+            if (journalId !== manuscript.journalId) {
+              await eventHelpers.updateInvoicePrice(
+                manuscript.customId,
+                journalId
+              );
+            }
 
-          const newTransaction = await helpers.createTransaction(
-            authors.map((a) => a.email),
-            submissionId,
-            journalId
-          );
-          logger.info(`Transaction Data`, newTransaction);
+            await eventHelpers.updateManuscript(manuscript, data);
+          }
+        } else {
+          if (!(articleType in ManuscriptTypeNotInvoiceable)) {
+            const newManuscript = await helpers.createManuscript(data);
+
+            logger.info('Manuscript Data', newManuscript);
+
+            const newTransaction = await helpers.createTransaction(
+              authors.map((a) => a.email),
+              submissionId,
+              journalId
+            );
+            logger.info(`Transaction Data`, newTransaction);
+          }
         }
       }
     };

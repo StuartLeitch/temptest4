@@ -31,6 +31,13 @@ import type {
   CatalogBulkUpdateItemDTO as ItemDTO,
 } from './catalogBulkUpdateDTO';
 import * as Errors from './catalogBulkUpdateErrors';
+import {
+  JournalAmountBelowZeroError,
+  JournalAmountFormatError,
+  JournalAmountRequiredError,
+  JournalAmountShouldBeZeroForZeroPricedJournalError,
+  JournalAmountTooLargeError,
+} from './catalogBulkUpdateErrors';
 
 export class CatalogBulkUpdateUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
@@ -70,8 +77,15 @@ export class CatalogBulkUpdateUsecase
         newRequest
       );
 
-      const maybeChangesValid =
-        validateChangedCatalogItems(changedCatalogItems);
+      const originalCatalogItems = catalogsOriginal.filter((item) =>
+        changedCatalogItems.find((changedItem) =>
+          item.journalId.equals(changedItem.journalId)
+        )
+      );
+      const maybeChangesValid = validateChangedCatalogItems(
+        changedCatalogItems,
+        originalCatalogItems
+      );
       if (maybeChangesValid.isLeft()) {
         return left(maybeChangesValid.value);
       }
@@ -167,19 +181,30 @@ function transformRequestToEntities(request: DTO): Array<JournalPriceUpdate> {
 }
 
 function validateChangedCatalogItems(
-  changedCatalogItems: JournalPriceUpdate[]
+  changedCatalogItems: JournalPriceUpdate[],
+  originalCatalogItems: CatalogItem[]
 ) {
-  return combine(...changedCatalogItems.map(validateChangedCatalogItem));
+  return combine(
+    ...changedCatalogItems.map((item) =>
+      validateChangedCatalogItem(
+        item,
+        originalCatalogItems.filter((origItem) =>
+          origItem.journalId.equals(item.journalId)
+        )[0]
+      )
+    )
+  );
 }
 
 function validateChangedCatalogItem(
-  item: JournalPriceUpdate
+  item: JournalPriceUpdate,
+  originalCatalogItem: CatalogItem
 ): Either<
-  | Errors.JournalAmountBelowZeroError
-  | Errors.JournalAmountRequiredError
-  | Errors.JournalAmountTooLargeError
-  | Errors.JournalAmountFormatError
-  | Errors.JournalIdRequiredError,
+  | JournalAmountBelowZeroError
+  | JournalAmountRequiredError
+  | JournalAmountTooLargeError
+  | JournalAmountFormatError
+  | JournalAmountShouldBeZeroForZeroPricedJournalError,
   void
 > {
   const regExPattern = new RegExp(/^[0-9]+$/);
@@ -196,6 +221,12 @@ function validateChangedCatalogItem(
 
   if (amount <= 0) {
     return left(new Errors.JournalAmountBelowZeroError(journalId));
+  }
+
+  if (amount > 0 && originalCatalogItem.isZeroPriced) {
+    return left(
+      new Errors.JournalAmountShouldBeZeroForZeroPricedJournalError(journalId)
+    );
   }
 
   return right(null);

@@ -29,3 +29,9 @@ export class JournalAmountTooLargeError extends UseCaseError {
     super(`The amount for journal {${journalId}} exceeds limit.`);
   }
 }
+
+export class JournalAmountShouldBeZeroForZeroPricedJournalError extends UseCaseError {
+  constructor(journalId: string) {
+    super(`The amount for journal {${journalId}} must be zero because it is a zero priced journal.`);
+  }
+}
