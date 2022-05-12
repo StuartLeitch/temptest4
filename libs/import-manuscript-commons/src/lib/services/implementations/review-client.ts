@@ -8,7 +8,6 @@ import { File, Manuscript } from '../../models';
 import {
   AuthorInput,
   CreateDraftManuscriptInput,
-  DraftManuscript,
   ReviewClientContract,
   SubmissionUploadFile,
   UpdateDraftManuscriptInput,

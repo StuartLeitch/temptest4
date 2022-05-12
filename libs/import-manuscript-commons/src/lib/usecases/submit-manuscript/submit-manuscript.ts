@@ -139,7 +139,7 @@ export class ExtractManuscriptMetadataUseCase
 
     if (!draftManuscriptResult) {
       throw new GuardFailure(
-        `The draft manuscript with id ${draftManuscriptResult.manuscriptId} was not found.`
+        `The draft manuscript for journal with id ${destinationJournal.id} was not found.`
       );
     }
 
