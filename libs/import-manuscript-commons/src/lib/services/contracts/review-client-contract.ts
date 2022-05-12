@@ -73,7 +73,7 @@ export interface ReviewClientContract {
 
   setSubmissionAuthors(
     manuscriptId: string,
-    authors: Array<AuthorInput>
+    authorInput: AuthorInput
   ): Promise<string>;
 
   uploadFiles(submissionId: UniqueEntityID, files: Array<File>): Promise<void>;

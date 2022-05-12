@@ -32,7 +32,6 @@ import {
 
 import FormData from 'form-data';
 import * as fs from 'fs';
-import { readFile } from 'fs';
 import { DraftSubmission } from '../../models/submission-system-models/draft-submission';
 
 type GqlVariables = Record<string, unknown>;
@@ -55,23 +54,14 @@ export class ReviewClient implements ReviewClientContract {
     'Import/Manuscript/Backend/ReviewClient',
     {
       isDevelopment: false,
-      logLevel: "debug",
+      logLevel: 'debug',
     }
   ).getLogger();
 
   constructor(
     private readonly submissionEndpoint: string,
     private readonly keycloakAuthenticator: KeycloakAuthenticator
-  ) {
-    // axios.interceptors.request.use((request) => {
-    //   console.log('Starting Request', JSON.stringify(request, null, 2));
-    //   return request;
-    // });
-    // axios.interceptors.response.use((response) => {
-    //   console.log('Response:', JSON.stringify(response, null, 2));
-    //   return response;
-    // });
-  }
+  ) {}
 
   getRemoteUrl(): string {
     return this.submissionEndpoint;
@@ -171,7 +161,7 @@ export class ReviewClient implements ReviewClientContract {
 
   async setSubmissionAuthors(
     manuscriptId: string,
-    authors: AuthorInput[]
+    authorInput: AuthorInput
   ): Promise<string> {
     const addAuthorToManuscriptMutation = gql`
       mutation addAuthorToManuscript(
@@ -187,14 +177,11 @@ export class ReviewClient implements ReviewClientContract {
       }
     `;
 
-    for (const authorInput of authors) {
-      const response = await this.callGraphql<{
-        addAuthorToManuscript: RawTeamMemberProps[];
-      }>(addAuthorToManuscriptMutation, { manuscriptId, authorInput });
-      return SubmissionSystemTeamMemberMapper.toDomain(
-        response.addAuthorToManuscript
-      ).id;
-    }
+    const response = await this.callGraphql<{
+      addAuthorToManuscript: RawTeamMemberProps;
+    }>(addAuthorToManuscriptMutation, { manuscriptId, authorInput });
+
+    return response.addAuthorToManuscript['id'] || '';
   }
 
   async uploadFile(
