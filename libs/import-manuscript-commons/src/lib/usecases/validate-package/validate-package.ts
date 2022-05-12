@@ -8,7 +8,7 @@ import { FileUtils } from '../../utils';
 import {
   ManifestProps,
   PackageItem,
-  FileType,
+  MecaFileType,
   Manifest,
   Path,
 } from '../../models';
@@ -70,7 +70,7 @@ async function getInaccessibleFiles(
   return files.filter((f) => !f.isAccessible);
 }
 
-function getItemCount(manifest: Manifest, desiredType: FileType): number {
+function getItemCount(manifest: Manifest, desiredType: MecaFileType): number {
   const matchingItems = manifest.items.filter(
     (item) => item.type === desiredType
   );
@@ -78,7 +78,7 @@ function getItemCount(manifest: Manifest, desiredType: FileType): number {
   return matchingItems.length;
 }
 
-function noMoreThanOne(manifest: Manifest, itemType: FileType): void {
+function noMoreThanOne(manifest: Manifest, itemType: MecaFileType): void {
   const errMultipleItems = (itemType: string): Error => {
     return new VError('The manifest contains multiple %s items', itemType);
   };
@@ -90,7 +90,7 @@ function noMoreThanOne(manifest: Manifest, itemType: FileType): void {
   }
 }
 
-function exactlyOne(manifest: Manifest, itemType: FileType): void {
+function exactlyOne(manifest: Manifest, itemType: MecaFileType): void {
   const errNoItem = (itemType: string): Error => {
     return new VError('The manifest does not contain any %s item', itemType);
   };
@@ -105,12 +105,12 @@ function exactlyOne(manifest: Manifest, itemType: FileType): void {
 }
 
 function validateItemTypeCount(manifest: Manifest): void {
-  exactlyOne(manifest, FileType.manuscript);
-  exactlyOne(manifest, FileType.manifestMetadata);
-  exactlyOne(manifest, FileType.articleMetadata);
-  exactlyOne(manifest, FileType.transferMetadata);
-  noMoreThanOne(manifest, FileType.coverLetter);
-  noMoreThanOne(manifest, FileType.conflictOfInterestStatement);
+  exactlyOne(manifest, MecaFileType.manuscript);
+  exactlyOne(manifest, MecaFileType.manifestMetadata);
+  exactlyOne(manifest, MecaFileType.articleMetadata);
+  exactlyOne(manifest, MecaFileType.transferMetadata);
+  noMoreThanOne(manifest, MecaFileType.coverLetter);
+  noMoreThanOne(manifest, MecaFileType.conflictOfInterestStatement);
 }
 
 async function validateItemAreAccessible(

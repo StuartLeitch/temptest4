@@ -150,7 +150,7 @@ function extractAuthorData(
     email: author['email'],
     givenName: author['name']['given-names'],
     surname: author['name']['surname'],
-    isCorresponding: author['@_corresp'] || false,
+    isCorresponding: author['@_corresp'] === 'yes',
     isSubmitting: author['@_specific-use'] === 'submitting',
   };
 

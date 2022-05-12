@@ -5,9 +5,9 @@ import {
   UseCase,
   UseCaseError,
 } from '@hindawi/shared';
-import { env } from '@hindawi/import-manuscript-validation/env';
-import { VError } from 'verror';
-import { Manuscript } from '../../models/manuscript';
+import {env} from '@hindawi/import-manuscript-validation/env';
+import {VError} from 'verror';
+import {Manuscript} from '../../models/manuscript';
 import {
   AuthorInput,
   CreateDraftManuscriptInput,
@@ -19,10 +19,23 @@ import {
   DraftSubmission,
   SourceJournal,
 } from '../../models/submission-system-models';
+import {MecaFileType} from "@hindawi/import-manuscript-commons";
 
-export class ExtractManuscriptMetadataUseCase
-  implements UseCase<Manuscript, Promise<string>, null>
-{
+export enum SubmissionSystemFileType {
+  figure = 'figure',
+  manuscript = 'manuscript',
+  supplementary = 'supplementary',
+  coverLetter = 'coverLetter',
+  reviewComment = 'reviewComment',
+  responseToReviewers = 'responseToReviewers',
+}
+
+interface Request {
+  manuscript: Manuscript,
+  packagePath: string
+}
+
+export class SubmitManuscriptUseCase implements UseCase<Request, Promise<string>, null> {
   logger: LoggerContract;
 
   constructor(private readonly reviewClient: ReviewClientContract) {
@@ -32,9 +45,9 @@ export class ExtractManuscriptMetadataUseCase
     }).getLogger();
   }
 
-  async execute(request?: Manuscript, context?: null): Promise<string> {
-    const sourceJournalName = request.sourceJournal.name;
-    const destinationJournalName = request.destinationJournal.name;
+  async execute({manuscript, packagePath}: Request): Promise<string> {
+    const sourceJournalName = manuscript.sourceJournal.name;
+    const destinationJournalName = manuscript.destinationJournal.name;
     const allSourceJournals = await this.reviewClient.getSourceJournals();
 
     const sourceJournal = allSourceJournals.find(
@@ -42,7 +55,7 @@ export class ExtractManuscriptMetadataUseCase
     ); //TODO add PISSN and EISSN to review
     if (!sourceJournal) {
       throw new GuardFailure(
-        `The source journal ${sourceJournalName} for manuscript ${request.sourceManuscriptId} not found.`
+        `The source journal ${sourceJournalName} for manuscript ${manuscript.sourceManuscriptId} not found.`
       );
     }
 
@@ -53,27 +66,41 @@ export class ExtractManuscriptMetadataUseCase
 
     if (!destinationJournal) {
       throw new GuardFailure(
-        `The destination journal ${destinationJournalName} for manuscript ${request.sourceManuscriptId} not found.`
+        `The destination journal ${destinationJournalName} for manuscript ${manuscript.sourceManuscriptId} not found.`
       );
     }
 
-    const { manuscriptId, submissionId } = await this.createDraftManuscript(
+    this.logger.info(`Creating draft manuscript into ${destinationJournal.name}`)
+    const {manuscriptId, submissionId} = await this.createDraftManuscript(
       destinationJournal
     );
-    await this.addManuscriptDetails(request, sourceJournal, manuscriptId);
-    await this.addAuthorsToManuscript(request, manuscriptId);
-    await this.uploadFiles(request, manuscriptId);
+    this.logger.info(`Created manuscriptID: ${manuscriptId} submissionId: ${submissionId}`)
 
-    return `${this.reviewClient.getRemoteUrl()}/submit/${submissionId}/${manuscriptId}`;
+    this.logger.info(`Adding manuscript details for manuscriptID: ${manuscriptId} submissionId: ${submissionId}`)
+    await this.addManuscriptDetails(manuscript, sourceJournal, manuscriptId);
+
+    this.logger.info(`Adding authors to manuscriptID: ${manuscriptId} submissionId: ${submissionId}`)
+    await this.addAuthorsToManuscript(manuscript, manuscriptId);
+
+    this.logger.info(`Uploading files for manuscriptID: ${manuscriptId} submissionId: ${submissionId}`)
+    await this.uploadFiles(manuscript, manuscriptId, packagePath);
+
+    this.logger.info(`Creating submission edit url for manuscriptID: ${manuscriptId} submissionId: ${submissionId}`)
+    return `${env.app.reviewAppBasePath}/submit/${submissionId}/${manuscriptId}`;
   }
 
-  private async uploadFiles(request: Manuscript, manuscriptId: string) {
+  private async uploadFiles(request: Manuscript, manuscriptId: string, packagePath: string) {
     for (const file of request.files) {
-      await this.reviewClient.uploadFile(
-        manuscriptId,
-        { type: file.type, size: 1 },
-        file.name
-      );
+      const type = this.mapMecaFileTypeToSubmissionSystemFileType(file.type);
+      if(type) {
+        await this.reviewClient.uploadFile(
+          manuscriptId,
+          {type: type, size: 1},
+          file.path.prefix(packagePath).src
+        );
+      } else {
+        this.logger.debug(`Not uploading ${file.name} as we do not support the ${file.type} file type`);
+      }
     }
   }
 
@@ -96,6 +123,28 @@ export class ExtractManuscriptMetadataUseCase
       }
     );
     await this.reviewClient.setSubmissionAuthors(manuscriptId, authors);
+  }
+
+  private mapMecaFileTypeToSubmissionSystemFileType(mecaFileType: MecaFileType) {
+    const mapper: Map<MecaFileType, SubmissionSystemFileType> = new Map<MecaFileType, SubmissionSystemFileType>()
+
+    mapper.set(MecaFileType.coverLetter, SubmissionSystemFileType.coverLetter);
+    mapper.set(MecaFileType.manuscript, SubmissionSystemFileType.manuscript);
+
+    mapper.set(MecaFileType.conflictOfInterestStatement, SubmissionSystemFileType.supplementary);
+    mapper.set(MecaFileType.supportingInformation, SubmissionSystemFileType.supplementary);
+    mapper.set(MecaFileType.reportsAndResponses, SubmissionSystemFileType.supplementary);
+    mapper.set(MecaFileType.supplementary, SubmissionSystemFileType.supplementary);
+
+    mapper.set(MecaFileType.reviewMetadata, null);
+    mapper.set(MecaFileType.transferMetadata, null);
+    mapper.set(MecaFileType.articleMetadata, null);
+    mapper.set(MecaFileType.manifestMetadata, null);
+
+    const submissionSystemFileType = mapper.get(mecaFileType);
+
+    this.logger.info(`Mapping ${mecaFileType} to ${submissionSystemFileType} `)
+    return submissionSystemFileType
   }
 
   private async addManuscriptDetails(

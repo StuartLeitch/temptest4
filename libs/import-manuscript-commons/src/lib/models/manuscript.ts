@@ -7,7 +7,7 @@ import {
 } from '@hindawi/shared';
 
 import { SourceJournal, Journal } from './journal';
-import { FileType, File } from './file';
+import { MecaFileType, File } from './file';
 import { Founding } from './founding';
 import { Author } from './author';
 
@@ -65,15 +65,15 @@ export class Manuscript extends ValueObject<ManuscriptProps> {
   }
 
   get manuscriptFiles(): Array<File> {
-    return this.files.filter((file) => file.type === FileType.manuscript);
+    return this.files.filter((file) => file.type === MecaFileType.manuscript);
   }
 
   get coverLetterFiles(): Array<File> {
-    return this.files.filter((file) => file.type === FileType.coverLetter);
+    return this.files.filter((file) => file.type === MecaFileType.coverLetter);
   }
 
   get supplementaryFiles(): Array<File> {
-    return this.files.filter((file) => file.type === FileType.supplementary);
+    return this.files.filter((file) => file.type === MecaFileType.supplementary);
   }
 
   get title(): string {

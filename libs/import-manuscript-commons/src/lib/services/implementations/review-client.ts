@@ -13,7 +13,6 @@ import {
   UpdateDraftManuscriptInput,
 } from '../contracts';
 import { KeycloakAuthenticator } from './keycloakAuthenticator';
-import { env } from '@hindawi/import-manuscript-validation/env';
 import { ActiveJournal } from '../../models/submission-system-models/active-journal';
 import { SubmissionSystemActiveJournalMapper } from '../../models/mappers/submission-system-active-journal-mapper';
 import { SourceJournal } from '../../models/submission-system-models/source-journal';
@@ -55,8 +54,8 @@ export class ReviewClient implements ReviewClientContract {
   private logger: LoggerContract = new LoggerBuilder(
     'Import/Manuscript/Backend/ReviewClient',
     {
-      isDevelopment: env.isDevelopment,
-      logLevel: env.log.level,
+      isDevelopment: false,
+      logLevel: "debug",
     }
   ).getLogger();
 
@@ -297,7 +296,7 @@ export class ReviewClient implements ReviewClientContract {
     };
     const formData: FormData = new FormData();
 
-    const file = await fs.promises.readFile('/home/andrei/Downloads/thing.pdf');
+    const file = await fs.promises.readFile(fileName);
 
     const headers: AxiosRequestHeaders = {
       Authorization: `Bearer ${authorizationToken}`,

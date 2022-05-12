@@ -84,45 +84,5 @@ export function buildServices(): Services {
   //   type: 'supplementary', //manuscript, //
   // };
 
-  const autoSaveInput: UpdateDraftManuscriptInput = {
-    meta: {
-      title: 'Ree',
-      abstract: '',
-      agreeTc: true,
-      conflictOfInterest: null,
-      dataAvailability: null,
-      fundingStatement: null,
-      articleTypeId: null,
-    },
-    authors: [],
-    files: [],
-    journalId: '03c3c41e-bded-4323-a482-88d805ba35bb',
-    sectionId: null,
-    preprintValue: null,
-    sourceJournalId: null,
-    sourceJournalManuscriptId: null,
-    linkedSubmissionCustomId: null
-  };
-
-  const input: CreateDraftManuscriptInput = {
-    journalId: '03c3c41e-bded-4323-a482-88d805ba35bb',
-    sectionId: null,
-    specialIssueId: null,
-    customId: '5108482',
-  };
-
-  services.reviewClient
-    .createNewDraftSubmission(input)
-    .then(({manuscriptId, submissionId}) => {
-      console.log(JSON.stringify(manuscriptId, null, 2))
-      services.reviewClient
-        .updateDraftManuscript(manuscriptId, autoSaveInput)
-        .then((updatedManuscriptId) => console.log(JSON.stringify(updatedManuscriptId, null, 2)))
-        .catch((exception) => console.log(exception));
-
-    })
-    .catch((exception) => console.log(exception));
-
-
   return services;
 }

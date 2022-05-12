@@ -7,7 +7,7 @@ import {
 
 import { Path } from './path';
 
-export enum FileType {
+export enum MecaFileType {
   conflictOfInterestStatement = 'conflict-of-interest-statement',
   supportingInformation = 'supporting-information',
   reportsAndResponses = 'reports-and-responses',
@@ -23,7 +23,7 @@ export enum FileType {
 export interface FileProps extends ValueObjectProps {
   name: string;
   size: number;
-  type: FileType;
+  type: MecaFileType;
   path: Path;
 }
 
@@ -36,7 +36,7 @@ export class File extends ValueObject<FileProps> {
     return this.props.size;
   }
 
-  get type(): FileType {
+  get type(): MecaFileType {
     return this.props.type;
   }
 

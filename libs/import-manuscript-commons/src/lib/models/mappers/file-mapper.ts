@@ -1,6 +1,6 @@
 import { Mapper } from '@hindawi/shared';
 
-import { FileProps, FileType, File } from '../file';
+import { FileProps, MecaFileType, File } from '../file';
 import { Path } from '../path';
 
 export interface RawFileProps {
@@ -13,7 +13,7 @@ export interface RawFileProps {
 export class FileMapper extends Mapper<File> {
   static toDomain(raw: RawFileProps): File {
     const props: FileProps = {
-      type: <FileType>raw.type,
+      type: <MecaFileType>raw.type,
       path: Path.create(raw.path),
       name: raw.name,
       size: raw.size,
