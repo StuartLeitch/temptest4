@@ -1,5 +1,5 @@
 import { QueueEventConsumer, SqsEventConsumer } from '@hindawi/queue-utils';
-import { LoggerBuilder } from '@hindawi/shared';
+import { KeycloakAuthenticator } from '../../../../libs/import-manuscript-commons/src/lib/services/implementations/keycloakAuthenticator';
 
 import {
   ObjectStoreServiceContract,
@@ -10,19 +10,12 @@ import {
   ArchiveService,
   XmlService,
   S3Service,
-  AuthorInput,
-  SubmissionUploadFile,
-  UpdateDraftManuscriptInput,
-  CreateDraftManuscriptInput,
-} from '@hindawi/import-manuscript-commons';
+} from '../../../../libs/import-manuscript-commons/src';
 
 import { EmailService } from '../libs/email';
 
 import { env } from '../env';
-import { KeycloakAuthenticator } from '../../../../libs/import-manuscript-commons/src/lib/services/implementations/keycloakAuthenticator';
 import Keycloak from 'keycloak-connect';
-import { SubmissionFile } from '../../../../libs/import-manuscript-commons/src/lib/models/submission-system-models/file-submission';
-import * as fs from 'fs';
 
 export interface Services {
   objectStoreService: ObjectStoreServiceContract;

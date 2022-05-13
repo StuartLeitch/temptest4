@@ -1,8 +1,23 @@
+/* eslint-disable max-len */
+import { KeycloakAuthenticator } from './keycloakAuthenticator';
 import axios, { AxiosRequestHeaders } from 'axios';
-import { LoggerBuilder, LoggerContract, UniqueEntityID } from '@hindawi/shared';
-import { ASTNode, print } from 'graphql';
 import VError, { MultiError } from 'verror';
+import { ASTNode, print } from 'graphql';
+import FormData from 'form-data';
 import gql from 'graphql-tag';
+import * as fs from 'fs';
+
+import { ActiveJournal } from '../../models/submission-system-models/active-journal';
+import { SourceJournal } from '../../models/submission-system-models/source-journal';
+import { SourceJournalMapper } from '../../models/mappers/source-journal-mapper';
+import {
+  RawDraftSubmissionProps,
+  SubmissionSystemDraftSubmissionMapper,
+} from '../../models/mappers/submission-system-draft-submission-mapper';
+import { SubmissionSystemActiveJournalMapper } from '../../models/mappers/submission-system-active-journal-mapper';
+import { RawTeamMemberProps } from '../../models/mappers/submission-system-team-member-mapper';
+import { RawSubmissionFileProps } from '../../models/mappers/submission-system-file-mapper';
+import { DraftSubmission } from '../../models/submission-system-models/draft-submission';
 import { File, Manuscript } from '../../models';
 
 import {
@@ -12,27 +27,7 @@ import {
   SubmissionUploadFile,
   UpdateDraftManuscriptInput,
 } from '../contracts';
-import { KeycloakAuthenticator } from './keycloakAuthenticator';
-import { ActiveJournal } from '../../models/submission-system-models/active-journal';
-import { SubmissionSystemActiveJournalMapper } from '../../models/mappers/submission-system-active-journal-mapper';
-import { SourceJournal } from '../../models/submission-system-models/source-journal';
-import { SourceJournalMapper } from '../../models/mappers/source-journal-mapper';
-import {
-  RawDraftSubmissionProps,
-  SubmissionSystemDraftSubmissionMapper,
-} from '../../models/mappers/submission-system-draft-submission-mapper';
-import {
-  RawTeamMemberProps,
-  SubmissionSystemTeamMemberMapper,
-} from '../../models/mappers/submission-system-team-member-mapper';
-import {
-  RawSubmissionFileProps,
-  SubmissionSystemFileMapper,
-} from '../../models/mappers/submission-system-file-mapper';
-
-import FormData from 'form-data';
-import * as fs from 'fs';
-import { DraftSubmission } from '../../models/submission-system-models/draft-submission';
+import { LoggerBuilder, LoggerContract, UniqueEntityID } from '@hindawi/shared';
 
 type GqlVariables = Record<string, unknown>;
 type GqlResponse<T = unknown> = {
@@ -240,7 +235,6 @@ export class ReviewClient implements ReviewClientContract {
     };
 
     const graphqlQuery = {
-      // operationName: 'updateDraftManuscript',
       query: print(request),
       variables: variable,
     };
@@ -255,7 +249,7 @@ export class ReviewClient implements ReviewClientContract {
       );
 
       if (resp.data['errors']) {
-        throw this.parseGqlErrors(resp.data['errors']);
+        throw parseGqlErrors(resp.data['errors']);
       }
       return resp.data.data;
     } catch (err) {
@@ -296,7 +290,6 @@ export class ReviewClient implements ReviewClientContract {
     try {
       const resp = await axios.post<GqlResponse<T>>(
         this.submissionEndpoint,
-        // formData.getBuffer(),
         formData,
         {
           headers,
@@ -304,25 +297,25 @@ export class ReviewClient implements ReviewClientContract {
       );
 
       if (resp.data['errors']) {
-        throw this.parseGqlErrors(resp.data['errors']);
+        throw parseGqlErrors(resp.data['errors']);
       }
       return resp.data.data;
     } catch (err) {
       throw new VError(err);
     }
   }
+}
 
-  private parseGqlErrors(errs: any[]): MultiError {
-    const gqlErrors: Array<GqlError> = new Array<GqlError>();
-    for (const err of errs) {
-      gqlErrors.push(
-        new GqlError(
-          err['message'],
-          err['extensions']['serviceName'],
-          err['extensions']['code']
-        )
-      );
-    }
-    return new MultiError(gqlErrors);
+function parseGqlErrors(errs: any[]): MultiError {
+  const gqlErrors: Array<GqlError> = new Array<GqlError>();
+  for (const err of errs) {
+    gqlErrors.push(
+      new GqlError(
+        err['message'],
+        err['extensions']['serviceName'],
+        err['extensions']['code']
+      )
+    );
   }
+  return new MultiError(gqlErrors);
 }

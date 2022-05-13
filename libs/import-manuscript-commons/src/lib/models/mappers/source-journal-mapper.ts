@@ -1,5 +1,8 @@
-import {Mapper} from '@hindawi/shared';
-import {SourceJournal, SourceJournalProps} from "../submission-system-models/source-journal";
+import { Mapper } from '../../../../../shared/src/lib/infrastructure';
+import {
+  SourceJournal,
+  SourceJournalProps,
+} from '../submission-system-models/source-journal';
 
 export interface RawSourceJournalProps {
   id: string;
@@ -25,8 +28,7 @@ export class SourceJournalMapper extends Mapper<SourceJournal> {
       id: journal.id,
       name: journal.name,
       eissn: journal.eissn,
-      pissn: journal.pissn
+      pissn: journal.pissn,
     };
   }
 }
-

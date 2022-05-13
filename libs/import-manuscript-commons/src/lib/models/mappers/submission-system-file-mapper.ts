@@ -1,4 +1,4 @@
-import { Mapper } from '@hindawi/shared';
+import { Mapper } from '../../../../../shared/src/lib/infrastructure';
 import {
   SubmissionFile,
   SubmissionFileProps,

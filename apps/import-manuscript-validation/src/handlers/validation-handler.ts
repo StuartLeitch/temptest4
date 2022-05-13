@@ -12,8 +12,8 @@ import { Context } from '../builders';
 import { env } from '../env';
 
 import { Logger } from '../libs/logger';
-import {SubmitManuscriptUseCase} from "../../../../libs/import-manuscript-commons/src/lib/usecases/submit-manuscript/submit-manuscript";
-import {VError} from "verror";
+import { SubmitManuscriptUseCase } from '../../../../libs/import-manuscript-commons/src/lib/usecases/submit-manuscript/submit-manuscript';
+import { VError } from 'verror';
 
 const VALIDATE_PACKAGE = 'ValidatePackage';
 
@@ -42,7 +42,12 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
       */
 
       const {
-        services: { objectStoreService, archiveService, xmlService, reviewClient },
+        services: {
+          objectStoreService,
+          archiveService,
+          xmlService,
+          reviewClient,
+        },
         loggerBuilder,
       } = context;
       // const logger = loggerBuilder.getLogger();
@@ -85,16 +90,17 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
           JSON.stringify(ManuscriptMapper.toPersistance(manuscript), null, 2)
         );
 
-        const submissionEditURL = await new SubmitManuscriptUseCase(reviewClient).execute({manuscript, packagePath: res.value.src});
+        const submissionEditURL = await new SubmitManuscriptUseCase(
+          reviewClient
+        ).execute({ manuscript, packagePath: res.value.src });
         logger.info(`Submission url ${submissionEditURL}`);
 
         context.services.emailService.sendEmail(
           [data.successContactEmail],
           'import-manuscript@hindawi.com',
           'Important Message',
-           logger.messages
+          logger.messages
         );
-
       } catch (err) {
         context.services.emailService.sendEmail(
           [data.failContactEmail],

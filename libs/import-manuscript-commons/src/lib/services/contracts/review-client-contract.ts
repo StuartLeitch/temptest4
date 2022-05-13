@@ -1,10 +1,8 @@
-import { UniqueEntityID, ValueObjectProps } from '@hindawi/shared';
+import { UniqueEntityID } from '@hindawi/shared';
 
-import { Manuscript, File, Journal } from '../../models';
+import { Manuscript, File } from '../../models';
 import { ActiveJournal } from '../../models/submission-system-models/active-journal';
-import { SubmissionFile } from '../../models/submission-system-models/file-submission';
 import { SourceJournal } from '../../models/submission-system-models/source-journal';
-import { ReadStream } from 'fs';
 import { DraftSubmission } from '../../models/submission-system-models';
 
 export interface CreateDraftManuscriptInput {

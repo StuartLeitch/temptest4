@@ -11,6 +11,12 @@ import { MecaFileType, File } from './file';
 import { Founding } from './founding';
 import { Author } from './author';
 
+export enum MecaArticleType {
+  researchArticle = 'Research Article',
+  reviewArticle = 'Review Article',
+  caseReport = 'Case Study',
+}
+
 export interface ManuscriptProps extends ValueObjectProps {
   sourceManuscriptId: UniqueEntityID;
   articleTypeId: UniqueEntityID;
@@ -73,7 +79,9 @@ export class Manuscript extends ValueObject<ManuscriptProps> {
   }
 
   get supplementaryFiles(): Array<File> {
-    return this.files.filter((file) => file.type === MecaFileType.supplementary);
+    return this.files.filter(
+      (file) => file.type === MecaFileType.supplementary
+    );
   }
 
   get title(): string {

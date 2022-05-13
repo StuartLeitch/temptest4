@@ -1,4 +1,4 @@
-import {UniqueEntityID, ValueObject, ValueObjectProps} from "@hindawi/shared";
+import { ValueObject, ValueObjectProps } from '@hindawi/shared';
 
 export interface ActiveJournalProps extends ValueObjectProps {
   id: string;
@@ -23,20 +23,20 @@ export class ActiveJournal extends ValueObject<ActiveJournalProps> {
     return this.props.name;
   }
 
-  get issn(): string{
+  get issn(): string {
     return this.props.issn;
   }
 
-  get email(): string{
+  get email(): string {
     return this.props.email;
   }
 
-  get isActive(): boolean{
-    return this.props.isActive
+  get isActive(): boolean {
+    return this.props.isActive;
   }
 
-  get apc(): number{
-    return this.props.apc
+  get apc(): number {
+    return this.props.apc;
   }
 
   private constructor(props: ActiveJournalProps) {

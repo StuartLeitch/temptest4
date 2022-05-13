@@ -1,13 +1,11 @@
-import { Mapper, UniqueEntityID } from '@hindawi/shared';
+import { Mapper } from '../../../../../shared/src/lib/infrastructure';
 
 import { IssnType, Issn } from '../issn';
+
 import {
-  SourceJournalProps,
-  SourceJournal,
-  JournalProps,
-  Journal,
-} from '../journal';
-import {ActiveJournal, ActiveJournalProps} from "../submission-system-models/active-journal";
+  ActiveJournal,
+  ActiveJournalProps,
+} from '../submission-system-models/active-journal';
 
 export interface RawJournalProps {
   id: string;
@@ -28,7 +26,7 @@ export class SubmissionSystemActiveJournalMapper extends Mapper<ActiveJournal> {
       issn: raw.issn,
       id: raw.id,
       name: raw.name,
-      code: raw.code
+      code: raw.code,
     };
 
     return ActiveJournal.create(props);
@@ -42,8 +40,7 @@ export class SubmissionSystemActiveJournalMapper extends Mapper<ActiveJournal> {
       id: journal.id,
       isActive: journal.isActive,
       issn: journal.issn,
-      name: journal.name
+      name: journal.name,
     };
   }
 }
-

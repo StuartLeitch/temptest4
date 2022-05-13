@@ -3,11 +3,9 @@ import {
   LoggerBuilder,
   LoggerContract,
   UseCase,
-  UseCaseError,
 } from '@hindawi/shared';
 import { env } from '@hindawi/import-manuscript-validation/env';
-import { VError } from 'verror';
-import { Manuscript } from '../../models/manuscript';
+import { Manuscript, MecaArticleType } from '../../models/manuscript';
 import {
   AuthorInput,
   CreateDraftManuscriptInput,
@@ -19,7 +17,7 @@ import {
   DraftSubmission,
   SourceJournal,
 } from '../../models/submission-system-models';
-import { MecaFileType } from '@hindawi/import-manuscript-commons';
+import { MecaFileType } from '../../models/file';
 
 export enum SubmissionSystemFileType {
   figure = 'figure',
@@ -30,7 +28,11 @@ export enum SubmissionSystemFileType {
   responseToReviewers = 'responseToReviewers',
 }
 
-import util from 'util';
+export enum SubmissionSystemArticleType { // NOT LIKE THIS AT ALL ITS TEMPORARY
+  researchArticle = 'd44a048b-fff6-45de-9ac7-b1765c756cb6',
+  reviewArticle = '37103a3b-6f88-436e-925a-8dce2c146815',
+  caseStudy = '34340e3d-8822-4ad3-af77-9a5aab614605',
+}
 interface Request {
   manuscript: Manuscript;
   packagePath: string;
@@ -108,7 +110,7 @@ export class SubmitManuscriptUseCase
     request: Manuscript,
     manuscriptId: string,
     packagePath: string
-  ) {
+  ): Promise<void> {
     for (const file of request.files) {
       const type = this.mapMecaFileTypeToSubmissionSystemFileType(file.type);
       if (type) {
@@ -146,10 +148,36 @@ export class SubmitManuscriptUseCase
     for (const author of authors) {
       await this.reviewClient.setSubmissionAuthors(manuscriptId, author);
     }
-
-    return;
   }
 
+  private mapMecaArticleTypeToSubmissionSystemArticleType(
+    mecaArticleType: string
+  ): SubmissionSystemArticleType {
+    const mapper: Map<string, SubmissionSystemArticleType> = new Map<
+      MecaArticleType,
+      SubmissionSystemArticleType
+    >();
+
+    mapper.set(
+      MecaArticleType.caseReport,
+      SubmissionSystemArticleType.caseStudy
+    );
+    mapper.set(
+      MecaArticleType.researchArticle,
+      SubmissionSystemArticleType.researchArticle
+    );
+    mapper.set(
+      MecaArticleType.reviewArticle,
+      SubmissionSystemArticleType.reviewArticle
+    );
+
+    const submissionSystemArticleType = mapper.get(mecaArticleType);
+    this.logger.info(
+      `Mapping ${mecaArticleType} to ${submissionSystemArticleType} `
+    );
+
+    return submissionSystemArticleType;
+  }
   private mapMecaFileTypeToSubmissionSystemFileType(
     mecaFileType: MecaFileType
   ): SubmissionSystemFileType {
@@ -194,6 +222,9 @@ export class SubmitManuscriptUseCase
     sourceJournal: SourceJournal,
     manuscriptId: string
   ): Promise<void> {
+    const type = this.mapMecaArticleTypeToSubmissionSystemArticleType(
+      request.articleTypeId.toString()
+    );
     const autoSaveInput: UpdateDraftManuscriptInput = {
       meta: {
         title: request.title,
@@ -202,7 +233,7 @@ export class SubmitManuscriptUseCase
         conflictOfInterest: request.conflictOfInterest,
         dataAvailability: request.dataAvailability,
         fundingStatement: `${request.founding.founderName} ${request.founding.recipientName} ${request.founding.founderId}`,
-        articleTypeId: request.articleTypeId.toString(),
+        articleTypeId: type,
       },
       authors: [],
       files: [],
