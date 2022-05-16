@@ -3,8 +3,10 @@ import * as pkg from '../../../package.json';
 import {
   getOsEnvOptionalIfOtherExists,
   getOsEnvOptional,
+  getOsEnvArray,
   getOsEnv,
-  toBool, toObject,
+  toBool,
+  toObject,
 } from '@hindawi/env-utils';
 
 export const env = {
@@ -21,10 +23,24 @@ export const env = {
     xmlDefinitionsLocation: getOsEnv('IMPORT_MANUSCRIPT_XML_DEFINITION_PATH'),
     submissionGraphqlEndpoint: getOsEnv('IMPORT_MANUSCRIPT_SUBMISSION_GRAPHQL'),
     reviewAppBasePath: getOsEnv('IMPORT_MANUSCRIPT_REVIEW_APP_BASE_PATH'),
-    submissionAdminUsername: getOsEnv('IMPORT_MANUSCRIPT_SUBMISSION_ADMIN_USERNAME'),
-    submissionAdminPassword: getOsEnv('IMPORT_MANUSCRIPT_SUBMISSION_ADMIN_PASSWORD'),
-    submissionKeycloakConfig: toObject(getOsEnv('IMPORT_MANUSCRIPT_SUBMISSION_KEYCLOAK_CONFIG')),
-    submissionKeycloakClientId: getOsEnv('IMPORT_MANUSCRIPT_SUBMISSION_KEYCLOAK_CLIENT_ID'),
+    submissionAdminUsername: getOsEnv(
+      'IMPORT_MANUSCRIPT_SUBMISSION_ADMIN_USERNAME'
+    ),
+    submissionAdminPassword: getOsEnv(
+      'IMPORT_MANUSCRIPT_SUBMISSION_ADMIN_PASSWORD'
+    ),
+    submissionKeycloakConfig: toObject(
+      getOsEnv('IMPORT_MANUSCRIPT_SUBMISSION_KEYCLOAK_CONFIG')
+    ),
+    submissionKeycloakClientId: getOsEnv(
+      'IMPORT_MANUSCRIPT_SUBMISSION_KEYCLOAK_CLIENT_ID'
+    ),
+    supportedArticleTypes: getOsEnvArray(
+      'IMPORT_MANUSCRIPT_SUPPORTED_ARTICLE_TYPES'
+    ),
+    mecaArticleTypes: toObject(
+      getOsEnv('IMPORT_MANUSCRIPT_MECA_ARTICLE_TYPES')
+    ),
   },
   log: {
     level: getOsEnv('LOG_LEVEL'),

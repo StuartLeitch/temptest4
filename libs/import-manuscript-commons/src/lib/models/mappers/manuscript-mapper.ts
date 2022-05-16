@@ -14,7 +14,7 @@ import {
 
 export interface RawManuscriptProps {
   sourceManuscriptId: string;
-  articleTypeId: string;
+  articleTypeName: string;
   destinationJournal: RawJournalProps;
   articleAbstract: string;
   authors: Array<RawAuthorProps>;
@@ -33,7 +33,7 @@ export class ManuscriptMapper extends Mapper<Manuscript> {
     const props: ManuscriptProps = {
       sourceManuscriptId:
         raw.sourceManuscriptId && new UniqueEntityID(raw.sourceManuscriptId),
-      articleTypeId: raw.articleTypeId && new UniqueEntityID(raw.articleTypeId),
+      articleTypeName: raw.articleTypeName,
       destinationJournal: JournalMapper.toDomain(raw.destinationJournal),
       sourceJournal: SourceJournalMapper.toDomain(raw.sourceJournal),
       authors: raw.authors.map(AuthorMapper.toDomain),
@@ -56,7 +56,7 @@ export class ManuscriptMapper extends Mapper<Manuscript> {
       authors: manuscript.authors.map(AuthorMapper.toPersistance),
       founding: FoundingMapper.toPersistance(manuscript.founding),
       files: manuscript.files.map(FileMapper.toPersistance),
-      articleTypeId: manuscript.articleTypeId.toString(),
+      articleTypeName: manuscript.articleTypeName,
       conflictOfInterest: manuscript.conflictOfInterest,
       dataAvailability: manuscript.dataAvailability,
       articleAbstract: manuscript.articleAbstract,

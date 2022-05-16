@@ -1,11 +1,11 @@
+/* eslint-disable max-len */
 import {
   GuardFailure,
   LoggerBuilder,
   LoggerContract,
   UseCase,
 } from '@hindawi/shared';
-import { env } from '@hindawi/import-manuscript-validation/env';
-import { Manuscript, MecaArticleType } from '../../models/manuscript';
+import { Manuscript } from '../../models/manuscript';
 import {
   AuthorInput,
   CreateDraftManuscriptInput,
@@ -28,11 +28,6 @@ export enum SubmissionSystemFileType {
   responseToReviewers = 'responseToReviewers',
 }
 
-export enum SubmissionSystemArticleType { // NOT LIKE THIS AT ALL ITS TEMPORARY
-  researchArticle = 'd44a048b-fff6-45de-9ac7-b1765c756cb6',
-  reviewArticle = '37103a3b-6f88-436e-925a-8dce2c146815',
-  caseStudy = '34340e3d-8822-4ad3-af77-9a5aab614605',
-}
 interface Request {
   manuscript: Manuscript;
   packagePath: string;
@@ -43,10 +38,13 @@ export class SubmitManuscriptUseCase
 {
   logger: LoggerContract;
 
-  constructor(private readonly reviewClient: ReviewClientContract) {
+  constructor(
+    private readonly reviewClient: ReviewClientContract,
+    private readonly envVars: any
+  ) {
     this.logger = new LoggerBuilder('ExtractManuscriptMetadataUseCase', {
-      isDevelopment: env.isDevelopment,
-      logLevel: env.log.level,
+      isDevelopment: envVars.isDevelopment,
+      logLevel: envVars.log.level,
     }).getLogger();
   }
 
@@ -103,7 +101,7 @@ export class SubmitManuscriptUseCase
     this.logger.info(
       `Creating submission edit url for manuscriptID: ${manuscriptId} submissionId: ${submissionId}`
     );
-    return `${env.app.reviewAppBasePath}/submit/${submissionId}/${manuscriptId}`;
+    return `${this.envVars.app.reviewAppBasePath}/submit/${submissionId}/${manuscriptId}`;
   }
 
   private async uploadFiles(
@@ -150,34 +148,6 @@ export class SubmitManuscriptUseCase
     }
   }
 
-  private mapMecaArticleTypeToSubmissionSystemArticleType(
-    mecaArticleType: string
-  ): SubmissionSystemArticleType {
-    const mapper: Map<string, SubmissionSystemArticleType> = new Map<
-      MecaArticleType,
-      SubmissionSystemArticleType
-    >();
-
-    mapper.set(
-      MecaArticleType.caseReport,
-      SubmissionSystemArticleType.caseStudy
-    );
-    mapper.set(
-      MecaArticleType.researchArticle,
-      SubmissionSystemArticleType.researchArticle
-    );
-    mapper.set(
-      MecaArticleType.reviewArticle,
-      SubmissionSystemArticleType.reviewArticle
-    );
-
-    const submissionSystemArticleType = mapper.get(mecaArticleType);
-    this.logger.info(
-      `Mapping ${mecaArticleType} to ${submissionSystemArticleType} `
-    );
-
-    return submissionSystemArticleType;
-  }
   private mapMecaFileTypeToSubmissionSystemFileType(
     mecaFileType: MecaFileType
   ): SubmissionSystemFileType {
@@ -222,9 +192,10 @@ export class SubmitManuscriptUseCase
     sourceJournal: SourceJournal,
     manuscriptId: string
   ): Promise<void> {
-    const type = this.mapMecaArticleTypeToSubmissionSystemArticleType(
-      request.articleTypeId.toString()
+    const phenomArticleTypeId = await this.articleTypeMapper(
+      request.articleTypeName
     );
+
     const autoSaveInput: UpdateDraftManuscriptInput = {
       meta: {
         title: request.title,
@@ -233,7 +204,7 @@ export class SubmitManuscriptUseCase
         conflictOfInterest: request.conflictOfInterest,
         dataAvailability: request.dataAvailability,
         fundingStatement: `${request.founding.founderName} ${request.founding.recipientName} ${request.founding.founderId}`,
-        articleTypeId: type,
+        articleTypeId: phenomArticleTypeId,
       },
       authors: [],
       files: [],
@@ -266,5 +237,34 @@ export class SubmitManuscriptUseCase
     }
 
     return draftManuscriptResult;
+  }
+
+  private async articleTypeMapper(mecaManuscript: string): Promise<string> {
+    const reviewArticleTypes = await this.reviewClient.getArticleTypes();
+
+    if (!reviewArticleTypes) {
+      throw new GuardFailure(`Could not retrieve review article types`);
+    }
+
+    const mecaTypes = this.envVars.app.mecaArticleTypes;
+
+    if (!mecaTypes[mecaManuscript]) {
+      throw new GuardFailure(
+        ` MECA article type not supported: ${mecaManuscript}. Supported types are: ${JSON.stringify(
+          mecaTypes
+        )}. `
+      );
+    }
+    const reviewArticleTypeId = reviewArticleTypes.find(
+      (rat) => rat.name === mecaTypes[mecaManuscript]
+    )?.id;
+
+    if (!reviewArticleTypeId) {
+      throw new GuardFailure(
+        `Unsupported article type found: ${mecaManuscript}. Supported types are: ${this.envVars.app.supportedArticleTypes}. `
+      );
+    }
+
+    return reviewArticleTypeId;
   }
 }

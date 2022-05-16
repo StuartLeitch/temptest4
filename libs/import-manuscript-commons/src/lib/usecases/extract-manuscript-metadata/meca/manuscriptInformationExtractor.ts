@@ -246,7 +246,7 @@ function extractBaseManuscriptData(
 
   const rawManuscript: RawManuscriptProps = {
     articleAbstract,
-    articleTypeId,
+    articleTypeName: articleTypeId,
     authors: [],
     conflictOfInterest,
     dataAvailability,

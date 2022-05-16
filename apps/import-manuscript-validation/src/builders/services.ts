@@ -10,11 +10,10 @@ import {
   ArchiveService,
   XmlService,
   S3Service,
-} from '../../../../libs/import-manuscript-commons/src';
+} from '@hindawi/import-manuscript-commons';
 
 import { EmailService } from '../libs/email';
 
-import { env } from '../env';
 import Keycloak from 'keycloak-connect';
 
 export interface Services {
@@ -26,39 +25,40 @@ export interface Services {
   emailService: EmailService;
 }
 
-export function buildServices(): Services {
-  const keycloak = new Keycloak({}, env.app.submissionKeycloakConfig);
+export function buildServices(envVars: any): Services {
+  const keycloak = new Keycloak({}, envVars.app.submissionKeycloakConfig);
 
   const reviewSystemAuthenticator: KeycloakAuthenticator =
     new KeycloakAuthenticator(
-      env.app.submissionAdminUsername,
-      env.app.submissionAdminPassword,
-      keycloak
+      envVars.app.submissionAdminUsername,
+      envVars.app.submissionAdminPassword,
+      keycloak,
+      envVars
     );
 
   const services: Services = {
     objectStoreService: new S3Service(
-      env.aws.s3.zipBucket,
-      env.aws.region,
-      env.aws.accessKey,
-      env.aws.secretKey
+      envVars.aws.s3.zipBucket,
+      envVars.aws.region,
+      envVars.aws.accessKey,
+      envVars.aws.secretKey
     ),
     jobQueue: new SqsEventConsumer(
-      env.aws.sqs.jobQueue,
-      env.aws.region,
-      env.aws.sqs.endpoint,
-      env.aws.accessKey,
-      env.aws.secretKey
+      envVars.aws.sqs.jobQueue,
+      envVars.aws.region,
+      envVars.aws.sqs.endpoint,
+      envVars.aws.accessKey,
+      envVars.aws.secretKey
     ),
     archiveService: new ArchiveService(),
     xmlService: new XmlService(),
     emailService: new EmailService(
-      env.aws.ses.accessKey,
-      env.aws.ses.secretKey,
-      env.aws.region
+      envVars.aws.ses.accessKey,
+      envVars.aws.ses.secretKey,
+      envVars.aws.region
     ),
     reviewClient: new ReviewClient(
-      env.app.submissionGraphqlEndpoint,
+      envVars.app.submissionGraphqlEndpoint,
       reviewSystemAuthenticator
     ),
   };

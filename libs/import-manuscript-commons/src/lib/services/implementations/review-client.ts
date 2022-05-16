@@ -28,6 +28,8 @@ import {
   UpdateDraftManuscriptInput,
 } from '../contracts';
 import { LoggerBuilder, LoggerContract, UniqueEntityID } from '@hindawi/shared';
+import { ArticleType } from '../../models/submission-system-models/article-type';
+import { SubmissionSystemArticleTypeMapper } from '../../models/mappers/submission-system-article-types-mapper';
 
 type GqlVariables = Record<string, unknown>;
 type GqlResponse<T = unknown> = {
@@ -60,6 +62,25 @@ export class ReviewClient implements ReviewClientContract {
 
   getRemoteUrl(): string {
     return this.submissionEndpoint;
+  }
+
+  async getArticleTypes(): Promise<ArticleType[]> {
+    const getArticleTypesQuery = gql`
+      query getArticleTypes {
+        getArticleTypes {
+          id
+          name
+        }
+      }
+    `;
+
+    const response = await this.callGraphql<{
+      getArticleTypes: Array<ArticleType>;
+    }>(getArticleTypesQuery);
+
+    return response.getArticleTypes.map(
+      SubmissionSystemArticleTypeMapper.toDomain
+    );
   }
 
   async getAllActiveJournals(): Promise<ActiveJournal[]> {

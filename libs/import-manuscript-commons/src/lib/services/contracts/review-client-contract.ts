@@ -4,6 +4,7 @@ import { Manuscript, File } from '../../models';
 import { ActiveJournal } from '../../models/submission-system-models/active-journal';
 import { SourceJournal } from '../../models/submission-system-models/source-journal';
 import { DraftSubmission } from '../../models/submission-system-models';
+import { ArticleType } from '../../models/submission-system-models/article-type';
 
 export interface CreateDraftManuscriptInput {
   journalId: string;
@@ -90,4 +91,6 @@ export interface ReviewClientContract {
     manuscriptId: string,
     draftManuscriptInput: UpdateDraftManuscriptInput
   ): Promise<string>;
+
+  getArticleTypes(): Promise<ArticleType[]>;
 }

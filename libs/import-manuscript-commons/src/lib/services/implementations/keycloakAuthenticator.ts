@@ -1,25 +1,28 @@
-import {Grant, Keycloak} from "keycloak-connect";
-import {VError} from "verror";
-import {LoggerBuilder, LoggerContract} from "@hindawi/shared";
-import {env} from "@hindawi/import-manuscript-validation/env";
+import { Grant, Keycloak } from 'keycloak-connect';
+import { VError } from 'verror';
+import { LoggerBuilder, LoggerContract } from '@hindawi/shared';
 
 export class KeycloakAuthenticator {
-  private authorization: Grant
+  private authorization: Grant;
   private logger: LoggerContract;
   constructor(
     private readonly username: string,
     private readonly password: string,
     private readonly keycloak: Keycloak,
+    private readonly envVars: any
   ) {
-    this.logger = new LoggerBuilder('Import/Manuscript/Backend/KeycloakAuthenticator', {
-      isDevelopment: env.isDevelopment,
-      logLevel: env.log.level,
-    }).getLogger();
+    this.logger = new LoggerBuilder(
+      'Import/Manuscript/Backend/KeycloakAuthenticator',
+      {
+        isDevelopment: this.envVars.isDevelopment,
+        logLevel: this.envVars.log.level,
+      }
+    ).getLogger();
   }
 
-  public async getAuthorizationToken(): Promise<string>{
+  public async getAuthorizationToken(): Promise<string> {
     await this.ensureFreshness();
-    return this.authorization["access_token"]["token"];
+    return this.authorization['access_token']['token'];
   }
 
   private async ensureFreshness(): Promise<void> {
@@ -36,10 +39,15 @@ export class KeycloakAuthenticator {
 
   private async obtainDirectly(): Promise<void> {
     try {
-      this.authorization = (await this.keycloak.grantManager.obtainDirectly(this.username, this.password));
+      this.authorization = await this.keycloak.grantManager.obtainDirectly(
+        this.username,
+        this.password
+      );
     } catch (exception) {
-      throw new VError(exception, 'Exception while trying to login with keycloak');
+      throw new VError(
+        exception,
+        'Exception while trying to login with keycloak'
+      );
     }
   }
-
 }

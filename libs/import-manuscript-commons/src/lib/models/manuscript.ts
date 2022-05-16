@@ -11,15 +11,9 @@ import { MecaFileType, File } from './file';
 import { Founding } from './founding';
 import { Author } from './author';
 
-export enum MecaArticleType {
-  researchArticle = 'Research Article',
-  reviewArticle = 'Review Article',
-  caseReport = 'Case Study',
-}
-
 export interface ManuscriptProps extends ValueObjectProps {
   sourceManuscriptId: UniqueEntityID;
-  articleTypeId: UniqueEntityID;
+  articleTypeName: string;
   destinationJournal: Journal;
   articleAbstract: string;
   authors: Array<Author>;
@@ -38,8 +32,8 @@ export class Manuscript extends ValueObject<ManuscriptProps> {
     return this.props.sourceManuscriptId;
   }
 
-  get articleTypeId(): UniqueEntityID {
-    return this.props.articleTypeId;
+  get articleTypeName(): string {
+    return this.props.articleTypeName;
   }
 
   get destinationJournal(): Journal {
@@ -111,7 +105,7 @@ export class Manuscript extends ValueObject<ManuscriptProps> {
   static create(props: ManuscriptProps): Manuscript {
     const guardArgs: GuardArgument[] = [
       { argument: props.articleAbstract, argumentName: 'articleAbstract' },
-      { argument: props.articleTypeId, argumentName: 'articleTypeId' },
+      { argument: props.articleTypeName, argumentName: 'articleTypeName' },
       { argument: props.sourceJournal, argumentName: 'sourceJournal' },
       { argument: props.authors, argumentName: 'authors' },
       { argument: props.files, argumentName: 'files' },

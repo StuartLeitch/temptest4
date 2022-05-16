@@ -10,7 +10,6 @@ export interface RawSubmissionFileProps {
 
 export class SubmissionSystemFileMapper extends Mapper<SubmissionFile> {
   static toDomain(raw: Partial<RawSubmissionFileProps>): SubmissionFile {
-    console.log(raw);
     const props: SubmissionFileProps = {
       id: raw.id,
     };

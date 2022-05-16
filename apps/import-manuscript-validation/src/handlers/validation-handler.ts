@@ -90,8 +90,11 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
           JSON.stringify(ManuscriptMapper.toPersistance(manuscript), null, 2)
         );
 
+        const envVars = env;
+
         const submissionEditURL = await new SubmitManuscriptUseCase(
-          reviewClient
+          reviewClient,
+          envVars
         ).execute({ manuscript, packagePath: res.value.src });
         logger.info(`Submission url ${submissionEditURL}`);
 
