@@ -4,6 +4,7 @@ import {
   ValidatePackageUseCase,
   ValidatePackageEvent,
   ManuscriptMapper,
+  SubmitManuscriptUseCase
 } from '@hindawi/import-manuscript-commons';
 
 import { EventHandler } from './event-handler';
@@ -12,8 +13,8 @@ import { Context } from '../builders';
 import { env } from '../env';
 
 import { Logger } from '../libs/logger';
-import { SubmitManuscriptUseCase } from '../../../../libs/import-manuscript-commons/src/lib/usecases/submit-manuscript/submit-manuscript';
 import { VError } from 'verror';
+import {LoggerBuilder} from "@hindawi/shared";
 
 const VALIDATE_PACKAGE = 'ValidatePackage';
 
@@ -71,7 +72,15 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
       logger.debug(`Package ${res.value.src} extracted`);
       const validateUsecase = new ValidatePackageUseCase(xmlService, logger);
       const extractManuscriptMetadataUseCase =
-        new ExtractManuscriptMetadataUseCase(xmlService, logger);
+        new ExtractManuscriptMetadataUseCase(xmlService,
+          new LoggerBuilder(
+            'Import/Manuscript/Backend/ExtractManuscriptMetadataUseCase',
+            {
+              isDevelopment: env.isDevelopment,
+              logLevel: env.log.level,
+            }
+          )
+        );
 
       try {
         await validateUsecase.execute({
@@ -90,11 +99,18 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
           JSON.stringify(ManuscriptMapper.toPersistance(manuscript), null, 2)
         );
 
-        const envVars = env;
-
         const submissionEditURL = await new SubmitManuscriptUseCase(
           reviewClient,
-          envVars
+          env.app.reviewAppBasePath,
+          env.app.supportedArticleTypes,
+          env.app.mecaArticleTypes,
+          new LoggerBuilder(
+            'Import/Manuscript/Backend/SubmitManuscriptUseCase',
+            {
+              isDevelopment: env.isDevelopment,
+              logLevel: env.log.level,
+            }
+          )
         ).execute({ manuscript, packagePath: res.value.src });
         logger.info(`Submission url ${submissionEditURL}`);
 

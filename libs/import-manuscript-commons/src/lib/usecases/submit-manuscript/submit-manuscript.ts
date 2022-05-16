@@ -40,12 +40,12 @@ export class SubmitManuscriptUseCase
 
   constructor(
     private readonly reviewClient: ReviewClientContract,
-    private readonly envVars: any
+    private readonly reviewAppBasePath: string,
+    private readonly supportedArticleTypes: string[],
+    private readonly mecaTypes: any,
+    loggerBuilder: LoggerBuilder,
   ) {
-    this.logger = new LoggerBuilder('ExtractManuscriptMetadataUseCase', {
-      isDevelopment: envVars.isDevelopment,
-      logLevel: envVars.log.level,
-    }).getLogger();
+    this.logger = loggerBuilder.getLogger();
   }
 
   async execute({ manuscript, packagePath }: Request): Promise<string> {
@@ -101,7 +101,7 @@ export class SubmitManuscriptUseCase
     this.logger.info(
       `Creating submission edit url for manuscriptID: ${manuscriptId} submissionId: ${submissionId}`
     );
-    return `${this.envVars.app.reviewAppBasePath}/submit/${submissionId}/${manuscriptId}`;
+    return `${this.reviewAppBasePath}/submit/${submissionId}/${manuscriptId}`;
   }
 
   private async uploadFiles(
@@ -246,22 +246,19 @@ export class SubmitManuscriptUseCase
       throw new GuardFailure(`Could not retrieve review article types`);
     }
 
-    const mecaTypes = this.envVars.app.mecaArticleTypes;
 
-    if (!mecaTypes[mecaManuscript]) {
+    if (!this.mecaTypes[mecaManuscript]) {
       throw new GuardFailure(
-        ` MECA article type not supported: ${mecaManuscript}. Supported types are: ${JSON.stringify(
-          mecaTypes
-        )}. `
+        ` MECA article type not supported: ${mecaManuscript}. Supported types are: ${JSON.stringify(this.mecaTypes)}. `
       );
     }
     const reviewArticleTypeId = reviewArticleTypes.find(
-      (rat) => rat.name === mecaTypes[mecaManuscript]
+      (rat) => rat.name === this.mecaTypes[mecaManuscript]
     )?.id;
 
     if (!reviewArticleTypeId) {
       throw new GuardFailure(
-        `Unsupported article type found: ${mecaManuscript}. Supported types are: ${this.envVars.app.supportedArticleTypes}. `
+        `Unsupported article type found: ${mecaManuscript}. Supported types are: ${this.supportedArticleTypes}. `
       );
     }
 

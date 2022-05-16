@@ -1,4 +1,4 @@
-import { LoggerContract, UseCase } from '@hindawi/shared';
+import {LoggerBuilder, LoggerContract, UseCase} from '@hindawi/shared';
 
 import {ManuscriptMapper, RawManuscriptProps} from '../../models/mappers';
 import { Path } from '../../models';
@@ -12,11 +12,16 @@ import type { ExtractManuscriptMetadataDTO as DTO } from './extract-manuscript-m
 
 export class ExtractManuscriptMetadataUseCase
   implements UseCase<DTO, Promise<Response>, null>
+
 {
+  logger: LoggerContract;
+
   constructor(
     private readonly xmlService: XmlServiceContract,
-    private readonly logger: LoggerContract
-  ) {}
+    loggerBuilder: LoggerBuilder,
+  ) {
+    this.logger = loggerBuilder.getLogger();
+  }
 
   async execute(request?: DTO): Promise<Response> {
     const packagePath = Path.create(request.packagePath).join();

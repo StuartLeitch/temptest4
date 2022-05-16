@@ -1,23 +1,19 @@
-import { Grant, Keycloak } from 'keycloak-connect';
-import { VError } from 'verror';
-import { LoggerBuilder, LoggerContract } from '@hindawi/shared';
+import {Grant, Keycloak} from 'keycloak-connect';
+import {VError} from 'verror';
+import {LoggerBuilder, LoggerContract} from '@hindawi/shared';
 
 export class KeycloakAuthenticator {
   private authorization: Grant;
   private logger: LoggerContract;
+
   constructor(
     private readonly username: string,
     private readonly password: string,
     private readonly keycloak: Keycloak,
-    private readonly envVars: any
+    private readonly loggerBuilder: LoggerBuilder
   ) {
-    this.logger = new LoggerBuilder(
-      'Import/Manuscript/Backend/KeycloakAuthenticator',
-      {
-        isDevelopment: this.envVars.isDevelopment,
-        logLevel: this.envVars.log.level,
-      }
-    ).getLogger();
+    loggerBuilder.setScope('Import/Manuscript/Backend/KeycloakAuthenticator')
+    this.loggerBuilder.getLogger();
   }
 
   public async getAuthorizationToken(): Promise<string> {

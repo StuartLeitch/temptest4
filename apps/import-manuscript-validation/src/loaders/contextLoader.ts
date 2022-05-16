@@ -17,7 +17,7 @@ export const contextLoader: MicroframeworkLoader = async (
       logLevel: env.log.level,
     });
 
-    const services = await buildServices(env);
+    const services = await buildServices();
 
     const context: Context = {
       services,
