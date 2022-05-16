@@ -1,4 +1,3 @@
-// import { env } from '../env';
 import { RetryFailedNetsuiteErpInvoicesUsecase, Roles } from '@hindawi/shared';
 
 import { Context } from '../builders';
@@ -38,21 +37,22 @@ export class RegisterInvoicesCron {
       services: { erp, vatService },
     } = context;
 
-    const retryFailedNetsuiteErpInvoicesUsecase = new RetryFailedNetsuiteErpInvoicesUsecase(
-      invoice,
-      invoiceItem,
-      coupon,
-      waiver,
-      payer,
-      address,
-      manuscript,
-      catalog,
-      erpReference,
-      erp?.netsuite || null,
-      publisher,
-      loggerService,
-      vatService
-    );
+    const retryFailedNetsuiteErpInvoicesUsecase =
+      new RetryFailedNetsuiteErpInvoicesUsecase(
+        invoice,
+        invoiceItem,
+        coupon,
+        waiver,
+        payer,
+        address,
+        manuscript,
+        catalog,
+        erpReference,
+        erp?.netsuite || null,
+        publisher,
+        loggerService,
+        vatService
+      );
 
     const maybeResponse = await retryFailedNetsuiteErpInvoicesUsecase.execute(
       null,

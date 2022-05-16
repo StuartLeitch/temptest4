@@ -1,21 +1,49 @@
-/* eslint-disable no-useless-catch */
-/* eslint-disable no-inner-declarations */
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
+import { setIntervalAsync } from 'set-interval-async/dynamic';
 import {
   MicroframeworkSettings,
   MicroframeworkLoader,
 } from 'microframework-w3tec';
-import { setIntervalAsync } from 'set-interval-async/dynamic';
 
-import { RegisterRevenueRecognitionsCron } from './../cron/registerRevenueRecognitionsCron';
-import { RegisterCreditNotesCron } from './../cron/registerCreditNotesCron';
-import { RegisterInvoicesCron } from './../cron/registerInvoicesCron';
-import { RegisterPaymentsCron } from './../cron/registerPaymentsCron';
-import { RegisterRevenueRecognitionReversalsCron } from './../cron/registerRevenueRecognitionsReversalCron';
+import { LoggerContract } from '@hindawi/shared';
 
-import { env } from '../env';
+import {
+  RegisterRevenueRecognitionReversalsCron,
+  RegisterRevenueRecognitionsCron,
+  RegisterCreditNotesCron,
+  RegisterInvoicesCron,
+  RegisterPaymentsCron,
+  Chron,
+} from './../cron';
+
 import { Context } from '../builders';
+import { env } from '../env';
+
+// * Start scheduler
+function processJobsQueue(
+  jobsQueue: Array<Chron>,
+  context: Context,
+  logger: LoggerContract
+) {
+  return async () => {
+    // * clones the jobs queue
+    let queue = [...jobsQueue];
+    if (queue.length === 0) {
+      return;
+    }
+
+    while (queue.length) {
+      const head = queue[0];
+      logger.debug('startProcessing', { job: head.name });
+      try {
+        await head.schedule(context);
+      } catch (err) {
+        logger.error('Job Error: ', err);
+      }
+      logger.debug('doneProcessing', { job: head.name });
+      queue = queue.slice(1);
+    }
+  };
+}
 
 export const schedulerLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
@@ -26,48 +54,24 @@ export const schedulerLoader: MicroframeworkLoader = async (
       services: { logger: loggerService },
     } = context;
     loggerService.setScope('SchedulingService');
-    const {
-      failedErpCronRetryTimeMinutes,
-      failedErpCronRetryDisabled,
-    } = env.app;
+    const { failedErpCronRetryTimeMinutes, failedErpCronRetryDisabled } =
+      env.app;
 
     const netSuiteJobQueue = [
       RegisterInvoicesCron,
       RegisterRevenueRecognitionsCron,
       RegisterCreditNotesCron,
       RegisterPaymentsCron,
-      RegisterRevenueRecognitionReversalsCron
+      RegisterRevenueRecognitionReversalsCron,
     ];
 
     const jobsQueue = [].concat(
       env.netSuite.netSuiteEnabled ? netSuiteJobQueue : []
     );
 
-    // * Start scheduler
-    async function processJobsQueue() {
-      // * clones the jobs queue
-      let queue = [...jobsQueue];
-
-      if (queue.length === 0) {
-        return;
-      }
-
-      while (queue.length) {
-        const head = queue[0];
-        loggerService.debug('startProcessing', { job: head.name });
-        try {
-          await head.schedule(context);
-        } catch (err) {
-          loggerService.error('Job Error: ', err);
-        }
-        loggerService.debug('doneProcessing', { job: head.name });
-        queue = queue.slice(1);
-      }
-    }
-
     if (!failedErpCronRetryDisabled) {
       setIntervalAsync(
-        processJobsQueue,
+        processJobsQueue(jobsQueue, context, loggerService),
         failedErpCronRetryTimeMinutes === 0
           ? 15000
           : failedErpCronRetryTimeMinutes * 60 * 1000

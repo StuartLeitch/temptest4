@@ -1,48 +1,53 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
+import KeycloakConnect, { Keycloak, Token } from 'keycloak-connect';
+import express, { Express, Request } from 'express';
+import session, { Store } from 'express-session';
+import * as csv from '@fast-csv/parse';
+import memorystore from 'memorystore';
 import corsMiddleware from 'cors';
-import express from 'express';
-import Keycloak from 'keycloak-connect';
-import session from 'express-session';
+import { Parser } from 'json2csv';
+import moment from 'moment';
+import multer from 'multer';
 
 import {
   MicroframeworkSettings,
   MicroframeworkLoader,
 } from 'microframework-w3tec';
-import { left } from '../../../../libs/shared/src/lib/core/logic/Either';
 
 import {
-  Roles,
+  PayPalProcessFinishedUsecase,
+  CatalogBulkUpdateUsecase,
+  GetJournalListUsecase,
+  GetInvoicePdfUsecase,
+  GetRecentLogsUsecase,
   isAuthorizationError,
-} from '../../../../libs/shared/src/lib/domain/authorization';
+  AuditLogMap,
+  CatalogMap,
+  Roles,
+  left,
+} from '@hindawi/shared';
 
-import { PayPalProcessFinishedUsecase } from '../../../../libs/shared/src/lib/modules/payments/usecases/paypalProcessFinished';
-import { GetInvoicePdfUsecase } from '../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoicePdf/getInvoicePdf';
-import { GetRecentLogsUsecase } from '../../../../libs/shared/src/lib/modules/audit/usecases/getRecentLogs';
-import { GetJournalListUsecase } from '../../../../libs/shared/src/lib/modules/journals/usecases/journals/getJournalList';
-import { CatalogBulkUpdateUsecase } from '../../../../libs/shared/src/lib/modules/journals/usecases/catalogBulkUpdate';
-import { AuditLogMap } from '../../../../libs/shared/src/lib/modules/audit/mappers/AuditLogMap';
-import { CatalogMap } from '../../../../libs/shared/src/lib/modules/journals/mappers/CatalogMap';
-
-import { Parser } from 'json2csv';
-
-import { Context } from '../builders';
 import {
   PayPalWebhookResponse,
   PayPalPaymentCapture,
 } from '../services/paypal/types/webhooks';
-
+import { Context } from '../builders';
 import { env } from '../env';
-import moment from 'moment';
-import multer from 'multer';
-import * as csv from '@fast-csv/parse';
 
-function extractRoles(req: any): Array<Roles> {
-  return req.kauth.grant.access_token.content.resource_access[
+type JournalJson = {
+  journalId?: string;
+  apc?: string;
+};
+
+function extractRoles(req: Request): Array<Roles> {
+  return (<any>req).kauth.grant.access_token.content.resource_access[
     env.app.keycloakConfig.resource
   ].roles
     .map((role: string) => role.toUpperCase())
     .map((role: string) => Roles[role]);
+}
+
+function extractEmail(req: Request): string {
+  return (<any>req).kauth.grant.access_token.content.email;
 }
 
 function extractCaptureId(data: PayPalPaymentCapture): string {
@@ -55,7 +60,7 @@ function extractCaptureId(data: PayPalPaymentCapture): string {
   return orderId;
 }
 
-function parseCsvToJson(path: string): Promise<Array<unknown>> {
+function parseCsvToJson<T>(path: string): Promise<Array<T>> {
   return new Promise((resolve, reject) => {
     const data = [];
     csv
@@ -73,10 +78,10 @@ function parseCsvToJson(path: string): Promise<Array<unknown>> {
   });
 }
 
-function configureKeycloak(app, memoryStore, graphqlPath) {
+function configureKeycloak(app: Express, memoryStore: Store): Keycloak {
   const keycloakConfig = env.app.keycloakConfig;
 
-  const keycloak = new Keycloak(
+  const keycloak = new KeycloakConnect(
     {
       store: memoryStore,
     },
@@ -85,12 +90,28 @@ function configureKeycloak(app, memoryStore, graphqlPath) {
 
   // Protect the main route for all graphql services
   // Disable unauthenticated access
-  app.use(
-    // graphqlPath,
-    keycloak.middleware()
-  );
+  app.use(keycloak.middleware());
 
-  return { keycloak };
+  return keycloak;
+}
+
+function protectMultiRole(...roles: Array<string>) {
+  return (token: Token) => {
+    const resp = roles
+      .map((role) => role.toLowerCase())
+      .map(token.hasRole, token)
+      .reduce((acc, r) => acc || r, false);
+
+    return resp;
+  };
+}
+
+function getStore(maxAge: number) {
+  const MemoryStore = memorystore(session);
+
+  return new MemoryStore({
+    checkPeriod: maxAge,
+  });
 }
 
 export const expressLoader: MicroframeworkLoader = (
@@ -103,18 +124,20 @@ export const expressLoader: MicroframeworkLoader = (
 
     const app = express();
 
-    const memoryStore = new session.MemoryStore();
+    const maxAge = 1000 * 60 * 60 * 8;
+    const store = getStore(maxAge);
 
     app.use(
       session({
         secret: env.app.sessionSecret,
         resave: false,
         saveUninitialized: true,
-        store: memoryStore,
+        store: store,
+        cookie: { maxAge },
       })
     );
 
-    const { keycloak } = configureKeycloak(app, memoryStore, env.graphql.route);
+    const keycloak = configureKeycloak(app, store);
     settings.setData('keycloak', keycloak);
 
     app.use(express.json());
@@ -308,12 +331,14 @@ export const expressLoader: MicroframeworkLoader = (
     app.post(
       '/api/apc/upload-csv',
       upload.single('file'),
-      keycloak.protect([
-        Roles.ADMIN,
-        Roles.FINANCIAL_CONTROLLER,
-        Roles.SUPER_ADMIN,
-      ] as any),
-      async (req: any, res) => {
+      keycloak.protect(
+        protectMultiRole(
+          Roles.FINANCIAL_CONTROLLER,
+          Roles.SUPER_ADMIN,
+          Roles.ADMIN
+        )
+      ),
+      async (req, res) => {
         const {
           repos,
           services: { logger },
@@ -323,7 +348,7 @@ export const expressLoader: MicroframeworkLoader = (
         const authContext = { roles: extractRoles(req) };
 
         const auditLoggerService = auditLoggerServiceProvider({
-          email: req.kauth.grant.access_token.content.email,
+          email: extractEmail(req),
         });
 
         const usecase = new CatalogBulkUpdateUsecase(
@@ -334,11 +359,13 @@ export const expressLoader: MicroframeworkLoader = (
         if (!req.file) {
           return res.status(400).send('Please upload a file');
         }
-        const jsonResult = await parseCsvToJson(req.file.path);
-        const newPrices = jsonResult.map((row: any) => ({
+
+        const jsonResult = await parseCsvToJson<JournalJson>(req.file.path);
+        const newPrices = jsonResult.map((row) => ({
           journalId: row?.journalId,
           amount: row?.apc,
         }));
+
         try {
           const updatedList = await usecase.execute(
             { catalogItems: newPrices },
