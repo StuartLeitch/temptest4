@@ -144,7 +144,7 @@ function extractAuthorData(
 
   const rawAuthor: RawAuthorProps = {
     affiliationName: authorAff['institution-wrap']['institution'],
-    affiliationRorId: '',
+    affiliationRorId: 'ReX uses Ringgold ID, not ROR ID; might be able to pass RoR ID (? About ReX consuming ROR ID from Phenom)',
     affiliationRinggoldId,
     countryCode: authorAff['country'],
     email: author['email'],
