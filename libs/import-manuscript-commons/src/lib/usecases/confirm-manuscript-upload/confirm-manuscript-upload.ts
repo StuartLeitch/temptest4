@@ -18,7 +18,7 @@ import { UploadServiceContract } from '../../services';
 import {
   ManuscriptUploadInfo,
   ManuscriptStatus,
-} from '../../models/manuscriptUploadInfo';
+} from '../../models/manuscript-upload-info';
 
 import { ManuscriptUploadInfoRepo } from '../../repo/implementations/manuscriptUploadInfoRepo';
 

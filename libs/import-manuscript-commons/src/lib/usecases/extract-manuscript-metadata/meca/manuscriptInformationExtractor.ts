@@ -146,11 +146,11 @@ function extractAuthorData(
     affiliationName: authorAff['institution-wrap']['institution'],
     affiliationRorId: '',
     affiliationRinggoldId,
-    countryCode: authorAff['country'],
+    countryCode: authorAff['country']['@_country'],
     email: author['email'],
     givenName: author['name']['given-names'],
     surname: author['name']['surname'],
-    isCorresponding: author['@_corresp'] || false,
+    isCorresponding: author['@_corresp'] === 'yes',
     isSubmitting: author['@_specific-use'] === 'submitting',
   };
 
@@ -246,7 +246,7 @@ function extractBaseManuscriptData(
 
   const rawManuscript: RawManuscriptProps = {
     articleAbstract,
-    articleTypeId,
+    articleTypeName: articleTypeId,
     authors: [],
     conflictOfInterest,
     dataAvailability,

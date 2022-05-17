@@ -1,8 +1,8 @@
 import Knex from 'knex';
 
-import { ManuscriptUploadInfo } from '../../models/manuscriptUploadInfo';
+import { ManuscriptUploadInfo } from '../../models/manuscript-upload-info';
 import { ManuscriptUploadInfoRepoContract } from '../contracts/manuscriptUploadInfoRepoContract';
-import { ManuscriptUploadInfoMapper } from '../../mappers/manuscriptInfoMapper';
+import { ManuscriptUploadInfoMapper } from '../../models/mappers/manuscript-upload-info-mapper';
 import { RepoError } from '../../../../../shared/src/lib/infrastructure/RepoError';
 
 export enum TABLES {

@@ -29,6 +29,11 @@ export class Path extends ValueObject<PathProps> {
     }
   }
 
+  prefix(...paths: Array<string | Path>): Path {
+    const p = paths.map((i) => (typeof i === 'string' ? i : i.src));
+    return Path.create(join(...p, this.src));
+  }
+
   join(...paths: Array<string | Path>): Path {
     const p = paths.map((i) => (typeof i === 'string' ? i : i.src));
 

@@ -4,7 +4,7 @@ import {
   ValueObject,
   Guard,
 } from '@hindawi/shared';
-import {FileType} from "./file";
+import {MecaFileType} from "./file";
 
 interface MetadataDetails {
   '#text': string;
@@ -25,7 +25,7 @@ export interface PackageItemProps extends ValueObjectProps {
   instance: ItemInstanceProps;
   'item-description'?: string;
   '@_item-version'?: string;
-  '@_item-type': FileType;
+  '@_item-type': MecaFileType;
   'file-order'?: string;
   '@_id'?: string;
 }
@@ -39,7 +39,7 @@ export class PackageItem extends ValueObject<PackageItemProps> {
   public readonly fileOrder?: string;
   public readonly mediaType?: string;
   public readonly version?: string;
-  public readonly type: FileType;
+  public readonly type: MecaFileType;
   public readonly id?: string;
   public readonly uri: string;
 

@@ -7,13 +7,13 @@ import {
 } from '@hindawi/shared';
 
 import { SourceJournal, Journal } from './journal';
-import { FileType, File } from './file';
+import { MecaFileType, File } from './file';
 import { Founding } from './founding';
 import { Author } from './author';
 
 export interface ManuscriptProps extends ValueObjectProps {
   sourceManuscriptId: UniqueEntityID;
-  articleTypeId: UniqueEntityID;
+  articleTypeName: string;
   destinationJournal: Journal;
   articleAbstract: string;
   authors: Array<Author>;
@@ -32,8 +32,8 @@ export class Manuscript extends ValueObject<ManuscriptProps> {
     return this.props.sourceManuscriptId;
   }
 
-  get articleTypeId(): UniqueEntityID {
-    return this.props.articleTypeId;
+  get articleTypeName(): string {
+    return this.props.articleTypeName;
   }
 
   get destinationJournal(): Journal {
@@ -65,15 +65,17 @@ export class Manuscript extends ValueObject<ManuscriptProps> {
   }
 
   get manuscriptFiles(): Array<File> {
-    return this.files.filter((file) => file.type === FileType.manuscript);
+    return this.files.filter((file) => file.type === MecaFileType.manuscript);
   }
 
   get coverLetterFiles(): Array<File> {
-    return this.files.filter((file) => file.type === FileType.coverLetter);
+    return this.files.filter((file) => file.type === MecaFileType.coverLetter);
   }
 
   get supplementaryFiles(): Array<File> {
-    return this.files.filter((file) => file.type === FileType.supplementary);
+    return this.files.filter(
+      (file) => file.type === MecaFileType.supplementary
+    );
   }
 
   get title(): string {
@@ -103,7 +105,7 @@ export class Manuscript extends ValueObject<ManuscriptProps> {
   static create(props: ManuscriptProps): Manuscript {
     const guardArgs: GuardArgument[] = [
       { argument: props.articleAbstract, argumentName: 'articleAbstract' },
-      { argument: props.articleTypeId, argumentName: 'articleTypeId' },
+      { argument: props.articleTypeName, argumentName: 'articleTypeName' },
       { argument: props.sourceJournal, argumentName: 'sourceJournal' },
       { argument: props.authors, argumentName: 'authors' },
       { argument: props.files, argumentName: 'files' },

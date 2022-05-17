@@ -1,10 +1,18 @@
 module.exports = {
-  displayName: 'lib-import-manuscript-commons',
-  testMatch: ['__test__/*/*Test.ts'],
-  preset: './jest.preset.js',
+  name: 'import-manuscript-backend',
+  preset: '../../jest.config.js',
   transform: {
-    '^.+\\.[tj]sx?$': 'ts-jest',
+    '^.+\\.graphql$': 'graphql-import-node/jest'
   },
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../coverage/libs/import-manuscript-commons',
+  reporters: [
+    'default',
+    [
+      'jest-junit',
+      {
+        outputDirectory: 'coverage/apps/import-manuscript-backend',
+        outputName: 'junit.xml'
+      }
+    ]
+  ],
+  coverageDirectory: '../../coverage/apps/import-manuscript-backend'
 };

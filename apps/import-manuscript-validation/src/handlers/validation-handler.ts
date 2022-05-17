@@ -5,6 +5,7 @@ import {
   ValidatePackageUseCase,
   ValidatePackageEvent,
   ManuscriptMapper,
+  SubmitManuscriptUseCase,
 } from '@hindawi/import-manuscript-commons';
 
 import { EventHandler } from './event-handler';
@@ -13,6 +14,8 @@ import { Context } from '../builders';
 import { env } from '../env';
 
 import { Logger } from '../libs/logger';
+import { VError } from 'verror';
+import { LoggerBuilder } from '@hindawi/shared';
 
 const VALIDATE_PACKAGE = 'ValidatePackage';
 
@@ -41,7 +44,12 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
       */
 
       const {
-        services: { objectStoreService, archiveService, xmlService },
+        services: {
+          objectStoreService,
+          archiveService,
+          xmlService,
+          reviewClient,
+        },
         loggerBuilder,
       } = context;
       // const logger = loggerBuilder.getLogger();
@@ -65,7 +73,10 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
       logger.debug(`Package ${res.value.src} extracted`);
       const validateUsecase = new ValidatePackageUseCase(xmlService, logger);
       const extractManuscriptMetadataUseCase =
-        new ExtractManuscriptMetadataUseCase(xmlService, logger);
+        new ExtractManuscriptMetadataUseCase(
+          xmlService,
+          new LoggerBuilder(LogLevel[env.log.level])
+        );
 
       try {
         await validateUsecase.execute({
@@ -84,6 +95,15 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
           JSON.stringify(ManuscriptMapper.toPersistance(manuscript), null, 2)
         );
 
+        const submissionEditURL = await new SubmitManuscriptUseCase(
+          reviewClient,
+          env.app.reviewAppBasePath,
+          env.app.supportedArticleTypes,
+          env.app.mecaArticleTypes,
+          new LoggerBuilder(LogLevel[env.log.level])
+        ).execute({ manuscript, packagePath: res.value.src });
+        logger.info(`Submission url ${submissionEditURL}`);
+
         context.services.emailService.sendEmail(
           [data.successContactEmail],
           'import-manuscript@hindawi.com',
@@ -95,14 +115,10 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
           [data.failContactEmail],
           'import-manuscript@hindawi.com',
           'Important Message',
-          `ERROR processing package:
-            ${err.message}
-            ${err.stack}
-          `
+          `ERROR processing package: ${err.message} ${err.stack}`
         );
-
-        logger.error(err);
-        throw err;
+        logger.error(err.message);
+        throw new VError(err.message);
       }
     };
   },
