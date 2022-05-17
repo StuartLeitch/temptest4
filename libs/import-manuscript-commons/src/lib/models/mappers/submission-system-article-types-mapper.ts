@@ -11,7 +11,6 @@ export interface RawArticleTypesProps {
 
 export class SubmissionSystemArticleTypeMapper extends Mapper<ArticleType> {
   static toDomain(raw: Partial<RawArticleTypesProps>): ArticleType {
-    console.log(raw);
     const props: ArticleTypeProps = {
       id: raw.id,
       name: raw.name,

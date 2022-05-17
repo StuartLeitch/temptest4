@@ -43,7 +43,7 @@ export class SubmitManuscriptUseCase
     private readonly reviewAppBasePath: string,
     private readonly supportedArticleTypes: string[],
     private readonly mecaTypes: any,
-    loggerBuilder: LoggerBuilder,
+    loggerBuilder: LoggerBuilder
   ) {
     this.logger = loggerBuilder.getLogger();
   }
@@ -58,7 +58,7 @@ export class SubmitManuscriptUseCase
     ); //TODO add PISSN and EISSN to review
     if (!sourceJournal) {
       throw new GuardFailure(
-        `The source journal ${sourceJournalName} for manuscript ${manuscript.sourceManuscriptId} not found.`
+        `The source journal ${sourceJournalName} for manuscript ${manuscript.sourceManuscriptId.toString()} not found.`
       );
     }
 
@@ -69,7 +69,7 @@ export class SubmitManuscriptUseCase
 
     if (!destinationJournal) {
       throw new GuardFailure(
-        `The destination journal ${destinationJournalName} for manuscript ${manuscript.sourceManuscriptId} not found.`
+        `The destination journal ${destinationJournalName} for manuscript ${manuscript.destinationJournal.name} not found.`
       );
     }
 
@@ -208,7 +208,7 @@ export class SubmitManuscriptUseCase
       },
       authors: [],
       files: [],
-      journalId: '03c3c41e-bded-4323-a482-88d805ba35bb',
+      journalId: null,
       sectionId: null,
       preprintValue: request.preprintValue,
       sourceJournalId: sourceJournal.id,
@@ -246,10 +246,11 @@ export class SubmitManuscriptUseCase
       throw new GuardFailure(`Could not retrieve review article types`);
     }
 
-
     if (!this.mecaTypes[mecaManuscript]) {
       throw new GuardFailure(
-        ` MECA article type not supported: ${mecaManuscript}. Supported types are: ${JSON.stringify(this.mecaTypes)}. `
+        ` MECA article type not supported: ${mecaManuscript}. Supported types are: ${JSON.stringify(
+          this.mecaTypes
+        )}. `
       );
     }
     const reviewArticleTypeId = reviewArticleTypes.find(
