@@ -43,20 +43,6 @@ gemnasium-python-dependency_scanning:
   rules:
     - when: never
 
-retire-js-dependency_scanning:
-  tags:
-    - 'cluster:hindawi-dev'
-  variables:
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-  needs: [Build]
-  stage: package
-  cache:
-    key: node-modules-cache
-    paths:
-      - ./node_modules
-    policy: pull
-    when: always
-
 variables:
   # https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#docker-in-docker-with-tls-disabled
   DOCKER_HOST: tcp://docker:2375
