@@ -16,7 +16,7 @@ import {
 } from '../../../../domain/authorization';
 
 import { EmailService } from '../../../../infrastructure/communication-channels';
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../infrastructure/logging';
 import { VATService } from '../../../../domain/services/VATService';
 import { AuditLoggerServiceContract } from '../../../../infrastructure/audit/AuditLoggerService';
 
@@ -56,7 +56,8 @@ import * as Errors from './applyCouponToInvoiceErrors';
 
 export class ApplyCouponToInvoiceUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,

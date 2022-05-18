@@ -14,7 +14,10 @@ import { MockCatalogRepo } from '../../../../../../src/lib/modules/journals/repo
 import { MockArticleRepo } from '../../../../../../src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
 import { MockPayerRepo } from '../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
 import { MockErpReferenceRepo } from '../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
-import { MockLogger } from './../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
+import {
+  MockLogger,
+  MockLoggerBuilder,
+} from './../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
 import { PublisherMap } from '../../../../../../src/lib/modules/publishers/mappers/PublisherMap';
 import { MockPublisherRepo } from '../../../../../../src/lib/modules/publishers/repos/mocks/mockPublisherRepo';
 import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
@@ -71,7 +74,7 @@ Before({ tags: '@ValidatePublishInvoiceToErp' }, function () {
   mockCatalogRepo = new MockCatalogRepo();
   mockErpReferenceRepo = new MockErpReferenceRepo();
   mockErpService = new MockErpService();
-  mockLogger = new MockLogger();
+  mockLogger = new MockLoggerBuilder().getLogger();
   mockPublisherRepo = new MockPublisherRepo();
   vatService = new VATService();
 

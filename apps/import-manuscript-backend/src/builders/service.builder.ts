@@ -11,12 +11,8 @@ import { env } from '../env';
 export interface Services {
   uploadService: UploadServiceContract;
   queueService: SqsEventProducer;
-  logger: LoggerContract;
 }
-export async function buildServices(
-  repos: Repos,
-  loggerBuilder: LoggerBuilder
-): Promise<Services> {
+export async function buildServices(): Promise<Services> {
   const s3Configuration = {
     region: env.aws.region,
     accessKeyId: env.aws.accessKey,
@@ -43,7 +39,6 @@ export async function buildServices(
   const s3UploadService = new S3UploadService(s3Configuration);
 
   const services: Services = {
-    logger: loggerBuilder.getLogger(),
     uploadService: s3UploadService,
     queueService: sqsService,
   };

@@ -1,7 +1,7 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { Roles } from '../../../domain/authorization';
-import { LoggerContract } from '../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../infrastructure/logging';
 
 import { InvoiceDraftDueAmountUpdated } from '../domain/events/invoiceDraftDueAmountUpdated';
 

@@ -79,9 +79,7 @@ export class KnexCatalogRepo
 
     const getModel = () => db(TABLES.CATALOG);
 
-    const totalCount = await getModel().count(
-      `${TABLES.CATALOG}.id`
-    );
+    const totalCount = await getModel().count(`${TABLES.CATALOG}.id`);
 
     const offset = pagination.offset * pagination.limit;
 
@@ -90,8 +88,6 @@ export class KnexCatalogRepo
       .offset(offset < totalCount[0].count ? offset : 0)
       .limit(pagination.limit)
       .select([`${TABLES.CATALOG}.*`]);
-
-    console.log(sql.toString());
 
     const catalogsItems: Array<any> = await sql;
 
@@ -103,7 +99,7 @@ export class KnexCatalogRepo
 
     return right({
       catalogItems: maybeCatalogItems.value,
-      totalCount: totalCount[0]['count'] as number
+      totalCount: totalCount[0]['count'] as number,
     });
   }
 

@@ -4,7 +4,7 @@ import {
   MicroframeworkLoader,
 } from 'microframework-w3tec';
 
-import { LoggerContract } from '@hindawi/shared';
+import { executionContext, LoggerContract } from '@hindawi/shared';
 
 import {
   RegisterRevenueRecognitionReversalsCron,
@@ -35,7 +35,7 @@ function processJobsQueue(
       const head = queue[0];
       logger.debug('startProcessing', { job: head.name });
       try {
-        await head.schedule(context);
+        await executionContext.startSession(() => head.schedule(context));
       } catch (err) {
         logger.error('Job Error: ', err);
       }
@@ -50,10 +50,9 @@ export const schedulerLoader: MicroframeworkLoader = async (
 ) => {
   if (settings) {
     const context: Context = settings.getData('context');
-    const {
-      services: { logger: loggerService },
-    } = context;
-    loggerService.setScope('SchedulingService');
+    const { loggerBuilder } = context;
+
+    const loggerService = loggerBuilder.getLogger('SchedulingService');
     const { failedErpCronRetryTimeMinutes, failedErpCronRetryDisabled } =
       env.app;
 

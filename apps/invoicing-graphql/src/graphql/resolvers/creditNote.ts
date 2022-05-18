@@ -17,7 +17,6 @@ import {
   GetInvoiceDetailsDTO,
   CreditNoteMap,
   InvoiceMap,
-  Roles,
 } from '@hindawi/shared';
 
 import { handleForbiddenUsecase, getAuthRoles } from './utils';
@@ -197,7 +196,7 @@ export const creditNote: Resolvers<Context> = {
           coupon: couponRepo,
           waiver: waiverRepo,
         },
-        auditLoggerServiceProvider
+        auditLoggerServiceProvider,
       } = context;
 
       const request: CreateCreditNoteRequestDTO = {

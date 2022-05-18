@@ -1,21 +1,17 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
+import { Before, After, Given, When, Then } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
 import {
   EditorCollection,
-  EditorMap,
-  CatalogMap,
-  MockLogger,
-  MockEditorRepo,
   MockCatalogRepo,
+  MockEditorRepo,
+  CatalogMap,
+  EditorMap,
 } from '@hindawi/shared';
 
 import { Context } from '../../../src/builders';
 
 import { JournalEditorRemovedHandler } from '../../../src/queue_service/handlers/JournalEditorRemoved';
-import * as JournalEditorRemovedData from './JournalEditorRemoved_2.json';
 
 function getRandom(arr: string[], n: number) {
   const result = new Array(n);
@@ -37,7 +33,6 @@ function getRandom(arr: string[], n: number) {
 
 const { handler } = JournalEditorRemovedHandler;
 
-let mockLogger: MockLogger;
 let mockEditorRepo: MockEditorRepo;
 let mockCatalogRepo: MockCatalogRepo;
 
@@ -47,7 +42,6 @@ let journalId = null;
 let journalEditors = [];
 
 Before({ tags: '@ValidateJournalEditorRemoved' }, function () {
-  mockLogger = new MockLogger();
   mockEditorRepo = new MockEditorRepo();
   mockCatalogRepo = new MockCatalogRepo();
 
@@ -55,9 +49,6 @@ Before({ tags: '@ValidateJournalEditorRemoved' }, function () {
     repos: {
       editor: mockEditorRepo,
       catalog: mockCatalogRepo,
-    },
-    services: {
-      logger: mockLogger,
     },
   };
 });
@@ -134,7 +125,8 @@ When('"JournalEditorRemoved" event is being published', async function () {
 Then(
   /^The journal "([\w-]+)" should have only (\d+) editors left$/,
   async (eventJournalId: string, expectedEditorsLeft: number) => {
-    const editorCollectionAfter: EditorCollection = await mockEditorRepo.getEditorCollection();
+    const editorCollectionAfter: EditorCollection =
+      await mockEditorRepo.getEditorCollection();
     expect(editorCollectionAfter.length).to.equal(+expectedEditorsLeft);
   }
 );

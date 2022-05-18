@@ -1,5 +1,3 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
 import { createQueueService } from '@hindawi/queue-service';
 import { BullScheduler } from '@hindawi/sisif';
 import {
@@ -14,7 +12,6 @@ import {
   BraintreePayment,
   EmptyClientToken,
   IdentityPayment,
-  LoggerContract,
   LoggerBuilder,
   PayPalPayment,
   WaiverService,
@@ -31,15 +28,14 @@ import { env } from '../env';
 import { Repos } from './repo.builder';
 
 export interface Services {
-  logger: LoggerContract;
-  pdfGenerator: PdfGeneratorService;
-  vatService: VATService;
-  waiverService: WaiverService;
-  emailService: EmailService;
-  exchangeRateService: ExchangeRateService;
-  schedulingService: BullScheduler;
   paymentStrategyFactory: PaymentStrategyFactory;
-  qq: PhenomSqsServiceContract;
+  exchangeRateService: ExchangeRateService;
+  pdfGenerator: PdfGeneratorService;
+  schedulingService: BullScheduler;
+  waiverService: WaiverService;
+  queue: PhenomSqsServiceContract;
+  emailService: EmailService;
+  vatService: VATService;
   erp: {
     netsuite: NetSuiteService;
   };
@@ -51,11 +47,11 @@ function buildPaymentStrategyFactory(
 ) {
   const paypalService = new PayPalService(
     env.paypal,
-    loggerBuilder.getLogger()
+    loggerBuilder.getLogger(PayPalService.name)
   );
   const braintreeService = new BraintreeService(
     env.braintree,
-    loggerBuilder.getLogger()
+    loggerBuilder.getLogger(BraintreeService.name)
   );
 
   const braintreeClientToken = new BraintreeClientToken(braintreeService);
@@ -79,7 +75,7 @@ function buildPaymentStrategyFactory(
 }
 
 async function setupQueueService(loggerBuilder: LoggerBuilder) {
-  const logger = loggerBuilder.getLogger();
+  const logger = loggerBuilder.getLogger('setupQueueService');
   const config = {
     region: env.aws.sns.sqsRegion,
     accessKeyId: env.aws.sns.sqsAccessKey,
@@ -115,9 +111,9 @@ export async function buildServices(
   const { sisifEnabled } = env.loaders;
 
   return {
-    logger: loggerBuilder.getLogger(),
-    // auditLogger: auditLoggerBuilder.getLogger(),
-    pdfGenerator: createPdfGenerator(loggerBuilder.getLogger()),
+    pdfGenerator: createPdfGenerator(
+      loggerBuilder.getLogger('createPdfGenerator')
+    ),
     vatService: new VATService(),
     waiverService: new WaiverService(
       repos.invoiceItem,
@@ -133,14 +129,14 @@ export async function buildServices(
     ),
     exchangeRateService: new ExchangeRateService(),
     schedulingService: sisifEnabled
-      ? new BullScheduler(bullData, loggerBuilder.getLogger())
+      ? new BullScheduler(bullData, loggerBuilder.getLogger(BullScheduler.name))
       : null,
     paymentStrategyFactory: buildPaymentStrategyFactory(
       repos.paymentMethod,
       loggerBuilder
     ),
     erp: null,
-    qq: env.loaders.queueServiceEnabled
+    queue: env.loaders.queueServiceEnabled
       ? await setupQueueService(loggerBuilder)
       : null,
   };

@@ -2,12 +2,13 @@ import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 
 import { EmailService } from '../../../infrastructure/communication-channels';
-import { LoggerContract } from '../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../infrastructure/logging';
 
 import { InvoiceMovedToPendingEvent as InvoiceMovedToPending } from '../domain/events/invoiceMovedToPending';
 
 export class AfterInvoiceMovedToPending
-  implements HandleContract<InvoiceMovedToPending> {
+  implements HandleContract<InvoiceMovedToPending>
+{
   constructor(
     private loggerService: LoggerContract,
     private emailService: EmailService

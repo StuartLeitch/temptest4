@@ -15,7 +15,7 @@ import {
 
 import { PayloadBuilder } from '../../../../infrastructure/message-queues/payloadBuilder';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../infrastructure/logging';
 import {
   SisifJobTypes,
   JobBuilder,
@@ -58,7 +58,8 @@ interface CompoundDTO extends DTO {
 
 export class ResumeInvoiceConfirmationReminderUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,

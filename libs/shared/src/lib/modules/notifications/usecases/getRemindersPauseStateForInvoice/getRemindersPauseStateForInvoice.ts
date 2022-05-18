@@ -19,7 +19,7 @@ import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
 
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../infrastructure/logging';
 
 // * Usecase specific
 import { GetRemindersPauseStateForInvoiceResponse as Response } from './getRemindersPauseStateForInvoiceResponse';
@@ -28,7 +28,8 @@ import * as Errors from './getRemindersPauseStateForInvoiceErrors';
 
 export class GetRemindersPauseStateForInvoiceUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private pausedRemindersRepo: PausedReminderRepoContract,
     private invoiceRepo: InvoiceRepoContract,

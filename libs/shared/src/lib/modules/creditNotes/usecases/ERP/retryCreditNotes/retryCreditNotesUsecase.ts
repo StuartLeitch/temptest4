@@ -13,7 +13,7 @@ import { UseCase } from '../../../../../core/domain/UseCase';
 import { right, left } from '../../../../../core/logic/Either';
 import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { ErrorUtils } from '../../../../../utils/ErrorUtils';
-import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../../infrastructure/logging';
 import { CreditNoteRepoContract } from '../../../repos/creditNoteRepo';
 import { InvoiceRepoContract } from '../../../../invoices/repos/invoiceRepo';
 import { InvoiceItemRepoContract } from '../../../../invoices/repos/invoiceItemRepo';
@@ -31,8 +31,13 @@ import { PayerRepoContract } from '../../../../payers/repos/payerRepo';
 import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
 
 export class RetryCreditNotesUsecase
-  extends AccessControlledUsecase<Record<string, unknown>, Context, AccessControlContext>
-  implements UseCase<Record<string, unknown>, Promise<Response>, Context> {
+  extends AccessControlledUsecase<
+    Record<string, unknown>,
+    Context,
+    AccessControlContext
+  >
+  implements UseCase<Record<string, unknown>, Promise<Response>, Context>
+{
   private publishCreditNoteToErpUsecase: PublishCreditNoteToErpUsecase;
   constructor(
     private creditNoteRepo: CreditNoteRepoContract,
@@ -69,9 +74,13 @@ export class RetryCreditNotesUsecase
   }
 
   @Authorize('erp:publish')
-  public async execute(request?: Record<string, unknown>, context?: Context): Promise<Response> {
+  public async execute(
+    request?: Record<string, unknown>,
+    context?: Context
+  ): Promise<Response> {
     try {
-      const maybeUnregisteredErpCreditNotesIds = await this.creditNoteRepo.getUnregisteredErpCreditNotes();
+      const maybeUnregisteredErpCreditNotesIds =
+        await this.creditNoteRepo.getUnregisteredErpCreditNotes();
       const registeredCreditNotes: ErpInvoiceResponse[] = [];
 
       if (maybeUnregisteredErpCreditNotesIds.isLeft()) {
@@ -97,12 +106,13 @@ export class RetryCreditNotesUsecase
       const errs = [];
 
       for (const unregisteredCreditNote of unregisteredErpCreditNotesIds) {
-        const publishedCreditNoteResponse = await this.publishCreditNoteToErpUsecase.execute(
-          {
-            creditNoteId: unregisteredCreditNote.id.toString(),
-          },
-          context
-        );
+        const publishedCreditNoteResponse =
+          await this.publishCreditNoteToErpUsecase.execute(
+            {
+              creditNoteId: unregisteredCreditNote.id.toString(),
+            },
+            context
+          );
         if (publishedCreditNoteResponse.isLeft()) {
           errs.push(publishedCreditNoteResponse.value);
         } else {

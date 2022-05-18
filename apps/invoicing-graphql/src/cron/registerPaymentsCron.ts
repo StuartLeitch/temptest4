@@ -7,10 +7,9 @@ import { CronFeatureFlagsReader } from './CronFeatureFlagsReader';
 
 export class RegisterPaymentsCron {
   public static async schedule(context: Context): Promise<any> {
-    const {
-      services: { logger: loggerService },
-    } = context;
-    loggerService.setScope('cron:registerPayments');
+    const { loggerBuilder } = context;
+
+    const loggerService = loggerBuilder.getLogger('cron:registerPayments');
 
     const cronFlags = CronFeatureFlagsReader.readAll();
     FeatureFlags.setFeatureFlags(cronFlags);
@@ -37,20 +36,21 @@ export class RegisterPaymentsCron {
       services: { erp },
     } = context;
 
-    const retryPaymentsToNetsuiteErpUsecase = new RetryPaymentsRegistrationToErpUsecase(
-      invoice,
-      invoiceItem,
-      payment,
-      paymentMethod,
-      coupon,
-      waiver,
-      payer,
-      manuscript,
-      catalog,
-      erpReference,
-      erp?.netsuite || null,
-      loggerService
-    );
+    const retryPaymentsToNetsuiteErpUsecase =
+      new RetryPaymentsRegistrationToErpUsecase(
+        invoice,
+        invoiceItem,
+        payment,
+        paymentMethod,
+        coupon,
+        waiver,
+        payer,
+        manuscript,
+        catalog,
+        erpReference,
+        erp?.netsuite || null,
+        loggerService
+      );
 
     const maybeResponse = await retryPaymentsToNetsuiteErpUsecase.execute(
       null,

@@ -1,4 +1,4 @@
-import { LoggerContract } from '../Logger';
+import { LoggerContract, LoggerBuilderContract } from '../LoggerContract';
 
 export class MockLogger implements LoggerContract {
   constructor(private useConsole = false, private scope = 'TEST_LOGGER') {}
@@ -23,8 +23,12 @@ export class MockLogger implements LoggerContract {
       console.error(message);
     }
   }
+}
 
-  setScope(scope?: string): void {
-    this.scope = scope;
+export class MockLoggerBuilder implements LoggerBuilderContract {
+  getLogger(scope: string): MockLogger;
+  getLogger(): MockLogger;
+  getLogger(scope = 'TEST_LOGGER'): MockLogger {
+    return new MockLogger(false, scope);
   }
 }

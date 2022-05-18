@@ -10,7 +10,7 @@ import {
   Authorize,
 } from '../../../../../domain/authorization';
 
-import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../../infrastructure/logging';
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
 import { CreditNote } from '../../../domain/CreditNote';
 import { CreditNoteId } from '../../../domain/CreditNoteId';
@@ -41,7 +41,8 @@ import * as Errors from './publishCreditNoteToErp.errors';
 
 export class PublishCreditNoteToErpUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private creditNoteRepo: CreditNoteRepoContract,
     private invoiceRepo: InvoiceRepoContract,
@@ -176,15 +177,24 @@ export class PublishCreditNoteToErpUsecase
         context
       );
       if (maybeManuscript.isLeft()) {
-        return left(new Errors.InvoiceManuscriptNotFoundError(invoice.invoiceId.toString()));
+        return left(
+          new Errors.InvoiceManuscriptNotFoundError(
+            invoice.invoiceId.toString()
+          )
+        );
       }
 
       const manuscript = maybeManuscript.value;
 
       // * Get Payer details
-      const maybePayer = await getPayerDetails.execute({ invoiceId: invoice.invoiceId.toString() }, context);
+      const maybePayer = await getPayerDetails.execute(
+        { invoiceId: invoice.invoiceId.toString() },
+        context
+      );
       if (maybePayer.isLeft()) {
-        return left(new Errors.InvoicePayersNotFoundError(invoice.invoiceId.toString()));
+        return left(
+          new Errors.InvoicePayersNotFoundError(invoice.invoiceId.toString())
+        );
       }
       const payer = maybePayer.value;
 
@@ -203,7 +213,9 @@ export class PublishCreditNoteToErpUsecase
       );
 
       if (maybeCatalog.isLeft()) {
-        return left(new Errors.InvoiceCatalogNotFoundError(invoice.invoiceId.toString()));
+        return left(
+          new Errors.InvoiceCatalogNotFoundError(invoice.invoiceId.toString())
+        );
       }
 
       const catalog = maybeCatalog.value;
@@ -217,7 +229,9 @@ export class PublishCreditNoteToErpUsecase
       );
 
       if (maybePublisherCustomValue.isLeft()) {
-        return left(new Errors.InvoiceCatalogNotFoundError(invoice.invoiceId.toString()));
+        return left(
+          new Errors.InvoiceCatalogNotFoundError(invoice.invoiceId.toString())
+        );
       }
       const publisherCustomValues = maybePublisherCustomValue.value;
 
@@ -234,7 +248,7 @@ export class PublishCreditNoteToErpUsecase
           manuscript,
           billingAddress: address,
           payer,
-          publisherCustomValues
+          publisherCustomValues,
         };
 
         const maybeInvoiceErpReferences = invoice

@@ -78,7 +78,6 @@ export const env = {
     knexEnabled: toBool(getOsEnvOptional('KNEX_LOADER_ENABLED')),
     contextEnabled: toBool(getOsEnvOptional('CONTEXT_LOADER_ENABLED')),
     expressEnabled: toBool(getOsEnvOptional('EXPRESS_LOADER_ENABLED')),
-    monitorEnabled: toBool(getOsEnvOptional('MONITOR_LOADER_ENABLED')),
     graphqlEnabled: toBool(getOsEnvOptional('GRAPHQL_LOADER_ENABLED')),
     queueServiceEnabled: toBool(
       getOsEnvOptional('QUEUE_SERVICE_LOADER_ENABLED')
@@ -105,12 +104,6 @@ export const env = {
     editor: toBool(getOsEnv('GRAPHQL_EDITOR')),
     serviceUrl: getOsEnv('GRAPHQL_SERVICE_URL'),
     schemaRegistryUrl: getOsEnv('SCHEMA_REGISTRY_URL')
-  },
-  monitor: {
-    enabled: toBool(getOsEnv('MONITOR_ENABLED')),
-    route: getOsEnv('MONITOR_ROUTE'),
-    username: getOsEnv('MONITOR_USERNAME'),
-    password: getOsEnv('MONITOR_PASSWORD'),
   },
   aws: {
     enabled: toBool(getOsEnv('AWS_ENABLED')),

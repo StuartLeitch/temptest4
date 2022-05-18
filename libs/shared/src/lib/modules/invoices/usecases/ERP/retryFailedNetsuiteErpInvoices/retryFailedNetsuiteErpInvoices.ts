@@ -2,7 +2,7 @@ import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { right, left } from '../../../../../core/logic/Either';
 import { UseCase } from '../../../../../core/domain/UseCase';
 
-import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../../infrastructure/logging';
 
 import { ErrorUtils } from './../../../../../utils/ErrorUtils';
 
@@ -37,7 +37,8 @@ import type { RetryFailedNetsuiteErpInvoicesDTO as DTO } from './retryFailedNets
 
 export class RetryFailedNetsuiteErpInvoicesUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   private publishToErpUsecase: PublishInvoiceToErpUsecase;
   constructor(
     private invoiceRepo: InvoiceRepoContract,
@@ -76,7 +77,8 @@ export class RetryFailedNetsuiteErpInvoicesUsecase
   @Authorize('erp:publish')
   public async execute(request?: DTO, context?: Context): Promise<Response> {
     try {
-      const maybeFailedErpInvoicesIds = await this.invoiceRepo.getFailedNetsuiteErpInvoices();
+      const maybeFailedErpInvoicesIds =
+        await this.invoiceRepo.getFailedNetsuiteErpInvoices();
 
       if (maybeFailedErpInvoicesIds.isLeft()) {
         return left(
@@ -104,12 +106,13 @@ export class RetryFailedNetsuiteErpInvoicesUsecase
       const errs = [];
 
       for (const failedInvoice of failedErpInvoicesIds) {
-        const maybeUpdatedInvoiceResponse = await this.publishToErpUsecase.execute(
-          {
-            invoiceId: failedInvoice.id.toString(),
-          },
-          context
-        );
+        const maybeUpdatedInvoiceResponse =
+          await this.publishToErpUsecase.execute(
+            {
+              invoiceId: failedInvoice.id.toString(),
+            },
+            context
+          );
 
         if (
           typeof maybeUpdatedInvoiceResponse.isLeft === 'function' &&
@@ -119,7 +122,8 @@ export class RetryFailedNetsuiteErpInvoicesUsecase
           // return left(maybeUpdatedInvoiceResponse.value);
         } else {
           const updatedInvoiceResponse = maybeUpdatedInvoiceResponse.value;
-          const assignedErpReference = updatedInvoiceResponse as ErpInvoiceResponse;
+          const assignedErpReference =
+            updatedInvoiceResponse as ErpInvoiceResponse;
 
           if (assignedErpReference) {
             this.loggerService.info(

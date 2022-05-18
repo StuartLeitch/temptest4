@@ -13,7 +13,7 @@ import {
 } from '../../../../domain/authorization';
 
 import { EmailService } from '../../../../infrastructure/communication-channels';
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../infrastructure/logging';
 
 import { NotificationType, Notification } from '../../domain/Notification';
 import { InvoiceStatus, Invoice } from '../../../invoices/domain/Invoice';
@@ -50,7 +50,8 @@ import {
 
 export class SendInvoiceCreditControlReminderUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private sentNotificationRepo: SentNotificationRepoContract,
     private pausedReminderRepo: PausedReminderRepoContract,
@@ -65,9 +66,8 @@ export class SendInvoiceCreditControlReminderUsecase
   ) {
     super();
 
-    this.getPaymentNotificationsSent = this.getPaymentNotificationsSent.bind(
-      this
-    );
+    this.getPaymentNotificationsSent =
+      this.getPaymentNotificationsSent.bind(this);
     this.noReminderSentRecently = this.noReminderSentRecently.bind(this);
     this.isNotificationEnabled = this.isNotificationEnabled.bind(this);
     this.attachItemsToInvoice = this.attachItemsToInvoice.bind(this);

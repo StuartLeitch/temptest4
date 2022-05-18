@@ -3,16 +3,14 @@ import {
   GenerateClientTokenUsecase,
   GetPaymentMethodsUseCase,
   RecordPaymentUsecase,
+  executionContext,
   PaymentMethodMap,
   ExternalOrderId,
-  CorrelationID,
+  RepoErrorCode,
   PaymentTypes,
+  RepoError,
   Roles,
 } from '@hindawi/shared';
-import {
-  RepoErrorCode,
-  RepoError,
-} from 'libs/shared/src/lib/infrastructure/RepoError';
 
 import { Context } from '../../builders';
 import { Resolvers } from '../schema';
@@ -24,9 +22,13 @@ export const payments: Resolvers<Context> = {
     async getPaymentMethods(parent, args, context) {
       const {
         repos: { paymentMethod: paymentMethodRepo },
-        services: { logger: loggerService },
+        loggerBuilder,
       } = context;
-      const correlationId = new CorrelationID().toString();
+
+      const loggerService = loggerBuilder.getLogger(
+        GetPaymentMethodsUseCase.name
+      );
+
       const usecase = new GetPaymentMethodsUseCase(
         paymentMethodRepo,
         loggerService
@@ -34,7 +36,6 @@ export const payments: Resolvers<Context> = {
 
       const usecaseContext = {
         roles: [Roles.PAYER],
-        correlationId,
       };
 
       const result = await usecase.execute(null, usecaseContext);
@@ -49,8 +50,12 @@ export const payments: Resolvers<Context> = {
     },
     async getClientToken(parent, args, context) {
       const {
-        services: { paymentStrategyFactory, logger },
+        services: { paymentStrategyFactory },
+        loggerBuilder,
       } = context;
+
+      const logger = loggerBuilder.getLogger('getClientToken');
+
       const usecase = new GenerateClientTokenUsecase(paymentStrategyFactory);
 
       const usecaseContext = {
@@ -87,8 +92,12 @@ export const payments: Resolvers<Context> = {
           waiver: waiverRepo,
           payer: payerRepo,
         },
-        services: { paymentStrategyFactory, logger },
+        services: { paymentStrategyFactory },
+        loggerBuilder,
       } = context;
+
+      const logger = loggerBuilder.getLogger(RecordPaymentUsecase.name);
+
       const { paymentMethodNonce, invoiceId } = args;
 
       const usecase = new RecordPaymentUsecase(
@@ -155,8 +164,11 @@ export const payments: Resolvers<Context> = {
           waiver: waiverRepo,
           payer: payerRepo,
         },
-        services: { paymentStrategyFactory, logger },
+        services: { paymentStrategyFactory },
+        loggerBuilder,
       } = context;
+
+      const logger = loggerBuilder.getLogger(RecordPaymentUsecase.name);
 
       const usecase = new RecordPaymentUsecase(
         paymentStrategyFactory,
@@ -183,7 +195,6 @@ export const payments: Resolvers<Context> = {
       handleForbiddenUsecase(result);
 
       if (result.isLeft()) {
-        console.log(result.value.message);
         throw new Error(result.value.message);
       }
 
@@ -242,9 +253,13 @@ export const payments: Resolvers<Context> = {
           waiver: waiverRepo,
           payer: payerRepo,
         },
-        services: { paymentStrategyFactory, logger },
-        auditLoggerServiceProvider
+        services: { paymentStrategyFactory },
+        loggerBuilder,
+        auditLoggerServiceProvider,
       } = context;
+
+      const logger = loggerBuilder.getLogger(RecordPaymentUsecase.name);
+
       const {
         markInvoiceAsPaid,
         paymentReference,
@@ -255,9 +270,10 @@ export const payments: Resolvers<Context> = {
 
       // check if the payment reference is already used
 
-      const alreadyUsedPaymentReference = await paymentRepo.getPaymentByForeignId(
-        ExternalOrderId.create(paymentReference)
-      );
+      const alreadyUsedPaymentReference =
+        await paymentRepo.getPaymentByForeignId(
+          ExternalOrderId.create(paymentReference)
+        );
 
       if (alreadyUsedPaymentReference.isLeft()) {
         if (
@@ -308,7 +324,6 @@ export const payments: Resolvers<Context> = {
       handleForbiddenUsecase(result);
 
       if (result.isLeft()) {
-        console.log(result.value);
         throw result.value.message;
       }
 

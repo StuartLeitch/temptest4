@@ -1,6 +1,6 @@
 import { SQS, S3 } from 'aws-sdk';
 
-import { LoggerContract } from '../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../infrastructure/logging';
 import { RawEvent as EveEvent } from '../../../infrastructure/RawEvent';
 
 import { EventDTO } from '../domain/EventDTO';

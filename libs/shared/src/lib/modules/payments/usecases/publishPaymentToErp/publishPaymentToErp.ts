@@ -11,7 +11,7 @@ import {
   Authorize,
 } from '../../../../domain/authorization';
 
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../infrastructure/logging';
 import {
   RegisterPaymentResponse,
   RegisterPaymentRequest,
@@ -45,7 +45,8 @@ import type { PublishPaymentToErpDTO as DTO } from './publishPaymentToErpDTO';
 
 export class PublishPaymentToErpUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -185,7 +186,8 @@ export class PublishPaymentToErpUsecase
         return right(null);
       }
 
-      const maybePaymentMethods = await this.paymentMethodRepo.getPaymentMethods();
+      const maybePaymentMethods =
+        await this.paymentMethodRepo.getPaymentMethods();
 
       if (maybePaymentMethods.isLeft()) {
         return left(
@@ -209,7 +211,7 @@ export class PublishPaymentToErpUsecase
         throw new Error(`Invoice ${invoice.id} has no payers.`);
       }
 
-      let getManuscriptUsecase = new GetManuscriptByInvoiceIdUsecase(
+      const getManuscriptUsecase = new GetManuscriptByInvoiceIdUsecase(
         this.manuscriptRepo,
         this.invoiceItemRepo
       );
@@ -220,7 +222,7 @@ export class PublishPaymentToErpUsecase
       if (maybeManuscript.isLeft()) {
         throw new Error(maybeManuscript.value.message);
       }
-      let manuscript = maybeManuscript.value[0];
+      const manuscript = maybeManuscript.value[0];
       if (!manuscript) {
         throw new Error(`Invoice ${invoice.id} has no manuscripts associated.`);
       }

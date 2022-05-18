@@ -4,10 +4,11 @@ import {
   MicroframeworkSettings,
 } from 'microframework-w3tec';
 import { env } from '../env';
-import { Logger } from 'libs/shared/src/lib/infrastructure/logging/implementations/Logger';
+import { Logger } from 'libs/shared/src/lib/infrastructure/logging/implementations/LoggerBuilder';
+import { LogLevel } from 'libs/shared/src/lib/infrastructure/logging';
 import { ReportingHandlers } from './handlerLoader';
 import { Event } from 'libs/eve/src';
-const logger = new Logger('express:loader');
+const logger = new Logger(LogLevel.Info, 'express:loader');
 
 export const expressLoader: MicroframeworkLoader = (
   settings: MicroframeworkSettings | undefined

@@ -78,8 +78,7 @@ const masterConfig: {
 } = {
   [Tenant.hindawi]: {
     prod: {
-      [App.invoicingErpInvoiceRegistration]:
-        hindawiProdInvoicingErpInvoiceRegistrationValues,
+      // [App.invoicingErpInvoiceRegistration]: hindawiProdInvoicingErpInvoiceRegistrationValues,
       [App.graphql]: hindawiProdInvoicingGraphqlValues,
       [App.admin]: hindawiProdInvoicingAdminValues,
       // [App.reporting]: hindawiProdReportingValues,
@@ -89,15 +88,13 @@ const masterConfig: {
       // [App.importManuscriptWeb]: hindawiProdImportManuscriptWeb,,
     },
     preproduction: {
-      [App.invoicingErpInvoiceRegistration]:
-        preproductionInvoicingErpInvoiceRegistrationValues,
+      // [App.invoicingErpInvoiceRegistration]: preproductionInvoicingErpInvoiceRegistrationValues,
       [App.graphql]: preproductionInvoicingGraphqlValues,
       [App.admin]: preproductionInvoicingAdminValues,
       [App.web]: preproductionInvoicingWebValues,
     },
     demo: {
-      [App.invoicingErpInvoiceRegistration]:
-        demoInvoicingErpInvoiceRegistrationValues,
+      // [App.invoicingErpInvoiceRegistration]: demoInvoicingErpInvoiceRegistrationValues,
       [App.graphql]: demoInvoicingGraphqlValues,
       [App.admin]: demoInvoicingAdminValues,
       [App.web]: demoInvoicingWebValues,
@@ -106,8 +103,7 @@ const masterConfig: {
       [App.importManuscriptWeb]: demoImportManuscriptWeb,
     },
     'demo-sales': {
-      [App.invoicingErpInvoiceRegistration]:
-        demoSalesInvoicingErpInvoiceRegistrationValues,
+      // [App.invoicingErpInvoiceRegistration]: demoSalesInvoicingErpInvoiceRegistrationValues,
       [App.graphql]: demoSalesInvoicingGraphqlValues,
       [App.admin]: demoSalesInvoicingAdminValues,
       [App.web]: demoSalesInvoicingWebValues,
@@ -116,8 +112,7 @@ const masterConfig: {
       [App.importManuscriptWeb]: demoSalesImportManuscriptWeb,
     },
     qa: {
-      [App.invoicingErpInvoiceRegistration]:
-        qaInvoicingErpInvoiceRegistrationValues,
+      // [App.invoicingErpInvoiceRegistration]: qaInvoicingErpInvoiceRegistrationValues,
       // [App.reporting]: qaReportingBackendValues,
       [App.graphql]: qaInvoicingGraphqlValues,
       [App.admin]: qaInvoicingAdminValues,
@@ -127,8 +122,7 @@ const masterConfig: {
       [App.importManuscriptWeb]: qaImportManuscriptWeb,
     },
     automation: {
-      [App.invoicingErpInvoiceRegistration]:
-        automationInvoicingErpInvoiceRegistrationValues,
+      // [App.invoicingErpInvoiceRegistration]: automationInvoicingErpInvoiceRegistrationValues,
       [App.graphql]: automationInvoicingGraphqlValues,
       [App.admin]: automationInvoicingAdminValues,
       [App.web]: automationInvoicingWebValues,
@@ -137,8 +131,7 @@ const masterConfig: {
       [App.importManuscriptWeb]: automationImportManuscriptWeb,
     },
     dev: {
-      [App.invoicingErpInvoiceRegistration]:
-        devInvoicingErpInvoiceRegistrationValues,
+      // [App.invoicingErpInvoiceRegistration]:devInvoicingErpInvoiceRegistrationValues,
       // [App.reporting]: devReportingBackendValues,
       [App.graphql]: devInvoicingGraphqlValues,
       [App.admin]: devInvoicingAdminValues,
@@ -150,16 +143,14 @@ const masterConfig: {
   },
   [Tenant.gsw]: {
     prod: {
-      [App.invoicingErpInvoiceRegistration]:
-        gswProdInvoicingErpInvoiceRegistrationValues,
+      // [App.invoicingErpInvoiceRegistration]: gswProdInvoicingErpInvoiceRegistrationValues,
       [App.graphql]: gswProdInvoicingGraphqlValues,
       [App.admin]: gswProdInvoicingAdminValues,
       // [App.reporting]: gswProdReportingValues,
       [App.web]: gswProdInvoicingWebValues,
     },
     demo: {
-      [App.invoicingErpInvoiceRegistration]:
-        gswDemoInvoicingErpInvoiceRegistrationValues,
+      // [App.invoicingErpInvoiceRegistration]: gswDemoInvoicingErpInvoiceRegistrationValues,
       [App.graphql]: gswDemoInvoicingGraphqlValues,
       [App.admin]: gswDemoInvoicingAdminValues,
       [App.web]: gswDemoInvoicingWebValues,

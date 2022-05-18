@@ -14,7 +14,7 @@ import {
 
 import { InvoiceReminderPayload } from '../../../../infrastructure/message-queues/payloads';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../infrastructure/logging';
 import {
   SisifJobTypes,
   JobBuilder,
@@ -63,7 +63,8 @@ import {
 
 export class SendInvoicePaymentReminderUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private sentNotificationRepo: SentNotificationRepoContract,
     private pausedReminderRepo: PausedReminderRepoContract,
@@ -79,9 +80,8 @@ export class SendInvoicePaymentReminderUsecase
   ) {
     super();
 
-    this.getPaymentNotificationsSent = this.getPaymentNotificationsSent.bind(
-      this
-    );
+    this.getPaymentNotificationsSent =
+      this.getPaymentNotificationsSent.bind(this);
     this.sendPaymentReminderEmail = this.sendPaymentReminderEmail.bind(this);
     this.noReminderSentRecently = this.noReminderSentRecently.bind(this);
     this.attachItemsToInvoice = this.attachItemsToInvoice.bind(this);

@@ -1,6 +1,6 @@
 import { HandleContract } from '../../../core/domain/events/contracts/Handle';
 import { DomainEvents } from '../../../core/domain/events/DomainEvents';
-import { LoggerContract } from '../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../infrastructure/logging';
 import { NoOpUseCase } from '../../../core/domain/NoOpUseCase';
 import { UnexpectedError } from '../../../core/logic/AppError';
 import { Roles } from '../../../domain/authorization';

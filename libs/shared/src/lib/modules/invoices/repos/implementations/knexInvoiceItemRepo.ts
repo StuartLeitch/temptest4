@@ -16,7 +16,8 @@ import { InvoiceItemRepoContract } from '../invoiceItemRepo';
 
 export class KnexInvoiceItemRepo
   extends AbstractBaseDBRepo<Knex, InvoiceItem>
-  implements InvoiceItemRepoContract {
+  implements InvoiceItemRepoContract
+{
   async getInvoiceItemById(
     invoiceItemId: InvoiceItemId
   ): Promise<Either<GuardFailure | RepoError, InvoiceItem>> {
@@ -43,15 +44,12 @@ export class KnexInvoiceItemRepo
     manuscriptId: ManuscriptId
   ): Promise<Either<GuardFailure | RepoError, InvoiceItem[]>> {
     const { db, logger } = this;
-    const correlationId =
-      'correlationId' in this ? (this as any).correlationId : null;
 
     const sql = db(TABLES.INVOICE_ITEMS)
       .select()
       .where('manuscriptId', manuscriptId.id.toString());
 
     logger.debug('select', {
-      correlationId,
       sql: sql.toString(),
     });
 
@@ -173,11 +171,7 @@ export class KnexInvoiceItemRepo
 
     const sql = db(TABLES.INVOICE_ITEMS).select();
 
-    const correlationId =
-      'correlationId' in this ? (this as any).correlationId : null;
-
     logger.debug('getItemsByInvoiceId', {
-      correlationId,
       sql: sql.toString(),
     });
 
@@ -195,11 +189,7 @@ export class KnexInvoiceItemRepo
       .select()
       .where('invoiceId', invoiceId.id.toString());
 
-    const correlationId =
-      'correlationId' in this ? (this as any).correlationId : null;
-
     logger.debug('getItemsByInvoiceId', {
-      correlationId,
       sql: sql.toString(),
     });
 

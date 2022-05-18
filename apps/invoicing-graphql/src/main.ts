@@ -1,12 +1,11 @@
-import 'reflect-metadata';
 import { bootstrapMicroframework } from 'microframework-w3tec';
+import 'reflect-metadata';
+
+import { LoggerBuilder, executionContext, LogLevel } from '@hindawi/shared';
 
 import { banner } from './lib/banner';
-// import { Logger } from './lib/logger';
-// import './lib/logger/LoggerAspect';
 
 import { env } from './env';
-import { LoggerBuilder } from '@hindawi/shared';
 
 /**
  * EXPRESS TYPESCRIPT BOILERPLATE
@@ -16,17 +15,13 @@ import { LoggerBuilder } from '@hindawi/shared';
  * The basic layer of this app is express. For further information visit
  * the 'README.md' file.
  */
-const log = new LoggerBuilder('loader', {
-  logLevel: env.log.level,
-  isDevelopment: env.isDevelopment,
-}).getLogger();
+const log = new LoggerBuilder(LogLevel[env.log.level]).getLogger('loader');
 
 async function main() {
   /**
    * Loaders
    */
   const loaders = [];
-
 
   if (env.loaders.knexEnabled) {
     const { knexLoader } = await import(
@@ -35,7 +30,6 @@ async function main() {
     log.info('Knex Query Builder initiated ✔️');
     loaders.push(knexLoader);
   }
-
 
   if (env.loaders.contextEnabled) {
     const { contextLoader } = await import(
@@ -51,14 +45,6 @@ async function main() {
     );
     log.info('Express Server initiated ✔️');
     loaders.push(expressLoader);
-  }
-
-  if (env.loaders.monitorEnabled) {
-    const { monitorLoader } = await import(
-      /* webpackChunkName: "monitorLoader" */ './loaders/monitorLoader'
-    );
-    log.info('Express Monitor initiated ✔️');
-    loaders.push(monitorLoader);
   }
 
   if (env.loaders.graphqlEnabled) {
@@ -112,7 +98,6 @@ async function main() {
     loaders.push(sisifLoader);
   }
 
-
   await bootstrapMicroframework({
     /**
      * Loader is a place where you can configure all your modules during microframework
@@ -127,4 +112,4 @@ async function main() {
     });
 }
 
-main();
+executionContext.startSession(main);

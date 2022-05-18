@@ -1,8 +1,8 @@
 import { cloneDeep } from 'lodash';
 
 // * Core Domain
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { Either, right, left } from '../../../../core/logic/Either';
+import { LoggerContract } from '../../../../infrastructure/logging';
 import { UseCaseError } from '../../../../core/logic/UseCaseError';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
@@ -71,7 +71,8 @@ function roundToHour(dateToRound: Date): Date {
 
 export class GenerateInvoiceDraftCompensatoryEventsUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
     private manuscriptRepo: ArticleRepoContract,
@@ -195,9 +196,8 @@ export class GenerateInvoiceDraftCompensatoryEventsUsecase
       const initialWaivers = item.assignedWaivers.filter((w) => {
         return roundToHour(w.dateAssigned).getTime() === dateCreated.getTime();
       });
-      item.props.assignedWaivers = WaiverAssignedCollection.create(
-        initialWaivers
-      );
+      item.props.assignedWaivers =
+        WaiverAssignedCollection.create(initialWaivers);
       item.props.assignedCoupons = CouponAssignedCollection.create();
       return item;
     });
@@ -278,12 +278,10 @@ export class GenerateInvoiceDraftCompensatoryEventsUsecase
           const apWaivers = item.assignedWaivers.filter(
             (w) => roundToHour(w.dateAssigned) <= date
           );
-          item.props.assignedCoupons = CouponAssignedCollection.create(
-            apCoupons
-          );
-          item.props.assignedWaivers = WaiverAssignedCollection.create(
-            apWaivers
-          );
+          item.props.assignedCoupons =
+            CouponAssignedCollection.create(apCoupons);
+          item.props.assignedWaivers =
+            WaiverAssignedCollection.create(apWaivers);
           return item;
         });
 

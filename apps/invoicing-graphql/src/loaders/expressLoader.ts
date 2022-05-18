@@ -20,6 +20,7 @@ import {
   GetInvoicePdfUsecase,
   GetRecentLogsUsecase,
   isAuthorizationError,
+  executionContext,
   AuditLogMap,
   CatalogMap,
   Roles,
@@ -142,12 +143,17 @@ export const expressLoader: MicroframeworkLoader = (
 
     app.use(express.json());
     app.use(corsMiddleware());
+    app.use(executionContext.expressMiddleware);
 
     app.get('/api/invoice/:payerId', async (req, res) => {
       const {
         repos,
-        services: { pdfGenerator, logger },
+        services: { pdfGenerator },
+        loggerBuilder,
       } = context;
+
+      const logger = loggerBuilder.getLogger(GetInvoicePdfUsecase.name);
+
       const authContext = { roles: [Roles.PAYER] };
 
       const usecase = new GetInvoicePdfUsecase(
@@ -189,8 +195,11 @@ export const expressLoader: MicroframeworkLoader = (
       const data: PayPalWebhookResponse<PayPalPaymentCapture> = req.body;
       const {
         repos: { payment },
-        services: { logger },
+        loggerBuilder,
       } = context;
+
+      const logger = loggerBuilder.getLogger('PayPalPaymentFinished');
+
       const authContext = { roles: [Roles.PAYER] };
       const usecase = new PayPalProcessFinishedUsecase(payment);
       const payPalOrderId = extractCaptureId(data.resource);
@@ -339,11 +348,9 @@ export const expressLoader: MicroframeworkLoader = (
         )
       ),
       async (req, res) => {
-        const {
-          repos,
-          services: { logger },
-          auditLoggerServiceProvider,
-        } = context;
+        const { repos, loggerBuilder, auditLoggerServiceProvider } = context;
+
+        const logger = loggerBuilder.getLogger('upload-csv');
 
         const authContext = { roles: extractRoles(req) };
 

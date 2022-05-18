@@ -1,4 +1,5 @@
 import { SubmissionQualityCheckPassed as SQCP } from '@hindawi/phenom-events';
+
 import {
   GetTransactionDetailsByManuscriptCustomIdUsecase,
   UpdateTransactionOnAcceptManuscriptUsecase,
@@ -39,10 +40,13 @@ export const SubmissionQualityCheckPassed: EventHandler<SQCP> = {
           payer: payerRepo,
           coupon: couponRepo,
         },
-        services: { waiverService, emailService, vatService, logger },
+        services: { waiverService, emailService, vatService },
+        loggerBuilder,
       } = context;
 
-      logger.setScope(`PhenomEvent:${SUBMISSION_QUALITY_CHECK_PASSED}`);
+      const logger = loggerBuilder.getLogger(
+        `PhenomEvent:${SUBMISSION_QUALITY_CHECK_PASSED}`
+      );
       logger.info('Incoming Event Data', data);
 
       const { submissionId, manuscripts, updated } = data;

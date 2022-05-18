@@ -1,11 +1,13 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
+import { Before, Given, When, Then } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { Given, When, Then, Before } from '@cucumber/cucumber';
 
-import { CatalogMap, MockLogger, MockCatalogRepo } from '@hindawi/shared';
-import { MockPublisherRepo } from '../../../../../libs/shared/src/lib/modules/publishers/repos/mocks/mockPublisherRepo';
-import { PublisherMap } from '../../../../../libs/shared/src/lib/modules/publishers/mappers/PublisherMap';
+import {
+  MockPublisherRepo,
+  MockLoggerBuilder,
+  MockCatalogRepo,
+  PublisherMap,
+  CatalogMap,
+} from '@hindawi/shared';
 
 import { Context } from '../../../src/builders';
 
@@ -14,7 +16,6 @@ import * as JournalAddedData from './JournalAdded.json';
 
 const { handler } = JournalAddedHandler;
 
-let mockLogger: MockLogger;
 let mockCatalogRepo: MockCatalogRepo;
 let mockPublisherRepo: MockPublisherRepo;
 
@@ -35,7 +36,6 @@ const defaultPublisher = {
 };
 
 Before({ tags: '@ValidateJournalAdded' }, () => {
-  mockLogger = new MockLogger();
   mockCatalogRepo = new MockCatalogRepo();
   mockPublisherRepo = new MockPublisherRepo();
 
@@ -52,9 +52,7 @@ Before({ tags: '@ValidateJournalAdded' }, () => {
       catalog: mockCatalogRepo,
       publisher: mockPublisherRepo,
     },
-    services: {
-      logger: mockLogger,
-    },
+    loggerBuilder: new MockLoggerBuilder(),
   };
 });
 

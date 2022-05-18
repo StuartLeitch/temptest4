@@ -46,7 +46,7 @@ import {
 import { VATService } from '../../../../domain/services/VATService';
 import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
 
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../infrastructure/logging';
 
 import { PayerType } from '../../../payers/domain/Payer';
 import { CouponRepoContract } from '../../../coupons/repos';
@@ -54,7 +54,8 @@ import { WaiverRepoContract } from '../../../waivers/repos';
 
 export class GetInvoicePdfUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   authorizationContext: Context;
 
   constructor(
@@ -111,16 +112,14 @@ export class GetInvoicePdfUsecase
     const pdfExecution = await new AsyncEither(null)
       .then(async () => payloadExecution)
       .then(this.generateThePdf)
-      .then(
-        async (stream): Promise<Either<UnexpectedError, Buffer>> => {
-          try {
-            const result = await streamToPromise(stream);
-            return right(result);
-          } catch (err) {
-            return left(new UnexpectedError(err));
-          }
+      .then(async (stream): Promise<Either<UnexpectedError, Buffer>> => {
+        try {
+          const result = await streamToPromise(stream);
+          return right(result);
+        } catch (err) {
+          return left(new UnexpectedError(err));
         }
-      )
+      })
       .execute();
 
     return this.addFileNameToResponse(payloadExecution, pdfExecution);

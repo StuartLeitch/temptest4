@@ -14,7 +14,7 @@ async function getBase64(url) {
   });
   return Buffer.from(response.data, 'binary').toString('base64');
 }
-import { LoggerContract } from '../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../infrastructure/logging';
 
 import { Article } from '../../../modules/manuscripts/domain/Article';
 import { Address } from '../../../modules/addresses/domain/Address';
@@ -54,7 +54,6 @@ export class PdfGeneratorService {
     const logoTermination = logoUrl.substring(logoUrl.length - 3);
     let imgType = 'png';
 
-    console.log(logoTermination);
     if (logoTermination === 'svg') {
       imgType = 'svg+xml';
     }

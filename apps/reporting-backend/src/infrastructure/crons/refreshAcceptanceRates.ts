@@ -1,9 +1,10 @@
 import Knex from 'knex';
-import { Logger } from 'libs/shared/src/lib/infrastructure/logging/implementations/Logger';
+import { Logger } from 'libs/shared/src/lib/infrastructure/logging/implementations/LoggerBuilder';
+import { LogLevel } from 'libs/shared/src/lib/infrastructure/logging';
 import { differenceInSeconds } from '../../utils/utils';
 import acceptanceRatesView from '../views/AcceptanceRatesView';
 
-const logger = new Logger(__filename);
+const logger = new Logger(LogLevel.Info, __filename);
 
 export async function refreshAcceptanceRates(knex: Knex) {
   const refreshStart = new Date();

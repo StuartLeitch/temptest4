@@ -28,23 +28,25 @@ RECORD_TYPE=invoice BATCH_SIZE=200 DELAY=200 NETSUITE_REALM=6416429_SB1 NETSUITE
 ## Data files mapping
 
 The script will lookup for a specific `.csv` file, following the next rules:
-* when `RECORD_TYPE=invoice` it will delete the ids from `data/Invoices.csv`
-* when `RECORD_TYPE=journalentry` it will delete the ids from `data/Journals.csv`
-* when `RECORD_TYPE=creditmemo` it will delete the ids from `data/CreditMemos.csv`
-* when `RECORD_TYPE=customer` it will delete the ids from `data/Customers.csv`
-* when `RECORD_TYPE=customerpayment` it will delete the ids from `data/Payments.csv`
+
+- when `RECORD_TYPE=invoice` it will delete the ids from `data/Invoices.csv`
+- when `RECORD_TYPE=journalentry` it will delete the ids from `data/Journals.csv`
+- when `RECORD_TYPE=creditmemo` it will delete the ids from `data/CreditMemos.csv`
+- when `RECORD_TYPE=customer` it will delete the ids from `data/Customers.csv`
+- when `RECORD_TYPE=customerpayment` it will delete the ids from `data/Payments.csv`
 
 ## Dockerization
 
 ```sh
-docker build -t 916437579680.dkr.ecr.eu-west-1.amazonaws.com/belzebuth-playground:netsuite-pacifier-0.7.0 -f Dockerfile .
+docker build -t 916437579680.dkr.ecr.eu-west-1.amazonaws.com/dragons-playground:netsuite-pacifier-0.7.0 -f Dockerfile .
 ```
 
 ```sh
-docker push 916437579680.dkr.ecr.eu-west-1.amazonaws.com/belzebuth-playground:netsuite-pacifier-0.7.0
+docker push 916437579680.dkr.ecr.eu-west-1.amazonaws.com/dragons-playground:netsuite-pacifier-0.7.0
 ```
 
 ## AWS Login
+
 ```sh
 aws --profile=HindawiDevelopment ecr get-login-password | docker login --username AWS --password-stdin 916437579680.dkr.ecr.eu-west-1.amazonaws.com
 ```

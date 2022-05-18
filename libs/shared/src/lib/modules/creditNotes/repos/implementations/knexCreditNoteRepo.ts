@@ -19,7 +19,8 @@ import { KnexArticleRepo } from '../../../manuscripts/repos';
 
 export class KnexCreditNoteRepo
   extends AbstractBaseDBRepo<Knex, CreditNote>
-  implements CreditNoteRepoContract {
+  implements CreditNoteRepoContract
+{
   constructor(
     protected db: Knex,
     private invoiceItemRepo: KnexInvoiceItemRepo,
@@ -131,7 +132,8 @@ export class KnexCreditNoteRepo
       'creditNote'
     );
 
-    const filterCreditNotesReadyForERP = this.filterCreditNotesReadyForErpRegistration();
+    const filterCreditNotesReadyForERP =
+      this.filterCreditNotesReadyForErpRegistration();
 
     const prepareIdsSQL = filterCreditNotesReadyForERP(
       withCreditNoteErpReference(erpReferenceQuery)
@@ -214,7 +216,8 @@ export class KnexCreditNoteRepo
   ): Promise<Either<GuardFailure | RepoError, CreditNote>> {
     const selectQuery = this.creditNoteAndArticleSelector();
     const withArticleQuery = this.articleRepo.articleInvoiceItemJoinQuery();
-    const withInvoiceItems = this.invoiceItemRepo.invoiceItemCreditNoteJoinQuery();
+    const withInvoiceItems =
+      this.invoiceItemRepo.invoiceItemCreditNoteJoinQuery();
     const creditNoteResult = selectQuery(withArticleQuery(withInvoiceItems))
       .where({ 'articles.customId': customId })
       .first();
@@ -306,7 +309,6 @@ export class KnexCreditNoteRepo
     const stream = query.stream({ objectMode: true }).pipe(extractCreditNoteId);
 
     for await (const a of stream) {
-      console.log('yield', a);
       yield a;
     }
   }

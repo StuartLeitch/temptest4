@@ -1,11 +1,9 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
 import {
   MicroframeworkSettings,
   MicroframeworkLoader,
 } from 'microframework-w3tec';
 
-import { EmptyErpService } from '../../../../libs/shared/src/lib/domain/services/ErpService';
+import { EmptyErpService } from '@hindawi/shared';
 
 import { ErpReferenceAttributesMapping } from './../services/erp/ReferenceAttributesMap';
 import { NetSuiteService } from '../services/erp';

@@ -13,10 +13,11 @@ export class RegisterRevenueRecognitionsCron {
     const cronFlags = CronFeatureFlagsReader.readAll();
     FeatureFlags.setFeatureFlags(cronFlags);
 
-    const {
-      services: { logger: loggerService },
-    } = context;
-    loggerService.setScope('cron:registerRevenueRecognition');
+    const { loggerBuilder } = context;
+
+    const loggerService = loggerBuilder.getLogger(
+      'cron:registerRevenueRecognition'
+    );
 
     if (
       !FeatureFlags.isFeatureEnabled('erpRegisterRevenueRecognitionEnabled')
@@ -43,26 +44,27 @@ export class RegisterRevenueRecognitionsCron {
       services: { erp },
     } = context;
 
-    const retryRevenueRecognizedInvoicesToNetsuiteErpUsecase = new RetryRevenueRecognitionNetsuiteErpInvoicesUsecase(
-      invoice,
-      invoiceItem,
-      coupon,
-      waiver,
-      payer,
-      address,
-      manuscript,
-      catalog,
-      publisher,
-      erpReference,
-      creditNote,
-      erp?.netsuite || null,
-      loggerService
-    );
+    const retryRevenueRecognizedInvoicesToNetsuiteErpUsecase =
+      new RetryRevenueRecognitionNetsuiteErpInvoicesUsecase(
+        invoice,
+        invoiceItem,
+        coupon,
+        waiver,
+        payer,
+        address,
+        manuscript,
+        catalog,
+        publisher,
+        erpReference,
+        creditNote,
+        erp?.netsuite || null,
+        loggerService
+      );
 
-    const maybeResponse = await retryRevenueRecognizedInvoicesToNetsuiteErpUsecase.execute(
-      null,
-      { roles: [Roles.CHRON_JOB] }
-    );
+    const maybeResponse =
+      await retryRevenueRecognizedInvoicesToNetsuiteErpUsecase.execute(null, {
+        roles: [Roles.CHRON_JOB],
+      });
     if (maybeResponse.isLeft()) {
       loggerService.error(maybeResponse.value.message);
       throw maybeResponse.value;

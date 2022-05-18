@@ -17,8 +17,13 @@ export const reminders: Resolvers<Context> = {
       const { invoiceId } = args;
       const {
         repos: { invoice, pausedReminder },
-        services: { logger: loggerService },
+        loggerBuilder,
       } = context;
+
+      const loggerService = loggerBuilder.getLogger(
+        GetRemindersPauseStateForInvoiceUsecase.name
+      );
+
       const usecaseContext = {
         roles,
       };
@@ -47,8 +52,13 @@ export const reminders: Resolvers<Context> = {
       const { invoiceId } = args;
       const {
         repos: { invoice, sentNotifications },
-        services: { logger: loggerService },
+        loggerBuilder,
       } = context;
+
+      const loggerService = loggerBuilder.getLogger(
+        GetSentNotificationForInvoiceUsecase.name
+      );
+
       const usecaseContext = {
         roles,
       };
@@ -72,7 +82,7 @@ export const reminders: Resolvers<Context> = {
       }
 
       return maybeSentNotifications.value.map((reminder) => ({
-        type: (reminder.type as unknown) as ReminderType,
+        type: reminder.type as unknown as ReminderType,
         forInvoice: reminder.invoiceId.id.toString(),
         toEmail: reminder.recipientEmail,
         when: reminder.dateSent,
@@ -85,8 +95,12 @@ export const reminders: Resolvers<Context> = {
       const { invoiceId, state } = args;
       const {
         repos: { invoice, pausedReminder },
-        services: { logger: loggerService },
+        loggerBuilder,
       } = context;
+
+      const loggerService = loggerBuilder.getLogger(
+        GetRemindersPauseStateForInvoiceUsecase.name
+      );
 
       const usecaseContext = {
         roles,
@@ -124,8 +138,12 @@ export const reminders: Resolvers<Context> = {
       const { invoiceId, state } = args;
       const {
         repos: { invoice, pausedReminder },
-        services: { logger: loggerService },
+        loggerBuilder,
       } = context;
+
+      const loggerService = loggerBuilder.getLogger(
+        GetRemindersPauseStateForInvoiceUsecase.name
+      );
 
       const usecaseContext = {
         roles,

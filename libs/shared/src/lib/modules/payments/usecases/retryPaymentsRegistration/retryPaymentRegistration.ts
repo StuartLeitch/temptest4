@@ -6,12 +6,11 @@ import type { UsecaseAuthorizationContext as Context } from '../../../../domain/
 import {
   AccessControlledUsecase,
   AccessControlContext,
-  Authorize,
 } from '../../../../domain/authorization';
 
 import { ErrorUtils } from '../../../../utils/ErrorUtils';
 
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../infrastructure/logging';
 
 import {
   RegisterPaymentResponse,
@@ -37,7 +36,8 @@ import { RetryPaymentsRegistrationToErpDTO as DTO } from './retryPaymentRegistra
 
 export class RetryPaymentsRegistrationToErpUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   private publishPaymentToErpUsecase: PublishPaymentToErpUsecase;
   constructor(
     private invoiceRepo: InvoiceRepoContract,
@@ -90,12 +90,13 @@ export class RetryPaymentsRegistrationToErpUsecase
       const errs = [];
 
       for (const paymentId of paymentIds) {
-        const publishedPaymentResponse = await this.publishPaymentToErpUsecase.execute(
-          {
-            paymentId: paymentId.id.toString(),
-          },
-          context
-        );
+        const publishedPaymentResponse =
+          await this.publishPaymentToErpUsecase.execute(
+            {
+              paymentId: paymentId.id.toString(),
+            },
+            context
+          );
         if (publishedPaymentResponse.isLeft()) {
           errs.push(publishedPaymentResponse.value);
         } else {

@@ -26,7 +26,8 @@ import * as Errors from './getItemsForInvoiceErrors';
 
 export class GetItemsForInvoiceUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
     private couponRepo: CouponRepoContract,
@@ -75,7 +76,6 @@ export class GetItemsForInvoiceUsecase
           item.addAssignedWaivers(maybeWaivers.value);
         }
       } catch (err) {
-        console.log(err);
         return left(new Errors.InvoiceNotFoundError(invoiceId.id.toString()));
       }
 

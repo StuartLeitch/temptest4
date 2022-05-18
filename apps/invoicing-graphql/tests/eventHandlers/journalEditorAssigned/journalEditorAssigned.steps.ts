@@ -1,23 +1,19 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-/* eslint-disable max-len */
-
+import { Before, After, Given, When, Then } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
 import {
+  MockLoggerBuilder,
   EditorCollection,
-  EditorMap,
-  CatalogMap,
-  MockLogger,
-  MockEditorRepo,
   MockCatalogRepo,
+  MockEditorRepo,
+  CatalogMap,
+  EditorMap,
 } from '@hindawi/shared';
 
 import { Context } from '../../../src/builders';
 
 import { JournalEditorAssignedHandler } from '../../../src/queue_service/handlers/JournalEditorAssigned';
 
-let mockLogger: MockLogger;
 let mockEditorRepo: MockEditorRepo;
 let mockCatalogRepo: MockCatalogRepo;
 
@@ -54,7 +50,6 @@ async function generateMockEditor(editorsLength: number) {
 const { handler } = JournalEditorAssignedHandler;
 
 Before({ tags: '@ValidateJournalEditorAssigned' }, function () {
-  mockLogger = new MockLogger();
   mockEditorRepo = new MockEditorRepo();
   mockCatalogRepo = new MockCatalogRepo();
 
@@ -63,9 +58,7 @@ Before({ tags: '@ValidateJournalEditorAssigned' }, function () {
       editor: mockEditorRepo,
       catalog: mockCatalogRepo,
     },
-    services: {
-      logger: mockLogger,
-    },
+    loggerBuilder: new MockLoggerBuilder(),
   };
 });
 
@@ -121,7 +114,8 @@ When('"JournalEditorAssigned" event is being published', async function () {
 Then(
   /^The journal "([\w-]+)" should have only (\d+) editors assigned$/,
   async (eventJournalId: string, expectedEditorsLeft: number) => {
-    const editorCollectionAfter: EditorCollection = await mockEditorRepo.getEditorCollection();
+    const editorCollectionAfter: EditorCollection =
+      await mockEditorRepo.getEditorCollection();
     expect(editorCollectionAfter.length).to.equal(+expectedEditorsLeft);
   }
 );

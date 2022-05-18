@@ -13,7 +13,7 @@ import {
   Authorize,
 } from '../../../../domain/authorization';
 
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../infrastructure/logging';
 
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 
@@ -27,7 +27,8 @@ import * as Errors from './getPayerDetailsByInvoiceIdErrors';
 
 export class GetPayerDetailsByInvoiceIdUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private payerRepo: PayerRepoContract,
     private loggerService: LoggerContract

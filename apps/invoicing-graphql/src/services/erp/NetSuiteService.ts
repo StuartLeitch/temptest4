@@ -63,15 +63,14 @@ export class NetSuiteService implements ErpServiceContract {
     customUniquePaymentReference: string,
     taxDetailsUkStandard: ErpTaxDetails,
     taxDetailsUkZero: ErpTaxDetails,
-    paymentAccountCodes: PaymentAccountCodes,
+    paymentAccountCodes: PaymentAccountCodes
   ): NetSuiteService {
     const { connection: configConnection, referenceMappings } = config;
     const connection = new Connection({
       config: new ConnectionConfig(configConnection),
     });
 
-    const logger = loggerBuilder.getLogger();
-    logger.setScope('NetSuiteService');
+    const logger = loggerBuilder.getLogger('NetSuiteService');
 
     const service = new NetSuiteService(
       connection,
@@ -91,7 +90,7 @@ export class NetSuiteService implements ErpServiceContract {
   public async registerInvoice(
     data: ErpInvoiceRequest
   ): Promise<ErpInvoiceResponse> {
-    this.logger.info({
+    this.logger.info('New Erp request', {
       message: 'New Erp request',
       request: data,
     });
@@ -155,15 +154,14 @@ export class NetSuiteService implements ErpServiceContract {
       },
     } = data;
 
-    const revenueRecognitionReversal = await this.createRevenueRecognitionReversal(
-      {
+    const revenueRecognitionReversal =
+      await this.createRevenueRecognitionReversal({
         ...data,
         creditAccountId,
         customSegmentId,
         debitAccountId,
         creditAccountIdForCascaded,
-      }
-    );
+      });
 
     return {
       journal: { id: String(revenueRecognitionReversal) },
@@ -223,7 +221,7 @@ export class NetSuiteService implements ErpServiceContract {
     );
 
     if (customerAlreadyExists) {
-      this.logger.info({
+      this.logger.info('Reusing customer', {
         message: 'Reusing customer',
         payer,
         manuscript,
@@ -232,7 +230,7 @@ export class NetSuiteService implements ErpServiceContract {
       customerId = customerAlreadyExists.id;
     } else {
       customerId = await this.createCustomer(data);
-      this.logger.info({
+      this.logger.info('Newly created customer', {
         message: 'Newly created customer',
         customerId,
       });
@@ -266,7 +264,7 @@ export class NetSuiteService implements ErpServiceContract {
       q: query.toQuery(),
     };
 
-    this.logger.debug({
+    this.logger.debug('Query builder for get customer', {
       message: 'Query builder for get customer',
       request: queryCustomerRequest,
     });
@@ -284,7 +282,7 @@ export class NetSuiteService implements ErpServiceContract {
       return res?.data?.items?.pop();
     } catch (err) {
       this.logger.error(err?.request?.data);
-      this.logger.error({
+      this.logger.error('Failed to fetch customer', {
         message: 'Failed to fetch customer',
         response: JSON.stringify(err?.response?.data, null, 2),
         request: queryCustomerRequestOpts,
@@ -309,7 +307,7 @@ export class NetSuiteService implements ErpServiceContract {
 
     const createCustomerPayload = this.getCustomerPayload(payer, manuscript);
 
-    this.logger.info({
+    this.logger.info('Creating customer netsuite', {
       message: 'Creating customer netsuite',
       request: createCustomerPayload,
     });
@@ -326,7 +324,7 @@ export class NetSuiteService implements ErpServiceContract {
       newCustomerId = res?.headers?.location?.split('/').pop();
       return newCustomerId;
     } catch (err) {
-      this.logger.error({
+      this.logger.error('Failed to create customer', {
         message: 'Failed to create customer',
         response: JSON.stringify(err?.response?.data, null, 2),
         request: createCustomerPayload,
@@ -427,7 +425,7 @@ export class NetSuiteService implements ErpServiceContract {
 
       return res?.headers?.location?.split('/').pop();
     } catch (err) {
-      this.logger.error({
+      this.logger.error('Failed to create invoice', {
         message: 'Failed to create invoice',
         response: JSON.stringify(err?.response?.data, null, 2),
         request: createInvoicePayload,
@@ -457,9 +455,9 @@ export class NetSuiteService implements ErpServiceContract {
       .find(Boolean);
 
     if (nsErpReference?.value === 'NON_INVOICEABLE') {
-      this.logger.warn({
-        message: `Payment in NetSuite cancelled for "NON_INVOICEABLE" Invoice ${invoice.id.toString()}.`,
-      });
+      this.logger.warn(
+        `Payment in NetSuite cancelled for "NON_INVOICEABLE" Invoice ${invoice.id.toString()}.`
+      );
       return;
     }
 
@@ -472,7 +470,7 @@ export class NetSuiteService implements ErpServiceContract {
       pm.id.equals(payment.paymentMethodId.id)
     );
 
-    let refName = `${invoice.id}/${payment.foreignPaymentId}`;
+    const refName = `${invoice.id}/${payment.foreignPaymentId}`;
 
     const paymentAlreadyExists = await this.checkCustomerPaymentExists(refName);
     if (paymentAlreadyExists.alreadyExists) {
@@ -493,8 +491,8 @@ export class NetSuiteService implements ErpServiceContract {
       },
       // Invoice reference number,
       refName: `Invoice #${invoice.persistentReferenceNumber}`,
-      [this
-        .customExternalPaymentReference]: payment.foreignPaymentId.toString(),
+      [this.customExternalPaymentReference]:
+        payment.foreignPaymentId.toString(),
       [this.customUniquePaymentReference]: refName,
       // Original amount,
       total,
@@ -502,7 +500,7 @@ export class NetSuiteService implements ErpServiceContract {
       payment: payment.amount.value,
     };
 
-    this.logger.info({
+    this.logger.info('createPaymentPayload', {
       createPaymentPayload,
     });
 
@@ -515,7 +513,7 @@ export class NetSuiteService implements ErpServiceContract {
 
       return res?.headers?.location?.split('/').pop();
     } catch (err) {
-      this.logger.error({
+      this.logger.error('Failed to create payment', {
         message: 'Failed to create payment',
         response: JSON.stringify(err?.response?.data, null, 2),
       });
@@ -597,7 +595,7 @@ export class NetSuiteService implements ErpServiceContract {
 
       return journalId;
     } catch (err) {
-      this.logger.error({
+      this.logger.error('Failed to create revenue recognition', {
         message: 'Failed to create revenue recognition',
         response: JSON.stringify(err?.response?.data, null, 2),
         request: createJournalPayload,
@@ -679,7 +677,7 @@ export class NetSuiteService implements ErpServiceContract {
       return journalId;
     } catch (err) {
       // console.error(err);
-      this.logger.error({
+      this.logger.error('Failed to revenue recognition reversal', {
         message: 'Failed to revenue recognition reversal',
         response: JSON.stringify(err?.response?.data, null, 2),
         requestOptions: journalRequestOpts,
@@ -709,9 +707,9 @@ export class NetSuiteService implements ErpServiceContract {
       .find(Boolean);
 
     if (originalNSErpReference.value === 'NON_INVOICEABLE') {
-      this.logger.warn({
-        message: `CreditNote in NetSuite cancelled for "NON_INVOICEABLE" Invoice ${invoice.id.toString()}.`,
-      });
+      this.logger.warn(
+        `CreditNote in NetSuite cancelled for "NON_INVOICEABLE" Invoice ${invoice.id.toString()}.`
+      );
       return;
     }
 
@@ -720,12 +718,12 @@ export class NetSuiteService implements ErpServiceContract {
       return this.registerBadDebt(data as any);
     }
 
-    let creditNoteTransformOpts = {
+    const creditNoteTransformOpts = {
       url: `${config.endpoint}record/v1/invoice/${originalNSErpReference.value}/!transform/creditmemo`,
       method: 'POST',
     };
 
-    let creditNotePayload: Record<string, any> = {
+    const creditNotePayload: Record<string, any> = {
       tranDate: format(
         new Date(creditNote.dateIssued),
         "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"
@@ -747,7 +745,7 @@ export class NetSuiteService implements ErpServiceContract {
 
       return res?.headers?.location?.split('/').pop();
     } catch (err) {
-      this.logger.error({
+      this.logger.error('Failed to create credit note', {
         message: 'Failed to create credit note',
         response: JSON.stringify(err?.response?.data, null, 2),
         requestOptions: creditNoteTransformOpts,
@@ -842,7 +840,7 @@ export class NetSuiteService implements ErpServiceContract {
 
       return res?.headers?.location?.split('/').pop();
     } catch (err) {
-      this.logger.error({
+      this.logger.error('Failed to create credit note', {
         message: 'Failed to create credit note',
         response: JSON.stringify(err?.response?.data, null, 2),
         requestOptions: creditNoteTransformOpts,
@@ -907,7 +905,7 @@ export class NetSuiteService implements ErpServiceContract {
 
       return res?.headers?.location?.split('/').pop();
     } catch (err) {
-      this.logger.error({
+      this.logger.error('Failed to update credit note', {
         message: 'Failed to update credit note',
         response: JSON.stringify(err?.response?.data, null, 2),
         request: patchCreditNotePayload,
@@ -930,16 +928,18 @@ export class NetSuiteService implements ErpServiceContract {
 
     const keep = ` ${manuscript.customId.toString()}`;
 
-    let [firstName, ...lastNames] = payer?.name.toString().split(' ');
+    const [firstName, ...lastNames] = payer?.name.toString().split(' ');
 
-    lastNames = lastNames.map((n) => n.trim()).filter((n) => n?.length !== 0);
+    const lastNamesTrimmed = lastNames
+      .map((n) => n.trim())
+      .filter((n) => n?.length !== 0);
 
     let sendingName = '';
 
     if (payer.type === 'INSTITUTION') {
       sendingName = payer?.organization.toString();
     } else {
-      sendingName = firstName.concat(' ', lastNames.join(' '));
+      sendingName = firstName.concat(' ', lastNamesTrimmed.join(' '));
     }
 
     const cpy = sendingName;
@@ -962,7 +962,7 @@ export class NetSuiteService implements ErpServiceContract {
       connection: { config, oauth, token },
     } = this;
 
-    let invoiceExistsRequestOpts = {
+    const invoiceExistsRequestOpts = {
       url: `${config.endpoint}record/v1/invoice/${invoiceErpReference}`,
       method: 'GET',
     };
@@ -982,11 +982,18 @@ export class NetSuiteService implements ErpServiceContract {
       );
       return invoiceExists;
     } catch (err) {
-      this.logger.error({
-        message: `Error checking if invoice is already registered in NetSuite.`,
-        response: JSON.stringify(err?.response?.data['o:errorDetails'], null, 2),
-        error: err,
-      });
+      this.logger.error(
+        `Error checking if invoice is already registered in NetSuite.`,
+        {
+          message: `Error checking if invoice is already registered in NetSuite.`,
+          response: JSON.stringify(
+            err?.response?.data['o:errorDetails'],
+            null,
+            2
+          ),
+          error: err,
+        }
+      );
     }
   }
 
@@ -996,7 +1003,7 @@ export class NetSuiteService implements ErpServiceContract {
       customUniquePaymentReference,
     } = this;
 
-    let recordExistsRequestOpts = {
+    const recordExistsRequestOpts = {
       url: `${config.endpoint}query/v1/suiteql`,
       method: 'POST',
     };
@@ -1013,7 +1020,7 @@ export class NetSuiteService implements ErpServiceContract {
       );
     }
 
-    this.logger.debug({
+    this.logger.debug('Query builder for checking against payments', {
       message: 'Query builder for checking against payments',
       request: query.toQuery(),
     });
@@ -1039,10 +1046,17 @@ export class NetSuiteService implements ErpServiceContract {
         };
       }
     } catch (err) {
-      this.logger.warn({
-        message: `Error checking if customer payment is already registered in NetSuite.`,
-        response: JSON.stringify(err?.response?.data['o:errorDetails'], null, 2),
-      });
+      this.logger.warn(
+        `Error checking if customer payment is already registered in NetSuite.`,
+        {
+          message: `Error checking if customer payment is already registered in NetSuite.`,
+          response: JSON.stringify(
+            err?.response?.data['o:errorDetails'],
+            null,
+            2
+          ),
+        }
+      );
     }
   }
 
@@ -1061,14 +1075,14 @@ export class NetSuiteService implements ErpServiceContract {
     };
 
     const queryBuilder = knex({ client: 'pg' });
-    let query = queryBuilder.raw(
+    const query = queryBuilder.raw(
       `SELECT * FROM transaction WHERE recordtype = 'journalentry' AND tranid = 'Article ${manuscriptCustomId} - Invoice ${invoiceRefNumber}'`
     );
 
     const revenueRecognitionRequest = {
       q: query.toQuery(),
     };
-    this.logger.debug({
+    this.logger.debug('Query builder for get revenue recognition', {
       message: 'Query builder for get revenue recognition',
       request: revenueRecognitionRequest,
     });
@@ -1090,7 +1104,7 @@ export class NetSuiteService implements ErpServiceContract {
         return { count: res.data.count, id: res.data.items[0].id };
       }
     } catch (err) {
-      this.logger.error({
+      this.logger.error('No Revenue Recognition found.', {
         message: 'No Revenue Recognition found.',
         response: JSON.stringify(err?.response?.data, null, 2),
       });

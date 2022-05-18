@@ -15,7 +15,7 @@ import {
 import { InvoiceReminderPayload } from '../../../../infrastructure/message-queues/payloads';
 import { SchedulerContract } from '../../../../infrastructure/scheduler/Scheduler';
 import { EmailService } from '../../../../infrastructure/communication-channels';
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../infrastructure/logging';
 import {
   SisifJobTypes,
   JobBuilder,
@@ -62,7 +62,8 @@ interface CompoundDTO extends DTO {
 
 export class SendInvoiceConfirmationReminderUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private sentNotificationRepo: SentNotificationRepoContract,
     private pausedReminderRepo: PausedReminderRepoContract,
@@ -76,9 +77,8 @@ export class SendInvoiceConfirmationReminderUsecase
   ) {
     super();
 
-    this.getConfirmationNotificationsSent = this.getConfirmationNotificationsSent.bind(
-      this
-    );
+    this.getConfirmationNotificationsSent =
+      this.getConfirmationNotificationsSent.bind(this);
     this.noReminderSentRecently = this.noReminderSentRecently.bind(this);
     this.getManuscriptCustomId = this.getManuscriptCustomId.bind(this);
     this.shouldSendReminder = this.shouldSendReminder.bind(this);

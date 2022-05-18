@@ -1,5 +1,4 @@
 export * from './AggregateRoot';
-export * from './CorrelationID';
 export * from './Entity';
 export * from './Flow';
 export * from './Identifier';

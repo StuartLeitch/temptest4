@@ -1,11 +1,10 @@
 import { JobData } from '@hindawi/sisif';
-
-import { Logger } from '../../lib/logger';
+import { LoggerContract } from '@hindawi/shared';
 
 export const emptyHandler = (
   payload: JobData,
   appContext: any,
-  logger: Logger
+  logger: LoggerContract
 ) => {
   throw Error(`Unhandled job type.`);
 };

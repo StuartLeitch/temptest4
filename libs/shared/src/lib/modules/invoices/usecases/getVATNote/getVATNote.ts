@@ -28,7 +28,8 @@ import * as Errors from './getVATNoteErrors';
 
 export class GetVATNoteUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private payerRepo: PayerRepoContract,
     private addressRepo: AddressRepoContract,
@@ -51,7 +52,6 @@ export class GetVATNoteUsecase
         }
         payer = maybePayer.value;
       } catch (err) {
-        console.log(err);
         return left(new Errors.PayerNotFoundError(invoiceId.id.toString()));
       }
 

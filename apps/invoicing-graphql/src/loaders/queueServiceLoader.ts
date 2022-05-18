@@ -3,8 +3,12 @@ import {
   MicroframeworkLoader,
 } from 'microframework-w3tec';
 
-import { env } from '../env';
+import { executionContext } from '@hindawi/shared';
+
 import { Context } from '../builders';
+
+import { env } from '../env';
+
 import * as eventHandlers from '../queue_service/handlers';
 
 export const queueServiceLoader: MicroframeworkLoader = async (
@@ -13,7 +17,7 @@ export const queueServiceLoader: MicroframeworkLoader = async (
   if (settings && env.aws.enabled) {
     const context: Context = settings.getData('context');
 
-    const queue = context?.services?.qq;
+    const queue = context?.services?.queue;
 
     if (queue) {
       Object.keys(eventHandlers).forEach((eventHandler: string) => {
@@ -21,7 +25,7 @@ export const queueServiceLoader: MicroframeworkLoader = async (
 
         queue.registerEventHandler({
           event,
-          handler: handler(context),
+          handler: executionContext.wrapQueueHandler(handler(context)),
         });
       });
       queue.start();

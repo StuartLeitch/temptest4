@@ -15,11 +15,12 @@ import { ArticleMap } from '../../mappers/ArticleMap';
 
 import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
 import { ArticleRepoContract } from '../articleRepo';
-import Knex from "knex";
+import Knex from 'knex';
 
 export class KnexArticleRepo
   extends AbstractBaseDBRepo<Knex, Article | Manuscript>
-  implements ArticleRepoContract {
+  implements ArticleRepoContract
+{
   constructor(
     protected db: Knex,
     protected logger?: any,
@@ -51,9 +52,6 @@ export class KnexArticleRepo
   ): Promise<Either<GuardFailure | RepoError, Article | Manuscript>> {
     const { db, logger } = this;
 
-    const correlationId =
-      'correlationId' in this ? (this as any).correlationId : null;
-
     const articleDataQuery = db(TABLES.ARTICLES)
       .select()
       .where(
@@ -63,7 +61,6 @@ export class KnexArticleRepo
       .first();
 
     logger.debug('select', {
-      correlationId,
       sql: articleDataQuery.toString(),
     });
 
@@ -99,18 +96,14 @@ export class KnexArticleRepo
     invoiceId: InvoiceId
   ): Promise<Either<GuardFailure | RepoError, Article | Manuscript>> {
     const { logger } = this;
-    const correlationId =
-      'correlationId' in this ? (this as any).correlationId : null;
 
     const detailsQuery = this.createInvoiceDetailsQuery();
 
-    const filterInvoicesById: any = this.invoiceRepo.filterByInvoiceId(
-      invoiceId
-    );
+    const filterInvoicesById: any =
+      this.invoiceRepo.filterByInvoiceId(invoiceId);
     const sql = filterInvoicesById(detailsQuery);
 
     logger.debug('select', {
-      correlationId,
       sql: sql.toString(),
     });
 

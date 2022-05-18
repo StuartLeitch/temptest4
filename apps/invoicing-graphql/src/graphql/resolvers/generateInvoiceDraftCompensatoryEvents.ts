@@ -15,8 +15,13 @@ export const generateInvoiceDraftCompensatoryEvents: Resolvers<Context> = {
       const { invoiceIds, journalIds } = args;
       const {
         repos: { invoiceItem, manuscript, invoice, coupon, waiver },
-        services: { logger: loggerService, qq: sqsQueService },
+        services: { queue: sqsQueService },
+        loggerBuilder,
       } = context;
+
+      const loggerService = loggerBuilder.getLogger(
+        GenerateInvoiceDraftCompensatoryEventsUsecase.name
+      );
 
       const usecaseContext = {
         roles,
@@ -65,7 +70,6 @@ export const generateInvoiceDraftCompensatoryEvents: Resolvers<Context> = {
         throw errors;
       }
 
-      console.log('finish regeneration');
       loggerService.debug('Finish Regeneration');
       return 'ok';
     },

@@ -13,7 +13,7 @@ import {
   Authorize,
 } from '../../../../domain/authorization';
 
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../infrastructure/logging';
 
 import { SanctionedCountryPolicy } from '../../../../domain/reductions/policies/SanctionedCountryPolicy';
 import { PoliciesRegister } from '../../../../domain/reductions/policies/PoliciesRegister';
@@ -59,7 +59,8 @@ interface PayerDataDomain {
 
 export class ConfirmInvoiceUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   receiverEmail: string;
   senderEmail: string;
 
@@ -152,7 +153,8 @@ export class ConfirmInvoiceUsecase
         if (this.isFromSanctionedCountry(address) && invoice.invoiceTotal > 0) {
           return right(payerData);
         }
-        const lastInvoiceNumber = await this.invoiceRepo.getCurrentInvoiceNumber();
+        const lastInvoiceNumber =
+          await this.invoiceRepo.getCurrentInvoiceNumber();
         invoice.assignInvoiceNumber(lastInvoiceNumber);
         const maybeUpdated = await this.invoiceRepo.update(invoice);
 
@@ -352,9 +354,9 @@ export class ConfirmInvoiceUsecase
         addressId: payerData.address.addressId.id.toString(),
       };
 
-      return (
-        await createPayerUseCase.execute(payerDTO, context)
-      ).map((payerResult) => ({ ...payerData, payer: payerResult }));
+      return (await createPayerUseCase.execute(payerDTO, context)).map(
+        (payerResult) => ({ ...payerData, payer: payerResult })
+      );
     };
   }
 

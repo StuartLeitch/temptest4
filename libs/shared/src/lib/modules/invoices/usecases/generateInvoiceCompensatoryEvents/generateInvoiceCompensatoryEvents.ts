@@ -1,6 +1,6 @@
 // * Core Domain
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { Either, right, left } from '../../../../core/logic/Either';
+import { LoggerContract } from '../../../../infrastructure/logging';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
@@ -79,7 +79,8 @@ function originalInvoiceId(invoice: Invoice): string {
 
 export class GenerateInvoiceCompensatoryEventsUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private paymentMethodRepo: PaymentMethodRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,

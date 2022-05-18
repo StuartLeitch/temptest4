@@ -18,8 +18,11 @@ export async function pauseOrResumeConfirmation(
 ) {
   const {
     repos: { pausedReminder, invoiceItem, transaction, manuscript, invoice },
-    services: { logger: loggerService, schedulingService },
+    services: { schedulingService },
+    loggerBuilder,
   } = context;
+
+  const loggerService = loggerBuilder.getLogger('pauseOrResumeConfirmation');
 
   if (state == true) {
     const pauseUsecase = new PauseInvoiceConfirmationRemindersUsecase(
@@ -62,8 +65,11 @@ export async function pauseOrResumePayment(
 ) {
   const {
     repos: { pausedReminder, transaction, invoice, payer },
-    services: { logger: loggerService, schedulingService },
+    services: { schedulingService },
+    loggerBuilder,
   } = context;
+
+  const loggerService = loggerBuilder.getLogger('pauseOrResumePayment');
 
   if (state == true) {
     const pauseUsecase = new PauseInvoicePaymentRemindersUsecase(

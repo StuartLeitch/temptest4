@@ -1,4 +1,4 @@
-import { LoggerContract } from './../infrastructure/logging/Logger';
+import { LoggerContract } from './../infrastructure/logging';
 
 export class ErrorUtils {
   public static handleErpErrors(

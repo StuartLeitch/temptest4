@@ -4,7 +4,7 @@ import { Roles } from '../../../domain/authorization';
 
 import { PayloadBuilder } from '../../../infrastructure/message-queues/payloadBuilder';
 import { SchedulerContract } from '../../../infrastructure/scheduler/Scheduler';
-import { LoggerContract } from '../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../infrastructure/logging';
 import {
   SisifJobTypes,
   JobBuilder,

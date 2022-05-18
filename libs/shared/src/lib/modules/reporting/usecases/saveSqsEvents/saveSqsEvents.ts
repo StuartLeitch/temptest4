@@ -5,7 +5,7 @@ import { right } from '../../../../core/logic/Either';
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
 
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../infrastructure/logging/';
 
 import { FilterEventsService } from '../../services/FilterEventsService';
 

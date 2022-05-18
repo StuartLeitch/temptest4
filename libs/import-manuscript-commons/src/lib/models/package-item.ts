@@ -66,7 +66,6 @@ export class PackageItem extends ValueObject<PackageItemProps> {
     const nullResult = Guard.againstNullOrUndefinedBulk(guardArgs);
 
     if (nullResult.failed) {
-      console.log(JSON.stringify(props));
       throw nullResult;
     }
 

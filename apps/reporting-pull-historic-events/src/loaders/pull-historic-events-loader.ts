@@ -11,7 +11,7 @@ import { ConsumerTransport } from '../contants';
 import { env } from '../env';
 // import { Logger } from '../lib/logger';
 
-import { LoggerBuilder } from '@hindawi/shared';
+import { LoggerBuilder, LogLevel } from '@hindawi/shared';
 import {
   Event,
   FileResumeService,
@@ -45,7 +45,7 @@ export const pullHistoricEventsLoader: MicroframeworkLoader = async (
     s3Config.bucketName,
     fsResumeService
   );
-  const loggerBuilder = new LoggerBuilder();
+  const loggerBuilder = new LoggerBuilder(LogLevel.Info);
 
   let consumer;
   switch (env.consumerTransport) {
@@ -65,8 +65,9 @@ export const pullHistoricEventsLoader: MicroframeworkLoader = async (
         settings.onShutdown(() => knex.destroy());
       }
 
-      const filterEventsServiceLogger = loggerBuilder.getLogger();
-      filterEventsServiceLogger.setScope('service:FilterEvents');
+      const filterEventsServiceLogger = loggerBuilder.getLogger(
+        'service:FilterEvents'
+      );
 
       const filterEventsService = new FilterEventsService(
         s3,
@@ -76,8 +77,10 @@ export const pullHistoricEventsLoader: MicroframeworkLoader = async (
       const registry = defaultRegistry;
       const eventsRepo = new KnexEventsRepo(knex);
       const saveEventsUsecase = new SaveEventsUsecase(eventsRepo, registry);
-      const saveSqsEventsLogger = loggerBuilder.getLogger();
-      saveSqsEventsLogger.setScope('saveSqsEvents:usecase');
+      const saveSqsEventsLogger = loggerBuilder.getLogger(
+        'saveSqsEvents:usecase'
+      );
+
       const saveSqsEventsUsecase = new SaveSqsEventsUsecase(
         filterEventsService,
         saveEventsUsecase,
@@ -86,8 +89,8 @@ export const pullHistoricEventsLoader: MicroframeworkLoader = async (
       consumer = new UsecasePublishConsumer<any>(saveSqsEventsUsecase); // saveSqsEventsUsecase support both EveEvent and SqsEvent
       break;
     case ConsumerTransport.HTTP:
-      const publisherHttpLogger = loggerBuilder.getLogger();
-      publisherHttpLogger.setScope('publisher:http');
+      const publisherHttpLogger = loggerBuilder.getLogger('publisher:http');
+
       consumer = new HttpPublishConsumer(
         env.consumerHttp.host,
         env.consumerHttp.token,
@@ -107,8 +110,8 @@ export const pullHistoricEventsLoader: MicroframeworkLoader = async (
       consumer = new SqsPublishConsumer<Event>(sqs, sqsConfig.queueName);
       break;
     case ConsumerTransport.Counter:
-      const consumerCounterLogger = loggerBuilder.getLogger();
-      consumerCounterLogger.setScope('consumer:counter');
+      const consumerCounterLogger = loggerBuilder.getLogger('consumer:counter');
+
       consumer = new CounterConsumer<Event>(consumerCounterLogger);
       break;
     default:

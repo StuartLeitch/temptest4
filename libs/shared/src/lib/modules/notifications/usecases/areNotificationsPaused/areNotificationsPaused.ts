@@ -19,7 +19,7 @@ import { NotificationType } from '../../domain/Notification';
 
 import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
 
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../infrastructure/logging';
 
 // * Usecase specific
 import { AreNotificationsPausedResponse as Response } from './areNotificationsPausedResponse';
@@ -39,7 +39,8 @@ const notificationTypeToPause: TypeToPauseMap = {
 
 export class AreNotificationsPausedUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
     private loggerService: LoggerContract

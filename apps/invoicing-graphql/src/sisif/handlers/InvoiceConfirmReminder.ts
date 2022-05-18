@@ -1,19 +1,19 @@
 import { JobData } from '@hindawi/sisif';
+
 import {
   SendInvoiceConfirmationReminderUsecase,
   SendInvoiceConfirmationReminderDTO,
+  LoggerContract,
   QueuePayloads,
   Roles,
 } from '@hindawi/shared';
-
-import { Logger } from '../../lib/logger';
 
 import { env } from '../../env';
 
 export const invoiceConfirmHandler = (
   payload: JobData<QueuePayloads.InvoiceReminderPayload>,
   appContext: any,
-  loggerService: Logger
+  loggerService: LoggerContract
 ) => {
   const {
     repos: {
@@ -24,9 +24,12 @@ export const invoiceConfirmHandler = (
       manuscript,
       invoice,
     },
-    services: { schedulingService, emailService, logger },
+    services: { schedulingService, emailService },
+    loggerBuilder,
   } = appContext;
   const { recipientEmail, recipientName, invoiceId } = payload;
+
+  const logger = loggerBuilder.getLogger('InvoiceConfirmationHandler');
 
   const usecase = new SendInvoiceConfirmationReminderUsecase(
     sentNotifications,

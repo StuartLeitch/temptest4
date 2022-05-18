@@ -2,18 +2,17 @@ import { JobData } from '@hindawi/sisif';
 import {
   SendInvoicePaymentReminderUsecase,
   SendInvoicePaymentReminderDTO,
+  LoggerContract,
   QueuePayloads,
   Roles,
 } from '@hindawi/shared';
-
-import { Logger } from '../../lib/logger';
 
 import { env } from '../../env';
 
 export const invoicePaymentHandler = (
   payload: JobData<QueuePayloads.InvoiceReminderPayload>,
   appContext: any,
-  loggerService: Logger
+  loggerService: LoggerContract
 ) => {
   const {
     repos: {
@@ -26,9 +25,12 @@ export const invoicePaymentHandler = (
       coupon,
       waiver,
     },
-    services: { schedulingService, emailService, logger },
+    services: { schedulingService, emailService },
+    loggerBuilder,
   } = appContext;
   const { recipientEmail, recipientName, invoiceId } = payload;
+
+  const logger = loggerBuilder.getLogger('InvoicePaymentHandler');
 
   const usecase = new SendInvoicePaymentReminderUsecase(
     sentNotifications,

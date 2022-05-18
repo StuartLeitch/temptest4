@@ -23,7 +23,7 @@ import { WaiverRepoContract } from '../../../../waivers/repos';
 
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
 import { ErpRevRecResponse } from '../../../../../domain/services/ErpService';
-import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../../infrastructure/logging';
 
 import { PublishRevenueRecognitionToErpUsecase } from '../publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
 
@@ -32,7 +32,8 @@ import type { RetryRevenueRecognitionSageErpInvoicesDTO as DTO } from './retryRe
 
 export class RetryRevenueRecognitionSageErpInvoicesUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   private publishRevenueRecognitionToErpUsecase: PublishRevenueRecognitionToErpUsecase;
   constructor(
     private invoiceRepo: InvoiceRepoContract,
@@ -51,27 +52,29 @@ export class RetryRevenueRecognitionSageErpInvoicesUsecase
   ) {
     super();
 
-    this.publishRevenueRecognitionToErpUsecase = new PublishRevenueRecognitionToErpUsecase(
-      this.invoiceRepo,
-      this.invoiceItemRepo,
-      this.couponRepo,
-      this.waiverRepo,
-      this.payerRepo,
-      this.addressRepo,
-      this.manuscriptRepo,
-      this.catalogRepo,
-      this.publisherRepo,
-      this.erpReferenceRepo,
-      this.creditNoteRepo,
-      this.sageService,
-      this.loggerService
-    );
+    this.publishRevenueRecognitionToErpUsecase =
+      new PublishRevenueRecognitionToErpUsecase(
+        this.invoiceRepo,
+        this.invoiceItemRepo,
+        this.couponRepo,
+        this.waiverRepo,
+        this.payerRepo,
+        this.addressRepo,
+        this.manuscriptRepo,
+        this.catalogRepo,
+        this.publisherRepo,
+        this.erpReferenceRepo,
+        this.creditNoteRepo,
+        this.sageService,
+        this.loggerService
+      );
   }
 
   @Authorize('erp:publish')
   public async execute(request?: DTO, context?: Context): Promise<Response> {
     try {
-      const maybeUnrecognizedErpInvoices = await this.invoiceRepo.getUnrecognizedSageErpInvoices();
+      const maybeUnrecognizedErpInvoices =
+        await this.invoiceRepo.getUnrecognizedSageErpInvoices();
 
       if (maybeUnrecognizedErpInvoices.isLeft()) {
         return left(
@@ -98,12 +101,13 @@ export class RetryRevenueRecognitionSageErpInvoicesUsecase
       const errs = [];
 
       for (const unrecognizedInvoice of unrecognizedErpInvoices) {
-        const updatedInvoiceResponse = await this.publishRevenueRecognitionToErpUsecase.execute(
-          {
-            invoiceId: unrecognizedInvoice.id.toString(),
-          },
-          context
-        );
+        const updatedInvoiceResponse =
+          await this.publishRevenueRecognitionToErpUsecase.execute(
+            {
+              invoiceId: unrecognizedInvoice.id.toString(),
+            },
+            context
+          );
         if (updatedInvoiceResponse.isLeft()) {
           errs.push(updatedInvoiceResponse.value);
         } else {

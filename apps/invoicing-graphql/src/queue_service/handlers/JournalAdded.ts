@@ -17,10 +17,10 @@ export const JournalAddedHandler: EventHandler<JournalAdded> = {
     return async (data: JournalAdded) => {
       const {
         repos: { publisher: publisherRepo, catalog: catalogRepo },
-        services: { logger },
+        loggerBuilder,
       } = context;
 
-      logger.setScope(`PhenomEvent:${JOURNAL_ADDED}`);
+      const logger = loggerBuilder.getLogger(`PhenomEvent:${JOURNAL_ADDED}`);
       logger.info(`Incoming Event Data`, data);
 
       const addJournalUsecase = new AddCatalogItemToCatalogUseCase(

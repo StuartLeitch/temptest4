@@ -2,7 +2,7 @@ import { UnexpectedError } from '../../../../../core/logic/AppError';
 import { right, left } from '../../../../../core/logic/Either';
 import { UseCase } from '../../../../../core/domain/UseCase';
 
-import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../../infrastructure/logging';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../../domain/authorization';
@@ -35,7 +35,8 @@ import type { RetryFailedSageErpInvoicesDTO as DTO } from './retryFailedSageErpI
 
 export class RetryFailedSageErpInvoicesUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   private publishToErpUsecase: PublishInvoiceToErpUsecase;
   constructor(
     private invoiceRepo: InvoiceRepoContract,
@@ -74,7 +75,8 @@ export class RetryFailedSageErpInvoicesUsecase
   @Authorize('erp:publish')
   public async execute(request?: DTO, context?: Context): Promise<Response> {
     try {
-      const maybeFailedErpInvoicesIds = await this.invoiceRepo.getFailedSageErpInvoices();
+      const maybeFailedErpInvoicesIds =
+        await this.invoiceRepo.getFailedSageErpInvoices();
 
       if (maybeFailedErpInvoicesIds.isLeft()) {
         return left(
@@ -101,12 +103,13 @@ export class RetryFailedSageErpInvoicesUsecase
       const errs = [];
 
       for (const failedInvoice of failedErpInvoicesIds) {
-        const maybeUpdatedInvoiceResponse = await this.publishToErpUsecase.execute(
-          {
-            invoiceId: failedInvoice.id.toString(),
-          },
-          context
-        );
+        const maybeUpdatedInvoiceResponse =
+          await this.publishToErpUsecase.execute(
+            {
+              invoiceId: failedInvoice.id.toString(),
+            },
+            context
+          );
 
         if (
           typeof maybeUpdatedInvoiceResponse.isLeft === 'function' &&
@@ -117,7 +120,8 @@ export class RetryFailedSageErpInvoicesUsecase
 
         const updatedInvoiceResponse = maybeUpdatedInvoiceResponse.value;
 
-        const assignedErpReference = updatedInvoiceResponse as ErpInvoiceResponse;
+        const assignedErpReference =
+          updatedInvoiceResponse as ErpInvoiceResponse;
 
         if (assignedErpReference) {
           this.loggerService.info(

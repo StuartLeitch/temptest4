@@ -37,6 +37,7 @@ import {
   InvoiceId,
   UniqueEntityID,
   VATService,
+  MockLoggerBuilder,
   WaiverMap,
 } from '../../../../../../src/lib/shared';
 import { WaiverType } from '../../../../../../src/lib/modules/waivers/domain/Waiver';
@@ -116,7 +117,7 @@ Before({ tags: '@ValidateApplyCoupon' }, () => {
   mockPublisherRepo = new MockPublisherRepo();
   mockWaiverRepo = new MockWaiverRepo();
   emailService = new EmailService(mailingDisabled, fePath, tenantName, '', '');
-  mockLogger = new MockLogger();
+  mockLogger = new MockLoggerBuilder().getLogger();
   mockInvoiceRepo = new MockInvoiceRepo(
     mockManuscriptRepo,
     mockInvoiceItemRepo

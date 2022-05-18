@@ -43,27 +43,13 @@ gemnasium-python-dependency_scanning:
   rules:
     - when: never
 
-retire-js-dependency_scanning:
-  tags:
-    - 'cluster:hindawi-dev'
-  variables:
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-  needs: [Build]
-  stage: package
-  cache:
-    key: node-modules-cache
-    paths:
-      - ./node_modules
-    policy: pull
-    when: always
-
 variables:
   # https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#docker-in-docker-with-tls-disabled
   DOCKER_HOST: tcp://docker:2375
   DOCKER_TLS_CERTDIR: ''
   NODE_VERSION: 14.4.0
-  BUILD_IMAGE: $AWS_DEV_REGISTRY/belzebuth-runner:$CI_COMMIT_SHA
-  PACKAGE_IMAGE: $AWS_DEV_REGISTRY/belzebuth-package:$CI_COMMIT_SHA
+  BUILD_IMAGE: $AWS_DEV_REGISTRY/dragons-runner:$CI_COMMIT_SHA
+  PACKAGE_IMAGE: $AWS_DEV_REGISTRY/dragons-package:$CI_COMMIT_SHA
   AWS_REGION: 'eu-west-1'
   BT_ENVIRONMENT: 'sandbox'
   BT_MERCHANT_ID: 'test-merchant-id'

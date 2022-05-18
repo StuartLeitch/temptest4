@@ -41,10 +41,11 @@ export const SubmissionPeerReviewCycleCheckPassed: EventHandler<SPRCCP> = {
           payer: payerRepo,
           coupon: couponRepo,
         },
-        services: { waiverService, emailService, vatService, logger },
+        services: { waiverService, emailService, vatService },
+        loggerBuilder,
       } = context;
 
-      logger.setScope(
+      const logger = loggerBuilder.getLogger(
         `PhenomEvent:${SUBMISSION_PEER_REVIEW_CYCLE_CHECK_PASSED}`
       );
       logger.info('Incoming Event Data', data);

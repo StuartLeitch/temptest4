@@ -2,7 +2,7 @@ import { Before, Given, When, Then, After } from '@cucumber/cucumber';
 import { expect } from 'chai';
 
 import { UsecaseAuthorizationContext } from '../../../../../../src/lib/domain/authorization';
-import { MockLogger } from '../../../../../../src/lib/infrastructure/logging';
+import { MockLoggerBuilder } from '../../../../../../src/lib/infrastructure/logging';
 
 import { MockSqsPublishService } from '../../../../../../src/lib/domain/services/SQSPublishService';
 import { UniqueEntityID } from '../../../../../../src/lib/core/domain/UniqueEntityID';
@@ -40,8 +40,8 @@ interface Context {
   };
   services: {
     queueService: MockSqsPublishService;
-    logger: MockLogger;
   };
+  loggerBuilder: MockLoggerBuilder;
 }
 
 const tag = { tags: '@GenerateDraftCompensatoryEvents' };
@@ -63,7 +63,7 @@ Before(tag, () => {
   const waiver = new MockWaiverRepo();
 
   const queueService = new MockSqsPublishService();
-  const logger = new MockLogger();
+  const loggerBuilder = new MockLoggerBuilder();
 
   context = {
     repos: {
@@ -76,8 +76,8 @@ Before(tag, () => {
     },
     services: {
       queueService,
-      logger,
     },
+    loggerBuilder,
   };
 
   usecase = new GenerateInvoiceDraftCompensatoryEventsUsecase(
@@ -87,7 +87,7 @@ Before(tag, () => {
     coupon,
     waiver,
     queueService,
-    logger
+    loggerBuilder.getLogger()
   );
 });
 
@@ -192,9 +192,8 @@ Given(
     }
 
     const invoiceId = InvoiceId.create(new UniqueEntityID(id));
-    const maybeInvoiceItems = await context.repos.invoiceItem.getItemsByInvoiceId(
-      invoiceId
-    );
+    const maybeInvoiceItems =
+      await context.repos.invoiceItem.getItemsByInvoiceId(invoiceId);
 
     if (maybeInvoiceItems.isLeft()) {
       throw maybeInvoiceItems.value;

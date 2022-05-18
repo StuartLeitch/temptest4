@@ -4,22 +4,15 @@ import {
 } from 'microframework-w3tec';
 import Knex from 'knex';
 import { env } from '../env';
-import { LoggerBuilder } from '@hindawi/shared';
-
-const log = new LoggerBuilder('loader', {
-  logLevel: env.log.level,
-  isDevelopment: env.isDevelopment,
-}).getLogger();
 
 export const knexLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
 ) => {
-
   const knexParams = {
     client: 'pg',
     migrations: {
       directory: env.app.dirs.migrationsDir,
-      disableMigrationsListValidation: true
+      disableMigrationsListValidation: true,
     },
     seeds: {
       directory: env.app.dirs.seedsDir,

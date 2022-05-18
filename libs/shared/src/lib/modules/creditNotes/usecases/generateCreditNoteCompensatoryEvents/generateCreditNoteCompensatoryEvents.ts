@@ -1,7 +1,7 @@
 // * Core Domain
 import { RepoErrorCode, RepoError } from '../../../../infrastructure/RepoError';
 import { flatten, Either, right, left } from '../../../../core/logic/Either';
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../infrastructure/logging';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
@@ -61,7 +61,8 @@ import {
 
 export class GenerateCreditNoteCompensatoryEventsUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private paymentMethodRepo: PaymentMethodRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -78,9 +79,8 @@ export class GenerateCreditNoteCompensatoryEventsUsecase
   ) {
     super();
 
-    this.sendCreditNoteCreatedEvent = this.sendCreditNoteCreatedEvent.bind(
-      this
-    );
+    this.sendCreditNoteCreatedEvent =
+      this.sendCreditNoteCreatedEvent.bind(this);
     this.publishCreditNoteCreated = this.publishCreditNoteCreated.bind(this);
     this.attachPaymentMethods = this.attachPaymentMethods.bind(this);
     this.attachInvoiceItems = this.attachInvoiceItems.bind(this);
@@ -145,7 +145,6 @@ export class GenerateCreditNoteCompensatoryEventsUsecase
       request: T
     ): Promise<Either<UnexpectedError, T>> => {
       const usecase = new PublishCreditNoteCreatedUsecase(this.sqsPublish);
-      console.log('------------------------------------------------------');
 
       const invoiceItems = request.invoiceItems.map((item) => {
         const coupons = request.coupons.filter((c) =>

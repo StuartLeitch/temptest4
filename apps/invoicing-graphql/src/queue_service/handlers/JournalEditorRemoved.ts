@@ -1,17 +1,14 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-/* eslint-disable max-len */
-
 import {
   JournalSectionEditorRemoved,
   JournalEditorRemoved,
 } from '@hindawi/phenom-events';
 
 import {
-  GetEditorsByJournalUsecase,
-  AssignEditorsToJournalUsecase,
   RemoveEditorsFromJournalUsecase,
-  EditorMap,
+  AssignEditorsToJournalUsecase,
+  GetEditorsByJournalUsecase,
   JournalEventMap,
+  EditorMap,
   Roles,
 } from '@hindawi/shared';
 
@@ -19,8 +16,8 @@ import { Context } from '../../builders';
 
 import { HandlerFunction, EventHandler } from '../event-handler';
 
-const JOURNAL_EDITOR_REMOVED = 'JournalEditorRemoved';
 const JOURNAL_SECTION_EDITOR_REMOVED = 'JournalSectionEditorRemoved';
+const JOURNAL_EDITOR_REMOVED = 'JournalEditorRemoved';
 
 function removeEditorEventHandlerFactory(eventName: string) {
   return (context: Context): HandlerFunction<JournalEditorRemoved> => {
@@ -29,10 +26,10 @@ function removeEditorEventHandlerFactory(eventName: string) {
 
       const {
         repos: { catalog: catalogRepo, editor: editorRepo },
-        services: { logger },
+        loggerBuilder,
       } = context;
 
-      logger.setScope(`PhenomEvent:${eventName}`);
+      const logger = loggerBuilder.getLogger(`PhenomEvent:${eventName}`);
       logger.info(`Incoming Event Data`, data);
 
       const getEditorsByJournal = new GetEditorsByJournalUsecase(
@@ -114,7 +111,8 @@ export const JournalEditorRemovedHandler: EventHandler<JournalEditorRemoved> = {
   handler: removeEditorEventHandlerFactory(JOURNAL_EDITOR_REMOVED),
 };
 
-export const JournalSectionEditorRemovedHandler: EventHandler<JournalSectionEditorRemoved> = {
-  event: JOURNAL_SECTION_EDITOR_REMOVED,
-  handler: removeEditorEventHandlerFactory(JOURNAL_SECTION_EDITOR_REMOVED),
-};
+export const JournalSectionEditorRemovedHandler: EventHandler<JournalSectionEditorRemoved> =
+  {
+    event: JOURNAL_SECTION_EDITOR_REMOVED,
+    handler: removeEditorEventHandlerFactory(JOURNAL_SECTION_EDITOR_REMOVED),
+  };

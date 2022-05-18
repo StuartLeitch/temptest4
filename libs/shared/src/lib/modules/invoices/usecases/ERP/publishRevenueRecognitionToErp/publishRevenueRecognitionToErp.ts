@@ -33,7 +33,7 @@ import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
 
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
-import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../../infrastructure/logging';
 
 import { GetItemsForInvoiceUsecase } from './../../getItemsForInvoice/getItemsForInvoice';
 
@@ -46,7 +46,8 @@ import {
 
 export class PublishRevenueRecognitionToErpUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -142,9 +143,8 @@ export class PublishRevenueRecognitionToErpUsecase
       }
 
       // * If it's a credit note and the manuscript has been published
-      const maybeCreditNote = await this.creditNoteRepo.getCreditNoteByInvoiceId(
-        invoice.invoiceId
-      );
+      const maybeCreditNote =
+        await this.creditNoteRepo.getCreditNoteByInvoiceId(invoice.invoiceId);
 
       if (maybeCreditNote.isLeft()) {
         const err = maybeCreditNote.value;
@@ -176,9 +176,10 @@ export class PublishRevenueRecognitionToErpUsecase
 
       const catalog = maybeCatalog.value;
 
-      const maybePublisherCustomValues = await this.publisherRepo.getCustomValuesByPublisherId(
-        catalog.publisherId
-      );
+      const maybePublisherCustomValues =
+        await this.publisherRepo.getCustomValuesByPublisherId(
+          catalog.publisherId
+        );
       if (maybePublisherCustomValues.isLeft()) {
         throw new Error(`Invoice ${invoice.id} has no publisher associated.`);
       }
@@ -233,10 +234,11 @@ export class PublishRevenueRecognitionToErpUsecase
         return right(null);
       }
 
-      const existingRevenueRecognition = await this.erpService.getExistingRevenueRecognition(
-        invoice.persistentReferenceNumber,
-        manuscript.customId
-      );
+      const existingRevenueRecognition =
+        await this.erpService.getExistingRevenueRecognition(
+          invoice.persistentReferenceNumber,
+          manuscript.customId
+        );
 
       if (existingRevenueRecognition.count === 1) {
         const maybeErpReference = ErpReferenceMap.toDomain({
@@ -310,7 +312,6 @@ export class PublishRevenueRecognitionToErpUsecase
       }
       return right(erpResponse);
     } catch (err) {
-      console.log(err);
       return left(new UnexpectedError(err, err.toString()));
     }
   }

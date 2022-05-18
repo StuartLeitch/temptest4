@@ -24,7 +24,8 @@ import * as Errors from './deleteInvoiceErrors';
 
 export class DeleteInvoiceUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(private invoiceRepo: InvoiceRepoContract) {
     super();
   }
@@ -47,7 +48,6 @@ export class DeleteInvoiceUsecase
 
       return right(null);
     } catch (err) {
-      console.log(err);
       return left(new UnexpectedError(err));
     }
   }

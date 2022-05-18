@@ -58,7 +58,8 @@ Before({ tags: '@ValidateRecordPayment' }, async function () {
       waiver: waiverRepo,
       payer: payerRepo,
     },
-    services: { paymentStrategyFactory, logger },
+    services: { paymentStrategyFactory },
+    loggerBuilder,
   } = context;
 
   usecase = new RecordPaymentUsecase(
@@ -71,7 +72,7 @@ Before({ tags: '@ValidateRecordPayment' }, async function () {
     couponRepo,
     waiverRepo,
     payerRepo,
-    logger,
+    loggerBuilder.getLogger(),
     { log: () => void 0 }
   );
 
@@ -130,7 +131,7 @@ Before({ tags: '@ValidateRecordPayment' }, async function () {
 
   subscription = new AfterPaymentCompleted(
     context.repos.invoice,
-    context.services.logger
+    context.loggerBuilder.getLogger()
   );
 });
 
@@ -262,9 +263,8 @@ Then(/^The payments are of type "Bank Transfer"$/, async () => {
 
   const payments = maybePayments.value;
 
-  const maybePaymentMethod = await context.repos.paymentMethod.getPaymentMethodByName(
-    'Bank Transfer'
-  );
+  const maybePaymentMethod =
+    await context.repos.paymentMethod.getPaymentMethodByName('Bank Transfer');
 
   if (maybePaymentMethod.isLeft()) {
     throw maybePaymentMethod.value;

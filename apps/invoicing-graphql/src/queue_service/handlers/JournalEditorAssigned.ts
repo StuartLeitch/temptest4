@@ -1,5 +1,3 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-/* eslint-disable max-len */
 import {
   JournalSectionEditorAssigned,
   JournalEditorAssigned,
@@ -15,8 +13,8 @@ import { Context } from '../../builders';
 
 import { HandlerFunction, EventHandler } from '../event-handler';
 
-const JOURNAL_EDITOR_ASSIGNED = 'JournalEditorAssigned';
 const JOURNAL_SECTION_EDITOR_ASSIGNED = 'JournalSectionEditorAssigned';
+const JOURNAL_EDITOR_ASSIGNED = 'JournalEditorAssigned';
 
 type EnvType = JournalSectionEditorAssigned | JournalEditorAssigned;
 
@@ -25,10 +23,10 @@ function addEditorEventHandlerFactory<T extends EnvType>(eventName: string) {
     return async (data: T) => {
       const {
         repos: { catalog: catalogRepo, editor: editorRepo },
-        services: { logger },
+        loggerBuilder,
       } = context;
 
-      logger.setScope(`PhenomEvent:${eventName}`);
+      const logger = loggerBuilder.getLogger(`PhenomEvent:${eventName}`);
       logger.info(`Incoming Event Data`, data);
 
       const assignEditorToJournal = new AssignEditorsToJournalUsecase(
@@ -61,16 +59,18 @@ function addEditorEventHandlerFactory<T extends EnvType>(eventName: string) {
   };
 }
 
-export const JournalEditorAssignedHandler: EventHandler<JournalEditorAssigned> = {
-  event: JOURNAL_EDITOR_ASSIGNED,
-  handler: addEditorEventHandlerFactory<JournalEditorAssigned>(
-    JOURNAL_EDITOR_ASSIGNED
-  ),
-};
+export const JournalEditorAssignedHandler: EventHandler<JournalEditorAssigned> =
+  {
+    event: JOURNAL_EDITOR_ASSIGNED,
+    handler: addEditorEventHandlerFactory<JournalEditorAssigned>(
+      JOURNAL_EDITOR_ASSIGNED
+    ),
+  };
 
-export const JournalSectionEditorAssignedHandler: EventHandler<JournalSectionEditorAssigned> = {
-  event: JOURNAL_SECTION_EDITOR_ASSIGNED,
-  handler: addEditorEventHandlerFactory<JournalSectionEditorAssigned>(
-    JOURNAL_SECTION_EDITOR_ASSIGNED
-  ),
-};
+export const JournalSectionEditorAssignedHandler: EventHandler<JournalSectionEditorAssigned> =
+  {
+    event: JOURNAL_SECTION_EDITOR_ASSIGNED,
+    handler: addEditorEventHandlerFactory<JournalSectionEditorAssigned>(
+      JOURNAL_SECTION_EDITOR_ASSIGNED
+    ),
+  };

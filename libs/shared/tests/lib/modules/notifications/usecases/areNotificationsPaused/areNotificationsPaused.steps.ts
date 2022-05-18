@@ -1,7 +1,10 @@
 import { expect } from 'chai';
 import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
-import { MockLogger } from '../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
+import {
+  MockLogger,
+  MockLoggerBuilder,
+} from '../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
 
 import { AreNotificationsPausedUsecase } from '../../../../../../src/lib/modules/notifications/usecases/areNotificationsPaused';
 import { AreNotificationsPausedResponse } from '../../../../../../src/lib/modules/notifications/usecases/areNotificationsPaused/areNotificationsPausedResponse';
@@ -56,7 +59,7 @@ const context: UsecaseAuthorizationContext = { roles: [Roles.ADMIN] };
 Before({ tags: '@ValidateNotificationsPaused' }, () => {
   mockPausedReminderRepo = new MockPausedReminderRepo();
   mockSentNotificationRepo = new MockSentNotificationRepo();
-  mockLogger = new MockLogger();
+  mockLogger = new MockLoggerBuilder().getLogger();
   usecase = new AreNotificationsPausedUsecase(
     mockPausedReminderRepo,
     mockLogger
@@ -117,9 +120,8 @@ Then(
 
     const invoiceId = InvoiceId.create(new UniqueEntityID(testInvoiceId));
 
-    const maybePausedReminder = await mockPausedReminderRepo.getNotificationPausedStatus(
-      invoiceId
-    );
+    const maybePausedReminder =
+      await mockPausedReminderRepo.getNotificationPausedStatus(invoiceId);
 
     if (maybePausedReminder.isLeft()) {
       throw maybePausedReminder.value;

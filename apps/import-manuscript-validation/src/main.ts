@@ -1,14 +1,11 @@
 import { bootstrapMicroframework } from 'microframework-w3tec';
 
-import { LoggerBuilder } from '@hindawi/shared';
+import { LoggerBuilder, LogLevel } from '@hindawi/shared';
 
 import { banner } from './banner';
 import { env } from './env';
 
-const log = new LoggerBuilder('loader', {
-  logLevel: env.log.level,
-  isDevelopment: env.isDevelopment,
-}).getLogger();
+const log = new LoggerBuilder(LogLevel[env.log.level]).getLogger('loader');
 
 async function main() {
   const loaders = [];

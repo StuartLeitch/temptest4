@@ -12,11 +12,12 @@ import { Transaction } from '../../domain/Transaction';
 import { TransactionMap } from '../../mappers/TransactionMap';
 
 import { TransactionRepoContract } from '../transactionRepo';
-import Knex from "knex";
+import Knex from 'knex';
 
 export class KnexTransactionRepo
   extends AbstractBaseDBRepo<Knex, Transaction>
-  implements TransactionRepoContract {
+  implements TransactionRepoContract
+{
   async getTransactionById(
     transactionId: TransactionId
   ): Promise<Either<GuardFailure | RepoError, Transaction>> {
@@ -43,8 +44,6 @@ export class KnexTransactionRepo
     invoiceId: InvoiceId
   ): Promise<Either<GuardFailure | RepoError, Transaction>> {
     const { db, logger } = this;
-    const correlationId =
-      'correlationId' in this ? (this as any).correlationId : null;
 
     const transactionRow = await db(TABLES.INVOICES)
       .select(
@@ -64,7 +63,6 @@ export class KnexTransactionRepo
       .first();
 
     logger.debug('select', {
-      correlationId,
       sql: transactionRow.toString(),
     });
 

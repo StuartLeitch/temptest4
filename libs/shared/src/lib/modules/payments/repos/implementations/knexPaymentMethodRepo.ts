@@ -11,11 +11,12 @@ import { PaymentMethod } from './../../domain/PaymentMethod';
 import { PaymentMethodMap } from './../../mapper/PaymentMethod';
 
 import { PaymentMethodRepoContract } from './../paymentMethodRepo';
-import Knex from "knex";
+import Knex from 'knex';
 
 export class KnexPaymentMethodRepo
   extends AbstractBaseDBRepo<Knex, PaymentMethod>
-  implements PaymentMethodRepoContract {
+  implements PaymentMethodRepoContract
+{
   async getPaymentMethodById(
     paymentMethodId: PaymentMethodId
   ): Promise<Either<GuardFailure | RepoError, PaymentMethod>> {
@@ -80,11 +81,7 @@ export class KnexPaymentMethodRepo
 
     const paymentMethodsSelect = db(TABLES.PAYMENT_METHODS).select();
 
-    const correlationId =
-      'correlationId' in this ? (this as any).correlationId : null;
-
     logger.debug('select', {
-      correlationId,
       sql: paymentMethodsSelect.toString(),
     });
 

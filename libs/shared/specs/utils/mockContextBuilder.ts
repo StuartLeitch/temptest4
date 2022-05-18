@@ -1,5 +1,3 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-import sinon from 'sinon';
 import {
   BraintreeClientToken,
   BraintreePayment,
@@ -13,10 +11,7 @@ import {
   MockEditorRepo,
   MockInvoiceItemRepo,
   MockInvoiceRepo,
-  MockLogger,
   MockPayerRepo,
-  // MockSentNotificationsRepo,
-  // MockPausedReminderRepo,
   MockPaymentMethodRepo,
   MockPaymentRepo,
   MockPublisherRepo,
@@ -27,6 +22,7 @@ import {
   PayPalPayment,
   MockPayPalService,
   MockBraintreeService,
+  MockLoggerBuilder,
 } from '../../src';
 
 export interface MockRepos {
@@ -43,18 +39,16 @@ export interface MockRepos {
   editor: MockEditorRepo;
   coupon: MockCouponRepo;
   publisher: MockPublisherRepo;
-  // sentNotifications: MockSentNotificationsRepo;
-  // pausedReminder: MockPausedReminderRepo;
 }
 
 export interface MockServices {
   paymentStrategyFactory: PaymentStrategyFactory;
-  logger: MockLogger;
 }
 
 export interface MockContext {
-  repos: MockRepos;
+  loggerBuilder: MockLoggerBuilder;
   services: MockServices;
+  repos: MockRepos;
 }
 
 export function buildMockServices(repos: MockRepos): MockServices {
@@ -80,7 +74,6 @@ export function buildMockServices(repos: MockRepos): MockServices {
       payPalPayment,
       repos.paymentMethod
     ),
-    logger: new MockLogger(),
   };
 }
 export function buildMockRepos(): MockRepos {
@@ -107,7 +100,8 @@ export function buildMockRepos(): MockRepos {
 export function buildMockContext(): MockContext {
   const repos = buildMockRepos();
   return {
-    repos,
+    loggerBuilder: new MockLoggerBuilder(),
     services: buildMockServices(repos),
+    repos,
   };
 }

@@ -7,10 +7,9 @@ import { CronFeatureFlagsReader } from './CronFeatureFlagsReader';
 
 export class RegisterCreditNotesCron {
   public static async schedule(context: Context): Promise<any> {
-    const {
-      services: { logger: loggerService },
-    } = context;
-    loggerService.setScope('cron:registerCreditMemos');
+    const { loggerBuilder } = context;
+
+    const loggerService = loggerBuilder.getLogger('cron:registerCreditMemos');
 
     const cronFlags = CronFeatureFlagsReader.readAll();
     FeatureFlags.setFeatureFlags(cronFlags);
@@ -22,30 +21,43 @@ export class RegisterCreditNotesCron {
     }
 
     const {
-      repos: { creditNote, invoiceItem, invoice, coupon, waiver, erpReference, manuscript, address, payer, publisher, catalog },
+      repos: {
+        creditNote,
+        invoiceItem,
+        invoice,
+        coupon,
+        waiver,
+        erpReference,
+        manuscript,
+        address,
+        payer,
+        publisher,
+        catalog,
+      },
       services: { erp },
     } = context;
 
-    const retryRevenueRecognizedInvoicesToNetsuiteErpUsecase = new RetryCreditNotesUsecase(
-      creditNote,
-      invoice,
-      invoiceItem,
-      coupon,
-      waiver,
-      manuscript,
-      address,
-      payer,
-      catalog,
-      publisher,
-      erpReference,
-      erp?.netsuite || null,
-      loggerService
-    );
+    const retryRevenueRecognizedInvoicesToNetsuiteErpUsecase =
+      new RetryCreditNotesUsecase(
+        creditNote,
+        invoice,
+        invoiceItem,
+        coupon,
+        waiver,
+        manuscript,
+        address,
+        payer,
+        catalog,
+        publisher,
+        erpReference,
+        erp?.netsuite || null,
+        loggerService
+      );
 
-    const maybeResponse = await retryRevenueRecognizedInvoicesToNetsuiteErpUsecase.execute(
-      null,
-      { roles: [Roles.CHRON_JOB] }
-    );
+    const maybeResponse =
+      await retryRevenueRecognizedInvoicesToNetsuiteErpUsecase.execute(null, {
+        roles: [Roles.CHRON_JOB],
+      });
     if (maybeResponse.isLeft()) {
       loggerService.error(maybeResponse.value.message);
       throw maybeResponse.value;

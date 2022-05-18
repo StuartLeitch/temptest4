@@ -10,3 +10,4 @@ export * from './service-error';
 export * from './strategy-error';
 export * from './strategy';
 export * from './contracts';
+export * from './execution-context';

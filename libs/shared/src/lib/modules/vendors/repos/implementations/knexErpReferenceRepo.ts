@@ -3,7 +3,7 @@ import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { GuardFailure } from '../../../../core/logic/GuardFailure';
 
 import { AbstractBaseDBRepo } from '../../../../infrastructure/AbstractBaseDBRepo';
-import {TABLES } from '../../../../infrastructure/database/knex';
+import { TABLES } from '../../../../infrastructure/database/knex';
 import { RepoError } from '../../../../infrastructure/RepoError';
 
 import { InvoiceErpReferences } from './../../../invoices/domain/InvoiceErpReferences';
@@ -12,24 +12,22 @@ import { ErpReferenceMap } from './../../mapper/ErpReference';
 import { ErpReference } from '../../domain/ErpReference';
 
 import { ErpReferenceRepoContract } from '../ErpReferenceRepo';
-import Knex from "knex";
+import Knex from 'knex';
 
 export class KnexErpReferenceRepo
   extends AbstractBaseDBRepo<Knex, ErpReference>
-  implements ErpReferenceRepoContract {
+  implements ErpReferenceRepoContract
+{
   public async getErpReferencesByInvoiceId(
     invoiceId: InvoiceId
   ): Promise<Either<GuardFailure | RepoError, InvoiceErpReferences>> {
     const { db, logger } = this;
-    const correlationId =
-      'correlationId' in this ? (this as any).correlationId : null;
 
     const sql = db(TABLES.ERP_REFERENCES)
       .select()
       .where('entity_id', invoiceId.id.toString());
 
     logger.debug('select', {
-      correlationId,
       sql: sql.toString(),
     });
 

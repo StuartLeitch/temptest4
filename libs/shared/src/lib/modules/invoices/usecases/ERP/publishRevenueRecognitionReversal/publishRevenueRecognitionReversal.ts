@@ -17,7 +17,7 @@ import { ErpReferenceMap } from './../../../../vendors/mapper/ErpReference';
 
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
 import { AddressRepoContract } from '../../../../addresses/repos/addressRepo';
-import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../../infrastructure/logging';
 import { InvoiceItemRepoContract } from './../../../repos/invoiceItemRepo';
 import { PayerRepoContract } from '../../../../payers/repos/payerRepo';
 import { PublisherRepoContract } from '../../../../publishers/repos';
@@ -44,7 +44,8 @@ import * as Errors from './publishRevenueRecognitionReversal.errors';
 
 export class PublishRevenueRecognitionReversalUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -65,7 +66,6 @@ export class PublishRevenueRecognitionReversalUsecase
 
   @Authorize('erp:publish')
   public async execute(request: DTO, context?: Context): Promise<Response> {
-
     let creditNote: CreditNote;
 
     const invoiceId = request.invoiceId;
@@ -181,23 +181,28 @@ export class PublishRevenueRecognitionReversalUsecase
       const invoiceTotal = invoice.invoiceNetTotal;
 
       // * Get CreditNote details
-      const maybeCreditNote = await this.creditNoteRepo.getCreditNoteByInvoiceId(
-        CreditNoteId.create(new UniqueEntityID(request.invoiceId))
-      );
+      const maybeCreditNote =
+        await this.creditNoteRepo.getCreditNoteByInvoiceId(
+          CreditNoteId.create(new UniqueEntityID(request.invoiceId))
+        );
 
       if (maybeCreditNote.isLeft()) {
         return left(maybeCreditNote.value);
       }
       creditNote = maybeCreditNote.value;
-      this.loggerService.info('PublishRevenueRecognitionReversalToERP Credit Note', creditNote);
+      this.loggerService.info(
+        'PublishRevenueRecognitionReversalToERP Credit Note',
+        creditNote
+      );
 
       if (creditNote.creationReason === 'bad-debt') {
         const erpReference = ErpReferenceMap.toDomain({
           entity_id: creditNote.invoiceId.id.toString(),
           type: 'invoice',
           vendor: this.erpService.vendorName,
-          attribute: this.erpService?.referenceMappings?.revenueRecognitionReversal ||
-          'revenueRecognitionReversal',
+          attribute:
+            this.erpService?.referenceMappings?.revenueRecognitionReversal ||
+            'revenueRecognitionReversal',
           value: String('BAD_DEBT'),
         });
 
@@ -216,15 +221,14 @@ export class PublishRevenueRecognitionReversalUsecase
         return right(null);
       }
 
-      const erpResponse = await this.erpService.registerRevenueRecognitionReversal(
-        {
+      const erpResponse =
+        await this.erpService.registerRevenueRecognitionReversal({
           publisherCustomValues,
           manuscript,
           invoiceTotal,
           invoice,
           payer,
-        }
-      );
+        });
 
       this.loggerService.info('ERP response', erpResponse);
 

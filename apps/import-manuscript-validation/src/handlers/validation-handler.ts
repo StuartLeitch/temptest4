@@ -1,3 +1,4 @@
+import { LogLevel } from '@hindawi/shared';
 import {
   ExtractManuscriptMetadataUseCase,
   UnarchivePackageUsecase,
@@ -45,7 +46,7 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
       } = context;
       // const logger = loggerBuilder.getLogger();
 
-      const logger = new Logger('validation-handler');
+      const logger = new Logger(LogLevel[env.log.level], 'validation-handler');
 
       const usecase = new UnarchivePackageUsecase(
         objectStoreService,

@@ -17,7 +17,10 @@ import { PublisherMap } from '../../../../../../src/lib/modules/publishers/mappe
 import { MockPublisherRepo } from '../../../../../../src/lib/modules/publishers/repos/mocks/mockPublisherRepo';
 import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
 import { MockErpReferenceRepo } from '../../../../../../src/lib/modules/vendors/repos/mocks/mockErpReferenceRepo';
-import { MockLogger } from './../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
+import {
+  MockLogger,
+  MockLoggerBuilder,
+} from './../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
 import { setupVatService } from '../../../../../../src/lib/domain/services/mocks/VatSoapClient';
 import {
   AddressMap,
@@ -71,7 +74,7 @@ Before({ tags: '@ValidatePublishRevRecToErp' }, function () {
   mockErpReferenceRepo = new MockErpReferenceRepo();
   mockSalesforceService = new MockErpService();
   mockPublisherRepo = new MockPublisherRepo();
-  mockLogger = new MockLogger();
+  mockLogger = new MockLoggerBuilder().getLogger();
   mockInvoiceRepo = new MockInvoiceRepo(
     mockManuscriptRepo,
     mockInvoiceItemRepo,

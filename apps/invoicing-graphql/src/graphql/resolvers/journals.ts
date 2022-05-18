@@ -1,12 +1,10 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
 import {
-  GetJournalListUsecase,
-  CatalogMap,
-  Roles,
-  GetPublisherDetailsUsecase,
-  PublisherMap,
   UpdateCatalogItemFieldsUsecase,
+  GetPublisherDetailsUsecase,
+  GetJournalListUsecase,
+  PublisherMap,
+  CatalogMap,
+  UpdateCatalogItemFieldsDTO,
 } from '@hindawi/shared';
 
 import { Context } from '../../builders';
@@ -33,7 +31,9 @@ export const invoicingJournals: Resolvers<Context> = {
 
       if (resultJournals.isLeft()) {
         const err = resultJournals.value;
-        context.services.logger.error(err.message, err);
+        context.loggerBuilder
+          .getLogger('getInvoicingJournals')
+          .error(err.message, err);
         return null;
       }
 
@@ -77,10 +77,7 @@ export const invoicingJournals: Resolvers<Context> = {
       const roles = getAuthRoles(context);
       const userData = (context.keycloakAuth.accessToken as any)?.content;
 
-      const {
-        repos,
-        auditLoggerServiceProvider
-      } = context;
+      const { repos, auditLoggerServiceProvider } = context;
 
       const auditLoggerService = auditLoggerServiceProvider(userData);
 

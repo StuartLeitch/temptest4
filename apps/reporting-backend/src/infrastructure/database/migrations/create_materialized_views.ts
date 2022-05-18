@@ -1,9 +1,10 @@
 import * as Knex from 'knex';
 import { differenceInSeconds } from '../../../utils/utils';
-import { Logger } from 'libs/shared/src/lib/infrastructure/logging/implementations/Logger';
+import { Logger } from 'libs/shared/src/lib/infrastructure/logging/implementations/LoggerBuilder';
+import { LogLevel } from 'libs/shared/src/lib/infrastructure/logging';
 import { materializedViewList } from '../../views';
 
-const logger = new Logger(__filename);
+const logger = new Logger(LogLevel.Info, __filename);
 
 export async function up(knex: Knex): Promise<any> {
   for (const view of materializedViewList) {

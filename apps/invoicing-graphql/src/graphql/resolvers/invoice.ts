@@ -62,7 +62,7 @@ export const invoice: Resolvers<Context> = {
 
       if (result.isLeft()) {
         const err = result.value;
-        context.services.logger.error(err.message, err);
+        context.loggerBuilder.getLogger('getInvoice').error(err.message, err);
         return undefined;
       }
 
@@ -83,9 +83,8 @@ export const invoice: Resolvers<Context> = {
 
       const paymentsIds = payments.map((p) => p.id);
 
-      const maybeErpPaymentReferences = await repos.erpReference.getErpReferencesById(
-        paymentsIds
-      );
+      const maybeErpPaymentReferences =
+        await repos.erpReference.getErpReferencesById(paymentsIds);
 
       if (maybeErpPaymentReferences.isLeft()) {
         throw maybeErpPaymentReferences.value;
@@ -130,7 +129,9 @@ export const invoice: Resolvers<Context> = {
 
       if (result.isLeft()) {
         const err = result.value;
-        context.services.logger.error(err.message, err);
+        context.loggerBuilder
+          .getLogger('getInvoiceWithAuthorization')
+          .error(err.message, err);
         return undefined;
       }
 
@@ -151,9 +152,8 @@ export const invoice: Resolvers<Context> = {
 
       const paymentsIds = payments.map((p) => p.id);
 
-      const maybeErpPaymentReferences = await repos.erpReference.getErpReferencesById(
-        paymentsIds
-      );
+      const maybeErpPaymentReferences =
+        await repos.erpReference.getErpReferencesById(paymentsIds);
 
       if (maybeErpPaymentReferences.isLeft()) {
         throw maybeErpPaymentReferences.value;
@@ -503,9 +503,8 @@ export const invoice: Resolvers<Context> = {
       if (creditNote.isLeft()) {
         return null;
       }
-      const maybeErpCreditNoteReferences = await repos.erpReference.getErpReferenceById(
-        creditNote.value.id
-      );
+      const maybeErpCreditNoteReferences =
+        await repos.erpReference.getErpReferenceById(creditNote.value.id);
 
       const creditNoteErpReference = maybeErpCreditNoteReferences.isRight()
         ? maybeErpCreditNoteReferences.value
@@ -578,9 +577,10 @@ export const invoice: Resolvers<Context> = {
     },
 
     async coupons(parent, args, context) {
-      const maybeCouponsAssociation = await context.repos.coupon.getCouponsByInvoiceItemId(
-        InvoiceItemId.create(new UniqueEntityID(parent.id))
-      );
+      const maybeCouponsAssociation =
+        await context.repos.coupon.getCouponsByInvoiceItemId(
+          InvoiceItemId.create(new UniqueEntityID(parent.id))
+        );
 
       if (maybeCouponsAssociation.isLeft()) {
         throw new Error(maybeCouponsAssociation.value.message);
@@ -662,9 +662,15 @@ export const invoice: Resolvers<Context> = {
           payer: payerRepo,
           waiver: waiverRepo,
         },
-        services: { emailService, vatService, logger: loggerService },
+        services: { emailService, vatService },
+        loggerBuilder,
         auditLoggerServiceProvider,
       } = context;
+
+      const loggerService = loggerBuilder.getLogger(
+        ApplyCouponToInvoiceUsecase.name
+      );
+
       const {
         sanctionedCountryNotificationReceiver,
         sanctionedCountryNotificationSender,

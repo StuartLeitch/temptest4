@@ -1,33 +1,38 @@
 // * Core Domain
-import {DomainEvents} from '../../../../core/domain/events/DomainEvents';
-import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
-import {UnexpectedError} from '../../../../core/logic/AppError';
-import {left, right} from '../../../../core/logic/Either';
-import {UseCase} from '../../../../core/domain/UseCase';
+import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
+import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
+import { UnexpectedError } from '../../../../core/logic/AppError';
+import { left, right } from '../../../../core/logic/Either';
+import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
-import type {UsecaseAuthorizationContext as Context} from '../../../../domain/authorization';
-import {AccessControlContext, AccessControlledUsecase, Authorize,} from '../../../../domain/authorization';
+import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import {
+  AccessControlContext,
+  AccessControlledUsecase,
+  Authorize,
+} from '../../../../domain/authorization';
 
-import {Transaction, TransactionStatus} from '../../domain/Transaction';
-import {ManuscriptId} from './../../../manuscripts/domain/ManuscriptId';
-import {Manuscript} from './../../../manuscripts/domain/Manuscript';
-import {InvoiceItem} from './../../../invoices/domain/InvoiceItem';
-import {Invoice, InvoiceStatus} from './../../../invoices/domain/Invoice';
+import { Transaction, TransactionStatus } from '../../domain/Transaction';
+import { ManuscriptId } from './../../../manuscripts/domain/ManuscriptId';
+import { Manuscript } from './../../../manuscripts/domain/Manuscript';
+import { InvoiceItem } from './../../../invoices/domain/InvoiceItem';
+import { Invoice, InvoiceStatus } from './../../../invoices/domain/Invoice';
 
-import {ArticleRepoContract as ManuscriptRepoContract} from './../../../manuscripts/repos/articleRepo';
-import {InvoiceItemRepoContract} from './../../../invoices/repos/invoiceItemRepo';
-import {InvoiceRepoContract} from './../../../invoices/repos/invoiceRepo';
-import {TransactionRepoContract} from '../../repos/transactionRepo';
+import { ArticleRepoContract as ManuscriptRepoContract } from './../../../manuscripts/repos/articleRepo';
+import { InvoiceItemRepoContract } from './../../../invoices/repos/invoiceItemRepo';
+import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
+import { TransactionRepoContract } from '../../repos/transactionRepo';
 
-import type {SoftDeleteDraftTransactionRequestDTO as DTO} from './softDeleteDraftTransactionDTO';
-import {SoftDeleteDraftTransactionResponse as Response} from './softDeleteDraftTransactionResponse';
+import type { SoftDeleteDraftTransactionRequestDTO as DTO } from './softDeleteDraftTransactionDTO';
+import { SoftDeleteDraftTransactionResponse as Response } from './softDeleteDraftTransactionResponse';
 import * as Errors from './softDeleteDraftTransactionErrors';
-import {LoggerContract} from "../../../../infrastructure/logging";
+import { LoggerContract } from '../../../../infrastructure/logging';
 
 export class SoftDeleteDraftTransactionUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private transactionRepo: TransactionRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -36,7 +41,6 @@ export class SoftDeleteDraftTransactionUsecase
     private logger: LoggerContract
   ) {
     super();
-    this.logger.setScope("SoftDeleteDraftTransactionUsecase")
   }
 
   @Authorize('transaction:delete')
@@ -71,9 +75,8 @@ export class SoftDeleteDraftTransactionUsecase
 
       try {
         // * System identifies invoice item by manuscript Id
-        const maybeInvoiceItems = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
-          manuscriptId
-        );
+        const maybeInvoiceItems =
+          await this.invoiceItemRepo.getInvoiceItemByManuscriptId(manuscriptId);
 
         if (maybeInvoiceItems.isLeft()) {
           return left(
@@ -107,11 +110,15 @@ export class SoftDeleteDraftTransactionUsecase
         );
       }
 
-      if(invoice.status !== InvoiceStatus.DRAFT){
-        this.logger.info(`Attempted to soft delete a non draft invoice. Soft delete ignored. invoiceId: '${invoice.id.toString()}'`)
-        return right(null)
+      if (invoice.status !== InvoiceStatus.DRAFT) {
+        this.logger.info(
+          `Attempted to soft delete a non draft invoice. Soft delete ignored. invoiceId: '${invoice.id.toString()}'`
+        );
+        return right(null);
       } else {
-        this.logger.info(`Soft deleting invoice with invoiceId: '${invoice.id.toString()}'`)
+        this.logger.info(
+          `Soft deleting invoice with invoiceId: '${invoice.id.toString()}'`
+        );
       }
 
       try {

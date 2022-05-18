@@ -1,7 +1,8 @@
 import { bootstrapMicroframework } from 'microframework-w3tec';
 
 import { banner } from './lib/banner';
-import { LoggerBuilder } from 'libs/shared/src/lib/infrastructure/logging/LoggerBuilder';
+import { LoggerBuilder } from 'libs/shared/src/lib/infrastructure/logging/implementations';
+import { LogLevel } from 'libs/shared/src/lib/infrastructure/logging';
 /**
  * Loaders
  */
@@ -12,6 +13,7 @@ import { knexLoader } from './loaders/knexLoader';
 import { queueServiceLoader } from './loaders/queueServiceLoader';
 import { cronLoader } from './loaders/cronLoader';
 import { env } from './env';
+
 /**
  * EXPRESS TYPESCRIPT BOILERPLATE
  * ----------------------------------------
@@ -20,10 +22,9 @@ import { env } from './env';
  * The basic layer of this app is express. For further information visit
  * the 'README.md' file.
  */
-const log = new LoggerBuilder('system:loader', {
-  logLevel: env.log.level,
-  isDevelopment: env.isDevelopment,
-}).getLogger();
+const log = new LoggerBuilder(LogLevel[env.log.level]).getLogger(
+  'system:loader'
+);
 
 bootstrapMicroframework({
   /**

@@ -3,7 +3,7 @@ import { UnexpectedError } from '../../../../core/logic/AppError';
 import { right, left } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
 
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../infrastructure/logging';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
@@ -19,11 +19,12 @@ import { GetPaymentMethodsResponse as Response } from './GetPaymentMethodsRespon
 import type { GetPaymentMethodsDTO as DTO } from './GetPaymentMethodsDTO';
 import * as Errors from './GetPaymentMethodsErrors';
 
-type Context = UsecaseAuthorizationContext & { correlationId?: string };
+type Context = UsecaseAuthorizationContext;
 
 export class GetPaymentMethodsUseCase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private paymentMethodRepo: PaymentMethodRepoContract,
     private loggerService: LoggerContract

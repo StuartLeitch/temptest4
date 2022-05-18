@@ -1,4 +1,3 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
 import {
   ConfirmInvoiceUsecase,
   GetAddressUsecase,
@@ -18,8 +17,12 @@ export const payer: Resolvers<Context> = {
     async confirmInvoice(parent, args, context) {
       const {
         repos,
-        services: { vatService, emailService, logger: loggerService },
+        services: { vatService },
+        loggerBuilder,
       } = context;
+
+      const loggerService = loggerBuilder.getLogger(ConfirmInvoiceUsecase.name);
+
       const { payer: inputPayer } = args;
 
       const confirmInvoiceUsecase = new ConfirmInvoiceUsecase(

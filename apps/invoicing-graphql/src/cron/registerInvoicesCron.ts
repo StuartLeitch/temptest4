@@ -7,10 +7,9 @@ import { CronFeatureFlagsReader } from './CronFeatureFlagsReader';
 
 export class RegisterInvoicesCron {
   public static async schedule(context: Context): Promise<any> {
-    const {
-      services: { logger: loggerService },
-    } = context;
-    loggerService.setScope('cron:registerInvoices');
+    const { loggerBuilder } = context;
+
+    const loggerService = loggerBuilder.getLogger('cron:registerInvoices');
 
     const cronFlags = CronFeatureFlagsReader.readAll();
     FeatureFlags.setFeatureFlags(cronFlags);

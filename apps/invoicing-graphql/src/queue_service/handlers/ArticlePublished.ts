@@ -1,14 +1,12 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
 import { ArticlePublished } from '@hindawi/phenom-events';
 
-import { ManuscriptTypeNotInvoiceable } from './../../../../../libs/shared/src/lib/modules/manuscripts/domain/ManuscriptTypes';
-import { CorrelationID } from '../../../../../libs/shared/src/lib/core/domain/CorrelationID';
 import {
   EpicOnArticlePublishedUsecase,
+  ManuscriptTypeNotInvoiceable,
   EpicOnArticlePublishedDTO,
-} from '../../../../../libs/shared/src/lib/modules/manuscripts/usecases/epicOnArticlePublished';
-import { Roles } from '@hindawi/shared';
+  executionContext,
+  Roles,
+} from '@hindawi/shared';
 
 import { Context } from '../../builders';
 
@@ -33,13 +31,14 @@ export const ArticlePublishedHandler: EventHandler<ArticlePublished> = {
           waiver: waiverRepo,
           transaction: transactionRepo,
         },
-        services: { emailService, vatService, logger },
+        services: { emailService, vatService },
+        loggerBuilder,
       } = context;
 
-      const correlationId = new CorrelationID().toString();
-
-      logger.setScope(`PhenomEvent:${ARTICLE_PUBLISHED}`);
-      logger.info(`Incoming Event Data`, { correlationId, data });
+      const logger = loggerBuilder.getLogger(
+        `PhenomEvent:${ARTICLE_PUBLISHED}`
+      );
+      logger.info(`Incoming Event Data`, data);
 
       const { customId, articleType, published } = data;
 
@@ -74,12 +73,11 @@ export const ArticlePublishedHandler: EventHandler<ArticlePublished> = {
       };
 
       const result = await epicOnArticlePublishedUsecase.execute(args, {
-        correlationId,
         roles: [Roles.QUEUE_EVENT_HANDLER],
       });
 
       if (result.isLeft()) {
-        logger.error(result.value.message, { correlationId });
+        logger.error(result.value.message);
         throw result.value;
       }
     };

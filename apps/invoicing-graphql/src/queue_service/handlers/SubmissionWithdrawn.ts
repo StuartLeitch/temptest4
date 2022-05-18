@@ -1,9 +1,5 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-/* eslint-disable max-len */
-
 import { SubmissionWithdrawn as SubmissionWithdrawnPayload } from '@hindawi/phenom-events';
-// * Domain imports
+
 import {
   SoftDeleteDraftTransactionUsecase,
   ManuscriptTypeNotInvoiceable,
@@ -16,6 +12,7 @@ import { Context } from '../../builders';
 import { EventHandler } from '../event-handler';
 
 const SUBMISSION_WITHDRAWN = 'SubmissionWithdrawn';
+
 const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.QUEUE_EVENT_HANDLER],
 };
@@ -31,10 +28,12 @@ export const SubmissionWithdrawn: EventHandler<SubmissionWithdrawnPayload> = {
           invoice: invoiceRepo,
           manuscript: manuscriptRepo,
         },
-        services: { logger },
+        loggerBuilder,
       } = context;
 
-      logger.setScope(`PhenomEvent:${SUBMISSION_WITHDRAWN}`);
+      const logger = loggerBuilder.getLogger(
+        `PhenomEvent:${SUBMISSION_WITHDRAWN}`
+      );
       logger.info('Incoming Event Data', data);
 
       const {
@@ -50,13 +49,14 @@ export const SubmissionWithdrawn: EventHandler<SubmissionWithdrawnPayload> = {
         return;
       }
 
-      const softDeleteDraftTransactionUsecase: SoftDeleteDraftTransactionUsecase = new SoftDeleteDraftTransactionUsecase(
-        transactionRepo,
-        invoiceItemRepo,
-        invoiceRepo,
-        manuscriptRepo,
-        context.services.logger
-      );
+      const softDeleteDraftTransactionUsecase: SoftDeleteDraftTransactionUsecase =
+        new SoftDeleteDraftTransactionUsecase(
+          transactionRepo,
+          invoiceItemRepo,
+          invoiceRepo,
+          manuscriptRepo,
+          logger
+        );
 
       const result = await softDeleteDraftTransactionUsecase.execute(
         {

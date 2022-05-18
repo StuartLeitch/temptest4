@@ -52,7 +52,8 @@ import * as Errors from './updateTransactionOnAcceptManuscriptErrors';
 
 export class UpdateTransactionOnAcceptManuscriptUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private addressRepo: AddressRepoContract,
     private catalogRepo: CatalogRepoContract,
@@ -107,9 +108,8 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
 
       try {
         // * System identifies invoice item by manuscript Id
-        const maybeInvoiceItem = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
-          manuscriptId
-        );
+        const maybeInvoiceItem =
+          await this.invoiceItemRepo.getInvoiceItemByManuscriptId(manuscriptId);
 
         if (maybeInvoiceItem.isLeft()) {
           return left(
@@ -164,9 +164,10 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
 
       try {
         // * System looks-up the catalog item for the manuscript
-        const maybeCatalogItem = await this.catalogRepo.getCatalogItemByJournalId(
-          JournalId.create(new UniqueEntityID(manuscript.journalId))
-        );
+        const maybeCatalogItem =
+          await this.catalogRepo.getCatalogItemByJournalId(
+            JournalId.create(new UniqueEntityID(manuscript.journalId))
+          );
 
         if (maybeCatalogItem.isLeft()) {
           return left(
@@ -203,7 +204,6 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
           journalId: manuscript.journalId,
         });
       } catch (error) {
-        console.log('Failed to save waiver', error);
         return left(
           new UnexpectedError(
             new Error(

@@ -20,7 +20,7 @@ import { CreditNoteRepoContract } from '../../../../creditNotes/repos/creditNote
 
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
 import { ErpRevRecResponse } from '../../../../../domain/services/ErpService';
-import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../../infrastructure/logging';
 
 import { PublishRevenueRecognitionReversalUsecase } from '../publishRevenueRecognitionReversal/publishRevenueRecognitionReversal';
 
@@ -28,7 +28,8 @@ import { RetryRevenueRecognitionReversalsNetsuiteErpResponse as Response } from 
 import { RetryRevenueRecognitionReversalsNetsuiteErpDTO as DTO } from './retryRevenueRecognitionReversalsNetsuiteErpDTO';
 
 export class RetryRevenueRecognitionReversalsNetsuiteErpUsecase
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   private publishRevenueRecognitionReversalUsecase: PublishRevenueRecognitionReversalUsecase;
   constructor(
     private invoiceRepo: InvoiceRepoContract,
@@ -45,26 +46,28 @@ export class RetryRevenueRecognitionReversalsNetsuiteErpUsecase
     private netsuiteService: ErpServiceContract,
     private loggerService: LoggerContract
   ) {
-    this.publishRevenueRecognitionReversalUsecase = new PublishRevenueRecognitionReversalUsecase(
-      this.invoiceRepo,
-      this.invoiceItemRepo,
-      this.couponRepo,
-      this.waiverRepo,
-      this.payerRepo,
-      this.addressRepo,
-      this.manuscriptRepo,
-      this.catalogRepo,
-      this.publisherRepo,
-      this.creditNoteRepo,
-      this.erpReferenceRepo,
-      this.netsuiteService,
-      this.loggerService
-    );
+    this.publishRevenueRecognitionReversalUsecase =
+      new PublishRevenueRecognitionReversalUsecase(
+        this.invoiceRepo,
+        this.invoiceItemRepo,
+        this.couponRepo,
+        this.waiverRepo,
+        this.payerRepo,
+        this.addressRepo,
+        this.manuscriptRepo,
+        this.catalogRepo,
+        this.publisherRepo,
+        this.creditNoteRepo,
+        this.erpReferenceRepo,
+        this.netsuiteService,
+        this.loggerService
+      );
   }
 
   public async execute(request?: DTO, context?: Context): Promise<Response> {
     try {
-      const maybeUnrecognizedReversalsErpInvoicesIds = await this.invoiceRepo.getUnrecognizedReversalsNetsuiteErp();
+      const maybeUnrecognizedReversalsErpInvoicesIds =
+        await this.invoiceRepo.getUnrecognizedReversalsNetsuiteErp();
 
       if (maybeUnrecognizedReversalsErpInvoicesIds.isLeft()) {
         return left(
@@ -74,7 +77,8 @@ export class RetryRevenueRecognitionReversalsNetsuiteErpUsecase
         );
       }
 
-      const unrecognizedErpReversalsIds = maybeUnrecognizedReversalsErpInvoicesIds.value;
+      const unrecognizedErpReversalsIds =
+        maybeUnrecognizedReversalsErpInvoicesIds.value;
 
       const updatedReversals: ErpRevRecResponse[] = [];
 
@@ -91,12 +95,13 @@ export class RetryRevenueRecognitionReversalsNetsuiteErpUsecase
       const errs = [];
 
       for (const unrecognizedReversal of unrecognizedErpReversalsIds) {
-        const updatedReversalResponse = await this.publishRevenueRecognitionReversalUsecase.execute(
-          {
-            invoiceId: unrecognizedReversal.id.toString(),
-          },
-          context
-        );
+        const updatedReversalResponse =
+          await this.publishRevenueRecognitionReversalUsecase.execute(
+            {
+              invoiceId: unrecognizedReversal.id.toString(),
+            },
+            context
+          );
         if (updatedReversalResponse.isLeft()) {
           errs.push(updatedReversalResponse.value);
         } else {

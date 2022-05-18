@@ -14,13 +14,13 @@ export const SubmissionSubmittedHandler: EventHandler<SubmissionSubmitted> = {
   event: SUBMISSION_SUBMITTED,
   handler(context: Context) {
     return async (data: SubmissionSubmitted): Promise<void> => {
-      const {
-        services: { logger },
-      } = context;
+      const { loggerBuilder } = context;
       const helpers = new SubmissionSubmittedHelpers(context);
       const eventHelpers = new EventHandlerHelpers(context);
 
-      logger.setScope(`PhenomEvent:${SUBMISSION_SUBMITTED}`);
+      const logger = loggerBuilder.getLogger(
+        `PhenomEvent:${SUBMISSION_SUBMITTED}`
+      );
       logger.info(`Incoming Event Data`, data);
 
       const {

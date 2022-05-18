@@ -1,4 +1,7 @@
-import { RetryRevenueRecognitionReversalsNetsuiteErpUsecase, Roles } from '@hindawi/shared';
+import {
+  RetryRevenueRecognitionReversalsNetsuiteErpUsecase,
+  Roles,
+} from '@hindawi/shared';
 
 import { Context } from '../builders';
 
@@ -10,13 +13,16 @@ export class RegisterRevenueRecognitionReversalsCron {
     const cronFlags = CronFeatureFlagsReader.readAll();
     FeatureFlags.setFeatureFlags(cronFlags);
 
-    const {
-      services: { logger: loggerService },
-    } = context;
-    loggerService.setScope('cron:registerRevenueRecognitionReversals');
+    const { loggerBuilder } = context;
+
+    const loggerService = loggerBuilder.getLogger(
+      'cron:registerRevenueRecognitionReversals'
+    );
 
     if (
-      !FeatureFlags.isFeatureEnabled('erpRegisterRevenueRecognitionReversalsEnabled')
+      !FeatureFlags.isFeatureEnabled(
+        'erpRegisterRevenueRecognitionReversalsEnabled'
+      )
     ) {
       return loggerService.debug(
         'Skipping the CRON Job revenue recognition reversals registration scheduling...'
@@ -35,31 +41,32 @@ export class RegisterRevenueRecognitionReversalsCron {
         waiver,
         payer,
         erpReference,
-        creditNote
+        creditNote,
       },
       services: { erp },
     } = context;
 
-    const retryRevenueRecognizedReversalsToNetsuiteErpUsecase = new RetryRevenueRecognitionReversalsNetsuiteErpUsecase(
-      invoice,
-      invoiceItem,
-      coupon,
-      waiver,
-      payer,
-      address,
-      manuscript,
-      catalog,
-      publisher,
-      creditNote,
-      erpReference,
-      erp?.netsuite || null,
-      loggerService
-    );
+    const retryRevenueRecognizedReversalsToNetsuiteErpUsecase =
+      new RetryRevenueRecognitionReversalsNetsuiteErpUsecase(
+        invoice,
+        invoiceItem,
+        coupon,
+        waiver,
+        payer,
+        address,
+        manuscript,
+        catalog,
+        publisher,
+        creditNote,
+        erpReference,
+        erp?.netsuite || null,
+        loggerService
+      );
 
-    const maybeResponse = await retryRevenueRecognizedReversalsToNetsuiteErpUsecase.execute(
-      null,
-      { roles: [Roles.CHRON_JOB] }
-    );
+    const maybeResponse =
+      await retryRevenueRecognizedReversalsToNetsuiteErpUsecase.execute(null, {
+        roles: [Roles.CHRON_JOB],
+      });
     if (maybeResponse.isLeft()) {
       loggerService.error(maybeResponse.value.message);
       throw maybeResponse.value;

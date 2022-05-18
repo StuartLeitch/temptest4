@@ -24,7 +24,7 @@ import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
 
 import { ExchangeRateService } from '../../../../../domain/services/ExchangeRateService';
-import { LoggerContract } from '../../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../../infrastructure/logging';
 import { VATService } from '../../../../../domain/services/VATService';
 import {
   ErpServiceContract,
@@ -43,7 +43,8 @@ import type { PublishInvoiceToErpRequestDTO as DTO } from './publishInvoiceToErp
 
 export class PublishInvoiceToErpUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -64,7 +65,6 @@ export class PublishInvoiceToErpUsecase
 
   @Authorize('erp:publish')
   public async execute(request: DTO, context?: Context): Promise<Response> {
-    this.loggerService.setScope('PublishInvoiceToERP');
     this.loggerService.info('PublishInvoiceToERP Request', request);
 
     let invoice: Invoice;
@@ -194,9 +194,10 @@ export class PublishInvoiceToErpUsecase
         return err;
       }
 
-      const maybePublisherCustomValues = await this.publisherRepo.getCustomValuesByPublisherId(
-        catalog?.publisherId
-      );
+      const maybePublisherCustomValues =
+        await this.publisherRepo.getCustomValuesByPublisherId(
+          catalog?.publisherId
+        );
       if (maybePublisherCustomValues.isLeft()) {
         throw new Error(`Invoice ${invoice.id} has no publisher associated.`);
       }

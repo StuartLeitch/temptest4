@@ -24,8 +24,11 @@ function softDelete(context: Context) {
   return async (submissionId: string): Promise<void> => {
     const {
       repos: { invoiceItem, transaction, manuscript, invoice },
-      services: { logger },
+      loggerBuilder,
     } = context;
+
+    const logger = loggerBuilder.getLogger('softDeleteDraftTransactionUsecase');
+
     const softDeleteDraftTransactionUsecase =
       new SoftDeleteDraftTransactionUsecase(
         transaction,
@@ -53,8 +56,12 @@ function restore(context: Context) {
   return async (manuscriptId: string): Promise<void> => {
     const {
       repos: { transaction, invoice, invoiceItem, coupon, waiver, manuscript },
-      services: { logger },
+      loggerBuilder,
     } = context;
+
+    const logger = loggerBuilder.getLogger(
+      'RestoreSoftDeleteDraftTransactionUsecase'
+    );
 
     const usecase = new RestoreSoftDeleteDraftTransactionUsecase(
       transaction,
@@ -83,9 +90,11 @@ function getJournal(context: Context) {
   return async (journalId: string): Promise<CatalogItem> => {
     const {
       repos: { catalog },
-      services: { logger },
+      loggerBuilder,
     } = context;
     const getJournalUsecase: GetJournalUsecase = new GetJournalUsecase(catalog);
+
+    const logger = loggerBuilder.getLogger('GetJournalUsecase');
 
     const journalResult = await getJournalUsecase.execute(
       {
@@ -120,7 +129,8 @@ function createTransaction(context: Context) {
         invoice,
         catalog,
       },
-      services: { waiverService, logger },
+      services: { waiverService },
+      loggerBuilder,
     } = context;
     const createTransactionUsecase = new CreateTransactionUsecase(
       pausedReminder,
@@ -131,6 +141,8 @@ function createTransaction(context: Context) {
       invoice,
       waiverService
     );
+
+    const logger = loggerBuilder.getLogger('CreateTransactionUsecase');
 
     const maybeTransaction = await createTransactionUsecase.execute(
       {
@@ -154,10 +166,12 @@ function createManuscript(context: Context) {
   return async (data: SubmissionSubmitted): Promise<Manuscript> => {
     const {
       repos: { manuscript: manuscriptRepo },
-      services: { logger },
+      loggerBuilder,
     } = context;
-    const createManuscript: CreateManuscriptUsecase =
-      new CreateManuscriptUsecase(manuscriptRepo);
+
+    const logger = loggerBuilder.getLogger('CreateManuscriptUsecase');
+
+    const createManuscript = new CreateManuscriptUsecase(manuscriptRepo);
 
     const manuscript = data.manuscripts[0];
     let hasSourceJournal = false;

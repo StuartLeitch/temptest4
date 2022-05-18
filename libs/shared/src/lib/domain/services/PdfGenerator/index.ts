@@ -1,6 +1,6 @@
 import { PdfGeneratorService } from './PdfGenerator';
 import type { InvoicePayload } from './PdfGenerator';
-import { LoggerContract } from '../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../infrastructure/logging';
 
 export { PdfGeneratorService, InvoicePayload };
 

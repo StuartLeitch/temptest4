@@ -23,7 +23,8 @@ import * as Errors from './addCatalogItemToCatalogErrors';
 
 export class AddCatalogItemToCatalogUseCase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Response, Context> {
+  implements UseCase<DTO, Response, Context>
+{
   constructor(
     private catalogRepo: CatalogRepoContract,
     private publisherRepo: PublisherRepoContract
@@ -97,7 +98,7 @@ export class AddCatalogItemToCatalogUseCase
       }
 
       if (maybeIsCreated.value) {
-        console.log(`Journal ${catalogItem.journalTitle} already exists.`);
+        // do nothing
       } else {
         // * This is where all the magic happens
         await this.catalogRepo.save(catalogItem);
@@ -105,7 +106,6 @@ export class AddCatalogItemToCatalogUseCase
 
       return right(catalogItem);
     } catch (err) {
-      console.log(err);
       return left(new UnexpectedError(err));
     }
   }

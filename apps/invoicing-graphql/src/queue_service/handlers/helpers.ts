@@ -25,8 +25,10 @@ function getExistingManuscript(context: Context) {
   return async (submissionId: string): Promise<Manuscript> => {
     const {
       repos: { manuscript: manuscriptRepo },
-      services: { logger },
+      loggerBuilder,
     } = context;
+
+    const logger = loggerBuilder.getLogger(ExistsManuscriptByIdUsecase.name);
 
     const existsManuscriptById = new ExistsManuscriptByIdUsecase(
       manuscriptRepo
@@ -69,14 +71,16 @@ function checkIsInvoiceDeleted(context: Context) {
   return async (invoiceId: string): Promise<boolean> => {
     const {
       repos: { invoice: invoiceRepo },
-      services: { logger },
+      loggerBuilder,
     } = context;
+
+    const logger = loggerBuilder.getLogger(IsInvoiceDeletedUsecase.name);
 
     const usecase = new IsInvoiceDeletedUsecase(invoiceRepo, logger);
     const maybeDeleted = await usecase.execute({ invoiceId }, defaultContext);
 
     if (maybeDeleted.isLeft()) {
-      logger.error(maybeDeleted.value);
+      logger.error(maybeDeleted.value.message);
       throw maybeDeleted.value;
     }
 
@@ -90,8 +94,12 @@ function getInvoiceId(context: Context) {
   return async (customId: string): Promise<InvoiceId> => {
     const {
       repos: { invoiceItem, manuscript },
-      services: { logger },
+      loggerBuilder,
     } = context;
+
+    const logger = loggerBuilder.getLogger(
+      GetInvoiceIdByManuscriptCustomIdUsecase.name
+    );
 
     const invoiceIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
       manuscript,
@@ -118,8 +126,11 @@ function getInvoiceItems(context: Context) {
   return async (customId: string): Promise<InvoiceItem[]> => {
     const {
       repos: { invoiceItem, manuscript, coupon, waiver },
-      services: { logger },
+      loggerBuilder,
     } = context;
+
+    const logger = loggerBuilder.getLogger('getInvoiceItems');
+
     const invoiceIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
       manuscript,
       invoiceItem
@@ -164,8 +175,11 @@ function updateInvoicePrice(context: Context) {
   return async (customId: string, newJournalId: string): Promise<void> => {
     const {
       repos: { invoiceItem, catalog },
-      services: { logger },
+      loggerBuilder,
     } = context;
+
+    const logger = loggerBuilder.getLogger('updateInvoicePrice');
+
     const getJournalUsecase: GetJournalUsecase = new GetJournalUsecase(catalog);
     const updateInvoiceItemsUsecase: UpdateInvoiceItemsUsecase =
       new UpdateInvoiceItemsUsecase(invoiceItem);
@@ -215,8 +229,11 @@ function updateManuscript(context: Context) {
   ): Promise<Manuscript> => {
     const {
       repos: { manuscript: manuscriptRepo },
-      services: { logger },
+      loggerBuilder,
     } = context;
+
+    const logger = loggerBuilder.getLogger('updateManuscript');
+
     const editManuscript: EditManuscriptUsecase = new EditManuscriptUsecase(
       manuscriptRepo
     );

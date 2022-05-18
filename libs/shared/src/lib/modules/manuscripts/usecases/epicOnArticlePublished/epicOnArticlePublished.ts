@@ -24,10 +24,10 @@ import { TransactionRepoContract } from '../../../transactions/repos/transaction
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
 import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
 import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
 import { CouponRepoContract } from '../../../coupons/repos/couponRepo';
 import { WaiverRepoContract } from '../../../waivers/repos/waiverRepo';
+import { LoggerContract } from '../../../../infrastructure/logging';
 import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 
 // * Usecase specific
@@ -45,14 +45,11 @@ import { EpicOnArticlePublishedResponse as Response } from './epicOnArticlePubli
 import type { EpicOnArticlePublishedDTO as DTO } from './epicOnArticlePublishedDTO';
 import * as Errors from './epicOnArticlePublishedErrors';
 
-interface CorrelationContext {
-  correlationId: string;
-}
-
-type Context = UsecaseAuthorizationContext & CorrelationContext;
+type Context = UsecaseAuthorizationContext;
 export class EpicOnArticlePublishedUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private invoiceItemRepo: InvoiceItemRepoContract,
     private transactionRepo: TransactionRepoContract,
@@ -73,21 +70,13 @@ export class EpicOnArticlePublishedUsecase
   public async execute(request: DTO, context?: Context): Promise<Response> {
     let manuscript: Manuscript;
 
-    const {
-      manuscriptRepo,
-      invoiceItemRepo,
-      invoiceRepo,
-      loggerService,
-    } = this;
+    const { manuscriptRepo, loggerService } = this;
     const {
       customId,
       published,
       sanctionedCountryNotificationReceiver,
       sanctionedCountryNotificationSender,
     } = request;
-    (manuscriptRepo as any).correlationId = context.correlationId;
-    (invoiceRepo as any).correlationId = context.correlationId;
-    (invoiceItemRepo as any).correlationId = context.correlationId;
 
     // * It should describe the business rules with minimal amount of implementation details.
 
@@ -95,7 +84,6 @@ export class EpicOnArticlePublishedUsecase
 
     try {
       loggerService.info('Find Manuscript by Custom Id', {
-        correlationId: context.correlationId,
         manuscriptId: manuscriptId.id.toString(),
       });
       try {
@@ -115,7 +103,6 @@ export class EpicOnArticlePublishedUsecase
       }
 
       loggerService.info('Mark Manuscript as Published', {
-        correlationId: context.correlationId,
         manuscriptId: manuscriptId.id.toString(),
       });
       manuscript.markAsPublished(published);
@@ -159,7 +146,6 @@ export class EpicOnArticlePublishedUsecase
     );
 
     this.loggerService.info('Find Invoice Ids by Manuscript Id', {
-      correlationId: context.correlationId,
       manuscriptId: manuscript.id.toString(),
     });
 
@@ -180,7 +166,6 @@ export class EpicOnArticlePublishedUsecase
 
     for (const invoiceId of invoiceIds) {
       this.loggerService.info('Get invoice details', {
-        correlationId: context.correlationId,
         invoiceId: invoiceId.toString(),
       });
 
@@ -195,7 +180,6 @@ export class EpicOnArticlePublishedUsecase
       if (invoice.status === InvoiceStatus.DRAFT) {
         if (typeof manuscript.authorCountry === 'undefined') {
           this.loggerService.info('sendEmail', {
-            correlationId: context.correlationId,
             invoiceId: invoiceId.id.toString(),
             manuscriptIdId: manuscript.manuscriptId.id.toString(),
             sanctionedCountryNotificationReceiver: emailReceiver,
@@ -263,7 +247,6 @@ export class EpicOnArticlePublishedUsecase
         };
 
         this.loggerService.info('Try to auto-confirm invoice', {
-          correlationId: context.correlationId,
           invoiceId: invoiceId.toString(),
         });
 

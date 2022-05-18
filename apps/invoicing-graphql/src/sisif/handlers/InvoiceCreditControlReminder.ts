@@ -1,10 +1,11 @@
 import { JobData } from '@hindawi/sisif';
+
 import {
   SendInvoiceCreditControlReminderUsecase,
   SendInvoiceCreditControlReminderDTO,
+  LoggerContract,
   QueuePayloads,
   Roles,
-  LoggerContract,
 } from '@hindawi/shared';
 
 import { Context } from '../../builders';
@@ -26,9 +27,14 @@ export const invoiceCreditControlHandler = (
       coupon,
       waiver,
     },
-    services: { emailService, logger },
+    services: { emailService },
+    loggerBuilder,
   } = appContext;
   const { recipientEmail, recipientName, invoiceId } = payload;
+
+  const logger = loggerBuilder.getLogger(
+    SendInvoiceCreditControlReminderUsecase.name
+  );
 
   const usecase = new SendInvoiceCreditControlReminderUsecase(
     sentNotifications,

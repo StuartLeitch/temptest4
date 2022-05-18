@@ -1,8 +1,9 @@
 import {
-  MicroframeworkLoader,
   MicroframeworkSettings,
+  MicroframeworkLoader,
 } from 'microframework-w3tec';
 import Knex from 'knex';
+
 import { env } from '../env';
 
 export const knexLoader: MicroframeworkLoader = async (

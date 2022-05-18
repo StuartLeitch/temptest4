@@ -27,14 +27,14 @@ export const s3Upload: Resolvers<Context> = {
 
       const email = context.keycloakAuth.accessToken['content']['email'];
 
-      const { services, repos } = context;
+      const { services, repos, loggerBuilder } = context;
       try {
         const confirmManuscriptUploadUseCase =
           new ConfirmManuscriptUploadUseCase(
             repos.manuscriptInfoRepo,
             services.uploadService,
             services.queueService,
-            services.logger
+            loggerBuilder.getLogger(ConfirmManuscriptUploadUseCase.name)
           );
         const response = await confirmManuscriptUploadUseCase.execute(
           { fileName, failsEmail: email, successEmail: email },
@@ -49,7 +49,7 @@ export const s3Upload: Resolvers<Context> = {
 
         return true;
       } catch (err) {
-        services.logger.error(err);
+        loggerBuilder.getLogger('confirmS3Upload').error(err);
         throw err;
       }
     },
@@ -64,14 +64,14 @@ export const s3Upload: Resolvers<Context> = {
         roles: contextRoles,
       };
 
-      const { services, repos } = context;
+      const { services, repos, loggerBuilder } = context;
 
       try {
         const createManuscriptUploadUrlUseCase =
           new CreateManuscriptUploadUrlUseCase(
             services.uploadService,
             repos.manuscriptInfoRepo,
-            services.logger
+            loggerBuilder.getLogger(CreateManuscriptUploadUrlUseCase.name)
           );
         const response = await createManuscriptUploadUrlUseCase.execute(
           { fileName },
@@ -86,7 +86,7 @@ export const s3Upload: Resolvers<Context> = {
 
         return response.value;
       } catch (err) {
-        context.services.logger.error(err);
+        loggerBuilder.getLogger('createSignedUrlForS3Upload').error(err);
         throw err;
       }
     },

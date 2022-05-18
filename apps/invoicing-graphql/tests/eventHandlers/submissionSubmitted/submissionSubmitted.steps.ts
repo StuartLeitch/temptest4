@@ -1,42 +1,38 @@
-/* eslint-disable @nrwl/nx/enforce-module-boundaries */
-
 import { Before, Given, When, Then, After } from '@cucumber/cucumber';
 import { expect } from 'chai';
 
 import { SubmissionSubmitted } from '@hindawi/phenom-events';
 
-import { MockLogger } from '../../../../../libs/shared/src/lib/infrastructure/logging/mocks/MockLogger';
-import { UsecaseAuthorizationContext } from '../../../../../libs/shared/src/lib/domain/authorization';
-import { WaiverService } from '../../../../../libs/shared/src/lib/domain/services/WaiverService';
-
-import { Manuscript } from '../../../../../libs/shared/src/lib/modules/manuscripts/domain/Manuscript';
-import { InvoiceStatus } from '../../../../../libs/shared/src/lib/modules/invoices/domain/Invoice';
-import { WaiverType } from '../../../../../libs/shared/src/lib/modules/waivers/domain/Waiver';
-import { Roles } from '../../../../../libs/shared/src/lib/modules/users/domain/enums/Roles';
-
-import { MockPausedReminderRepo } from '../../../../../libs/shared/src/lib/modules/notifications/repos/mocks/mockPausedReminderRepo';
-import { MockTransactionRepo } from '../../../../../libs/shared/src/lib/modules/transactions/repos/mocks/mockTransactionRepo';
-import { MockInvoiceItemRepo } from '../../../../../libs/shared/src/lib/modules/invoices/repos/mocks/mockInvoiceItemRepo';
-import { MockArticleRepo } from '../../../../../libs/shared/src/lib/modules/manuscripts/repos/mocks/mockArticleRepo';
-import { MockCatalogRepo } from '../../../../../libs/shared/src/lib/modules/journals/repos/mocks/mockCatalogRepo';
-import { MockInvoiceRepo } from '../../../../../libs/shared/src/lib/modules/invoices/repos/mocks/mockInvoiceRepo';
-import { MockEditorRepo } from '../../../../../libs/shared/src/lib/modules/journals/repos/mocks/mockEditorRepo';
-import { MockCouponRepo } from '../../../../../libs/shared/src/lib/modules/coupons/repos/mocks/mockCouponRepo';
-import { MockWaiverRepo } from '../../../../../libs/shared/src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
-
-import { TransactionMap } from '../../../../../libs/shared/src/lib/modules/transactions/mappers/TransactionMap';
-import { ManuscriptMap } from '../../../../../libs/shared/src/lib/modules/manuscripts/mappers/ManuscriptMap';
-import { InvoiceItemMap } from '../../../../../libs/shared/src/lib/modules/invoices/mappers/InvoiceItemMap';
-import { ArticleMap } from '../../../../../libs/shared/src/lib/modules/manuscripts/mappers/ArticleMap';
-import { CatalogMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/CatalogMap';
-import { InvoiceMap } from '../../../../../libs/shared/src/lib/modules/invoices/mappers/InvoiceMap';
-import { EditorMap } from '../../../../../libs/shared/src/lib/modules/journals/mappers/EditorMap';
-import { WaiverMap } from '../../../../../libs/shared/src/lib/modules/waivers/mappers/WaiverMap';
-
-import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceIdByManuscriptCustomId/getInvoiceIdByManuscriptCustomId';
-import { SoftDeleteDraftTransactionUsecase } from '../../../../../libs/shared/src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
-import { GetItemsForInvoiceUsecase } from '../../../../../libs/shared/src/lib/modules/invoices/usecases/getItemsForInvoice/getItemsForInvoice';
-import { GetInvoiceDetailsUsecase } from '../../../../../libs/shared/src/lib/modules/invoices/usecases/getInvoiceDetails';
+import {
+  MockLoggerBuilder,
+  UsecaseAuthorizationContext,
+  WaiverService,
+  Manuscript,
+  InvoiceStatus,
+  WaiverType,
+  Roles,
+  MockPausedReminderRepo,
+  MockTransactionRepo,
+  MockInvoiceItemRepo,
+  MockArticleRepo,
+  MockCatalogRepo,
+  MockInvoiceRepo,
+  MockEditorRepo,
+  MockCouponRepo,
+  MockWaiverRepo,
+  TransactionMap,
+  ManuscriptMap,
+  InvoiceItemMap,
+  ArticleMap,
+  CatalogMap,
+  InvoiceMap,
+  EditorMap,
+  WaiverMap,
+  GetInvoiceIdByManuscriptCustomIdUsecase,
+  SoftDeleteDraftTransactionUsecase,
+  GetItemsForInvoiceUsecase,
+  GetInvoiceDetailsUsecase,
+} from '@hindawi/shared';
 
 import { Context } from '../../../src/builders';
 
@@ -56,8 +52,8 @@ interface MockContext {
   };
   services: {
     waiverService: WaiverService;
-    logger: MockLogger;
   };
+  loggerBuilder: MockLoggerBuilder;
 }
 
 let context: MockContext = {
@@ -74,8 +70,8 @@ let context: MockContext = {
   },
   services: {
     waiverService: null,
-    logger: null,
   },
+  loggerBuilder: null,
 };
 
 const defaultUsecaseContext: UsecaseAuthorizationContext = {
@@ -100,7 +96,7 @@ Before({ tags: '@ValidateSubmissionSubmitted' }, () => {
   context.repos.editor = new MockEditorRepo();
   context.repos.waiver = new MockWaiverRepo();
 
-  context.services.logger = new MockLogger();
+  context.loggerBuilder = new MockLoggerBuilder();
   context.services.waiverService = new WaiverService(
     context.repos.invoiceItem,
     context.repos.editor,
@@ -127,8 +123,8 @@ After({ tags: '@ValidateSubmissionSubmitted' }, () => {
     },
     services: {
       waiverService: null,
-      logger: null,
     },
+    loggerBuilder: null,
   };
 });
 
@@ -186,7 +182,7 @@ When(`The "Submission Submitted" event is triggered`, async () => {
       },
     ],
   } as SubmissionSubmitted;
-  await Handler.handler((context as unknown) as Context)(event);
+  await Handler.handler(context as unknown as Context)(event);
 });
 
 Then(
@@ -345,7 +341,7 @@ Given(
       context.repos.invoiceItem,
       context.repos.invoice,
       context.repos.manuscript,
-      context.services.logger
+      context.loggerBuilder.getLogger()
     );
 
     const maybeResult = await usecase.execute(
@@ -502,9 +498,10 @@ Given(
 
     const manuscript = maybeManuscript.value;
 
-    const maybeItems = await context.repos.invoiceItem.getInvoiceItemByManuscriptId(
-      manuscript.manuscriptId
-    );
+    const maybeItems =
+      await context.repos.invoiceItem.getInvoiceItemByManuscriptId(
+        manuscript.manuscriptId
+      );
 
     if (maybeItems.isLeft()) {
       throw maybeItems.value;

@@ -35,8 +35,11 @@ export const sisifLoader: MicroframeworkLoader = async (
 
     const { sisifEnabled } = env.loaders;
     const {
-      services: { schedulingService, logger: loggerService },
+      services: { schedulingService },
+      loggerBuilder,
     } = context;
+
+    const loggerService = loggerBuilder.getLogger('sisifLoader');
 
     if (sisifEnabled) {
       env.scheduler.notificationsQueues.forEach((queue) => {

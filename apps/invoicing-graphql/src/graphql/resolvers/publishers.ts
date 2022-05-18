@@ -113,7 +113,9 @@ export const publisher: Resolvers<Context> = {
 
       if (resultPublisher.isLeft()) {
         const err = resultPublisher.value;
-        context.services.logger.error(err.message, err);
+        context.loggerBuilder
+          .getLogger('getPublisherByName')
+          .error(err.message, err);
         return null;
       }
 

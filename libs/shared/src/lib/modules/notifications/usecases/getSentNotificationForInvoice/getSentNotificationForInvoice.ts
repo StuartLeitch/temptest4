@@ -19,7 +19,7 @@ import { Notification } from '../../domain/Notification';
 import { SentNotificationRepoContract } from '../../repos/SentNotificationRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
 
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../infrastructure/logging';
 
 // * Usecase specific
 import { GetSentNotificationForInvoiceResponse as Response } from './getSentNotificationForInvoiceResponse';
@@ -28,7 +28,8 @@ import * as Errors from './getSentNotificationForInvoiceErrors';
 
 export class GetSentNotificationForInvoiceUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private sentNotificationRepo: SentNotificationRepoContract,
     private invoiceRepo: InvoiceRepoContract,
@@ -90,9 +91,8 @@ export class GetSentNotificationForInvoiceUsecase
     const uuid = new UniqueEntityID(request.invoiceId);
     const invoiceId = InvoiceId.create(uuid);
     try {
-      const results = await this.sentNotificationRepo.getNotificationsByInvoiceId(
-        invoiceId
-      );
+      const results =
+        await this.sentNotificationRepo.getNotificationsByInvoiceId(invoiceId);
 
       if (results.isLeft()) {
         return left(

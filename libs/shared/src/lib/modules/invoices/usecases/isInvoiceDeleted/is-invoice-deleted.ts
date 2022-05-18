@@ -1,7 +1,7 @@
 // * Core Domain
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
 import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
 import { Either, right, left } from '../../../../core/logic/Either';
+import { LoggerContract } from '../../../../infrastructure/logging';
 import { UnexpectedError } from '../../../../core/logic/AppError';
 import { AsyncEither } from '../../../../core/logic/AsyncEither';
 import { UseCase } from '../../../../core/domain/UseCase';
@@ -29,7 +29,8 @@ interface WithInvoiceId {
 
 export class IsInvoiceDeletedUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private invoiceRepo: InvoiceRepoContract,
     private logger: LoggerContract

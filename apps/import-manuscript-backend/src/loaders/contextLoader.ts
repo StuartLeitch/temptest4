@@ -3,7 +3,7 @@ import {
   MicroframeworkLoader,
 } from 'microframework-w3tec';
 
-import { LoggerBuilder } from '@hindawi/shared';
+import { LoggerBuilder, LogLevel } from '@hindawi/shared';
 
 import { buildServices, buildRepos, Context } from '../builders';
 import { env } from '../env';
@@ -13,13 +13,10 @@ export const contextLoader: MicroframeworkLoader = async (
 ) => {
   if (settings) {
     const db = settings.getData('connection');
-    const loggerBuilder = new LoggerBuilder('Import/Manuscript/Backend', {
-      isDevelopment: env.isDevelopment,
-      logLevel: env.log.level,
-    });
+    const loggerBuilder = new LoggerBuilder(LogLevel[env.log.level]);
 
     const repos = buildRepos(db, loggerBuilder);
-    const services = await buildServices(repos, loggerBuilder);
+    const services = await buildServices();
 
     const context: Context = {
       services,

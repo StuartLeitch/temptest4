@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 // * Core Domain
 import { flattenEither, AsyncEither } from '../../../../core/logic/AsyncEither';
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../infrastructure/logging';
 import { AuditLoggerServiceContract } from '../../../../infrastructure/audit/AuditLoggerService';
 import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
 import { Either, right, left } from '../../../../core/logic/Either';
@@ -64,7 +64,8 @@ export type Context = UsecaseAuthorizationContext & {
 
 export class RecordPaymentUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private strategyFactory: PaymentStrategyFactory,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -362,12 +363,13 @@ export class RecordPaymentUsecase
   }
 
   private savePayment(context: Context) {
-
     const _self = this;
 
     return async <T extends WithPaymentDetails>(request: T) => {
       const usecaseSave = new CreatePaymentUsecase(this.paymentRepo);
-      const getPaymentMethodById = new GetPaymentMethodByIdUsecase(this.paymentMethodRepo);
+      const getPaymentMethodById = new GetPaymentMethodByIdUsecase(
+        this.paymentMethodRepo
+      );
       const { paymentDetails, datePaid, invoice, amount, payer } = request;
 
       const dto = {
@@ -398,7 +400,10 @@ export class RecordPaymentUsecase
         .map((payment) => ({ ...request, payment }))
         .execute();
 
-      const maybePaymentMethod = await getPaymentMethodById.execute({ paymentMethodId: dto.paymentMethodId} , context);
+      const maybePaymentMethod = await getPaymentMethodById.execute(
+        { paymentMethodId: dto.paymentMethodId },
+        context
+      );
 
       const maybeUpdatePayment = await maybeWithPayment
         .advanceOrEnd(async (data) => {
@@ -409,9 +414,8 @@ export class RecordPaymentUsecase
         })
         .map((request) => {
           const { existingPayment, foreignPaymentId } = request;
-          existingPayment.foreignPaymentId = ExternalOrderId.create(
-            foreignPaymentId
-          );
+          existingPayment.foreignPaymentId =
+            ExternalOrderId.create(foreignPaymentId);
 
           return { ...request, payment: existingPayment };
         })
@@ -421,7 +425,6 @@ export class RecordPaymentUsecase
 
       return flattenEither([maybeCreateNewPayment, maybeUpdatePayment]).map(
         ([saveValue, updateValue]) => {
-
           // * Save the payment in audit log
           if (maybePaymentMethod.isRight) {
             // ! Should only log for Bank Transfers
@@ -435,7 +438,6 @@ export class RecordPaymentUsecase
               });
             }
           }
-
 
           if (saveValue.payment) {
             return saveValue;

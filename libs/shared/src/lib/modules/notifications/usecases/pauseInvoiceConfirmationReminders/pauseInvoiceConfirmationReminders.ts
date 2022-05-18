@@ -16,7 +16,7 @@ import {
 import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { NotificationType } from '../../domain/Notification';
 
-import { LoggerContract } from '../../../../infrastructure/logging/Logger';
+import { LoggerContract } from '../../../../infrastructure/logging';
 
 import { PausedReminderRepoContract } from '../../repos/PausedReminderRepo';
 import { InvoiceRepoContract } from '../../../invoices/repos';
@@ -28,7 +28,8 @@ import * as Errors from './pauseInvoiceConfirmationRemindersErrors';
 
 export class PauseInvoiceConfirmationRemindersUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private pausedReminderRepo: PausedReminderRepoContract,
     private invoiceRepo: InvoiceRepoContract,

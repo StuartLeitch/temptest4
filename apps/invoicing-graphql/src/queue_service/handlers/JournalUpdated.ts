@@ -1,5 +1,6 @@
 import { JournalUpdated } from '@hindawi/phenom-events';
-import { Roles, UpdateCatalogItemToCatalogUseCase } from '@hindawi/shared';
+
+import { UpdateCatalogItemToCatalogUseCase, Roles } from '@hindawi/shared';
 
 import { Context } from '../../builders';
 
@@ -15,10 +16,10 @@ export const JournalUpdatedHandler: EventHandler<JournalUpdated> = {
 
       const {
         repos: { catalog: catalogRepo, publisher: publisherRepo },
-        services: { logger },
+        loggerBuilder,
       } = context;
 
-      logger.setScope(`PhenomEvent:${JOURNAL_UPDATED}`);
+      const logger = loggerBuilder.getLogger(`PhenomEvent:${JOURNAL_UPDATED}`);
       logger.info(`Incoming Event Data`, data);
 
       const updateJournalUsecase = new UpdateCatalogItemToCatalogUseCase(

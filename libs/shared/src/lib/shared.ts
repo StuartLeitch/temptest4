@@ -30,6 +30,7 @@ export * from './modules/manuscripts/usecases/getManuscriptByManuscriptId/getMan
 export * from './modules/manuscripts/usecases/editManuscript/editManuscript';
 export * from './modules/manuscripts/usecases/editManuscript/editManuscriptDTO';
 export * from './modules/manuscripts/usecases/existsManuscriptById';
+export * from './modules/manuscripts/usecases/epicOnArticlePublished';
 
 // * Export Transaction Subdomain
 export * from './modules/transactions/domain/Transaction';
@@ -100,6 +101,9 @@ export * from './modules/invoices/subscriptions/AfterInvoiceFinalizedEvent';
 export * from './modules/invoices/subscriptions/AfterInvoicePaidEvents';
 export * from './modules/invoices/subscriptions/afterInvoiceConfirmedEvent';
 export * from './modules/invoices/subscriptions/AfterInvoiceMovedToPendingEvent';
+export * from './modules/invoices/subscriptions/AfterInvoiceDueAmountUpdateEvent';
+export * from './modules/invoices/subscriptions/AfterInvoiceDraftCreatedEvent';
+export * from './modules/invoices/subscriptions/AfterInvoiceDraftDeletedEvent';
 
 // export * from './invoices/usecases/sendInvoice/sendInvoice';
 // export * from './modules/invoices/dtos/InvoiceDTO';
@@ -157,6 +161,9 @@ export * from './modules/journals/usecases/addCatalogItemToCatalog';
 export * from './modules/journals/usecases/updateCatalogItemToCatalog';
 export * from './modules/journals/usecases/updateCatalogItemFields';
 export * from './modules/journals/usecases/catalogBulkUpdate';
+export * from './modules/journals/usecases/publishEvents/publishJournalAPCUpdated';
+
+export * from './modules/journals/subscriptions/AfterJournalAPCUpdatedEvent';
 
 // * Export User Subdomain
 export { Roles } from './modules/users/domain/enums/Roles';
@@ -217,6 +224,7 @@ export * from './modules/waivers/repos';
 export * from './modules/coupons/mappers/CouponMap';
 export * from './modules/waivers/mappers/WaiverMap';
 export * from './modules/coupons/repos';
+export * from './modules/waivers/domain/Waiver';
 
 // * Export Notifications Subdomain
 export * from './modules/notifications/domain/Notification';
@@ -237,6 +245,7 @@ export * from './modules/notifications/usecases/pauseInvoicePaymentReminders';
 export * from './modules/notifications/usecases/resumeInvoicePaymentReminders';
 export * from './modules/notifications/usecases/getRemindersPauseStateForInvoice';
 export * from './modules/notifications/usecases/addEmptyPauseStateForInvoice';
+export * from './modules/notifications/repos/mocks/mockPausedReminderRepo';
 
 // * Export Author Subdomain
 export * from './modules/authors/domain/Author';
@@ -260,6 +269,8 @@ export * from './modules/creditNotes/usecases/getCreditNoteByInvoiceId';
 export * from './modules/creditNotes/usecases/getCreditNoteByReferenceNumber';
 export * from './modules/creditNotes/usecases/getCreditNoteIds';
 export * from './modules/creditNotes/usecases/generateCreditNoteCompensatoryEvents';
+export * from './modules/creditNotes/usecases/publishEvents/publishCreditNoteCreated';
+export * from './modules/creditNotes/subscriptions/AfterCreditNoteCreatedEvent';
 
 // * Export user Subdomain
 export * from './modules/invoices/usecases/ERP/retryFailedNetsuiteErpInvoices/retryFailedNetsuiteErpInvoices';
@@ -286,10 +297,10 @@ import * as QueuePayloads from './infrastructure/message-queues/payloads';
 export { QueuePayloads };
 export * from './infrastructure/message-queues/payloadBuilder';
 export * from './infrastructure/Mapper';
+export * from './infrastructure/RepoError';
 
 // * LoggerBuilder/Logger
-export * from './infrastructure/logging/LoggerBuilder';
-export * from './infrastructure/logging/implementations/Logger';
+export * from './infrastructure/logging/implementations';
 
 // * Audit Logger
 export * from './infrastructure/audit/AuditLoggerService';

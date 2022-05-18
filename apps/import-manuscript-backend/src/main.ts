@@ -1,7 +1,7 @@
 import { bootstrapMicroframework } from 'microframework-w3tec';
 import 'reflect-metadata';
 
-import { LoggerBuilder } from '@hindawi/shared';
+import { LoggerBuilder, LogLevel } from '@hindawi/shared';
 
 import { banner } from './lib/banner';
 import { env } from './env';
@@ -14,10 +14,7 @@ import { env } from './env';
  * the 'README.md' file.
  */
 
-const log = new LoggerBuilder('loader', {
-  logLevel: env.log.level,
-  isDevelopment: env.isDevelopment,
-}).getLogger();
+const log = new LoggerBuilder(LogLevel[env.log.level]).getLogger('loader');
 
 async function main() {
   /**

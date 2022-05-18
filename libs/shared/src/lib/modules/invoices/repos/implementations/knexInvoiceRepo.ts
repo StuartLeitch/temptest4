@@ -79,16 +79,12 @@ export class KnexInvoiceRepo
   ): Promise<Either<GuardFailure | RepoError, Invoice>> {
     const { logger, db } = this;
 
-    const correlationId =
-      'correlationId' in this ? (this as any).correlationId : null;
-
     const sql = db(TABLES.INVOICES)
       .select()
       .where('id', invoiceId.id.toString())
       .first();
 
     logger.debug('select', {
-      correlationId,
       sql: sql.toString(),
     });
 
@@ -104,7 +100,6 @@ export class KnexInvoiceRepo
       .where('entity_id', invoiceId.id.toString());
 
     logger.debug('select', {
-      correlationId,
       erpReferencesSQL: erpReferencesSQL.toString(),
     });
 
@@ -421,14 +416,14 @@ export class KnexInvoiceRepo
 
   public async getUnrecognizedSageErpInvoices(): Promise<
     Either<GuardFailure | RepoError, InvoiceId[]>
-    > {
+  > {
     const maybeIds = await this.getUnrecognizedInvoices('sage');
     return right(maybeIds);
   }
 
   public async getUnrecognizedNetsuiteErpInvoices(): Promise<
     Either<GuardFailure | RepoError, InvoiceId[]>
-    > {
+  > {
     const maybeIds = await this.getUnrecognizedInvoices('netsuite');
     return right(maybeIds);
   }
@@ -484,14 +479,14 @@ export class KnexInvoiceRepo
 
   public async getFailedNetsuiteErpInvoices(): Promise<
     Either<GuardFailure | RepoError, InvoiceId[]>
-    > {
+  > {
     const maybeIds = await this.getUnregisteredInvoices('netsuite');
     return right(maybeIds);
   }
 
   public async getFailedSageErpInvoices(): Promise<
     Either<GuardFailure | RepoError, InvoiceId[]>
-    > {
+  > {
     const maybeIds = await this.getUnregisteredInvoices('sage');
     return right(maybeIds);
   }
@@ -666,7 +661,7 @@ export class KnexInvoiceRepo
 
   public async getUnrecognizedReversalsNetsuiteErp(): Promise<
     Either<GuardFailure | RepoError, any[]>
-    > {
+  > {
     const { db, logger } = this;
 
     const erpReferencesQuery = db(TABLES.CREDIT_NOTES)
