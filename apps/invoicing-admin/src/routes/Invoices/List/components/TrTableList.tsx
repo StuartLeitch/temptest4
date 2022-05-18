@@ -27,21 +27,22 @@ const INVOICE_STATUS = {
 };
 
 const TrTableInvoicesList = ({ invoices }) => {
-  let tabularData = invoices.map(i => {
+  let tabularData = invoices.map((i) => {
     // * applied coupons
     let coupons = 0;
-    i.invoiceItem.coupons.forEach(c => {
+    i.invoiceItem.coupons.forEach((c) => {
       coupons += c.reduction;
     });
 
     // * applied waivers
     let waivers = 0;
-    i.invoiceItem.waivers.forEach(w => {
+    i.invoiceItem.waivers.forEach((w) => {
       waivers += w.reduction;
-    })
+    });
 
-    const netCharges = i.invoiceItem.price * (1 - (coupons + waivers) / 100) * 100;
-    const total = netCharges + ((netCharges * i.invoiceItem.vat) / 100);
+    const netCharges =
+      i.invoiceItem.price * (1 - (coupons + waivers) / 100) * 100;
+    const total = netCharges + (netCharges * i.invoiceItem.vat) / 100;
     i.total = Math.round(total) / 100;
 
     return i;
@@ -54,26 +55,19 @@ const TrTableInvoicesList = ({ invoices }) => {
           id,
           status,
           referenceNumber,
-          // cancelledInvoiceReference,
-          // customId,
-          // manuscriptTitle,
           total,
 
           invoiceItem,
           dateIssued,
           dateAccepted,
         }) => (
-          <tr
-            key={id}
-          >
+          <tr key={id}>
             <td className='align-middle'>
               <div>{INVOICE_STATUS[status]}</div>
             </td>
             <td className='align-middle'>
               <Link
-                to={
-                  `/invoices/details/${id}`
-                }
+                to={`/invoices/details/${id}`}
                 className='text-decoration-none'
               >
                 <span className='text-secondary'>
@@ -83,9 +77,7 @@ const TrTableInvoicesList = ({ invoices }) => {
             </td>
             <td className='align-middle'>
               <Link
-                to={
-                `/invoices/details/${id}`
-                }
+                to={`/invoices/details/${id}`}
                 className='text-decoration-none'
               >
                 <span
@@ -93,9 +85,7 @@ const TrTableInvoicesList = ({ invoices }) => {
                     invoiceItem?.total < 0 ? 'text-danger' : 'text-success'
                   }
                 >
-                  <strong>
-                    { referenceNumber || ' '}
-                  </strong>
+                  <strong>{referenceNumber || ' '}</strong>
                 </span>
               </Link>
             </td>
@@ -118,7 +108,7 @@ const TrTableInvoicesList = ({ invoices }) => {
         )
       )}
     </React.Fragment>
-  )
+  );
 };
 
 function formatDate(date) {

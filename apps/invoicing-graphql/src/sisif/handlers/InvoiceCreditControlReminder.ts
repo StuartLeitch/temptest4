@@ -3,7 +3,6 @@ import { JobData } from '@hindawi/sisif';
 import {
   SendInvoiceCreditControlReminderUsecase,
   SendInvoiceCreditControlReminderDTO,
-  LoggerContract,
   QueuePayloads,
   Roles,
 } from '@hindawi/shared';
@@ -13,8 +12,7 @@ import { env } from '../../env';
 
 export const invoiceCreditControlHandler = (
   payload: JobData<QueuePayloads.InvoiceReminderPayload>,
-  appContext: Context,
-  loggerService: LoggerContract
+  appContext: Context
 ) => {
   const {
     repos: {
@@ -67,10 +65,10 @@ export const invoiceCreditControlHandler = (
     .execute(request, usecaseContext)
     .then((maybeResult) => {
       if (maybeResult.isLeft()) {
-        loggerService.error(maybeResult.value.message, maybeResult.value);
+        logger.error(maybeResult.value.message, maybeResult.value);
       }
     })
     .catch((err) => {
-      loggerService.error(err.message, err);
+      logger.error(err.message, err);
     });
 };

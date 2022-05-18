@@ -66,16 +66,17 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({
     });
 
     if (x.error) {
-      let failure = x?.error;
+      const failure = x?.error;
       let fail: any = failure;
 
       if (failure.graphQLErrors) {
         fail = failure.graphQLErrors.shift() as any;
-        toast.error(<ErrorPaymentToast closeToast={() => ({})} text={fail.message} />);
+        toast.error(
+          <ErrorPaymentToast closeToast={() => ({})} text={fail.message} />
+        );
       } else {
         toast.error(ErrorPaymentToast);
       }
-
     } else {
       onSuccessCallback();
       setIsModalOpen(false);

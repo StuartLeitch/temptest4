@@ -20,7 +20,7 @@ import { Tag, Table, Button } from '@hindawi/phenom-ui';
 
 import { HeaderMain } from '../../components/HeaderMain';
 import { Loading } from '../../components';
-import NotAuthorized from '../../components/NotAuthorized';
+import { NotAuthorized } from '../../components/NotAuthorized';
 
 const defaultPaginationSettings = { page: 1, offset: 0, limit: 10 };
 

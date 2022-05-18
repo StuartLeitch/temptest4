@@ -2,8 +2,6 @@ import React, { ReactNode } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import Common from './../../common';
-
 export class SidebarContent extends React.Component<SidebarContentProps, SidebarContentState> {
   static propTypes = {
       children: PropTypes.node,
@@ -14,9 +12,6 @@ export class SidebarContent extends React.Component<SidebarContentProps, Sidebar
   }
 
   sidebarRef: React.RefObject<HTMLDivElement> = React.createRef();
-  sidebarEntryAnimate: any;
-  slimSidebarAnimate: any;
-  slimMenuAnimate: any;
 
   constructor(props: SidebarContentProps) {
     super(props);
@@ -24,27 +19,6 @@ export class SidebarContent extends React.Component<SidebarContentProps, Sidebar
     this.state = {
       entryAnimationFinished: false,
     };
-  }
-
-  componentDidMount() {
-    this.sidebarEntryAnimate = new Common.SidebarEntryAnimate();
-    this.slimSidebarAnimate = new Common.SlimSidebarAnimate();
-    this.slimMenuAnimate = new Common.SlimMenuAnimate();
-
-    this.sidebarEntryAnimate.assignParentElement(this.sidebarRef.current);
-    this.slimSidebarAnimate.assignParentElement(this.sidebarRef.current);
-    this.slimMenuAnimate.assignSidebarElement(this.sidebarRef.current);
-
-    this.sidebarEntryAnimate.executeAnimation()
-      .then(() => {
-        this.setState({ entryAnimationFinished: true });
-      });
-  }
-
-  componentWillUnmount() {
-    this.sidebarEntryAnimate.destroy();
-    this.slimSidebarAnimate.destroy();
-    this.slimMenuAnimate.destroy();
   }
 
   render() {
@@ -58,7 +32,6 @@ export class SidebarContent extends React.Component<SidebarContentProps, Sidebar
 
     const sidebarClass = classNames('sidebar', 'sidebar--animations-enabled', {
       'sidebar--slim': slim || pageConfig.sidebarSlim,
-      'sidebar--collapsed': collapsed || pageConfig.sidebarCollapsed,
       'sidebar--animations-disabled': animationsDisabled || pageConfig.animationsDisabled,
       'sidebar--animate-entry-complete': this.state.entryAnimationFinished,
     });

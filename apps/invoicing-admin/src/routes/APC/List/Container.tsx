@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useQueryState } from 'react-router-use-location-state';
 import { useManualQuery, useMutation } from 'graphql-hooks';
 import axios, { AxiosError } from 'axios';
-import { Upload, Switch } from 'antd';
+import { Upload } from 'antd';
 
 import { Preset } from '@hindawi/phenom-ui/dist/Typography/Text';
 import {
@@ -25,7 +25,7 @@ import {
 import Restricted from '../../../contexts/Restricted';
 import { useAuth } from '../../../contexts/Auth';
 
-import NotAuthorized from '../../components/NotAuthorized';
+import { NotAuthorized } from '../../components/NotAuthorized';
 import { Loading } from '../../components';
 import {
   ButtonToolbar,

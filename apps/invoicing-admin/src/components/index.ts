@@ -1,34 +1,18 @@
-import Avatar, { AvatarAddOn } from './Avatar';
 import Card from './Card';
 import CardHeader from './CardHeader';
 import CustomInput from './CustomInput';
 import EmptyLayout from './EmptyLayout';
 import Error from './Error';
-import ExtendedDropdown from './ExtendedDropdown';
-import IconWithBadge from './IconWithBadge';
 import InputGroupAddon from './InputGroupAddon';
-import Layout, {
-  withPageConfig,
-  setupPage,
-  PageConfigProvider,
-  PageConfigConsumer
-} from './Layout';
+import Layout, { withPageConfig, setupPage } from './Layout';
 import ListPagination from './ListPagination';
 import Nav from './Nav';
 import Navbar from './Navbar';
-import NestedDropdown from './NestedDropdown';
 import ModalDropdown from './ModalDropdown';
-import OuterClick from './OuterClick';
 import Progress from './Progress';
 import Sidebar from './Sidebar';
 import SidebarMenu from './SidebarMenu';
-import SidebarTrigger from './SidebarTrigger';
-import {
-  ThemeClass,
-  ThemeProvider,
-  ThemeSelector,
-  ThemeConsumer
-} from './Theme';
+import { ThemeClass, ThemeProvider, ThemeConsumer } from './Theme';
 import UncontrolledModal from './UncontrolledModal';
 import UncontrolledPopover from './UncontrolledPopover';
 import UncontrolledTabs from './UncontrolledTabs';
@@ -105,40 +89,30 @@ export {
   UncontrolledButtonDropdown,
   UncontrolledDropdown,
   UncontrolledCollapse,
-  UncontrolledTooltip
+  UncontrolledTooltip,
 } from 'reactstrap';
 
 export {
-  Avatar,
-  AvatarAddOn,
   Card,
   CardHeader,
   CustomInput,
   EmptyLayout,
   Error,
-  ExtendedDropdown,
-  IconWithBadge,
   InputGroupAddon,
   Layout,
   ListPagination,
   ModalDropdown,
   Nav,
   Navbar,
-  NestedDropdown,
   withPageConfig,
   setupPage,
-  OuterClick,
-  PageConfigConsumer,
-  PageConfigProvider,
   Progress,
   Sidebar,
   SidebarMenu,
-  SidebarTrigger,
   ThemeClass,
   ThemeConsumer,
   ThemeProvider,
-  ThemeSelector,
   UncontrolledPopover,
   UncontrolledTabs,
-  UncontrolledModal
+  UncontrolledModal,
 };

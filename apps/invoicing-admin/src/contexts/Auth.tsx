@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { useAsync } from 'react-async';
-import { useLocation } from 'react-router-dom';
 
-import PendingLogging from '../routes/components/PendingLogging';
-import Danger from '../routes/Pages/Danger';
+import { PendingLogging } from '../routes/components/PendingLogging';
+import Danger from '../routes/Danger';
 
 /** Utils */
 import { bootstrapAppData } from '../utils/bootstrap';
@@ -12,11 +11,9 @@ import { AuthClient } from '../utils/auth-client';
 export const AuthContext = React.createContext(null);
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = (props: any) => {
-  const { pathname } = useLocation();
-
   const [firstAttemptFinished, setFirstAttemptFinished] = React.useState(false);
-  const { data, error, isRejected, isPending, isSettled, reload } = useAsync({
-    promiseFn: bootstrapAppData
+  const { data, isRejected, isPending, isSettled, reload } = useAsync({
+    promiseFn: bootstrapAppData,
   });
 
   React.useLayoutEffect(() => {
@@ -30,13 +27,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = (props: any) => {
       return <PendingLogging />;
     }
     if (isRejected) {
-      return (
-        // <div style={{ color: 'red' }}>
-        //   <p>Uh oh&hellip; There's a problem. Try refreshing the app.</p>
-        //   <pre>{error.message}</pre>
-        // </div>
-        <Danger />
-      );
+      return <Danger />;
     }
   }
 

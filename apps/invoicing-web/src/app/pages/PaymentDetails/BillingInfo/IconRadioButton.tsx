@@ -2,7 +2,8 @@ import React from "react";
 import styled from "styled-components";
 import { useField } from "formik";
 import { SpaceProps } from "styled-system";
-import { Icon, Flex, Text, IconNames, th } from "@hindawi/react-components";
+import type { IconNames } from "@hindawi/react-components";
+import { Icon, Flex, Text, th } from "@hindawi/react-components";
 
 interface Props extends SpaceProps {
   icon: IconNames;

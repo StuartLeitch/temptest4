@@ -6,16 +6,12 @@ import {
   ManuscriptTypeNotInvoiceable,
   UsecaseAuthorizationContext,
   TransactionStatus,
-  VersionCompare,
   Roles,
 } from '@hindawi/shared';
 
-import { Context } from '../../builders';
-
-import { EventHandlerHelpers } from './helpers';
-
+import { EventHandlerHelpers, getLatestManuscript } from './helpers';
 import { EventHandler } from '../event-handler';
-
+import { Context } from '../../builders';
 import { env } from '../../env';
 
 const defaultContext: UsecaseAuthorizationContext = {
@@ -50,9 +46,11 @@ export const SubmissionPeerReviewCycleCheckPassed: EventHandler<SPRCCP> = {
       );
       logger.info('Incoming Event Data', data);
 
-      const { submissionId, manuscripts, updated } = data;
+      const { submissionId, updated } = data;
 
-      if (manuscripts[0]?.articleType?.name in ManuscriptTypeNotInvoiceable) {
+      const latestManuscript = getLatestManuscript(data);
+
+      if (latestManuscript?.articleType?.name in ManuscriptTypeNotInvoiceable) {
         return;
       }
 
@@ -60,7 +58,7 @@ export const SubmissionPeerReviewCycleCheckPassed: EventHandler<SPRCCP> = {
       const manuscript = await eventHelpers.getExistingManuscript(submissionId);
 
       if (manuscript) {
-        const { journalId } = manuscripts[0];
+        const { journalId } = latestManuscript;
 
         const invoiceId = await eventHelpers.getInvoiceId(manuscript.customId);
 
@@ -81,24 +79,17 @@ export const SubmissionPeerReviewCycleCheckPassed: EventHandler<SPRCCP> = {
         await eventHelpers.updateManuscript(manuscript, data);
       } else {
         logger.info(
-          `PeerReviewCheckedMessage ignored for manuscript with id: '${data.manuscripts[0].id}' because the journal with id: ${data.manuscripts[0].journalId} is zero priced.`
+          `PeerReviewCheckedMessage ignored for manuscript with id: '${latestManuscript.id}' because the journal with id: ${latestManuscript.journalId} is zero priced.`
         );
         return;
       }
-
-      const maxVersion = manuscripts.reduce((max, m) => {
-        const version = VersionCompare.versionCompare(m.version, max)
-          ? m.version
-          : max;
-        return version;
-      }, manuscripts[0].version);
 
       const {
         customId,
         title,
         articleType: { name },
         authors,
-      } = manuscripts.find((m) => m.version === maxVersion);
+      } = latestManuscript;
 
       const { email, country, surname, givenNames } = authors.find(
         (a) => a.isCorresponding

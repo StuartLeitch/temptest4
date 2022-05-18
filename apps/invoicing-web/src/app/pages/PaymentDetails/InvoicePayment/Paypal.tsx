@@ -1,59 +1,36 @@
-import React, { useState, useEffect, useRef } from "react";
-import scriptLoader from "react-async-script-loader";
-
-import { config } from "../../../../config";
+import { usePayPalScriptReducer, PayPalButtons } from "@paypal/react-paypal-js";
+import React from "react";
 
 interface Props {
-  isScriptLoaded: boolean;
-  isScriptLoadSucceed: boolean;
-  onError?(data?: any): void;
-  onCancel?(data?: any): void;
-  onSuccess?(data?: any): void;
   createPayPalOrder(): Promise<string>;
+  onSuccess?(data?: any): void;
+  onCancel?(data?: any): void;
+  onError?(data?: any): void;
 }
 
-const ENV = config.env === "production" ? "production" : "sandbox";
-
-const CLIENT = {
-  production: config.paypallClientId,
-  sandbox: config.paypallClientId,
-};
-
 const Paypal: React.FunctionComponent<Props> = ({
-  onError,
-  onCancel,
-  onSuccess,
-  isScriptLoaded,
-  isScriptLoadSucceed,
   createPayPalOrder,
+  onSuccess,
+  onCancel,
+  onError,
 }) => {
-  const paypalRef = useRef();
+  const [{ isPending }] = usePayPalScriptReducer();
 
-  useEffect(() => {
-    isScriptLoadSucceed &&
-      isScriptLoaded &&
-      (window as any).paypal
-        .Buttons({
-          style: {
-            layout: "horizontal",
-            label: "pay",
-          },
-          createOrder: async (data, actions) => {
-            const a = await createPayPalOrder();
-            return a;
-          },
-          onApprove: async (data, actions) => {
-            onSuccess({ orderId: data.orderID });
-          },
-          onError,
-          onCancel,
-        })
-        .render(paypalRef.current);
-  }, [isScriptLoadSucceed, isScriptLoaded]);
-
-  return isScriptLoadSucceed && isScriptLoaded && <div ref={paypalRef} />;
+  return (
+    !isPending && (
+      <PayPalButtons
+        createOrder={async () => {
+          const a = await createPayPalOrder();
+          return a;
+        }}
+        onApprove={async (data) => {
+          onSuccess({ orderId: data.orderID });
+        }}
+        onError={onError}
+        onCancel={onCancel}
+      />
+    )
+  );
 };
 
-export default scriptLoader(
-  `https://www.paypal.com/sdk/js?client-id=${CLIENT[ENV]}`,
-)(Paypal);
+export default Paypal;

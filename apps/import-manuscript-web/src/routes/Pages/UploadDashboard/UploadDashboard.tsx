@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { useManualQuery, useMutation } from 'graphql-hooks';
 import axios, { AxiosRequestConfig } from 'axios';
 import { useDispatch } from 'react-redux';
-import { useHistory } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
+import { Alert } from 'antd';
 
 import {
   IconRemoveSolid,
   DragAndDrop,
   IconRemove,
-  Alert,
   Title,
   Card,
 } from '@hindawi/phenom-ui';
@@ -23,16 +23,11 @@ const UploadDashboard = () => {
   const [uploadError, setUploadError] = useState(null);
   const [retryProps, setRetryProps] = useState(null);
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
-  const [confirmS3Upload] = useMutation(
-    UPLOAD_FILE_MUTATION
-  );
+  const [confirmS3Upload] = useMutation(UPLOAD_FILE_MUTATION);
 
-  const [
-    createSignedUrl,
-    { error },
-  ] = useManualQuery(UPLOAD_FILE_QUERY);
+  const [createSignedUrl, { error }] = useManualQuery(UPLOAD_FILE_QUERY);
 
   const dispatch = useDispatch();
 
@@ -46,15 +41,15 @@ const UploadDashboard = () => {
       removeIcon: <IconRemove />,
     },
 
-    async handleUpload({ onSuccess, onError, file, onProgress} : any) {
-      controller = new AbortController()
+    async handleUpload({ onSuccess, onError, file, onProgress }: any) {
+      controller = new AbortController();
       const { error, data } = await createSignedUrl({
         variables: {
           fileName: file.name,
         },
       });
 
-      setRetryProps({onSuccess, onError, file, onProgress})
+      setRetryProps({ onSuccess, onError, file, onProgress });
 
       if (error) {
         onError({ error });
@@ -75,25 +70,22 @@ const UploadDashboard = () => {
       };
 
       try {
-        const res = await axios.put(
-          createSignedUrlForS3Upload,
-          file,
-          config
-        );
+        const res = await axios.put(createSignedUrlForS3Upload, file, config);
         onSuccess('Ok');
-        setFileList([{
-          uid: '0',
-          name: file.name,
-          status: 'success',
-          size: res.config.data.size,
-        }]);
+        setFileList([
+          {
+            uid: '0',
+            name: file.name,
+            status: 'success',
+            size: res.config.data.size,
+          },
+        ]);
 
         dispatch(upload(file.name));
 
         setTimeout(() => {
-          history.push('/successful-upload');
+          navigate('/successful-upload');
         }, 1000);
-
       } catch (err) {
         console.error('Error: ', err);
         onError({ err });
@@ -109,14 +101,14 @@ const UploadDashboard = () => {
         controller.abort();
       }
 
-      setUploadError(null)
+      setUploadError(null);
     },
 
     onRetry() {
       controller = new AbortController();
-      setUploadError(null)
-      retryProps.onProgress({percent: 0})
-      props.handleUpload(retryProps)
+      setUploadError(null);
+      retryProps.onProgress({ percent: 0 });
+      props.handleUpload(retryProps);
     },
 
     disabledCheck(fileList) {
@@ -129,26 +121,25 @@ const UploadDashboard = () => {
       } else if (file.status === 'uploading') {
         setFileList([file]);
       } else if (file.status === 'done') {
-        try{
+        try {
           confirmS3Upload({
-          variables: {
-            confirmation: {
-              fileName: file.name,
-              location: 'foo'
-            }
-          },
-        });
-      }catch(err) {
-        console.error('Error: ', err);
-        setUploadError(error);
-      }
+            variables: {
+              confirmation: {
+                fileName: file.name,
+                location: 'foo',
+              },
+            },
+          });
+        } catch (err) {
+          console.error('Error: ', err);
+          setUploadError(error);
+        }
       } else if (file.status === 'error') {
         setFileList([file]);
       } else {
         setFileList([file]);
       }
-
-    }
+    },
   };
 
   return (

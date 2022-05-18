@@ -1,26 +1,20 @@
-// @import '~@owczar/dashboard-style--airframe/scss/style';
-
-// @import '~@owczar/dashboard-style--airframe/scss/sidebar';
 @import './plugins/custom/sidebar';
-// @import "~@owczar/dashboard-style--airframe/scss/sidebar-menu";
 @import './plugins/custom/sidebar-menu';
-// @import '~@owczar/dashboard-style--airframe/scss/theme-variants';
 @import './plugins/custom/theme-variants';
 
-@import '~@owczar/dashboard-style--airframe/scss/animations';
-@import '~@owczar/dashboard-style--airframe/scss/avatars';
-@import '~@owczar/dashboard-style--airframe/scss/custom-card';
-@import '~@owczar/dashboard-style--airframe/scss/custom-card-header';
-@import '~@owczar/dashboard-style--airframe/scss/hr-text';
-@import '~@owczar/dashboard-style--airframe/scss/icon-with-badge';
-// @import '~@owczar/dashboard-style--airframe/scss/layout';
+@import './plugins/dep/animations';
+@import './plugins/dep/avatars';
+@import './plugins/dep/custom-card';
+@import './plugins/dep/custom-card-header';
+@import './plugins/dep/hr-text';
+@import './plugins/dep/icon-with-badge';
 @import './plugins/custom/layout';
 
-@import '~@owczar/dashboard-style--airframe/scss/navbar';
-@import '~@owczar/dashboard-style--airframe/scss/extended-dropdown';
-@import '~@owczar/dashboard-style--airframe/scss/fullScreen';
-@import '~@owczar/dashboard-style--airframe/scss/nested-dropdown';
-@import '~@owczar/dashboard-style--airframe/scss/timeline';
-@import '~@owczar/dashboard-style--airframe/scss/theme-config';
+@import './plugins/dep/navbar';
+@import './plugins/dep/extended-dropdown';
+@import './plugins/dep/fullScreen';
+@import './plugins/dep/nested-dropdown';
+@import './plugins/dep/timeline';
+@import './plugins/dep/theme-config';
 
 // @import '~@hindawi/phenom-ui/dist/styles.css';

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Route, Switch, Redirect } from 'react-router';
+import { Route, Routes, Navigate } from 'react-router-dom';
 
 import { ClientContext } from 'graphql-hooks';
 
@@ -10,6 +10,7 @@ import SuccessfulUpload from './Pages/SuccessfulUpload';
 
 //------ Route Definitions --------
 export const RoutedContent = () => {
+  const client = useContext(ClientContext);
   const auth: any = useAuth();
 
   if (!auth) {
@@ -17,52 +18,56 @@ export const RoutedContent = () => {
   }
   const { token } = auth.data;
 
-  const client = useContext(ClientContext);
-
   // ! Do not use '===' for checking
   if (client.headers['Authorization'] == null) {
     client.setHeader('Authorization', `Bearer ${token}`);
   }
 
   return (
-    <Switch>
-      <Redirect from='/' to='/transfer-manuscript' exact />
+    <Routes>
+      <Route path='/' element={<Navigate to='/transfer-manuscript' />} />
+
       {/*     Package Submission Routes      */}
-      <PrivateRoute exact path='/transfer-manuscript'>
-        <UploadDashboard />
-      </PrivateRoute>
-      <PrivateRoute exact path='/successful-upload'>
-        <SuccessfulUpload />
-      </PrivateRoute>
-      {/*    404    */}
-      <Redirect to='/pages/error-404' />
-    </Switch>
+      <Route
+        path='/transfer-manuscript'
+        element={
+          <PrivateRoute>
+            <UploadDashboard />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path='/successful-upload'
+        element={
+          <PrivateRoute>
+            <SuccessfulUpload />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path='*'
+        element={<Navigate to='/transfer-manuscript' replace />}
+      />
+    </Routes>
   );
 };
 
-function childrenInRoute(children: any, pathMatch: any, params: any) {
-  const toRender = <React.Suspense fallback={null}>{children}</React.Suspense>;
-  return <Route {...params} render={() => toRender} />;
-}
-
-function PrivateRoute({ children, ...rest }: any): any {
+function PrivateRoute({ children, ...rest }) {
   const auth = useAuth();
 
   // * If auth is not enabled
   if (typeof auth === 'object' && !auth) {
-    return childrenInRoute(children, rest.computedMatch, rest);
+    return children;
   }
 
-  const { data, login }: any = auth;
+  const { data, login } = auth;
   if (!data || !data.isAuthenticated) {
     // * Ask user to login!
     login();
-
-    return null;
   }
 
   if (data && 'isAuthenticated' in data && data.isAuthenticated) {
-    return childrenInRoute(children, rest.computedMatch, rest);
+    return children;
   }
 }
-

@@ -17,7 +17,7 @@ import {
   Row,
   Table,
 } from '../../../../components';
-import  { formatDate } from '../../../../utils/date';
+import { formatDate } from '../../../../utils/date';
 
 import Config from '../../../../config';
 
@@ -62,7 +62,11 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
                 <DatePicker
                   disabled
                   customInput={<ButtonInput />}
-                  selected={new Date(Date.parse(formatDate(new Date(invoice?.dateIssued))))}
+                  selected={
+                    new Date(
+                      Date.parse(formatDate(new Date(invoice?.dateIssued)))
+                    )
+                  }
                   onChange={() => ({})}
                 />
               ) : (
@@ -82,12 +86,10 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
             <FormGroup row>
               <Label for='staticText' sm={12}>
                 Credit Note
-                <Link
-                  to={`/credit-notes/details/${creditNote.id}`}
-                >
+                <Link to={`/credit-notes/details/${creditNote.id}`}>
                   {
                     <span className='ml-1 font-weight-bold text-warning'>
-                     {creditNote.persistentReferenceNumber}
+                      {creditNote.persistentReferenceNumber}
                     </span>
                   }
                 </Link>

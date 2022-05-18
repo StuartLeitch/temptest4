@@ -20,7 +20,7 @@ import { HeaderMain } from '../../components/HeaderMain';
 import { InvoicesLeftNav } from '../../components/Invoices/InvoicesLeftNav';
 import InvoicesList from './List';
 import SuccessfulUrlCopiedToClipboardToast from './components/SuccessfulUrlCopiedToClipboardToast';
-import NotAuthorized from '../../components/NotAuthorized';
+import { NotAuthorized } from '../../components/NotAuthorized';
 
 const InvoicesContainer: React.FC = () => {
   const defaultFilters = {
@@ -57,7 +57,10 @@ const InvoicesContainer: React.FC = () => {
     (defaultFilters as any).customId
   );
 
-  const [listState] = useLocalStorage('invoicesList', { filters:defaultFilters, pagination: defaultPagination});
+  const [listState] = useLocalStorage('invoicesList', {
+    filters: defaultFilters,
+    pagination: defaultPagination,
+  });
   let { filters, pagination } = listState;
   const queryFilters = {
     invoiceStatus,
@@ -158,7 +161,10 @@ const InvoicesContainer: React.FC = () => {
                     className='text-decoration-none align-self-center pr-0'
                     id='tooltipFav'
                     onClick={() => {
-                      const urlToShare = buildURLWithFilters(filters, pagination);
+                      const urlToShare = buildURLWithFilters(
+                        filters,
+                        pagination
+                      );
                       copyToClipboard(urlToShare);
                       return toast.success(
                         <SuccessfulUrlCopiedToClipboardToast />
@@ -172,11 +178,7 @@ const InvoicesContainer: React.FC = () => {
                   </UncontrolledTooltip>
                 </ButtonGroup>
               </ButtonToolbar>
-              <InvoicesList
-                state={listState}
-                setPage={setFilter}
-              />
-
+              <InvoicesList state={listState} setPage={setFilter} />
             </Col>
           </Row>
         </Container>
@@ -196,7 +198,6 @@ const InvoicesContainer: React.FC = () => {
     let newTransactionStatus = [];
 
     switch (name) {
-
       // * invoices status filter
       case 'invoiceStatus':
         if (filters.invoiceStatus.includes(status)) {
@@ -214,26 +215,24 @@ const InvoicesContainer: React.FC = () => {
           },
           pagination: {
             ...pagination,
-            page: 1
-          }
+            page: 1,
+          },
         });
 
         break;
-
 
       // * pagination
       case 'page':
         setPage(value as string);
         writeStorage('invoicesList', {
           filters,
-          pagination:{
+          pagination: {
             ...pagination,
             page: value,
             offset: Number(value) - 1,
-          }
+          },
         });
         break;
-
 
       // * transaction status filter
       default:
@@ -249,12 +248,14 @@ const InvoicesContainer: React.FC = () => {
 
         writeStorage('invoicesList', {
           filters: {
-          ...filters,
-          transactionStatus: newTransactionStatus,
-        }, pagination: {
-          ...pagination,
-          page: 1,
-        }});
+            ...filters,
+            transactionStatus: newTransactionStatus,
+          },
+          pagination: {
+            ...pagination,
+            page: 1,
+          },
+        });
         break;
     }
   }

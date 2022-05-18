@@ -1,5 +1,4 @@
 import { SisifJobTypes, JobData } from '@hindawi/sisif';
-import { LoggerContract } from '@hindawi/shared';
 
 import { Context } from '../../builders';
 
@@ -8,11 +7,7 @@ import { invoiceConfirmHandler } from './InvoiceConfirmReminder';
 import { invoicePaymentHandler } from './InvoicePaymentReminder';
 import { emptyHandler } from './EmptyHandler';
 
-type SisifHandler = (
-  payload: JobData,
-  appContext: Context,
-  logger: LoggerContract
-) => void;
+type SisifHandler = (payload: JobData, appContext: Context) => void;
 
 type SisifHandlersRepo = {
   [key in SisifJobTypes & 'default']: SisifHandler;

@@ -3,12 +3,10 @@ import PropTypes from 'prop-types';
 import { GraphQLClient, ClientContext } from 'graphql-hooks';
 import { ToastContainer } from 'react-toastify';
 
-import {
-  Layout,
-  ThemeSelector,
-  ThemeProvider,
-  PageConfigConsumer,
-} from '../components';
+import { Layout, ThemeProvider } from '../components';
+
+import { InvoicingNavbar } from '../layout/components/Navbar';
+import { InvoicingSidebar } from '../layout/components/Sidebar';
 
 import AppProviders from '../contexts';
 import config from '../config';
@@ -19,8 +17,6 @@ import '../styles/plugins/plugins.scss';
 import './../styles/plugins/plugins.css';
 
 import '@hindawi/phenom-ui/dist/styles.css';
-
-import { RoutedNavbars, RoutedSidebars } from './../routes';
 
 const favIcons = [
   {
@@ -67,11 +63,11 @@ class AppLayout extends React.Component {
           <Layout sidebarSlim favIcons={favIcons}>
             {/* --------- Navbar ----------- */}
             <Layout.Navbar>
-              <RoutedNavbars />
+              <InvoicingNavbar />
             </Layout.Navbar>
             {/* -------- Sidebar ------------*/}
             <Layout.Sidebar>
-              <RoutedSidebars />
+              <InvoicingSidebar />
             </Layout.Sidebar>
 
             {/* -------- Content ------------*/}
@@ -80,13 +76,6 @@ class AppLayout extends React.Component {
                 {children}
               </ClientContext.Provider>
             </Layout.Content>
-
-            {/* -- Theme Selector (DEMO) ----*/}
-            {/* <PageConfigConsumer>
-              {({ sidebarHidden, navbarHidden }) => (
-                <ThemeSelector styleDisabled={sidebarHidden && navbarHidden} />
-              )}
-            </PageConfigConsumer> */}
           </Layout>
           <ToastContainer
             position='top-right'

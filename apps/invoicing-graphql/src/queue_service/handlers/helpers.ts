@@ -1,25 +1,64 @@
-import { SubmissionSubmitted } from '@hindawi/phenom-events';
+import {
+  SubmissionPeerReviewCycleCheckPassed,
+  SubmissionSubmitted,
+} from '@hindawi/phenom-events';
 
 import {
   GetInvoiceIdByManuscriptCustomIdUsecase,
-  UsecaseAuthorizationContext,
-  IsInvoiceDeletedUsecase,
   GetManuscriptByManuscriptIdUsecase,
   ExistsManuscriptByIdUsecase,
-  Manuscript,
-  InvoiceId,
+  UsecaseAuthorizationContext,
   GetItemsForInvoiceUsecase,
   UpdateInvoiceItemsUsecase,
+  IsInvoiceDeletedUsecase,
   EditManuscriptUsecase,
   GetJournalUsecase,
+  VersionCompare,
   InvoiceItem,
+  Manuscript,
+  InvoiceId,
   Roles,
 } from '@hindawi/shared';
+
 import { Context } from '../../builders';
 
 const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.QUEUE_EVENT_HANDLER],
 };
+
+export function hasSourceJournal(data: SubmissionSubmitted): boolean {
+  const manuscript = getLatestManuscript(data);
+
+  if (!manuscript.sourceJournal) {
+    return false;
+  }
+
+  const eissn = manuscript.sourceJournal.eissn;
+  const pissn = manuscript.sourceJournal.pissn;
+
+  if (!eissn && !pissn) {
+    return false;
+  }
+
+  if (manuscript.sourceJournal.name == null) {
+    return false;
+  }
+
+  return true;
+}
+
+export function getLatestManuscript({
+  manuscripts,
+}: SubmissionSubmitted | SubmissionPeerReviewCycleCheckPassed) {
+  const maxVersion = manuscripts.reduce((max, m) => {
+    const version = VersionCompare.versionCompare(m.version, max)
+      ? m.version
+      : max;
+    return version;
+  }, manuscripts[0].version);
+
+  return manuscripts.find((m) => m.version === maxVersion);
+}
 
 function getExistingManuscript(context: Context) {
   return async (submissionId: string): Promise<Manuscript> => {
@@ -238,19 +277,9 @@ function updateManuscript(context: Context) {
       manuscriptRepo
     );
 
-    const newManuscript = data.manuscripts[0];
+    const newManuscript = getLatestManuscript(data);
 
     const author = newManuscript.authors.find((a) => a.isCorresponding);
-
-    let hasSourceJournal = false;
-    if (
-      'sourceJournal' in newManuscript &&
-      newManuscript['sourceJournal']['name'] !== null &&
-      newManuscript['sourceJournal']['pissn'] !== null &&
-      newManuscript['sourceJournal']['eissn'] !== null
-    ) {
-      hasSourceJournal = true;
-    }
 
     const newJournalId =
       newManuscript.journalId !== oldManuscript.journalId
@@ -268,7 +297,7 @@ function updateManuscript(context: Context) {
         title: newManuscript.title,
         authorEmail: author.email,
         journalId: newJournalId,
-        is_cascaded: hasSourceJournal ? 1 : 0,
+        is_cascaded: hasSourceJournal(data) ? 1 : 0,
       },
       defaultContext
     );

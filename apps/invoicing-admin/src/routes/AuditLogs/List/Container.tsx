@@ -1,32 +1,27 @@
-import React, { useEffect, useCallback, useState } from 'react';
-import { useManualQuery } from 'graphql-hooks';
 import { useQueryState } from 'react-router-use-location-state';
 import DatePicker, { setDefaultLocale } from 'react-datepicker';
-import axios from 'axios';
+import React, { useEffect, useCallback } from 'react';
+import { useManualQuery } from 'graphql-hooks';
 import moment from 'moment';
+import axios from 'axios';
+
+import { Table, Button } from '@hindawi/phenom-ui';
+
 import { useAuth } from '../../../contexts/Auth';
-
 import { AUDIT_LOGS_QUERY } from '../graphql';
-
-import {
-  Container,
-  Row,
-  Col,
-  Error,
-  ListPagination,
-  CardFooter,
-  Card,
-  ButtonToolbar,
-  // Button,
-} from '../../../components';
-
-import { Text, Table, Button, IconDownload } from '@hindawi/phenom-ui';
 
 import { HeaderMain } from '../../components/HeaderMain';
 import { Loading } from '../../components';
 import { AddonInput } from './components';
+import {
+  ButtonToolbar,
+  Container,
+  Error,
+  Card,
+  Col,
+  Row,
+} from '../../../components';
 
-import List from './List';
 import _ from 'lodash';
 
 setDefaultLocale('en');
@@ -60,15 +55,6 @@ const AuditLogsContainer: React.FC = () => {
     defaultPaginationSettings.page
   );
 
-  const queryParams = new URLSearchParams(window.location.search);
-  const startDateParam = queryParams.get('startDate');
-  const endDateParam = queryParams.get('endDate');
-
-  const queryParamsFilter = {
-    startDate: startDateParam,
-    endDate: endDateParam,
-  };
-
   const fetchData = useCallback(
     async (currentPage, startDate, endDate) => {
       await fetchLogs({
@@ -79,8 +65,8 @@ const AuditLogsContainer: React.FC = () => {
             offset: currentPage - 1,
           },
           filters: {
-            startDate,
-            endDate,
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString(),
           },
         },
       });

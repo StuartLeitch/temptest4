@@ -1,13 +1,11 @@
 import React, { useEffect } from "react";
-import { Route, Switch } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 import { config } from "../config";
 
 import { Header } from "./components/Header";
 import { PaymentDetails } from "./pages/PaymentDetails";
 import { NotFound } from "./pages/NotFound";
-
-// import { useUser } from "./contexts/User";
 
 export const App = () => {
   useEffect(() => {
@@ -29,13 +27,9 @@ export const App = () => {
 
 function AppRoutes() {
   return (
-    <Switch>
-      <Route path="/payment-details/:invoiceId">
-        <PaymentDetails />
-      </Route>
-      <Route path="*">
-        <NotFound />
-      </Route>
-    </Switch>
+    <Routes>
+      <Route path="/payment-details/:invoiceId" element={<PaymentDetails />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }

@@ -35,8 +35,6 @@ class _AuthClient {
     const { user } = this.authState;
 
     if (!user) {
-      // const isAuthenticated = await this.init();
-      // return Promise.resolve({ user: this.authState.user });
       return Promise.resolve({ user: null });
     }
 
@@ -51,10 +49,7 @@ class _AuthClient {
   public async init() {
     const kcOptions = {
       onLoad: "check-sso",
-      // onLoad: "login-required",
       promiseType: "native",
-      // silentCheckSsoRedirectUri: window.location.origin + "/silent-check-sso.html",
-      // pkceMethod: "S256",
     };
 
     return await this.kc.init(kcOptions as any);

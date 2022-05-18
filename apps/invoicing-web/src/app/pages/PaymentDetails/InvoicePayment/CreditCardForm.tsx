@@ -2,7 +2,6 @@ import React from "react";
 import styled from "styled-components";
 import PaymentIcon from "./PaymentIcon";
 import { Flex, Label, Button, Text, th } from "@hindawi/react-components";
-// import { Braintree, HostedField } from "react-braintree-fields";
 
 interface Props {
   handleSubmit: any;
@@ -25,81 +24,87 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
   constructor(props: any) {
     super(props);
 
-    ["start", "setupComponents", "setupForm", "enablePayNow", "onSubmit"].forEach(
-      prop => (this[prop] = this[prop].bind(this)),
-    );
+    [
+      "start",
+      "setupComponents",
+      "setupForm",
+      "enablePayNow",
+      "onSubmit",
+    ].forEach((prop) => (this[prop] = this[prop].bind(this)));
   }
 
   state = {
     isBraintreeReady: false,
     numberFocused: false,
     error: null,
-    loading: false
+    loading: false,
   };
 
-   componentDidMount() {
+  componentDidMount() {
     this.start();
   }
 
   start() {
     var self = this;
-    const {ccToken } = this.props;
+    const { ccToken } = this.props;
 
-    return this.setupComponents(ccToken).then(function(instances) {
-      self.hf = instances[0];
-      self.threeDS = instances[1];
+    return this.setupComponents(ccToken)
+      .then(function (instances) {
+        self.hf = instances[0];
+        self.threeDS = instances[1];
 
-      self.setupForm();
-    }).catch(function (err) {
-       console.error('component error:', err);
-    });
+        self.setupForm();
+      })
+      .catch(function (err) {
+        console.error("component error:", err);
+      });
   }
 
-  setupComponents (clientToken) {
+  setupComponents(clientToken) {
     const braintree = (window as any).braintree;
     return Promise.all([
       (braintree as any).hostedFields.create({
         authorization: clientToken,
         styles: {
-          '::placeholder': {
-            'color': 'rgb(181, 181, 181)',
-            'opacity': '1' /* Firefox */
+          "::placeholder": {
+            color: "rgb(181, 181, 181)",
+            opacity: "1" /* Firefox */,
           },
           input: {
-            'font-size': '14px',
-            'font-family': 'monospace',
-            'letter-spacing': "2px",
-            'word-spacing': "4px",
-            'width': "100%",
-            'color': "rgb(91, 91, 91)",
+            "font-size": "14px",
+            "font-family": "monospace",
+            "letter-spacing": "2px",
+            "word-spacing": "4px",
+            width: "100%",
+            color: "rgb(91, 91, 91)",
           },
-          '.number': {
-            'font-family': 'monospace',
-            'color': "rgb(91, 91, 91)",
+          ".number": {
+            "font-family": "monospace",
+            color: "rgb(91, 91, 91)",
           },
-          '.valid': {
-            'color': 'green'
-          }
+          ".valid": {
+            color: "green",
+          },
         },
         fields: {
           number: {
-            selector: '#hf-number',
-            placeholder: '•••• •••• •••• ••••'
+            selector: "#hf-number",
+            placeholder: "•••• •••• •••• ••••",
           },
           cvv: {
-            selector: '#hf-cvv',
-            placeholder: '•••'
+            selector: "#hf-cvv",
+            placeholder: "•••",
           },
           expirationDate: {
-            selector: '#hf-date',
-            placeholder: 'MM/YYYY'
-          }
-        }
+            selector: "#hf-date",
+            placeholder: "MM/YYYY",
+          },
+        },
       }),
       (braintree as any).threeDSecure.create({
         authorization: clientToken,
-        version: 2
-      })
+        version: 2,
+      }),
     ]);
   }
 
@@ -117,54 +122,82 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
   }
 
   renderError(title: string, obj: any) {
-
     if (!obj && !this.props.serverError) {
       return null;
     }
 
     if (this.props.serverError && !this.state.error) {
-      return (<Text type="warning" key='3dsecure_error'>{'Your credit card was declined by the supplier.'}</Text>)
+      return (
+        <Text type="warning" key="3dsecure_error">
+          {"Your credit card was declined by the supplier."}
+        </Text>
+      );
     }
 
-    if (obj && ('name' in obj) && obj.name === 'BraintreeError') {
+    if (obj && "name" in obj && obj.name === "BraintreeError") {
       if (obj.details?.originalError?.code) {
-        return (<Text type="warning" key='3dsecure_error'>{'3D Secure authentication failed.'}</Text>)
+        return (
+          <Text type="warning" key="3dsecure_error">
+            {"3D Secure authentication failed."}
+          </Text>
+        );
       }
 
       if (obj.details?.originalError?.details?.originalError?.error) {
-        return (<Text type="warning" key='braintree_error'>{obj.details.originalError.details.originalError.error.message}</Text>)
+        return (
+          <Text type="warning" key="braintree_error">
+            {obj.details.originalError.details.originalError.error.message}
+          </Text>
+        );
       }
     }
 
-    if (obj && ('liabilityShifted' in obj) && obj.liabilityShifted === false) {
-      return (<Text type="warning" key='3dsecure_error'>{'3D Secure authentication failed.'}</Text>)
+    if (obj && "liabilityShifted" in obj && obj.liabilityShifted === false) {
+      return (
+        <Text type="warning" key="3dsecure_error">
+          {"3D Secure authentication failed."}
+        </Text>
+      );
     }
 
-    if (obj && obj.code && obj.code === 'HOSTED_FIELDS_FIELDS_EMPTY') {
-       return (
-         <Text type="warning" key='all_fields_empty'>{'All fields are empty'}</Text>
+    if (obj && obj.code && obj.code === "HOSTED_FIELDS_FIELDS_EMPTY") {
+      return (
+        <Text type="warning" key="all_fields_empty">
+          {"All fields are empty"}
+        </Text>
       );
-    } else if (obj && obj.code && obj.code === 'HOSTED_FIELDS_FIELDS_INVALID') {
-      const map = []
-      if (obj.details && 'invalidFields' in obj.details) {
-        const invalids = Object.values(obj.details.invalidFieldKeys).reduce((acc: any[], invalidFieldKey) => {
-          let txt = '';
-          if (invalidFieldKey === 'number') {
-            txt = '\u2022 Please enter a valid credit card number'
-          }
-          if (invalidFieldKey === 'expirationDate') {
-            txt = '\u2022 Please enter a valid expiration date'
-          }
-          if (invalidFieldKey === 'cvv') {
-            txt = '\u2022 Please enter a valid CVV'
-          }
-          acc.push(<Text type="warning" key={`${invalidFieldKey}`}>{txt}</Text>)
-          return acc;
-        }, []);
+    } else if (obj && obj.code && obj.code === "HOSTED_FIELDS_FIELDS_INVALID") {
+      const map = [];
+      if (obj.details && "invalidFields" in obj.details) {
+        const invalids = Object.values(obj.details.invalidFieldKeys).reduce(
+          (acc: any[], invalidFieldKey) => {
+            let txt = "";
+            if (invalidFieldKey === "number") {
+              txt = "\u2022 Please enter a valid credit card number";
+            }
+            if (invalidFieldKey === "expirationDate") {
+              txt = "\u2022 Please enter a valid expiration date";
+            }
+            if (invalidFieldKey === "cvv") {
+              txt = "\u2022 Please enter a valid CVV";
+            }
+            acc.push(
+              <Text type="warning" key={`${invalidFieldKey}`}>
+                {txt}
+              </Text>,
+            );
+            return acc;
+          },
+          [],
+        );
 
-        return ([
-          <Text key={'msg'} type="warning">{'Some payment input fields are invalid: '}</Text>
-        ] as any).concat(invalids)
+        return (
+          [
+            <Text key={"msg"} type="warning">
+              {"Some payment input fields are invalid: "}
+            </Text>,
+          ] as any
+        ).concat(invalids);
       }
     }
   }
@@ -174,42 +207,44 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
 
     this.setState({ loading: true });
 
-    this.hf.tokenize().then(function (payload) {
-
-      return self.threeDS.verifyCard({
-        onLookupComplete: function (data, next) {
-          self.setState({ loading: false });
-          next();
-        },
-        amount: self.props.total,
-        nonce: payload.nonce,
-        bin: payload.details.bin
+    this.hf
+      .tokenize()
+      .then(function (payload) {
+        return self.threeDS.verifyCard({
+          onLookupComplete: function (data, next) {
+            self.setState({ loading: false });
+            next();
+          },
+          amount: self.props.total,
+          nonce: payload.nonce,
+          bin: payload.details.bin,
+        });
       })
-    }).then(function (token) {
-      if (!token.liabilityShifted) {
+      .then(function (token) {
+        if (!token.liabilityShifted) {
+          self.setState({ loading: false });
+          self.onError(token);
+          return;
+        }
+
+        self.setState(
+          (state) => ({ ...state, token, error: null }),
+          () => {
+            // * send nonce and verification data to our server
+            const ccPayload = {
+              paymentMethodNonce: token.nonce,
+              paymentMethodId: self.props.paymentMethodId,
+              payerId: self.props.payerId,
+              amount: self.props.total,
+            };
+            self.props.handleSubmit(ccPayload);
+          },
+        );
+      })
+      .catch(function (err: any) {
         self.setState({ loading: false });
-        self.onError(token);
-        return;
-      }
-
-      self.setState(
-        state => ({ ...state, token, error: null }),
-        () => {
-
-          // * send nonce and verification data to our server
-          const ccPayload = {
-            paymentMethodNonce: token.nonce,
-            paymentMethodId: self.props.paymentMethodId,
-            payerId: self.props.payerId,
-            amount: self.props.total,
-          };
-          self.props.handleSubmit(ccPayload);
-        },
-      );
-    }).catch(function (err: any) {
-      self.setState({ loading: false });
-      self.onError(err);
-    });
+        self.onError(err);
+      });
   }
 
   render() {
@@ -223,49 +258,44 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
           <PaymentIcon id="discover" style={{ margin: 3, width: 36 }} />
         </Flex>
 
+        <CardContainer
+          className={this.state.isBraintreeReady ? "" : "disabled"}
+        >
+          <Flex justifyContent="flex-start" mb={0} mt={3}>
+            <FormGroup style={{ marginRight: "16px" }}>
+              <Label required htmlFor="cardNumber">
+                Card Number
+              </Label>
+              <div className="form-control" id="hf-number" />
+            </FormGroup>
 
-          <CardContainer
-            className={this.state.isBraintreeReady ? "" : "disabled"}
-          >
-            <Flex justifyContent="flex-start" mb={0} mt={3}>
-              <FormGroup style={{ marginRight: '16px' }}>
-                <Label required htmlFor="cardNumber">
-                  Card Number
-                </Label>
-                <div
-                  className="form-control"
-                  id="hf-number"
-                />
-              </FormGroup>
+            <FormGroup style={{ marginRight: "16px" }}>
+              <Label required htmlFor="expirationDate">
+                Expiration Date
+              </Label>
+              <div className="form-control" id="hf-date" />
+            </FormGroup>
 
-              <FormGroup style={{ marginRight: '16px' }}>
-                <Label required htmlFor="expirationDate">
-                  Expiration Date
-                </Label>
-                <div className="form-control" id="hf-date" />
-              </FormGroup>
+            <FormGroup style={{ marginRight: "16px" }}>
+              <Label required htmlFor="cvv">
+                CVV
+              </Label>
+              <div className="form-control" id="hf-cvv" />
+            </FormGroup>
 
-              <FormGroup style={{ marginRight: '16px' }}>
-                <Label required htmlFor="cvv">
-                  CVV
-                </Label>
-                <div className="form-control" id="hf-cvv" />
-              </FormGroup>
+            <Button
+              mt={0}
+              mb={3}
+              size="medium"
+              onClick={this.onSubmit}
+              loading={this.state.loading || this.props.loading}
+            >
+              Pay
+            </Button>
+          </Flex>
+        </CardContainer>
 
-              <Button
-                mt={0}
-                mb={3}
-                size="medium"
-                onClick={this.onSubmit}
-                loading={this.state.loading || this.props.loading}
-              >
-                Pay
-              </Button>
-            </Flex>
-
-          </CardContainer>
-
-        {this.renderError('Error', this.state.error)}
+        {this.renderError("Error", this.state.error)}
       </Flex>
     );
   }
@@ -273,7 +303,7 @@ class CreditCardForm extends React.PureComponent<Props, {}> {
 
 export default CreditCardForm;
 
-const CardContainer = styled('div')`
+const CardContainer = styled("div")`
   width: 100%;
   background-color: ${th("colors.background")};
   border-radius: ${th("gridUnit")};
@@ -309,7 +339,7 @@ const CardContainer = styled('div')`
   }
 `;
 
-const FormGroup = styled('div')`
+const FormGroup = styled("div")`
   margin-bottom: 15px;
 
   .label {
@@ -333,9 +363,10 @@ const FormGroup = styled('div')`
     border-radius: 4px;
     -webkit-box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
     box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
-    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
-    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    -webkit-transition: border-color ease-in-out 0.15s,
+      -webkit-box-shadow ease-in-out 0.15s;
+    -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+    transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
   }
 
   #hf-cvv {

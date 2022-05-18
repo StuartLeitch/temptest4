@@ -39,11 +39,19 @@ class ExecutionContext {
     return this.localStorage.run(baseStore, f);
   }
 
-  wrapQueueHandler<T>(f: (data: T) => Promise<void>) {
+  wrapAsyncQueueHandler<T>(f: (data: T) => Promise<void>) {
     return async (payload: T): Promise<void> => {
       const baseStore = this.createBaseStore(payload[CORRELATION_ID_KEY]);
 
       await this.localStorage.run(baseStore, f, payload);
+    };
+  }
+
+  wrapSyncQueueHandler<T>(f: (data: T) => void) {
+    return (payload: T): void => {
+      const baseStore = this.createBaseStore(payload[CORRELATION_ID_KEY]);
+
+      this.localStorage.run(baseStore, f, payload);
     };
   }
 

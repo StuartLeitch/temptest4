@@ -17,8 +17,9 @@ const SuccessfulPayment: React.FunctionComponent<Props> = ({
   <Flex alignItems="center" vertical flex={2}>
     <Flex vertical alignItems="center" style={{ padding: "40px" }}>
       <img
-        src="../../assets/images/hindawi-payment-success.svg"
+        src="../../assets/images/hindawi-payment-success.webp"
         alt="Success"
+        style={{ height: "111px" }}
       />
 
       <div style={{ height: "30px" }}>

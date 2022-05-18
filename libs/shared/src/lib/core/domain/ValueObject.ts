@@ -1,4 +1,4 @@
-import { shallowEqual } from 'shallow-equal-object';
+import { isEqual } from 'lodash';
 
 /**
  * @description ValueObjects are objects that we determine their
@@ -23,6 +23,6 @@ export abstract class ValueObject<T extends Partial<ValueObjectProps>> {
     if (vo.props === undefined) {
       return false;
     }
-    return shallowEqual(this.props, vo.props);
+    return isEqual(this.props, vo.props);
   }
 }

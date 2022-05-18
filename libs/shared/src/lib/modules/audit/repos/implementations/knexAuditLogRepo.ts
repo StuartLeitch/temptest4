@@ -30,8 +30,8 @@ export class KnexAuditLogRepo
     let startDate = moment(new Date()).subtract(5, 'days').format('YYYY-MM-DD');
 
     if (filters) {
-      startDate = moment(filters.startDate).format('YYYY-MM-DD');
-      endDate = moment(filters.endDate).add(1, 'days').format('YYYY-MM-DD');
+      startDate = moment(new Date(filters.startDate).toISOString()).format('YYYY-MM-DD');
+      endDate = moment(new Date(filters.endDate).toISOString()).add(1, 'days').format('YYYY-MM-DD');
     }
 
     const totalCount = await getModel()

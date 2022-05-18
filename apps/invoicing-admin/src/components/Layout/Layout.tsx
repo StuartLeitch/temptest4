@@ -2,8 +2,6 @@ import React, { ReactNode } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Helmet } from 'react-helmet';
-import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
 
 import { LayoutContent } from './LayoutContent';
@@ -144,27 +142,6 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
       }
     }
 
-    // After location change
-    if (prevProps.location.pathname !== this.props.location.pathname) {
-      // Scroll to top
-      if (this.bodyElement && this.documentElement) {
-        this.documentElement.scrollTop = this.bodyElement.scrollTop = 0;
-      }
-
-      // Hide the sidebar when in overlay mode
-      if (
-        !this.state.sidebarCollapsed &&
-        (this.state.screenSize === 'xs' ||
-          this.state.screenSize === 'sm' ||
-          this.state.screenSize === 'md')
-      ) {
-        // Add some time to prevent jank while the dom is updating
-        setTimeout(() => {
-          this.setState({ sidebarCollapsed: true });
-        }, 100);
-      }
-    }
-
     // Update positions of STICKY navbars
     this.updateNavbarsPositions();
   }
@@ -238,18 +215,13 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
           },
         }}
       >
-        <Helmet>
-          <meta charSet='utf-8' />
-          <title>
-            {config.siteTitle +
-              (this.state.pageTitle ? ` - ${this.state.pageTitle}` : '')}
-          </title>
-          <link rel='canonical' href={config.siteCanonicalUrl} />
-          <meta name='description' content={this.state.pageDescription} />
-          {/* {_.map(favIcons, (favIcon, index) => (
-            <link {...favIcon} key={index} />
-          ))} */}
-        </Helmet>
+        <meta charSet='utf-8' />
+        <title>
+          {config.siteTitle +
+            (this.state.pageTitle ? ` - ${this.state.pageTitle}` : '')}
+        </title>
+        <link rel='canonical' href={config.siteCanonicalUrl} />
+        <meta name='description' content={this.state.pageDescription} />
         <ThemeClass>
           {(themeClass) => (
             <div
@@ -260,16 +232,16 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
                 {!this.state.navbarHidden && navbars}
 
                 {!this.state.sidebarHidden &&
-                sidebar &&
-                React.cloneElement(sidebar, {
-                  sidebarSlim:
-                    !!this.props.sidebarSlim &&
-                    this.state.sidebarCollapsed &&
-                    (this.state.screenSize === 'lg' ||
-                      this.state.screenSize === 'xl'),
-                  sidebarCollapsed:
-                    !this.props.sidebarSlim && this.state.sidebarCollapsed,
-                })}
+                  sidebar &&
+                  React.cloneElement(sidebar, {
+                    sidebarSlim:
+                      !!this.props.sidebarSlim &&
+                      this.state.sidebarCollapsed &&
+                      (this.state.screenSize === 'lg' ||
+                        this.state.screenSize === 'xl'),
+                    sidebarCollapsed:
+                      !this.props.sidebarSlim && this.state.sidebarCollapsed,
+                  })}
 
                 {content}
               </div>
@@ -282,8 +254,6 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
     );
   }
 }
-
-const routedLayout: any = withRouter(Layout);
 
 interface LayoutProps {
   children: ReactNode;
@@ -306,4 +276,4 @@ interface LayoutState {
   pageKeywords: string;
 }
 
-export { routedLayout as Layout };
+export { Layout };

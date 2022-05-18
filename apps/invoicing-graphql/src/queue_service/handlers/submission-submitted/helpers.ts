@@ -15,6 +15,7 @@ import {
 } from '@hindawi/shared';
 
 import { Context } from '../../../builders';
+import { hasSourceJournal } from '../helpers';
 
 const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.QUEUE_EVENT_HANDLER],
@@ -174,15 +175,6 @@ function createManuscript(context: Context) {
     const createManuscript = new CreateManuscriptUsecase(manuscriptRepo);
 
     const manuscript = data.manuscripts[0];
-    let hasSourceJournal = false;
-    if (
-      'sourceJournal' in manuscript &&
-      manuscript['sourceJournal']['name'] !== null &&
-      manuscript['sourceJournal']['pissn'] !== null &&
-      manuscript['sourceJournal']['eissn'] !== null
-    ) {
-      hasSourceJournal = true;
-    }
 
     const author = manuscript.authors.find((a) => a.isCorresponding);
 
@@ -198,7 +190,7 @@ function createManuscript(context: Context) {
       authorEmail: author.email,
       title: manuscript.title,
       id: data.submissionId,
-      is_cascaded: hasSourceJournal ? 1 : 0,
+      is_cascaded: hasSourceJournal(data) ? 1 : 0,
     };
 
     const maybeManuscript = await createManuscript.execute(

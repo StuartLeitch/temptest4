@@ -6,7 +6,7 @@ import { Context } from '../../../builders';
 import { EventHandler } from '../../event-handler';
 
 import { SubmissionSubmittedHelpers } from './helpers';
-import { EventHandlerHelpers } from '../helpers';
+import { EventHandlerHelpers, getLatestManuscript } from '../helpers';
 
 const SUBMISSION_SUBMITTED = 'SubmissionSubmitted';
 
@@ -23,18 +23,17 @@ export const SubmissionSubmittedHandler: EventHandler<SubmissionSubmitted> = {
       );
       logger.info(`Incoming Event Data`, data);
 
+      const { submissionId } = data;
+
+      const latestManuscript = getLatestManuscript(data);
+
       const {
-        submissionId,
-        manuscripts: [
-          {
-            journalId,
-            authors,
-            articleType: { name: articleType },
-            id,
-            title,
-          },
-        ],
-      } = data;
+        journalId,
+        authors,
+        articleType: { name: articleType },
+        id,
+        title,
+      } = latestManuscript;
 
       const manuscript = await eventHelpers.getExistingManuscript(submissionId);
       const journal = await helpers.getJournal(journalId);

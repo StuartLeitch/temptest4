@@ -219,7 +219,6 @@
             "assets": [
               "apps/import-manuscript-web/src/favicon.ico",
               "apps/import-manuscript-web/src/assets",
-              "apps/import-manuscript-web/src/silent-check-sso.html",
               "apps/import-manuscript-web/src/env-template.js",
               "apps/import-manuscript-web/src/Dockerfile",
               "apps/import-manuscript-web/src/nginx.conf"
@@ -320,7 +319,6 @@
             "assets": [
               "apps/invoicing-admin/src/favicon.ico",
               "apps/invoicing-admin/src/assets",
-              "apps/invoicing-admin/src/silent-check-sso.html",
               "apps/invoicing-admin/src/env-template.js",
               "apps/invoicing-admin/src/Dockerfile",
               "apps/invoicing-admin/src/nginx.conf"
@@ -330,12 +328,6 @@
           },
           "configurations": {
             "production": {
-              "fileReplacements": [
-                {
-                  "replace": "apps/invoicing-admin/src/environments/environment.ts",
-                  "with": "apps/invoicing-admin/src/environments/environment.prod.ts"
-                }
-              ],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -637,7 +629,6 @@
             "polyfills": "apps/invoicing-web/src/polyfills.ts",
             "tsConfig": "apps/invoicing-web/tsconfig.app.json",
             "assets": [
-              "apps/invoicing-web/src/silent-check-sso.html",
               "apps/invoicing-web/src/favicon.ico",
               "apps/invoicing-web/src/assets",
               "apps/invoicing-web/src/env-template.js",

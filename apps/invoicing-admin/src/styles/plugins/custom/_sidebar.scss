@@ -152,37 +152,3 @@
     }
   }
 }
-
-// overlay and collapse with transform at < LG
-@media (max-width: breakpoint-max('md', $grid-breakpoints)) {
-  .sidebar {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: auto;
-    touch-action: none;
-    transform: translateZ(0);
-
-    transition: transform $sidebar-overlay-transition;
-
-    &--collapsed {
-      transform: translateZ(0) translateX(-100%);
-    }
-
-    &--animations-disabled {
-      transition: none;
-    }
-
-    &__close {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      display: block;
-    }
-
-    &:not(.sidebar--collapsed) {
-      box-shadow: 0px 0px 1rem 0px rgba($black, 0.15);
-    }
-  }
-}

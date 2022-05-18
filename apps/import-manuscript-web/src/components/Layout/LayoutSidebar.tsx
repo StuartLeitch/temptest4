@@ -4,8 +4,7 @@ import classNames from 'classnames';
 
 const LayoutSidebar = (props) => {
     const sidebarClass = classNames("layout__sidebar", {
-        "layout__sidebar--slim": props.sidebarSlim,
-        "layout__sidebar--collapsed": props.sidebarCollapsed
+        "layout__sidebar--slim": props.sidebarSlim
     });
 
     return (

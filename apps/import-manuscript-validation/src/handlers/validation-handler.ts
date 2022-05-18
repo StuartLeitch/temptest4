@@ -117,8 +117,8 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
           'Important Message',
           `ERROR processing package: ${err.message} ${err.stack}`
         );
-        logger.error(err.message);
-        throw new VError(err.message);
+        logger.error(err.message, err);
+        throw new VError(err);
       }
     };
   },

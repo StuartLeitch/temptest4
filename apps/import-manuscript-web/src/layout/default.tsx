@@ -3,9 +3,7 @@ import PropTypes from 'prop-types';
 import { GraphQLClient, ClientContext } from 'graphql-hooks';
 import { ToastContainer } from 'react-toastify';
 
-import {
-  Layout
- } from '../components';
+import { Layout } from '../components';
 
 import AppProviders from '../contexts';
 import config from '../config';

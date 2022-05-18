@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import Toggle from 'react-toggle';
+import { Switch } from 'antd';
 
 interface ReminderToggleProps {
   reminderName: string;
@@ -35,13 +35,7 @@ const ReminderToggle: FunctionComponent<ReminderToggleProps> = ({
       <dd className='col-sm-8 d-flex'>
         <label className='d-flex align-items-middle mb-0 align-items-center'>
           {label(isActive)}
-          <Toggle
-            checked={isActive}
-            onChange={(event) => {
-              onChange(event.target.checked);
-            }}
-            name={name}
-          />
+          <Switch checked={isActive} onChange={onChange} title={name} />
         </label>
       </dd>
     </>

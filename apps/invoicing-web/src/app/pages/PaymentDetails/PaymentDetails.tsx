@@ -1,9 +1,11 @@
-import React, { Fragment, useEffect, useCallback, useState } from "react";
-import { connect } from "react-redux";
-import styled from "styled-components";
+import { Loader, Flex, Text, th } from "@hindawi/react-components";
+import React, { useCallback, useEffect, useState } from "react";
 import { RootState } from "typesafe-actions";
 import { useParams } from "react-router-dom";
-import { Flex, Loader, Text, th } from "@hindawi/react-components";
+import styled from "styled-components";
+import { connect } from "react-redux";
+import { ASTNode } from "graphql";
+import gql from "graphql-tag";
 
 import { Details } from "./Details";
 import { BillingInfo } from "./BillingInfo";
@@ -13,11 +15,7 @@ import { PaymentFooter } from "./PaymentFooter";
 
 import { oneContext } from "../../../context";
 
-import {
-  // invoiceTypes,
-  invoiceActions,
-  invoiceSelectors,
-} from "../../state/modules/invoice";
+import { invoiceActions, invoiceSelectors } from "../../state/modules/invoice";
 
 import {
   paymentSelectors,
@@ -28,10 +26,6 @@ import {
   InvoiceVATDTO,
   ApplyCouponDTO,
 } from "../../state/modules/invoice/types";
-// import { getClientToken } from "@hindawi/invoicing-web/app/state/modules/payment/actions";
-
-import gql from "graphql-tag";
-import { ASTNode } from "graphql";
 
 interface Props {
   invoiceError: string;
@@ -77,13 +71,13 @@ const createPayPalOrder: ASTNode = gql`
 
 const createPayPalOrderAction = (invoice, setError) => {
   return async () => {
-    try{
+    try {
       const aa: any = await oneContext.graphqlAdapter.send(createPayPalOrder, {
         invoiceId: invoice.invoiceId,
       });
       return aa.data.createPayPalOrder.id;
-    } catch (err)  {
-      setError(err.message)
+    } catch (err) {
+      setError(err.message);
     }
   };
 };
@@ -119,7 +113,8 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
   token,
 }) => {
   const { invoiceId } = useParams() as any;
-  const [paypalInvoiceCreationError, setPaypalInvoiceCreationError] = useState(null)
+  const [paypalInvoiceCreationError, setPaypalInvoiceCreationError] =
+    useState(null);
 
   // * This will only run once
   useEffect(() => {
@@ -167,9 +162,16 @@ const PaymentDetails: React.FunctionComponent<Props> = ({
                 ccToken={token}
                 methods={paymentMethods}
                 invoiceStatus={invoice.status}
-                createPayPalOrder={createPayPalOrderAction(invoice, setPaypalInvoiceCreationError)}
+                createPayPalOrder={createPayPalOrderAction(
+                  invoice,
+                  setPaypalInvoiceCreationError,
+                )}
                 paymentStatus={invoice.payments.map((p) => p.status)}
-                error={creditCardPaymentError || payPalPaymentError  || paypalInvoiceCreationError}
+                error={
+                  creditCardPaymentError ||
+                  payPalPaymentError ||
+                  paypalInvoiceCreationError
+                }
                 payByCardSubmit={payByCard}
                 payByPayPalSubmit={payByPayPal(recordPayPalPayment, invoice)}
                 loading={creditCardPaymentLoading || payPalPaymentLoading}
@@ -220,9 +222,8 @@ const mapStateToProps = (state: RootState) => ({
   paymentMethods: paymentSelectors.getPaymentMethods(state),
   token: paymentSelectors.getToken(state),
   creditCardPaymentError: paymentSelectors.recordCreditCardPaymentError(state),
-  creditCardPaymentLoading: paymentSelectors.recordCreditCardPaymentLoading(
-    state,
-  ),
+  creditCardPaymentLoading:
+    paymentSelectors.recordCreditCardPaymentLoading(state),
   payPalPaymentError: paymentSelectors.recordPayPalPaymentError(state),
   payPalPaymentLoading: paymentSelectors.recordPayPalPaymentLoading(state),
 });

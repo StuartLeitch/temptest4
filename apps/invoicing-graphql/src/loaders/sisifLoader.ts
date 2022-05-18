@@ -3,7 +3,7 @@ import {
   MicroframeworkLoader,
 } from 'microframework-w3tec';
 
-import { LoggerContract } from '@hindawi/shared';
+import { LoggerContract, executionContext } from '@hindawi/shared';
 import { Job } from '@hindawi/sisif';
 
 import { SisifHandlers } from '../sisif';
@@ -15,7 +15,9 @@ function jobHandlerDispatcher(context: Context, loggerService: LoggerContract) {
     const { data, type } = job;
 
     try {
-      SisifHandlers.get(type)(data, context, loggerService);
+      const handler = SisifHandlers.get(type);
+
+      executionContext.wrapSyncQueueHandler((d) => handler(d, context))(data);
     } catch (e) {
       loggerService.error(
         `

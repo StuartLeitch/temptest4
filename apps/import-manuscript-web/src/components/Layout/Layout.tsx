@@ -1,15 +1,11 @@
 import React, { ReactNode } from 'react';
-import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Helmet } from 'react-helmet';
-import { withRouter } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import _ from 'lodash';
 
 import { LayoutContent } from './LayoutContent';
 import { LayoutHeader } from './LayoutHeader';
 import { LayoutNavbar } from './LayoutNavbar';
-import { LayoutFooter } from './LayoutFooter';
 import config from '../../config';
 
 const findChildByType = (children, targetType) => {
@@ -29,7 +25,6 @@ const findChildrenByType = (children, targetType) => {
     (child) => (child as any).type.layoutPartName === targetType.layoutPartName
   );
 };
-
 
 class Layout extends React.Component<LayoutProps, LayoutState> {
   static propTypes = {
@@ -62,37 +57,23 @@ class Layout extends React.Component<LayoutProps, LayoutState> {
   }
 
   render() {
-    const { children, favIcons } = this.props;
+    const { children } = this.props;
     const header = findChildByType(children, LayoutHeader);
-    const navbar = findChildrenByType(children, LayoutNavbar)
-    const footer = findChildrenByType(children, LayoutFooter);
+    const navbar = findChildrenByType(children, LayoutNavbar);
     const content = findChildByType(children, LayoutContent);
-    const otherChildren = _.differenceBy(
-      React.Children.toArray(children),
-      [header, footer, content],
-      'type'
-    );
-    const layoutClass = classNames('layout', 'layout--animations-enabled', {
-      //'layout--only-navbar': this.state.sidebarHidden && !this.state.navbarHidden
-    });
+    const layoutClass = classNames('layout', 'layout--animations-enabled', {});
 
     return (
-      <div
-        className={classNames(layoutClass)}
-        ref={this.containerRef}
-      >
+      <div className={classNames(layoutClass)} ref={this.containerRef}>
         <div className='layout__wrap'>
           {header}
           {navbar}
           {content}
         </div>
-        {/* {otherChildren} */}
       </div>
     );
   }
 }
-
-const routedLayout: any = withRouter(Layout);
 
 interface LayoutProps {
   children: ReactNode;
@@ -110,4 +91,4 @@ interface LayoutState {
   pageKeywords: string;
 }
 
-export { routedLayout as Layout };
+export { Layout };

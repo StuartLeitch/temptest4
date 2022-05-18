@@ -1,14 +1,9 @@
-import React, { useState } from 'react';
-
-import { BrowserRouter } from 'react-router-dom';
+import React from 'react';
 
 import config from '../config';
 
 import { AuthProvider } from './Auth';
 import { UserProvider } from './User';
-
-// import { Permission, User } from "./PermissionTypes";
-// import PermissionProvider from "./PermissionProvider";
 
 function AppProviders({ children }) {
   const { authEnabled } = config;
@@ -17,9 +12,7 @@ function AppProviders({ children }) {
     if (authEnabled) {
       return (
         <AuthProvider>
-          <UserProvider>
-            {children}
-          </UserProvider>
+          <UserProvider>{children}</UserProvider>
         </AuthProvider>
       );
     } else {
@@ -27,7 +20,7 @@ function AppProviders({ children }) {
     }
   };
 
-  return <BrowserRouter>{renderAuthProvider()}</BrowserRouter>;
+  return renderAuthProvider();
 }
 
 export default AppProviders;

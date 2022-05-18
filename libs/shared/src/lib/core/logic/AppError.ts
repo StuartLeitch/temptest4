@@ -1,5 +1,4 @@
 import { UseCaseError } from './UseCaseError';
-import ChainedError, {Options} from "typescript-chained-error";
 
 export class UnexpectedError extends UseCaseError {
   public constructor(message: string);
@@ -28,4 +27,3 @@ export class UnexpectedError extends UseCaseError {
     return new UnexpectedError(err, message);
   }
 }
-

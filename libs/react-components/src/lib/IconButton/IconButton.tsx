@@ -1,8 +1,9 @@
 import React from 'react';
-import {SpaceProps} from 'styled-system';
+import { SpaceProps } from 'styled-system';
 
-import Icon, {IconNames} from '../Icon';
-import {IconButton as Root} from './IconButton.styles';
+import Icon from '../Icon';
+import type { IconNames } from '../Icon';
+import { IconButton as Root } from './IconButton.styles';
 
 export interface Props extends SpaceProps {
   highlight?: boolean;
@@ -19,14 +20,14 @@ const IconButton: React.FunctionComponent<Props> = ({
   ...rest
 }) => {
   return (
-    <Root aria-label={label} role="button" onClick={onClick} {...rest}>
+    <Root aria-label={label} role='button' onClick={onClick} {...rest}>
       <Icon name={name} />
     </Root>
   );
 };
 
 IconButton.defaultProps = {
-  label: 'Icon button'
+  label: 'Icon button',
 };
 
 export default IconButton;

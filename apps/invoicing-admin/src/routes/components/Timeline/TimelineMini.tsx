@@ -1,5 +1,4 @@
 import React from 'react';
-import faker from 'faker/locale/en_US';
 import PropTypes from 'prop-types';
 import { Tag } from '@hindawi/phenom-ui';
 
@@ -35,10 +34,10 @@ const TimelineMini = props => (
           </div>
           {/* Content */}
           <p className='text-inverse mb-1'>
-            {props.phrase || faker.company.catchPhrase()}
+            {props.phrase}
           </p>
           {/* Date */}
-          <p>{props.date || faker.date.past().toString()}</p>
+          <p>{props.date}</p>
         </div>
       </div>
       {/* END POST Timeline */}

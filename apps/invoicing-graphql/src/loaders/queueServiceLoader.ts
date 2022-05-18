@@ -25,7 +25,7 @@ export const queueServiceLoader: MicroframeworkLoader = async (
 
         queue.registerEventHandler({
           event,
-          handler: executionContext.wrapQueueHandler(handler(context)),
+          handler: executionContext.wrapAsyncQueueHandler(handler(context)),
         });
       });
       queue.start();

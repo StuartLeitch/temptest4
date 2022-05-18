@@ -1,13 +1,12 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { Button, Media } from '../../../../components';
 
-const SuccessfulCreditNoteCreatedToast: React.FC<SuccessfulCreditNoteCreatedToastProps> =  ({
-  closeToast,
-  creditNote
-}) => {
-  const history = useHistory();
+const SuccessfulCreditNoteCreatedToast: React.FC<
+  SuccessfulCreditNoteCreatedToastProps
+> = ({ closeToast, creditNote }) => {
+  const navigate = useNavigate();
 
   return (
     <Media>
@@ -24,7 +23,7 @@ const SuccessfulCreditNoteCreatedToast: React.FC<SuccessfulCreditNoteCreatedToas
             color='success'
             onClick={() => {
               closeToast();
-              history.push(`/credit-notes/details/${creditNote.id}`);
+              navigate(`/credit-notes/details/${creditNote.id}`);
             }}
           >
             See details
@@ -33,7 +32,6 @@ const SuccessfulCreditNoteCreatedToast: React.FC<SuccessfulCreditNoteCreatedToas
             color='link'
             onClick={() => {
               closeToast();
-              // window.location = `/invoices/details/${creditNote.id}`;
             }}
             className='ml-2 text-success'
           >
@@ -50,6 +48,6 @@ interface SuccessfulCreditNoteCreatedToastProps {
     id: string;
   };
   closeToast(): void;
-};
+}
 
 export default SuccessfulCreditNoteCreatedToast;

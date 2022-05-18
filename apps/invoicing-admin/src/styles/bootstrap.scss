@@ -1,5 +1,4 @@
 @import '~bootstrap/dist/css/bootstrap.min.css';
-// @import '~@owczar/dashboard-style--airframe/scss/bootstrap/bootstrap';
 
 @import './plugins/custom/bootstrap-variables';
 // TODO: Typically here should be imported
@@ -42,7 +41,7 @@
 @import '~bootstrap/scss/utilities';
 @import '~bootstrap/scss/print';
 
-@import '~@owczar/dashboard-style--airframe/scss/bootstrap/helpers';
+@import './plugins/dep/bootstrap/helpers';
 
 /* Modifications */
 // Recovered Button Nowrap

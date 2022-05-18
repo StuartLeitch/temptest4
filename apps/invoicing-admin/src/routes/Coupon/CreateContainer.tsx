@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useMutation } from 'graphql-hooks';
+import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { useHistory } from 'react-router-dom';
 
 import { HeaderMain } from '../components/HeaderMain';
 
@@ -17,7 +16,6 @@ import {
   CardBody,
   CardHeader,
 } from '../../components';
-import Restricted from '../../contexts/Restricted';
 
 import CouponCreate from './components/CouponCreate';
 
@@ -28,7 +26,7 @@ import { CouponCreateContext, couponCreateInitialState } from './Context';
 import { CREATE } from './config';
 
 const ViewEditContainer: React.FC = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const [saveInProgress, setSaveInProgress] = useState(false);
 
   const [createCoupon] = useMutation(COUPON_CREATE_MUTATION);
@@ -68,7 +66,7 @@ const ViewEditContainer: React.FC = () => {
         ?.message;
 
       if (!createError) {
-        history.push('/coupons/list');
+        navigate('/coupons/list');
       } else {
         const Error = (props) => (
           <ErrorToast {...{ ...props, error: createError }} />
@@ -83,7 +81,7 @@ const ViewEditContainer: React.FC = () => {
   };
 
   const cancelCreate = () => {
-    history.push('/coupons/list');
+    navigate('/coupons/list');
   };
 
   return (

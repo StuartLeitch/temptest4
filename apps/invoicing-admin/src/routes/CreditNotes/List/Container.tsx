@@ -20,11 +20,11 @@ import { HeaderMain } from '../../components/HeaderMain';
 import { CreditNotesLeftNav } from '../../components/CreditNotes/CreditNotesLeftNav';
 import CreditNotesList from './CreditNoteList';
 import SuccessfulUrlCopiedToClipboardToast from './components/SuccessfulUrlCopiedToClipboardToast';
-import NotAuthorized from '../../components/NotAuthorized';
+import { NotAuthorized } from '../../components/NotAuthorized';
 
 const CreditNotesContainer: React.FC = () => {
   const defaultFilters = {
-    reason: []
+    reason: [],
   };
   const defaultPagination = {
     page: 1,
@@ -37,10 +37,13 @@ const CreditNotesContainer: React.FC = () => {
     (defaultFilters as any).reason
   );
 
-  const [listState] = useLocalStorage('creditNotesList', { filters:defaultFilters, pagination: defaultPagination});
+  const [listState] = useLocalStorage('creditNotesList', {
+    filters: defaultFilters,
+    pagination: defaultPagination,
+  });
   let { filters, pagination } = listState;
   const queryFilters = {
-    reason
+    reason,
   };
 
   // * When no query strings provided in the URL
@@ -73,19 +76,14 @@ const CreditNotesContainer: React.FC = () => {
   };
 
   const buildURLWithFilters = (_filters, _pagination) => {
-    const {
-      reason: _reason
-    } = _filters;
+    const { reason: _reason } = _filters;
     const { page: _page } = _pagination;
 
     // * build the query string out of query state
     let queryString = '';
     if (Object.keys(Object.assign({}, _filters, _pagination)).length) {
       queryString += '?';
-      queryString += _reason.reduce(
-        (qs, is) => (qs += `reason=${is}&`),
-        ''
-      );
+      queryString += _reason.reduce((qs, is) => (qs += `reason=${is}&`), '');
 
       if (_page) {
         queryString += `page=${_page}&`;
@@ -99,43 +97,43 @@ const CreditNotesContainer: React.FC = () => {
 
   return (
     <React.Fragment>
-    <Restricted to='list.credit-notes' fallback={<NotAuthorized/>}>
-      <Container fluid={true}>
-        <HeaderMain title='Credit Notes' className='mb-5 mt-4' />
-        <Row>
-          <Col lg={2}>
-            <CreditNotesLeftNav filters={filters} setFilter={setFilter} />
-          </Col>
-          <Col lg={10} className='mt-n4 mb-5'>
-            <ButtonToolbar className='d-flex justify-content-end'>
-              <ButtonGroup className='mr-2'>
-                <Button
-                  color='link'
-                  className='text-decoration-none align-self-center pr-0'
-                  id='tooltipFav'
-                  onClick={() => {
-                    const urlToShare = buildURLWithFilters(filters, pagination);
-                    copyToClipboard(urlToShare);
-                    return toast.success(
-                      <SuccessfulUrlCopiedToClipboardToast />
-                    );
-                  }}
-                >
-                  <i className='text-blue fas fa-fw fa-share-square'></i>
-                </Button>
-                <UncontrolledTooltip placement='bottom' target='tooltipFav'>
-                  Share Search Filters
-                </UncontrolledTooltip>
-              </ButtonGroup>
-            </ButtonToolbar>
-            <CreditNotesList
-              state={listState}
-              setPage={setFilter}
-            />
-          </Col>
-        </Row>
-      </Container>
-    </Restricted>
+      <Restricted to='list.credit-notes' fallback={<NotAuthorized />}>
+        <Container fluid={true}>
+          <HeaderMain title='Credit Notes' className='mb-5 mt-4' />
+          <Row>
+            <Col lg={2}>
+              <CreditNotesLeftNav filters={filters} setFilter={setFilter} />
+            </Col>
+            <Col lg={10} className='mt-n4 mb-5'>
+              <ButtonToolbar className='d-flex justify-content-end'>
+                <ButtonGroup className='mr-2'>
+                  <Button
+                    color='link'
+                    className='text-decoration-none align-self-center pr-0'
+                    id='tooltipFav'
+                    onClick={() => {
+                      const urlToShare = buildURLWithFilters(
+                        filters,
+                        pagination
+                      );
+                      copyToClipboard(urlToShare);
+                      return toast.success(
+                        <SuccessfulUrlCopiedToClipboardToast />
+                      );
+                    }}
+                  >
+                    <i className='text-blue fas fa-fw fa-share-square'></i>
+                  </Button>
+                  <UncontrolledTooltip placement='bottom' target='tooltipFav'>
+                    Share Search Filters
+                  </UncontrolledTooltip>
+                </ButtonGroup>
+              </ButtonToolbar>
+              <CreditNotesList state={listState} setPage={setFilter} />
+            </Col>
+          </Row>
+        </Container>
+      </Restricted>
     </React.Fragment>
   );
 
@@ -167,8 +165,8 @@ const CreditNotesContainer: React.FC = () => {
           },
           pagination: {
             ...pagination,
-            page: 1
-          }
+            page: 1,
+          },
         });
         break;
 
@@ -177,11 +175,11 @@ const CreditNotesContainer: React.FC = () => {
         setPage(value as string);
         writeStorage('creditNotesList', {
           filters,
-          pagination:{
+          pagination: {
             ...pagination,
             page: value,
             offset: Number(value) - 1,
-          }
+          },
         });
         break;
     }

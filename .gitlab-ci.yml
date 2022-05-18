@@ -126,6 +126,7 @@ Build:
     - mkdir -p $CI_PROJECT_DIR/reports/coverage
     - mkdir -p $CI_PROJECT_DIR/reports/cucumber
     - yarn install
+    - yarn nx clear-cache
     - git fetch
     - |
       if [ "$CI_COMMIT_REF_NAME" == "develop" ]; then
@@ -362,7 +363,7 @@ Deploy:dev-import:
     CLUSTER: hindawi-dev
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
-    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
     KUBERNETES_MEMORY_REQUEST: 3Gi
     KUBERNETES_CPU_REQUEST: 2
 
@@ -416,7 +417,7 @@ Deploy:qa-import:
     CLUSTER: hindawi-dev
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
-    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
     KUBERNETES_MEMORY_REQUEST: 3Gi
     KUBERNETES_CPU_REQUEST: 2
 
@@ -476,7 +477,7 @@ Deploy:automation-import:
     CLUSTER: hindawi-dev
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
-    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
     KUBERNETES_MEMORY_REQUEST: 3Gi
     KUBERNETES_CPU_REQUEST: 2
 
@@ -533,7 +534,7 @@ Deploy:hindawi-demo-import:
     CLUSTER: hindawi-dev
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
-    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
     KUBERNETES_MEMORY_REQUEST: 3Gi
     KUBERNETES_CPU_REQUEST: 2
 
@@ -587,7 +588,7 @@ Deploy:hindawi-demo-sales-import:
     CLUSTER: hindawi-dev
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
-    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
     KUBERNETES_MEMORY_REQUEST: 3Gi
     KUBERNETES_CPU_REQUEST: 2
 
@@ -641,7 +642,7 @@ Deploy:gsw-demo-import:
     CLUSTER: hindawi-dev
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
-    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
     KUBERNETES_MEMORY_REQUEST: 3Gi
     KUBERNETES_CPU_REQUEST: 2
 
@@ -699,7 +700,7 @@ Deploy:gsw-prod-import:
     CLUSTER: hindawi-prod
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
-    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
     KUBERNETES_MEMORY_REQUEST: 3Gi
     KUBERNETES_CPU_REQUEST: 2
 
@@ -755,7 +756,7 @@ Deploy:preproduction-import:
     CLUSTER: hindawi-prod
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
-    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
     KUBERNETES_MEMORY_REQUEST: 3Gi
     KUBERNETES_CPU_REQUEST: 2
 
@@ -813,7 +814,7 @@ Deploy:hindawi-prod-import:
     CLUSTER: hindawi-prod
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
-    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
     KUBERNETES_MEMORY_REQUEST: 3Gi
     KUBERNETES_CPU_REQUEST: 2
 
@@ -836,4 +837,3 @@ Deploy:hindawi-prod-reporting:
     REQUIRED_APPS: 'reporting-backend'
     KUBERNETES_MEMORY_REQUEST: 3Gi
     KUBERNETES_CPU_REQUEST: 2
-

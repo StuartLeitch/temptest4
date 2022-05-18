@@ -8,7 +8,7 @@ interface Props {
 }
 
 const Root = styled.div`
-  background-image: url("../../../../assets/images/swirly-background.svg");
+  background-image: url("../../../../assets/images/swirly-background.webp");
   width: 100%;
   height: 200px;
   display: flex;

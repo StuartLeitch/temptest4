@@ -2,7 +2,6 @@ import React from "react";
 import { Flex, Label, Text, ActionLink } from "@hindawi/react-components";
 
 import { DetailItem as Root } from "./DetailItem.styles";
-import { Action } from "rxjs/internal/scheduler/Action";
 
 interface Props {
   text: string;

@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useAsync } from 'react-async';
-// import { useLocation } from 'react-router-dom';
 
 import PendingLogging from '../routes/components/PendingLogging';
 import Danger from '../routes/Pages/Danger';
@@ -12,10 +11,9 @@ import { AuthClient } from '../utils/auth-client';
 export const AuthContext = React.createContext(null);
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = (props: any) => {
-
   const [firstAttemptFinished, setFirstAttemptFinished] = React.useState(false);
   const { data, error, isRejected, isPending, isSettled, reload } = useAsync({
-    promiseFn: bootstrapAppData
+    promiseFn: bootstrapAppData,
   });
 
   React.useLayoutEffect(() => {

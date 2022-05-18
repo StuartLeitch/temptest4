@@ -1,10 +1,7 @@
 import { Before, After, Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
 
-import {
-  buildMockContext,
-  MockContext,
-} from '../../../../../../specs/utils/mockContextBuilder';
+import { buildMockContext, MockContext } from './utils';
 
 import { DomainEvents } from '../../../../../../src/lib/core/domain/events/DomainEvents';
 import {
