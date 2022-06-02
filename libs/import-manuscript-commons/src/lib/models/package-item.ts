@@ -4,6 +4,7 @@ import {
   ValueObject,
   Guard,
 } from '@hindawi/shared';
+import {FileType} from "./file";
 
 interface MetadataDetails {
   '#text': string;
@@ -24,12 +25,13 @@ export interface PackageItemProps extends ValueObjectProps {
   instance: ItemInstanceProps;
   'item-description'?: string;
   '@_item-version'?: string;
-  '@_item-type': string;
+  '@_item-type': FileType;
   'file-order'?: string;
   '@_id'?: string;
 }
 
 type Metadata = Readonly<Record<string, string>>;
+
 
 export class PackageItem extends ValueObject<PackageItemProps> {
   public readonly metadata: Metadata = undefined;
@@ -37,7 +39,7 @@ export class PackageItem extends ValueObject<PackageItemProps> {
   public readonly fileOrder?: string;
   public readonly mediaType?: string;
   public readonly version?: string;
-  public readonly type: string;
+  public readonly type: FileType;
   public readonly id?: string;
   public readonly uri: string;
 

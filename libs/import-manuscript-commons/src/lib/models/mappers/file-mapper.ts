@@ -7,7 +7,7 @@ export interface RawFileProps {
   name: string;
   path: string;
   size: number;
-  type: string;
+  type: FileType;
 }
 
 export class FileMapper extends Mapper<File> {
