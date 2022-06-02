@@ -58,13 +58,15 @@ variables:
   VAT_VALIDATION_SERVICE_ENDPOINT: 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
   AFFECTED_COMMAND: ''
   AFFECTED_ARGS: '--base=remotes/origin/develop'
-  AFFECTED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend'
+  AFFECTED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend,import-manuscript-web,import-manuscript-validation,import-manuscript-backend'
 
 Prepare Docker Runner:
   tags:
     - 'cluster:hindawi-dev'
   interruptible: true
   variables:
+    KUBERNETES_MEMORY_REQUEST: 1Gi
+    KUBERNETES_CPU_REQUEST: 1
     GIT_STRATEGY: fetch
     GIT_SUBMODULE_STRATEGY: recursive
     GIT_DEPTH: 20
@@ -89,10 +91,8 @@ Prepare Docker Runner:
 Build:
   image: $BUILD_IMAGE
   variables:
-    KUBERNETES_MEMORY_REQUEST: 4Gi
-    KUBERNETES_CPU_REQUEST: 4
-    KUBERNETES_MEMORY_LIMIT: 4Gi
-    KUBERNETES_CPU_LIMIT: 4
+    KUBERNETES_MEMORY_REQUEST: 5Gi
+    KUBERNETES_CPU_REQUEST: 2
     FF_USE_FASTZIP: 1 # enable fastzip - a faster zip implementation that also supports level configuration.
     ARTIFACT_COMPRESSION_LEVEL: 'default' # can also be set to fastest, fast, slow and slowest. If just enabling fastzip is not enough try setting this to fastest or fast.
     CACHE_COMPRESSION_LEVEL: 'default' # same as above, but for caches
@@ -103,12 +103,16 @@ Build:
     - job: 'Prepare Docker Runner'
       optional: true
   cache:
-    #    why does this sometimes gets sufixed with _non_protected?
-    key: node-modules-cache
-    paths:
-      - ./node_modules
-    policy: pull-push
-    when: always
+    - key: node-modules-cache
+      paths:
+        - ./node_modules
+      policy: pull-push
+      when: always
+    - key: $CI_COMMIT_REF_SLUG
+      paths:
+        - ./node_modules
+      policy: push
+      when: always
   interruptible: true
   allow_failure: false
   stage: build
@@ -147,15 +151,14 @@ Build:
       fi
     - echo ${AFFECTED_COMMAND}
     - eval $AFFECTED_COMMAND
+    - yarn build invoicing-infrastructure
     - echo $CI_COMMIT_REF_SLUG
     - mkdir -p $CI_PROJECT_DIR/public/$CI_COMMIT_REF_SLUG
     - cd $CI_PROJECT_DIR
     - pwd
-    - yarn install
     - yarn run ci:coverage
     - cp -r -a $CI_PROJECT_DIR/reports/* $CI_PROJECT_DIR/public/$CI_COMMIT_REF_SLUG
   coverage: '/Statements\s*:.*?\s+(\d+.\d+)%/'
-
   artifacts:
     paths:
       - .ci_status
@@ -183,6 +186,8 @@ pages:
 Build Production Dependencies:
   image: $BUILD_IMAGE
   variables:
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
     FF_USE_FASTZIP: 1 # enable fastzip - a faster zip implementation that also supports level configuration.
     ARTIFACT_COMPRESSION_LEVEL: 'default' # can also be set to fastest, fast, slow and slowest. If just enabling fastzip is not enough try setting this to fastest or fast.
     CACHE_COMPRESSION_LEVEL: 'default' # same as above, but for caches
@@ -193,11 +198,16 @@ Build Production Dependencies:
     - job: 'Prepare Docker Runner'
       optional: true
   cache:
-    key: node-modules-production-cache
-    paths:
-      - ./node_modules
-    policy: pull-push
-    when: always
+    - key: node-modules-production-cache
+      paths:
+        - ./node_modules
+      policy: pull-push
+      when: always
+    - key: node-modules-production-cache-$CI_COMMIT_REF_SLUG
+      paths:
+        - ./node_modules
+      policy: push
+      when: always
   interruptible: true
   allow_failure: false
   stage: build
@@ -218,7 +228,7 @@ Build Production Dependencies:
     - Build
   stage: build
   cache:
-    key: node-modules-cache
+    key: $CI_COMMIT_REF_SLUG
     paths:
       - ./node_modules
     policy: pull
@@ -254,16 +264,14 @@ Package Images:dev:
   stage: package
   needs: [Build, Build Production Dependencies]
   cache:
-    key: node-modules-production-cache
+    key: node-modules-production-cache-$CI_COMMIT_REF_SLUG
     paths:
       - ./node_modules
     policy: pull
     when: always
   variables:
-    KUBERNETES_MEMORY_REQUEST: 4Gi
-    KUBERNETES_CPU_REQUEST: 4
-    KUBERNETES_MEMORY_LIMIT: 4Gi
-    KUBERNETES_CPU_LIMIT: 4
+    KUBERNETES_MEMORY_REQUEST: 5Gi
+    KUBERNETES_CPU_REQUEST: 3
     FF_USE_FASTZIP: 1 # enable fastzip - a faster zip implementation that also supports level configuration.
     ARTIFACT_COMPRESSION_LEVEL: 'default' # can also be set to fastest, fast, slow and slowest. If just enabling fastzip is not enough try setting this to fastest or fast.
     CACHE_COMPRESSION_LEVEL: 'default' # same as above, but for caches
@@ -301,7 +309,7 @@ Trigger Acceptance Tests:
   image: $BUILD_IMAGE
   needs: [Package Images:dev]
   cache:
-    key: node-modules-production-cache
+    key: node-modules-production-cache-$CI_COMMIT_REF_SLUG
     paths:
       - ./node_modules
     policy: pull
@@ -315,7 +323,7 @@ Trigger Acceptance Tests:
   script:
     - cd $CI_PROJECT_DIR
     - ls -al
-    - yarn install
+    - yarn install --frozen-lockfile --production
     - export AFFECTED_APPS=$(cat .ci_status/affected_apps)
     - ./tools/scripts/deploy-ci.sh
   artifacts:
@@ -337,6 +345,8 @@ Deploy:dev-invoicing:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:dev-import:
   stage: deploy-import
@@ -353,6 +363,8 @@ Deploy:dev-import:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:dev-reporting:
   stage: deploy-reporting
@@ -369,6 +381,8 @@ Deploy:dev-reporting:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'reporting-backend'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:qa-invoicing:
   stage: deploy-invoicing
@@ -385,6 +399,8 @@ Deploy:qa-invoicing:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:qa-import:
   stage: deploy-import
@@ -401,6 +417,8 @@ Deploy:qa-import:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:qa-reporting:
   stage: deploy-reporting
@@ -417,6 +435,8 @@ Deploy:qa-reporting:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'reporting-backend'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:automation-invoicing:
   stage: deploy-invoicing
@@ -436,6 +456,8 @@ Deploy:automation-invoicing:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:automation-import:
   stage: deploy-import
@@ -455,6 +477,8 @@ Deploy:automation-import:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:automation-reporting:
   stage: deploy-reporting
@@ -474,6 +498,8 @@ Deploy:automation-reporting:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'reporting-backend'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:hindawi-demo-invoicing:
   stage: deploy-invoicing
@@ -490,6 +516,8 @@ Deploy:hindawi-demo-invoicing:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:hindawi-demo-import:
   stage: deploy-import
@@ -506,6 +534,8 @@ Deploy:hindawi-demo-import:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:hindawi-demo-reporting:
   stage: deploy-reporting
@@ -522,6 +552,8 @@ Deploy:hindawi-demo-reporting:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'reporting-backend'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:hindawi-demo-sales-invoicing:
   stage: deploy-invoicing
@@ -538,6 +570,8 @@ Deploy:hindawi-demo-sales-invoicing:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:hindawi-demo-sales-import:
   stage: deploy-import
@@ -554,6 +588,8 @@ Deploy:hindawi-demo-sales-import:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:hindawi-demo-sales-reporting:
   stage: deploy-reporting
@@ -570,6 +606,8 @@ Deploy:hindawi-demo-sales-reporting:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'reporting-backend'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:gsw-demo-invoicing:
   stage: deploy-invoicing
@@ -586,6 +624,8 @@ Deploy:gsw-demo-invoicing:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:gsw-demo-import:
   stage: deploy-import
@@ -602,6 +642,8 @@ Deploy:gsw-demo-import:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:gsw-demo-reporting:
   stage: deploy-reporting
@@ -618,6 +660,8 @@ Deploy:gsw-demo-reporting:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'reporting-backend'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:gsw-prod-invoicing:
   stage: deploy-invoicing
@@ -636,6 +680,8 @@ Deploy:gsw-prod-invoicing:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:gsw-prod-import:
   stage: deploy-import
@@ -654,6 +700,8 @@ Deploy:gsw-prod-import:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:gsw-prod-reporting:
   stage: deploy-reporting
@@ -672,6 +720,8 @@ Deploy:gsw-prod-reporting:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'reporting-backend'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:preproduction-invoicing:
   stage: deploy-invoicing
@@ -688,6 +738,8 @@ Deploy:preproduction-invoicing:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:preproduction-import:
   stage: deploy-import
@@ -704,6 +756,8 @@ Deploy:preproduction-import:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:preproduction-reporting:
   stage: deploy-reporting
@@ -720,6 +774,8 @@ Deploy:preproduction-reporting:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'reporting-backend'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:hindawi-prod-invoicing:
   stage: deploy-invoicing
@@ -738,6 +794,8 @@ Deploy:hindawi-prod-invoicing:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:hindawi-prod-import:
   stage: deploy-import
@@ -756,6 +814,8 @@ Deploy:hindawi-prod-import:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 Deploy:hindawi-prod-reporting:
   stage: deploy-reporting
@@ -774,3 +834,6 @@ Deploy:hindawi-prod-reporting:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'reporting-backend'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
+
