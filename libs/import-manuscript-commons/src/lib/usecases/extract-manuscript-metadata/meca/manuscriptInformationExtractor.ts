@@ -144,8 +144,8 @@ function extractAuthorData(
 
   const rawAuthor: RawAuthorProps = {
     affiliationName: authorAff['institution-wrap']['institution'],
-    affiliationRorId: '',
-    affiliationRinggoldId,
+    affiliationRorId: '__MISSING__',
+    affiliationRinggoldId: affiliationRinggoldId || '__MISSING__',
     countryCode: authorAff['country']['@_country'],
     email: author['email'],
     givenName: author['name']['given-names'],
@@ -245,7 +245,7 @@ function extractBaseManuscriptData(
   )).trim();
 
   const rawManuscript: RawManuscriptProps = {
-    articleAbstract,
+    articleAbstract: articleAbstract || '__MISSING__',
     articleTypeName: articleTypeId,
     authors: [],
     conflictOfInterest,
