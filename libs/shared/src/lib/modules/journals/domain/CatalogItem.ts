@@ -59,7 +59,7 @@ export class CatalogItem extends AggregateRoot<CatalogItemProps> {
 
   set amount(newAmount: number) {
     if (this.props.amount !== newAmount) {
-      this.generateCatalogUpdatedEvent();
+      this.generateCatalogUpdatedEventWithoutDuplicate();
     }
     this.props.amount = newAmount;
   }
@@ -140,12 +140,26 @@ export class CatalogItem extends AggregateRoot<CatalogItemProps> {
     return this.props.zeroPriced;
   }
 
-  set isZeroPriced(zeroPriced: boolean){
+  set isZeroPriced(zeroPriced: boolean) {
+    if (this.props.zeroPriced !== zeroPriced) {
+      this.generateCatalogUpdatedEventWithoutDuplicate();
+    }
+
     this.props.zeroPriced = zeroPriced;
   }
 
-  public generateCatalogUpdatedEvent(): void {
+  public generateCatalogUpdatedEventWithoutDuplicate(): void {
     const now = new Date();
-    this.addDomainEvent(new JournalUpdated(this, now));
+
+    const event = new JournalUpdated(this, now);
+
+    const cmp = (a: JournalUpdated, b: JournalUpdated) =>
+      a.catalogItem === b.catalogItem;
+
+    if (this.domainEventExists(event, cmp)) {
+      return;
+    }
+
+    this.addDomainEvent(event);
   }
 }

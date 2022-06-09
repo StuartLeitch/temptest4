@@ -3,6 +3,8 @@ import { DomainEvents } from './events/DomainEvents';
 import { Entity } from './Entity';
 import { UniqueEntityID } from './UniqueEntityID';
 
+type CompareFunction = (a: DomainEventContract, b: DomainEventContract) => boolean;
+
 export abstract class AggregateRoot<T> extends Entity<T> {
   private _domainEvents: DomainEventContract[] = [];
 
@@ -22,6 +24,18 @@ export abstract class AggregateRoot<T> extends Entity<T> {
     DomainEvents.markAggregateForDispatch(this);
     // Log the domain event
     this.logDomainEventAdded(domainEvent);
+  }
+
+  /**
+   * Check if an event already was generated, based on a comparison function
+   * @param toCheck event for which existence will be checked
+   * @param compareFn comparison function for the existence check
+   * @returns true of false if the event exists, matching the compare function
+   */
+  protected domainEventExists(toCheck: DomainEventContract, compareFn: CompareFunction): boolean {
+    const index = this._domainEvents.findIndex(event => compareFn(event, toCheck))
+
+    return index > -1;
   }
 
   public clearEvents(): void {

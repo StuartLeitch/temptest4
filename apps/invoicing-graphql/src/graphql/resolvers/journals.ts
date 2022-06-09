@@ -4,7 +4,6 @@ import {
   GetJournalListUsecase,
   PublisherMap,
   CatalogMap,
-  UpdateCatalogItemFieldsDTO,
 } from '@hindawi/shared';
 
 import { Context } from '../../builders';

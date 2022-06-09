@@ -13,11 +13,9 @@ import {
 
 import { JournalId } from '../../domain/JournalId';
 
-import { CatalogMap } from '../../mappers/CatalogMap';
-
-import { CatalogRepoContract } from '../../repos/catalogRepo';
-import { PublisherRepoContract } from '../../../publishers/repos';
 import { AuditLoggerServiceContract } from '../../../../infrastructure/audit';
+import { PublisherRepoContract } from '../../../publishers/repos';
+import { CatalogRepoContract } from '../../repos/catalogRepo';
 
 import { UpdateCatalogItemFieldsResponse as Response } from './updateCatalogItemFieldsResponse';
 import type { UpdateCatalogItemFieldsDTO as DTO } from './updateCatalogItemFieldsDTO';
@@ -27,29 +25,21 @@ export class UpdateCatalogItemFieldsUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Response, Context>
 {
-  private catalogRepo: CatalogRepoContract;
-  private publisherRepo: PublisherRepoContract;
-  private auditLoggerService: AuditLoggerServiceContract;
-
   constructor(
-    catalogRepo: CatalogRepoContract,
-    publisherRepo: PublisherRepoContract,
-    auditLoggerService: AuditLoggerServiceContract
+    private readonly catalogRepo: CatalogRepoContract,
+    private readonly publisherRepo: PublisherRepoContract,
+    private readonly auditLoggerService: AuditLoggerServiceContract
   ) {
     super();
-
-    this.catalogRepo = catalogRepo;
-    this.publisherRepo = publisherRepo;
-    this.auditLoggerService = auditLoggerService;
   }
 
   @Authorize('journal:update')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     const {
-      amount,
       journalId: rawJournalId,
       publisherName,
       zeroPriced,
+      amount,
     } = request;
     try {
       const journalId: JournalId = JournalId.create(
@@ -79,7 +69,6 @@ export class UpdateCatalogItemFieldsUsecase
         return left(new Errors.CatalogNotFound(journalId.id.toString()));
       }
 
-      //getting publisherId by publisher name
       const maybePublisherId = await this.publisherRepo.getPublisherByName(
         publisherName
       );
@@ -90,43 +79,21 @@ export class UpdateCatalogItemFieldsUsecase
       }
 
       const publisherId = maybePublisherId.value;
-      const maybeUpdatedCatalogItem = CatalogMap.toDomain({
-        id: catalogItem.id,
-        amount,
-        created: catalogItem.created,
-        updated: new Date(),
-        isActive: catalogItem.isActive,
-        journalId: rawJournalId,
-        publisherId: publisherId.id.toString(),
-        zeroPriced: request.zeroPriced,
-      });
 
-      if (maybeUpdatedCatalogItem.isLeft()) {
-        return left(
-          new UnexpectedError(new Error(maybeUpdatedCatalogItem.value.message))
-        );
-      }
-
-      const updatedCatalogItem = maybeUpdatedCatalogItem.value;
-
-      // * Call knex update method from service for DB changes
-      const maybeResult = await this.catalogRepo.updateCatalogItem(
-        updatedCatalogItem
-      );
-
-      if (maybeResult.isLeft()) {
-        return left(new UnexpectedError(new Error(maybeResult.value.message)));
-      }
+      catalogItem.publisherId = publisherId;
 
       // * PPBK_2715: if there's a price change, log it
-      if (Number(catalogItem.amount) !== Number(updatedCatalogItem.amount)) {
+      if (
+        Number(catalogItem.amount) !== Number(amount) ||
+        catalogItem.isZeroPriced !== zeroPriced
+      ) {
         // * Save information as audit log
 
         this.auditLoggerService.log({
           action: 'edited',
           entity: 'journal',
-          item_reference: updatedCatalogItem.journalId.toString(),
-          target: `Journal #${updatedCatalogItem.journalId.toString()}`,
+          item_reference: catalogItem.journalId.toString(),
+          target: `Journal #${catalogItem.journalId.toString()}`,
           timestamp: new Date(),
         });
       }
@@ -134,11 +101,21 @@ export class UpdateCatalogItemFieldsUsecase
       // trigger the JOURNAL_APC_UPDATED event given it has a different value than one registered already
 
       catalogItem.amount = amount;
-      await this.catalogRepo.save(catalogItem);
+      catalogItem.isZeroPriced = zeroPriced;
+
+      const maybeUpdatedCatalog = await this.catalogRepo.updateCatalogItem(
+        catalogItem
+      );
+
+      if (maybeUpdatedCatalog.isLeft()) {
+        return left(
+          new UnexpectedError(new Error(maybeUpdatedCatalog.value.message))
+        );
+      }
 
       DomainEvents.dispatchEventsForAggregate(catalogItem.id);
 
-      return right(updatedCatalogItem);
+      return right(maybeUpdatedCatalog.value);
     } catch (err) {
       return left(new UnexpectedError(err));
     }
