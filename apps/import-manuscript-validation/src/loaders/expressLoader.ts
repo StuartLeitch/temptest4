@@ -3,14 +3,15 @@ import express from 'express';
 
 import { RequestHandler, Response } from 'express';
 
-import express_prom_bundle, {Opts, Labels}  from 'express-prom-bundle';
 import {
   MicroframeworkSettings,
   MicroframeworkLoader,
 } from 'microframework-w3tec';
 
+import { Context } from '../builders';
 
 import { env } from '../env';
+import express_prom_bundle, {Opts, Labels}  from 'express-prom-bundle';
 import { register } from 'prom-client'
 
 export const expressLoader: MicroframeworkLoader = async (
@@ -49,7 +50,7 @@ export const expressLoader: MicroframeworkLoader = async (
 
     // Run application to listen on given port
     if (!env.isTest) {
-      const server = app.listen(env.app.port);
+      const server = app.listen(env.app.appPort);
       settings.setData('express_server', server);
     }
 

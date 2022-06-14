@@ -10,6 +10,11 @@ const log = new LoggerBuilder(LogLevel[env.log.level]).getLogger('loader');
 async function main() {
   const loaders = [];
 
+  const { expressLoader } = await import(
+    /* webpackChunkName: "expressLoader" */ './loaders/expressLoader'
+    );
+  loaders.push(expressLoader)
+
   const { contextLoader } = await import(
     /* webpackChunkName: "contextLoader" */ './loaders/contextLoader'
   );

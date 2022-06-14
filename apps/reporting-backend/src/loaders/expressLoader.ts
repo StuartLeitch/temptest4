@@ -1,4 +1,4 @@
-import express from 'express';
+import express, {RequestHandler} from 'express';
 import {
   MicroframeworkLoader,
   MicroframeworkSettings,
@@ -8,6 +8,8 @@ import { Logger } from 'libs/shared/src/lib/infrastructure/logging/implementatio
 import { LogLevel } from 'libs/shared/src/lib/infrastructure/logging';
 import { ReportingHandlers } from './handlerLoader';
 import { Event } from 'libs/eve/src';
+import express_prom_bundle from "express-prom-bundle";
+import {register} from "prom-client";
 const logger = new Logger(LogLevel.Info, 'express:loader');
 
 export const expressLoader: MicroframeworkLoader = (
@@ -17,7 +19,29 @@ export const expressLoader: MicroframeworkLoader = (
     const handlers: ReportingHandlers = settings.getData('handlers');
     const app = express();
 
+    const expressPrometheusMiddleware: RequestHandler = express_prom_bundle({
+      buckets: [0.1, 0.4, 0.7, 1, 1.3, 2, 3],
+      includeMethod: true,
+      includePath: true,
+      metricType: 'histogram',
+      metricsPath: '/metrics',
+      promRegistry: register,
+      urlValueParser: {
+        minHexLength: 5,
+        extraMasks: [
+          '^[0-9]+\\.[0-9]+\\.[0-9]+$' // replace dot-separated dates with #val
+        ]
+      },
+    });
+
+    app.use(expressPrometheusMiddleware);
     app.use(express.json({ limit: '50mb' }));
+
+    app.get('/readyz', async (req, res) => {
+      res.set('Content-Type', 'application/json');
+      res.status(200).send('{ready: true}');
+    });
+
     app.get('/health', (_, res) => res.end());
     if (env.app.isRestEnabled) {
       app.put('/events', async (req, res) => {

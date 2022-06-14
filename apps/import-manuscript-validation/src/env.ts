@@ -25,6 +25,7 @@ export const env = {
     validationSenderEmail: getOsEnv('VALIDATION_SENDER_EMAIL'),
     submissionGraphqlEndpoint: getOsEnv('IMPORT_MANUSCRIPT_SUBMISSION_GRAPHQL'),
     reviewAppBasePath: getOsEnv('IMPORT_MANUSCRIPT_REVIEW_APP_BASE_PATH'),
+    appPort: getOsEnv('IMPORT_MANUSCRIPT_VALIDATION_APP_PORT'),
     importManuscriptAppBasePath: getOsEnv('IMPORT_MANUSCRIPT_APP_BASE_PATH'),
     submissionAdminUsername: getOsEnv(
       'IMPORT_MANUSCRIPT_SUBMISSION_ADMIN_USERNAME'

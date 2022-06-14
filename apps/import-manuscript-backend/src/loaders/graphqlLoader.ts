@@ -15,6 +15,9 @@ import { resolvers } from '../graphql/resolvers';
 import { typeDefs } from '../graphql/schema';
 
 import { env } from '../env';
+import {createPrometheusExporterPlugin} from "@bmatei/apollo-prometheus-exporter";
+import { register } from 'prom-client'
+import {prometheusPlugin} from "@talabes/apollo-prometheus-plugin";
 
 export const graphqlLoader: MicroframeworkLoader = async (
   settings: MicroframeworkSettings | undefined
@@ -40,10 +43,15 @@ export const graphqlLoader: MicroframeworkLoader = async (
       env.graphql.route
     );
 
+    const apolloPrometheusPlugin = prometheusPlugin(register, { enableNodeMetrics: false});
+    const prometheusExporterPlugin = createPrometheusExporterPlugin({ app: expressApp, hostnameLabel: false });
+
     const graphqlServer = new ApolloServer({
       typeDefs: [KeycloakTypeDefs, typeDefs], // 1. Add the Keycloak Type Defs
       schemaDirectives: KeycloakSchemaDirectives, // 2. Add the KeycloakSchemaDirectives
       resolvers,
+      plugins: [apolloPrometheusPlugin, prometheusExporterPlugin],
+      tracing: true,
       context: ({ req }) => {
         return {
           ...context,

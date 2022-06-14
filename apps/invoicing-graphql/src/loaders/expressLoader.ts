@@ -1,5 +1,5 @@
 import KeycloakConnect, { Keycloak, Token } from 'keycloak-connect';
-import express, { Express, Request } from 'express';
+import express, {Express, Request, RequestHandler} from 'express';
 import session, { Store } from 'express-session';
 import * as csv from '@fast-csv/parse';
 import memorystore from 'memorystore';
@@ -7,6 +7,8 @@ import corsMiddleware from 'cors';
 import { Parser } from 'json2csv';
 import moment from 'moment';
 import multer from 'multer';
+import express_prom_bundle, {Opts, Labels}  from 'express-prom-bundle';
+import { register } from 'prom-client'
 
 import {
   MicroframeworkSettings,
@@ -141,9 +143,35 @@ export const expressLoader: MicroframeworkLoader = (
     const keycloak = configureKeycloak(app, store);
     settings.setData('keycloak', keycloak);
 
+    const expressPrometheusMiddleware: RequestHandler = express_prom_bundle({
+      buckets: [0.1, 0.4, 0.7, 1, 1.3, 2, 3],
+      includeMethod: true,
+      includePath: true,
+      metricType: 'histogram',
+      metricsPath: '/metrics',
+      promRegistry: register,
+      urlValueParser: {
+        minHexLength: 5,
+        extraMasks: [
+          '^[0-9]+\\.[0-9]+\\.[0-9]+$' // replace dot-separated dates with #val
+        ]
+      },
+    });
+
+    app.use(expressPrometheusMiddleware);
     app.use(express.json());
     app.use(corsMiddleware());
     app.use(executionContext.expressMiddleware);
+
+    app.get('/livez', async (req, res) => {
+      res.set('Content-Type', 'application/json');
+      res.status(200).send('{live: true}');
+    });
+
+    app.get('/readyz', async (req, res) => {
+      res.set('Content-Type', 'application/json');
+      res.status(200).send('{ready: true}');
+    });
 
     app.get('/api/invoice/:payerId', async (req, res) => {
       const {

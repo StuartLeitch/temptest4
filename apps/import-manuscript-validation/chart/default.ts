@@ -24,6 +24,17 @@ const defaultValues: WithAwsSecretsServiceProps = {
       owner: 'belzebuth',
       tier: 'backend',
     },
+    livenessProbe: {
+      path: '/livez'
+    },
+    readinessProbe: {
+      path: 'readyz'
+
+    },
+    metrics: {
+      scrape: true
+    }
+
   },
 };
 
