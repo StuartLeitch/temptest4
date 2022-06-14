@@ -37,21 +37,23 @@ const getPaymentsMethodsEpic: RootEpic = (
 const getClientTokenEpic: RootEpic = (action$, state$, { graphqlAdapter }) => {
   return action$.pipe(
     filter(isActionOf(getClientToken.request)),
-    switchMap(() => graphqlAdapter.send(queries.getClientToken)),
+    switchMap(() => {
+      window.sessionStorage.removeItem("braintreeTokenLoaded");
+      return graphqlAdapter.send(queries.getClientToken);
+    }),
     map((r) => {
       return getClientToken.success(r.data.getClientToken);
     }),
   );
 };
 
-const creditCardPaymentEpic: RootEpic = (
-  action$,
-  state$,
-  { graphqlAdapter },
-) => action$.pipe(
+const creditCardPaymentEpic: RootEpic = (action$, state$, { graphqlAdapter }) =>
+  action$.pipe(
     filter(isActionOf(recordCardPayment.request)),
     switchMap((action) =>
-      from(graphqlAdapter.send(mutations.creditCardPayment, action.payload)).pipe(
+      from(
+        graphqlAdapter.send(mutations.creditCardPayment, action.payload),
+      ).pipe(
         withLatestFrom(state$.pipe(map(invoice))),
         mergeMap(([r, invoice]) => {
           return from([
@@ -59,11 +61,11 @@ const creditCardPaymentEpic: RootEpic = (
             getInvoice.request(invoice.invoiceId),
           ]);
         }),
-        catchError(err => {
+        catchError((err) => {
           return of(recordCardPayment.failure(err.message));
-        })
-      )
-    )
+        }),
+      ),
+    ),
   );
 
 const recordPayPalPaymentEpic: RootEpic = (

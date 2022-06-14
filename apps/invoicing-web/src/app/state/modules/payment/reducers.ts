@@ -21,6 +21,7 @@ const payment = createReducer(initialState)
     methods: action.payload,
   }))
   .handleAction(getClientToken.success, (state, action) => {
+    window.sessionStorage.setItem("braintreeTokenLoaded", "true");
     return {
       ...state,
       token: action.payload.token,

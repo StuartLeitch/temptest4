@@ -10,6 +10,7 @@ import { NotFound } from "./pages/NotFound";
 export const App = () => {
   useEffect(() => {
     document.title = config.appName;
+    window.sessionStorage.removeItem("braintreeTokenLoaded");
 
     const favicon: any = document.getElementById("favicon");
     favicon.href = config.faviconUrl;
