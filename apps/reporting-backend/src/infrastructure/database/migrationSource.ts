@@ -25,6 +25,7 @@ import * as move_peer_review_events from './migrations/20210112142215_move_peer_
 import * as remove_submission_data_dates from './migrations/20200304113458_remove_wrong_dates_from_submission_data';
 
 import * as fix_manuscripts_editorial_assistant_data_order_issue from './migrations/20220503115016_fix_manuscripts_editorial_assistant_data_order_issue';
+import * as fix_materialization_lock_performance_issue from './migrations/20220529161600_fix_materialization_lock_performance_issue';
 
 import Knex from 'knex';
 
@@ -255,6 +256,7 @@ class KnexMigrationSource {
     apollo1_views_triggers_functions_execute,
     // Apollo1 Fixes
     fix_manuscripts_editorial_assistant_data_order_issue,
+    fix_materialization_lock_performance_issue,
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
