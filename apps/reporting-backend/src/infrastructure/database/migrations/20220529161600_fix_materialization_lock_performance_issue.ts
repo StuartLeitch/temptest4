@@ -286,7 +286,7 @@ AS SELECT users.manuscript_custom_id,
            FROM users_data
           WHERE users_data.email = users.email AND users_data.orcid IS NOT NULL
          LIMIT 1) user_identities ON user_identities.email = users.email
-WITH DATA;
+WITH NO DATA;
 
 -- View indexes:
 CREATE INDEX a11_manuscript_users_email_idx ON public.manuscript_users USING btree (email);
@@ -410,7 +410,7 @@ AS SELECT reviews.manuscript_custom_id,
            FROM authors a
           WHERE a.id = reviews.team_member_id
          LIMIT 1) authors ON authors.id = reviews.team_member_id
-WITH DATA;
+WITH NO DATA;
 
 -- View indexes:
 CREATE INDEX a11_manuscript_reviews_created_date_idx ON public.manuscript_reviews USING btree (created_date);
