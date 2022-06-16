@@ -616,6 +616,16 @@ END
 $procedure$
 ;
 `
+const refresh_updated_materialized_views_for_first_time=`
+refresh materialized view public.authors;
+commit;
+refresh materialized view public.manuscript_editors;
+commit;
+refresh materialized view public.manuscript_reviews;
+commit;
+refresh materialized view public.manuscript_users;
+commit;
+`
 
 export async function up(knex: Knex): Promise<any> {
 	return Promise.all([
@@ -637,6 +647,8 @@ export async function up(knex: Knex): Promise<any> {
 	  
 	  knex.raw(grant_permissions),
 	  
+	  knex.raw(refresh_updated_materialized_views_for_first_time),
+
 	  knex.raw(refresh_all_materialized_views),
 	  
 	]);
