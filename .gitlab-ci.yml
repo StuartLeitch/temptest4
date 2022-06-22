@@ -331,60 +331,6 @@ Trigger Acceptance Tests:
     paths:
       - dist-k8s
 
-Deploy:dev-invoicing:
-  stage: deploy-invoicing
-  tags:
-    - 'cluster:hindawi-dev'
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: hindawi
-    NODE_ENV: dev
-    NAMESPACE: dev
-    CLUSTER: hindawi-dev
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
-    REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-    KUBERNETES_CPU_REQUEST: 2
-
-Deploy:dev-import:
-  stage: deploy-import
-  tags:
-    - 'cluster:hindawi-dev'
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: hindawi
-    NODE_ENV: dev
-    NAMESPACE: dev
-    CLUSTER: hindawi-dev
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
-    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-    KUBERNETES_CPU_REQUEST: 2
-
-Deploy:dev-reporting:
-  stage: deploy-reporting
-  tags:
-    - 'cluster:hindawi-dev'
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: hindawi
-    NODE_ENV: dev
-    NAMESPACE: dev
-    CLUSTER: hindawi-dev
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
-    REQUIRED_APPS: 'reporting-backend'
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-    KUBERNETES_CPU_REQUEST: 2
-
 Deploy:qa-invoicing:
   stage: deploy-invoicing
   tags:
@@ -460,47 +406,47 @@ Deploy:automation-invoicing:
     KUBERNETES_MEMORY_REQUEST: 3Gi
     KUBERNETES_CPU_REQUEST: 2
 
-Deploy:automation-import:
-  stage: deploy-import
-  tags:
-    - 'cluster:hindawi-dev'
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  interruptible: true
-  when: on_success
-  allow_failure: true
-  variables:
-    TENANT: hindawi
-    NODE_ENV: automation
-    NAMESPACE: automation
-    CLUSTER: hindawi-dev
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
-    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-    KUBERNETES_CPU_REQUEST: 2
+# Deploy:automation-import:
+#   stage: deploy-import
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   dependencies:
+#     - Package Images:dev
+#   <<: *script_deploy
+#   interruptible: true
+#   when: on_success
+#   allow_failure: true
+#   variables:
+#     TENANT: hindawi
+#     NODE_ENV: automation
+#     NAMESPACE: automation
+#     CLUSTER: hindawi-dev
+#     AWS_REGISTRY: $AWS_DEV_REGISTRY
+#     COMMAND: build-manifests
+#     REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
+#     KUBERNETES_MEMORY_REQUEST: 3Gi
+#     KUBERNETES_CPU_REQUEST: 2
 
-Deploy:automation-reporting:
-  stage: deploy-reporting
-  tags:
-    - 'cluster:hindawi-dev'
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  interruptible: true
-  when: on_success
-  allow_failure: true
-  variables:
-    TENANT: hindawi
-    NODE_ENV: automation
-    NAMESPACE: automation
-    CLUSTER: hindawi-dev
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
-    REQUIRED_APPS: 'reporting-backend'
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-    KUBERNETES_CPU_REQUEST: 2
+# Deploy:automation-reporting:
+#   stage: deploy-reporting
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   dependencies:
+#     - Package Images:dev
+#   <<: *script_deploy
+#   interruptible: true
+#   when: on_success
+#   allow_failure: true
+#   variables:
+#     TENANT: hindawi
+#     NODE_ENV: automation
+#     NAMESPACE: automation
+#     CLUSTER: hindawi-dev
+#     AWS_REGISTRY: $AWS_DEV_REGISTRY
+#     COMMAND: build-manifests
+#     REQUIRED_APPS: 'reporting-backend'
+#     KUBERNETES_MEMORY_REQUEST: 3Gi
+#     KUBERNETES_CPU_REQUEST: 2
 
 Deploy:hindawi-demo-invoicing:
   stage: deploy-invoicing
@@ -520,41 +466,41 @@ Deploy:hindawi-demo-invoicing:
     KUBERNETES_MEMORY_REQUEST: 3Gi
     KUBERNETES_CPU_REQUEST: 2
 
-Deploy:hindawi-demo-import:
-  stage: deploy-import
-  tags:
-    - 'cluster:hindawi-dev'
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: hindawi
-    NODE_ENV: demo
-    NAMESPACE: demo
-    CLUSTER: hindawi-dev
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
-    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-    KUBERNETES_CPU_REQUEST: 2
+# Deploy:hindawi-demo-import:
+#   stage: deploy-import
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   dependencies:
+#     - Package Images:dev
+#   <<: *script_deploy
+#   variables:
+#     TENANT: hindawi
+#     NODE_ENV: demo
+#     NAMESPACE: demo
+#     CLUSTER: hindawi-dev
+#     AWS_REGISTRY: $AWS_DEV_REGISTRY
+#     COMMAND: build-manifests
+#     REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
+#     KUBERNETES_MEMORY_REQUEST: 3Gi
+#     KUBERNETES_CPU_REQUEST: 2
 
-Deploy:hindawi-demo-reporting:
-  stage: deploy-reporting
-  tags:
-    - 'cluster:hindawi-dev'
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: hindawi
-    NODE_ENV: demo
-    NAMESPACE: demo
-    CLUSTER: hindawi-dev
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
-    REQUIRED_APPS: 'reporting-backend'
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-    KUBERNETES_CPU_REQUEST: 2
+# Deploy:hindawi-demo-reporting:
+#   stage: deploy-reporting
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   dependencies:
+#     - Package Images:dev
+#   <<: *script_deploy
+#   variables:
+#     TENANT: hindawi
+#     NODE_ENV: demo
+#     NAMESPACE: demo
+#     CLUSTER: hindawi-dev
+#     AWS_REGISTRY: $AWS_DEV_REGISTRY
+#     COMMAND: build-manifests
+#     REQUIRED_APPS: 'reporting-backend'
+#     KUBERNETES_MEMORY_REQUEST: 3Gi
+#     KUBERNETES_CPU_REQUEST: 2
 
 Deploy:hindawi-demo-sales-invoicing:
   stage: deploy-invoicing
@@ -574,41 +520,41 @@ Deploy:hindawi-demo-sales-invoicing:
     KUBERNETES_MEMORY_REQUEST: 3Gi
     KUBERNETES_CPU_REQUEST: 2
 
-Deploy:hindawi-demo-sales-import:
-  stage: deploy-import
-  tags:
-    - 'cluster:hindawi-dev'
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: hindawi
-    NODE_ENV: demo-sales
-    NAMESPACE: demo-sales
-    CLUSTER: hindawi-dev
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
-    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-    KUBERNETES_CPU_REQUEST: 2
+# Deploy:hindawi-demo-sales-import:
+#   stage: deploy-import
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   dependencies:
+#     - Package Images:dev
+#   <<: *script_deploy
+#   variables:
+#     TENANT: hindawi
+#     NODE_ENV: demo-sales
+#     NAMESPACE: demo-sales
+#     CLUSTER: hindawi-dev
+#     AWS_REGISTRY: $AWS_DEV_REGISTRY
+#     COMMAND: build-manifests
+#     REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
+#     KUBERNETES_MEMORY_REQUEST: 3Gi
+#     KUBERNETES_CPU_REQUEST: 2
 
-Deploy:hindawi-demo-sales-reporting:
-  stage: deploy-reporting
-  tags:
-    - 'cluster:hindawi-dev'
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: hindawi
-    NODE_ENV: demo-sales
-    NAMESPACE: demo-sales
-    CLUSTER: hindawi-dev
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
-    REQUIRED_APPS: 'reporting-backend'
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-    KUBERNETES_CPU_REQUEST: 2
+# Deploy:hindawi-demo-sales-reporting:
+# stage: deploy-reporting
+# tags:
+#   - 'cluster:hindawi-dev'
+# dependencies:
+#   - Package Images:dev
+# <<: *script_deploy
+# variables:
+#   TENANT: hindawi
+#   NODE_ENV: demo-sales
+#   NAMESPACE: demo-sales
+#   CLUSTER: hindawi-dev
+#   AWS_REGISTRY: $AWS_DEV_REGISTRY
+#   COMMAND: build-manifests
+#   REQUIRED_APPS: 'reporting-backend'
+#   KUBERNETES_MEMORY_REQUEST: 3Gi
+#   KUBERNETES_CPU_REQUEST: 2
 
 Deploy:gsw-demo-invoicing:
   stage: deploy-invoicing
@@ -628,41 +574,41 @@ Deploy:gsw-demo-invoicing:
     KUBERNETES_MEMORY_REQUEST: 3Gi
     KUBERNETES_CPU_REQUEST: 2
 
-Deploy:gsw-demo-import:
-  stage: deploy-import
-  tags:
-    - 'cluster:hindawi-dev'
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: gsw
-    NODE_ENV: demo
-    NAMESPACE: demo-gsw
-    CLUSTER: hindawi-dev
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
-    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-    KUBERNETES_CPU_REQUEST: 2
+# Deploy:gsw-demo-import:
+#   stage: deploy-import
+#   tags:
+#     - 'cluster:hindawi-dev'
+#   dependencies:
+#     - Package Images:dev
+#   <<: *script_deploy
+#   variables:
+#     TENANT: gsw
+#     NODE_ENV: demo
+#     NAMESPACE: demo-gsw
+#     CLUSTER: hindawi-dev
+#     AWS_REGISTRY: $AWS_DEV_REGISTRY
+#     COMMAND: build-manifests
+#     REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
+#     KUBERNETES_MEMORY_REQUEST: 3Gi
+#     KUBERNETES_CPU_REQUEST: 2
 
-Deploy:gsw-demo-reporting:
-  stage: deploy-reporting
-  tags:
-    - 'cluster:hindawi-dev'
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: gsw
-    NODE_ENV: demo
-    NAMESPACE: demo-gsw
-    CLUSTER: hindawi-dev
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
-    REQUIRED_APPS: 'reporting-backend'
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-    KUBERNETES_CPU_REQUEST: 2
+# Deploy:gsw-demo-reporting:
+# stage: deploy-reporting
+# tags:
+#   - 'cluster:hindawi-dev'
+# dependencies:
+#   - Package Images:dev
+# <<: *script_deploy
+# variables:
+#   TENANT: gsw
+#   NODE_ENV: demo
+#   NAMESPACE: demo-gsw
+#   CLUSTER: hindawi-dev
+#   AWS_REGISTRY: $AWS_DEV_REGISTRY
+#   COMMAND: build-manifests
+#   REQUIRED_APPS: 'reporting-backend'
+#   KUBERNETES_MEMORY_REQUEST: 3Gi
+#   KUBERNETES_CPU_REQUEST: 2
 
 Deploy:gsw-prod-invoicing:
   stage: deploy-invoicing
@@ -684,25 +630,25 @@ Deploy:gsw-prod-invoicing:
     KUBERNETES_MEMORY_REQUEST: 3Gi
     KUBERNETES_CPU_REQUEST: 2
 
-Deploy:gsw-prod-import:
-  stage: deploy-import
-  only:
-    - develop
-  tags:
-    - 'cluster:hindawi-prod'
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: gsw
-    NODE_ENV: prod
-    NAMESPACE: gsw-prod
-    CLUSTER: hindawi-prod
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
-    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-    KUBERNETES_CPU_REQUEST: 2
+# Deploy:gsw-prod-import:
+#   stage: deploy-import
+#   only:
+#     - develop
+#   tags:
+#     - 'cluster:hindawi-prod'
+#   dependencies:
+#     - Package Images:dev
+#   <<: *script_deploy
+#   variables:
+#     TENANT: gsw
+#     NODE_ENV: prod
+#     NAMESPACE: gsw-prod
+#     CLUSTER: hindawi-prod
+#     AWS_REGISTRY: $AWS_DEV_REGISTRY
+#     COMMAND: build-manifests
+#     REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
+#     KUBERNETES_MEMORY_REQUEST: 3Gi
+#     KUBERNETES_CPU_REQUEST: 2
 
 Deploy:gsw-prod-reporting:
   stage: deploy-reporting
@@ -717,60 +663,6 @@ Deploy:gsw-prod-reporting:
     TENANT: gsw
     NODE_ENV: prod
     NAMESPACE: gsw-prod
-    CLUSTER: hindawi-prod
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
-    REQUIRED_APPS: 'reporting-backend'
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-    KUBERNETES_CPU_REQUEST: 2
-
-Deploy:preproduction-invoicing:
-  stage: deploy-invoicing
-  tags:
-    - 'cluster:hindawi-prod'
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: hindawi
-    NODE_ENV: preproduction
-    NAMESPACE: preproduction
-    CLUSTER: hindawi-prod
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
-    REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-    KUBERNETES_CPU_REQUEST: 2
-
-Deploy:preproduction-import:
-  stage: deploy-import
-  tags:
-    - 'cluster:hindawi-prod'
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: hindawi
-    NODE_ENV: preproduction
-    NAMESPACE: preproduction
-    CLUSTER: hindawi-prod
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
-    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-    KUBERNETES_CPU_REQUEST: 2
-
-Deploy:preproduction-reporting:
-  stage: deploy-reporting
-  tags:
-    - 'cluster:hindawi-prod'
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: hindawi
-    NODE_ENV: preproduction
-    NAMESPACE: preproduction
     CLUSTER: hindawi-prod
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
@@ -798,25 +690,25 @@ Deploy:hindawi-prod-invoicing:
     KUBERNETES_MEMORY_REQUEST: 3Gi
     KUBERNETES_CPU_REQUEST: 2
 
-Deploy:hindawi-prod-import:
-  stage: deploy-import
-  only:
-    - develop
-  tags:
-    - 'cluster:hindawi-prod'
-  dependencies:
-    - Package Images:dev
-  <<: *script_deploy
-  variables:
-    TENANT: hindawi
-    NODE_ENV: prod
-    NAMESPACE: prod-hindawi
-    CLUSTER: hindawi-prod
-    AWS_REGISTRY: $AWS_DEV_REGISTRY
-    COMMAND: build-manifests
-    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-    KUBERNETES_CPU_REQUEST: 2
+# Deploy:hindawi-prod-import:
+#   stage: deploy-import
+#   only:
+#     - develop
+#   tags:
+#     - 'cluster:hindawi-prod'
+#   dependencies:
+#     - Package Images:dev
+#   <<: *script_deploy
+#   variables:
+#     TENANT: hindawi
+#     NODE_ENV: prod
+#     NAMESPACE: prod-hindawi
+#     CLUSTER: hindawi-prod
+#     AWS_REGISTRY: $AWS_DEV_REGISTRY
+#     COMMAND: build-manifests
+#     REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
+#     KUBERNETES_MEMORY_REQUEST: 3Gi
+#     KUBERNETES_CPU_REQUEST: 2
 
 Deploy:hindawi-prod-reporting:
   stage: deploy-reporting
