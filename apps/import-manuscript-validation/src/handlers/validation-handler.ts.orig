@@ -11,7 +11,6 @@ import { EventHandler } from './event-handler';
 import { Context } from '../builders';
 
 import { env } from '../env';
-import {VError} from "verror";
 
 const VALIDATE_PACKAGE = 'ValidatePackage';
 
@@ -95,7 +94,8 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
           loggerBuilder
         ).execute({ manuscript, packagePath: res.value.src });
         logger.info(`Submission url: ${submissionEditURL}`);
-        await context.services.emailService
+
+        context.services.emailService
           .createSuccesfulValidationNotification(
             data.fileName,
             env.app.validationSenderEmail,
@@ -108,8 +108,9 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
           )
           .sendEmail();
       } catch (err) {
+<<<<<<< HEAD
         // rejection email here
-        await context.services.emailService
+        context.services.emailService
           .createUnsuccesfulValidationNotification(
             data.fileName,
             env.app.validationSenderEmail,
@@ -121,8 +122,19 @@ export const ValidatePackageHandler: EventHandler<ValidatePackageEvent> = {
             env.app.importManuscriptAppBasePath
           )
           .sendEmail();
+        logger.error(err);
+        throw err;
+=======
+        context.services.emailService.sendEmail(
+          [data.failContactEmail],
+          'import-manuscript@hindawi.com',
+          'Important Message',
+          `ERROR processing package '${res.value.src}': ${err.message} ${err.stack}`
+        );
         logger.error(`Error while processing: '${res.value.src}'`, err);
-        throw new VError(err, `Error while processing: '${res.value.src}'`);      }
+        throw new VError(err, `Error while processing: '${res.value.src}'`);
+>>>>>>> feat | PPBK-2503 author.xml semantic validation
+      }
     };
   },
 };

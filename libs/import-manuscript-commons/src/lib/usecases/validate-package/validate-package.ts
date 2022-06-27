@@ -16,7 +16,7 @@ import {
 import type { ValidatePackage as Response } from './validate-package-response';
 import type { ValidatePackageDTO as DTO } from './validate-package-dto';
 
-type ManifestXML = {
+export type ManifestXML = {
   manifest: ManifestProps;
 };
 

@@ -2,7 +2,7 @@ import {
   ValueObjectProps,
   GuardFailure,
   ValueObject,
-  Guard,
+  Guard, GuardFail,
 } from '@hindawi/shared';
 
 import { Path } from './path';
@@ -18,6 +18,7 @@ export enum MecaFileType {
   supplementary = 'supplementary',
   coverLetter = 'cover-letter',
   manuscript = 'manuscript',
+  figure = 'figure',
 }
 
 export interface FileProps extends ValueObjectProps {
@@ -56,7 +57,7 @@ export class File extends ValueObject<FileProps> {
     ]);
 
     if (guardResult.isFail()) {
-      throw new GuardFailure(guardResult.message);
+      throw new GuardFail(guardResult.message);
     } else {
       return new File(props);
     }

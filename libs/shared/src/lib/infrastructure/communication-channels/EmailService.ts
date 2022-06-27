@@ -154,6 +154,7 @@ export class EmailService {
     error: any,
     importManuscriptPath: string
   ): Email {
+    console.log(JSON.stringify(receiver, null, 2))
     const unsuccessTxt = '⚠ Your uploaded zip file could not be analyzed!';
 
     const gotoPhenomButton = ButtonLinkTemplate.build(

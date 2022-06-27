@@ -61,20 +61,21 @@ export class Author extends ValueObject<AuthorProps> {
 
   static create(props: AuthorProps): Author {
     const guardArgs: GuardArgument[] = [
-      { argument: props.affiliationName, argumentName: 'affiliationName' },
-      { argument: props.isCorresponding, argumentName: 'isCorresponding' },
-      { argument: props.isSubmitting, argumentName: 'isSubmitting' },
-      { argument: props.countryCode, argumentName: 'countryCode' },
-      { argument: props.givenName, argumentName: 'givenName' },
-      { argument: props.surname, argumentName: 'surname' },
-      { argument: props.email, argumentName: 'email' },
+      {argument: props.affiliationName, argumentName: 'author.affiliationName'},
+      {argument: props.isCorresponding, argumentName: 'author.isCorresponding'},
+      {argument: props.isSubmitting, argumentName: 'author.isSubmitting'},
+      {argument: props.countryCode, argumentName: 'author.countryCode'},
+      {argument: props.givenName, argumentName: 'author.givenName'},
+      {argument: props.surname, argumentName: 'author.surname'},
+      {argument: props.email, argumentName: 'author.email'},
     ];
 
-    const guardResult = Guard.againstNullOrUndefinedBulk(guardArgs);
-
-    if (guardResult.failed) {
-      throw guardResult;
-    }
+    Guard.againstNullOrUndefinedBulk(guardArgs).throwIfFailed();
+    Guard.againstEmpty(props.givenName, 'author.givenName').throwIfFailed()
+    Guard.againstEmpty(props.surname, 'author.surname').throwIfFailed()
+    Guard.againstEmpty(props.email.value, 'author.email').throwIfFailed()
+    Guard.againstEmpty(props.countryCode, 'author.country').throwIfFailed()
+    Guard.againstEmpty(props.affiliationName, 'author.affiliationName').throwIfFailed()
 
     return new Author(props);
   }

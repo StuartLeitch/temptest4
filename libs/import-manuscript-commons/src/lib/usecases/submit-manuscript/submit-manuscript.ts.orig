@@ -53,10 +53,6 @@ export class SubmitManuscriptUseCase
     this.mapper = new Map<MecaFileType, SubmissionSystemFileType>();
 
     this.mapper.set(
-      MecaFileType.figure,
-      SubmissionSystemFileType.figure
-    );
-    this.mapper.set(
       MecaFileType.coverLetter,
       SubmissionSystemFileType.coverLetter
     );
@@ -203,7 +199,12 @@ export class SubmitManuscriptUseCase
     mapper: Map<MecaFileType, SubmissionSystemFileType>
   ): SubmissionSystemFileType {
     const submissionSystemFileType = mapper.get(mecaFileType);
+<<<<<<< HEAD
+    this.logger.info(`Mapping ${mecaFileType} to ${submissionSystemFileType} `);
+=======
+
     this.logger.info(`Mapping '${mecaFileType}' to '${submissionSystemFileType}'`);
+>>>>>>> feat | PPBK-2503 author.xml semantic validation
     return submissionSystemFileType;
   }
 

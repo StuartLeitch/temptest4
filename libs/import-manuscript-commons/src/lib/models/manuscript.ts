@@ -3,13 +3,15 @@ import {
   UniqueEntityID,
   GuardArgument,
   ValueObject,
-  Guard,
+  Guard, GuardFailure, GuardFail,
 } from '@hindawi/shared';
 
 import { SourceJournal, Journal } from './journal';
 import { MecaFileType, File } from './file';
 import { Founding } from './founding';
 import { Author } from './author';
+const { getName } = require('country-list');
+
 
 export interface ManuscriptProps extends ValueObjectProps {
   sourceManuscriptId: UniqueEntityID;
@@ -102,30 +104,51 @@ export class Manuscript extends ValueObject<ManuscriptProps> {
     super(props);
   }
 
-  static create(props: ManuscriptProps): Manuscript {
+  static create(manuscriptProps: ManuscriptProps): Manuscript {
     const guardArgs: GuardArgument[] = [
-      { argument: props.articleAbstract, argumentName: 'articleAbstract' },
-      { argument: props.articleTypeName, argumentName: 'articleTypeName' },
-      { argument: props.sourceJournal, argumentName: 'sourceJournal' },
-      { argument: props.authors, argumentName: 'authors' },
-      { argument: props.files, argumentName: 'files' },
-      { argument: props.title, argumentName: 'title' },
-      {
-        argument: props.destinationJournal,
-        argumentName: 'destinationJournal',
-      },
-      {
-        argument: props.sourceManuscriptId,
-        argumentName: 'sourceManuscriptId',
-      },
-    ];
+      { argument: manuscriptProps.sourceJournal, argumentName: 'sourceJournal' },
+      { argument: manuscriptProps.title, argumentName: 'title' },
+      { argument: manuscriptProps.conflictOfInterest, argumentName: 'conflictOfInterest' },
+      { argument: manuscriptProps.articleAbstract, argumentName: 'articleAbstract' },
+      { argument: manuscriptProps.articleTypeName, argumentName: 'articleTypeName' },
+      { argument: manuscriptProps.authors, argumentName: 'authors' },
+      { argument: manuscriptProps.files, argumentName: 'files' },
+      {argument: manuscriptProps.destinationJournal, argumentName: 'destinationJournal'},
+      {argument: manuscriptProps.sourceManuscriptId, argumentName: 'sourceManuscriptId'},    ];
 
-    const guardResult = Guard.againstNullOrUndefinedBulk(guardArgs);
+    Guard.againstNullOrUndefinedBulk(guardArgs).throwIfFailed();
+    Guard.againstEmpty(manuscriptProps.articleTypeName, 'article type').throwIfFailed()
+    Guard.againstEmpty(manuscriptProps.title, 'manuscript title').throwIfFailed()
 
-    if (guardResult.failed) {
-      throw guardResult;
+
+    if(!manuscriptProps.authors.find(a => a.isCorresponding)){
+      throw new GuardFail(`The manuscript ${manuscriptProps.title} does not have a corresponding author`)
     }
 
-    return new Manuscript(props);
+    if(!manuscriptProps.authors.find(a => a.isSubmitting)){
+      throw new GuardFail(`The manuscript ${manuscriptProps.title} does not have a submitting author`)
+    }
+
+    for (const author of manuscriptProps.authors) {
+      const authorGuardArgs: GuardArgument[] = [
+        { argument: author.givenName, argumentName: 'givenName' },
+        { argument: author.surname, argumentName: 'surname' },
+        { argument: author.email, argumentName: 'email' },
+        { argument: author.countryCode, argumentName: 'country' },
+        { argument: author.affiliationName, argumentName: 'affiliationName' },
+        { argument: author.affiliationRorId, argumentName: 'affiliationRorId' },
+      ];
+
+      const authorGuardResult = Guard.againstNullOrUndefinedBulk(authorGuardArgs);
+      if (authorGuardResult.failed) {
+        throw authorGuardResult;
+      }
+
+      if(!getName(author.countryCode)){
+        throw new GuardFail(`The country code ${author.countryCode} for author ${author.givenName} ${author.surname} does not exist on this planet.`)
+      }
+    }
+
+    return new Manuscript(manuscriptProps);
   }
 }

@@ -15,7 +15,7 @@ export class SourceJournalMapper extends Mapper<SourceJournal> {
   static toDomain(raw: RawSourceJournalProps): SourceJournal {
     const props: SourceJournalProps = {
       id: raw.id,
-      name: raw.name,
+      name: raw.name.trim().replace(/\s\s+/g, ' '),
       eissn: raw.eissn,
       pissn: raw.pissn,
     };

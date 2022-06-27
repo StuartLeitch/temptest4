@@ -5,7 +5,7 @@ import {
   LoggerContract,
   GuardFailure,
   UseCase,
-  left,
+  left, GuardFail,
 } from '@hindawi/shared';
 
 import type { UsecaseAuthorizationContext as Context } from '../../authorization';
@@ -41,20 +41,20 @@ export class CreateManuscriptUploadUrlUseCase
 
     try {
       if (!fileName.endsWith('-meca.zip')) {
-        return left(new GuardFailure(`The package name is not valid`));
+        return left(new GuardFail(`The package name is not valid`));
       }
 
       const uuid = fileName.substring(0, uuidLength);
 
       if (!uuidRegex.test(uuid)) {
-        return left(new GuardFailure(`The package name is not valid`));
+        return left(new GuardFail(`The package name is not valid`));
       }
 
       const manuscriptExists =
         await this.manuscriptUploadInfoRepo.manuscriptExistsByName(fileName);
 
       if (manuscriptExists) {
-        return left(new GuardFailure(`This package was already imported`));
+        return left(new GuardFail(`This package was already imported`));
       }
 
       const resp = await this.uploadService.createSignedUrlForUpload(fileName);

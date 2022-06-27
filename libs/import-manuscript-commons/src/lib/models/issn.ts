@@ -33,14 +33,11 @@ export class Issn extends ValueObject<IssnProps> {
       { argument: props.type, argumentName: 'issn type' },
     ];
 
-    const finalResult = Guard.combineResults([
+    Guard.combineResults([
       Guard.againstNullOrUndefinedBulk(guardArgs),
       Guard.againstInvalidIssn(props.value),
-    ]);
+    ]).throwIfFailed();
 
-    if (finalResult.failed) {
-      throw finalResult;
-    }
 
     return new Issn(props);
   }

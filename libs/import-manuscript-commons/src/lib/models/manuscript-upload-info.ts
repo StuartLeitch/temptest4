@@ -2,7 +2,7 @@ import {
   UniqueEntityID,
   AggregateRoot,
   GuardFailure,
-  Entity,
+  Entity, GuardFail,
 } from '@hindawi/shared';
 
 export enum ManuscriptStatus {
@@ -60,7 +60,7 @@ export class ManuscriptUploadInfo extends AggregateRoot<ManuscriptUploadProps> {
 
   private static validateProp(prop: unknown, propName: string): void {
     if (prop === null || prop === undefined)
-      throw new GuardFailure(`${propName} is null or undefined`);
+      throw new GuardFail(`${propName} is null or undefined`);
   }
 
   public get fileName(): string {

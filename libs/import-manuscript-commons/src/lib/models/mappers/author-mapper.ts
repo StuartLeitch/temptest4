@@ -1,4 +1,4 @@
-import { Mapper, Email } from '@hindawi/shared';
+import {Mapper, Email, Guard} from '@hindawi/shared';
 
 import { AuthorProps, Author } from '../author';
 
@@ -16,6 +16,7 @@ export interface RawAuthorProps {
 
 export class AuthorMapper extends Mapper<Author> {
   static toDomain(raw: Partial<RawAuthorProps>): Author {
+    Guard.againstEmpty(raw.email, "author.email").throwIfFailed()
     const maybeEmail = Email.create({ value: raw.email });
 
     if (maybeEmail.isLeft()) {
@@ -23,8 +24,8 @@ export class AuthorMapper extends Mapper<Author> {
     }
 
     const props: AuthorProps = {
-      affiliationRorId: raw.affiliationRorId || null,
-      affiliationRinggoldId: raw.affiliationRinggoldId || null,
+      affiliationRorId: raw.affiliationRorId || "__MISSING__",
+      affiliationRinggoldId: raw.affiliationRinggoldId || "__MISSING__",
       isCorresponding: raw.isCorresponding || false,
       affiliationName: raw.affiliationName || '',
       isSubmitting: raw.isSubmitting || false,

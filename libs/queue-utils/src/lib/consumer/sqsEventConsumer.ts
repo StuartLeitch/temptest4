@@ -36,6 +36,7 @@ export class SqsEventConsumer implements QueueEventConsumer {
     this.eventMap[eventName].push(handler);
   }
 
+  //TODO ADD PROPPER LOGGER
   async start() {
     const { QueueUrl } = await this.sqs
       .getQueueUrl({ QueueName: this.queueName })

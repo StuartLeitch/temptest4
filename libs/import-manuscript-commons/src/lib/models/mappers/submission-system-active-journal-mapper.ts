@@ -25,7 +25,7 @@ export class SubmissionSystemActiveJournalMapper extends Mapper<ActiveJournal> {
       isActive: raw.isActive,
       issn: raw.issn,
       id: raw.id,
-      name: raw.name,
+      name: raw.name.trim().replace(/\s\s+/g, ' '),
       code: raw.code,
     };
 

@@ -4,5 +4,6 @@ export class GuardFailure implements GuardFailureContract {
   constructor(
     public readonly message: string,
     public readonly name: string = ''
-  ) {}
+  ) {
+  }
 }

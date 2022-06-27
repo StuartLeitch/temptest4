@@ -27,7 +27,11 @@ export class KeycloakAuthenticator {
     try {
       await this.keycloak.grantManager.ensureFreshness(this.authorization);
     } catch (exception) {
-      throw new VError(exception, 'Exception while trying to refresh token');
+      try {
+        await this.obtainDirectly();
+      } catch (exception) {
+        throw new VError(exception, 'Exception while trying to refresh token');
+      }
     }
   }
 

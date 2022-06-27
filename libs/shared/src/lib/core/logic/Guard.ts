@@ -1,6 +1,11 @@
-abstract class GuardBaseResult {
+abstract class GuardBaseResult extends Error{
   readonly succeeded: boolean;
-  readonly message?: string;
+  readonly message: string;
+
+  constructor(message: string) {
+    super(message);
+    this.message = message;
+  }
 
   get failed(): boolean {
     return !this.succeeded;
@@ -21,13 +26,18 @@ abstract class GuardBaseResult {
   isFail(): this is GuardFail {
     return this.failed;
   }
+
+  throwIfFailed(): void {
+    if(this.failed)
+      throw this;
+  }
 }
 
 export class GuardSuccess extends GuardBaseResult {
   readonly succeeded: boolean = true;
 
   constructor() {
-    super();
+    super("");
   }
 }
 
@@ -35,10 +45,7 @@ export class GuardFail extends GuardBaseResult {
   readonly succeeded: boolean = false;
 
   constructor(public readonly message: string) {
-    super();
-    if (!message) {
-      throw new Error('Message is required for failed guards');
-    }
+    super(message);
   }
 }
 
@@ -104,15 +111,15 @@ export class Guard {
     }
 
     if (typeof argument === 'string' && argument === '') {
-      return fail(`${argumentName} is an empty string`);
+      return fail(`'${argumentName}' is an empty string`);
     }
 
     if (Array.isArray(argument) && argument.length === 0) {
-      return fail(`${argumentName} is an empty array`);
+      return fail(`'${argumentName}' is an empty array`);
     }
 
     if (typeof argument === 'object' && Object.keys(argument).length === 0) {
-      return fail(`${argumentName} is an empty object`);
+      return fail(`'${argumentName}' is an empty object`);
     }
 
     return success();
@@ -122,7 +129,7 @@ export class Guard {
     if (text.length >= numChars) {
       return success();
     } else {
-      return fail(`Text is not at least ${numChars} chars.`);
+      return fail(`Text is not at least '${numChars}' chars.`);
     }
   }
 
@@ -130,7 +137,21 @@ export class Guard {
     if (text.length <= numChars) {
       return success();
     } else {
-      return fail(`Text is greater than ${numChars} chars.`);
+      return fail(`Text is greater than '${numChars}' chars.`);
+    }
+  }
+
+  public static aOrB(argumentA: unknown,
+                     argumentNameA: string,
+                     argumentB: unknown,
+                     argumentNameB: string
+  ) {
+    const resultA = Guard.againstNullOrUndefined(argumentA, argumentNameA)
+    const resultB = Guard.againstNullOrUndefined(argumentB, argumentNameB)
+    if(resultA || resultB){
+      return success()
+    } else {
+      return fail(`'${argumentNameA}' or '${argumentNameB}' must exist.`)
     }
   }
 
@@ -161,7 +182,7 @@ export class Guard {
       }
     }
 
-    const msg = `${argumentName} isn't oneOf the correct types in ${JSON.stringify(
+    const msg = `'${argumentName}' isn't oneOf the correct types in ${JSON.stringify(
       validValues
     )}. Got "${value}".`;
 
@@ -178,7 +199,7 @@ export class Guard {
     if (isInRange) {
       return success();
     } else {
-      return fail(`${argumentName} is not within range ${min} to ${max}.`);
+      return fail(`'${argumentName}' is not within range '${min}' to '${max}'.`);
     }
   }
 
@@ -197,7 +218,7 @@ export class Guard {
     }
 
     if (failingResult) {
-      return fail(`${argumentName} is not within the range.`);
+      return fail(`'${argumentName}' is not within the range.`);
     } else {
       return success();
     }
@@ -213,21 +234,21 @@ export class Guard {
       return success();
     }
 
-    return fail(`${email} is an invalid email address.`);
+    return fail(`'${email}' is an invalid email address.`);
   }
 
   public static againstInvalidIssn(issn: string): GuardResult {
-    const issnRegex = /^[0-9]{4}-[0-9]{3}[0-9xX]$/;
+    const issnRegex = /^[0-9]{4}[0-9]{3}[0-9xX]$/;
 
-    if (!issnRegex.test(issn)) {
-      return fail(`${issn} is an invalid ISSN`);
+    if (!issnRegex.test(issn.trim().replace('-', ""))) {
+      return fail(`'${issn}' is an invalid ISSN`);
     }
 
     if (isIssnCheckSumValid(issn)) {
       return success();
     }
 
-    return fail(`${issn} is an invalid ISSN`);
+    return fail(`'${issn}' is an invalid ISSN`);
   }
 }
 

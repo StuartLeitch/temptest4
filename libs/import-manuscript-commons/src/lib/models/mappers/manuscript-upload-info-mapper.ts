@@ -1,4 +1,4 @@
-import {GuardFailure, Mapper, UniqueEntityID} from "@hindawi/shared";
+import {GuardFail, GuardFailure, Mapper, UniqueEntityID} from "@hindawi/shared";
 import {ManuscriptUploadInfo} from "../manuscript-upload-info";
 
 export class ManuscriptUploadInfoMapper extends Mapper<ManuscriptUploadInfo> {
@@ -26,7 +26,7 @@ export class ManuscriptUploadInfoMapper extends Mapper<ManuscriptUploadInfo> {
           }
           , uniqueEntityID)
       } else {
-        throw new GuardFailure("dbmodel is null");
+        throw new GuardFail("dbmodel is null");
       }
   }
 

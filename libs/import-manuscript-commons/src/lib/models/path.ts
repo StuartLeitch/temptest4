@@ -4,7 +4,7 @@ import {
   ValueObjectProps,
   GuardFailure,
   ValueObject,
-  Guard,
+  Guard, GuardFail,
 } from '@hindawi/shared';
 
 interface PathProps extends ValueObjectProps {
@@ -23,7 +23,7 @@ export class Path extends ValueObject<PathProps> {
   static create(src: string): Path {
     const guardResult = Guard.againstNullOrUndefined(src, 'source');
     if (guardResult.isFail()) {
-      throw new GuardFailure(guardResult.message);
+      throw new GuardFail(guardResult.message);
     } else {
       return new Path({ src });
     }

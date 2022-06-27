@@ -1,6 +1,6 @@
-import { Mapper, UniqueEntityID } from '@hindawi/shared';
+import {Mapper, UniqueEntityID} from '@hindawi/shared';
 
-import { IssnType, Issn } from '../issn';
+import {IssnType, Issn} from '../issn';
 import {
   SourceJournalProps,
   SourceJournal,
@@ -45,13 +45,11 @@ export class JournalMapper extends Mapper<Journal> {
 export class SourceJournalMapper extends Mapper<SourceJournal> {
   static toDomain(raw: RawSourceJournalProps): SourceJournal {
     const props: SourceJournalProps = {
-      pissn: Issn.create({ type: IssnType.ISSN, value: raw.pissn }),
-      eissn: raw.eissn
-        ? Issn.create({ value: raw.eissn, type: IssnType.eISSN })
-        : null,
+      pissn: raw.pissn ? Issn.create({type: IssnType.ISSN, value: raw.pissn}) : null,
+      eissn: raw.eissn ? Issn.create({value: raw.eissn, type: IssnType.eISSN}) : null,
       phenomId: new UniqueEntityID(raw.phenomId),
       code: raw.code,
-      name: raw.name,
+      name: raw.name
     };
 
     return SourceJournal.create(props);
@@ -61,7 +59,7 @@ export class SourceJournalMapper extends Mapper<SourceJournal> {
     return {
       phenomId: sourceJournal.phenomId.toString(),
       eissn: sourceJournal.eissn?.value || '',
-      pissn: sourceJournal.pissn.value,
+      pissn: sourceJournal.pissn?.value || '',
       code: sourceJournal.code,
       name: sourceJournal.name,
     };

@@ -1,4 +1,4 @@
-import { LoggerContract } from '@hindawi/shared';
+import {Guard, LoggerContract} from '@hindawi/shared';
 
 import { Path } from '../../../models';
 
@@ -112,12 +112,16 @@ function getAuthors(contributors: Array<any>): Array<any> {
 
 function extractRinggoldId(aff: any): string {
   const externalAffiliationIds = aff['institution-wrap']['institution-id'];
+  if(!externalAffiliationIds)
+    return '';
 
   if (Array.isArray(externalAffiliationIds)) {
     const id = externalAffiliationIds.find(
-      (id) => id['@_institution-id-type'] === 'Ringgold'
+      (aff) => aff['@_institution-id-type'] === 'Ringgold'
     );
 
+    Guard.againstNullOrUndefined(id, 'affiliationId').throwIfFailed()
+    Guard.againstEmpty(id, 'affiliationId').throwIfFailed()
     return id && id['#text'];
   }
 
@@ -126,11 +130,10 @@ function extractRinggoldId(aff: any): string {
 
 function getAuthorAffiliationId(author: any): string {
   const references = author['xref'];
-
+  Guard.againstEmpty(references, "author.affiliation").throwIfFailed()
   if (Array.isArray(references)) {
     return references[0]['@_rid'];
   }
-
   return references['@_rid'];
 }
 
@@ -140,19 +143,20 @@ function extractAuthorData(
 ): RawAuthorProps {
   const authorAffId = getAuthorAffiliationId(author);
   const authorAff = affiliations.find((aff) => aff['@_id'] === authorAffId);
-  const affiliationRinggoldId = extractRinggoldId(authorAff);
+  Guard.againstNullOrUndefined(authorAff, "author.institution").throwIfFailed()
+  const ringgolId = extractRinggoldId(authorAff)
 
-  if (!authorAff['country']['@_country']) {
-    throw new VError('Country code for an author is not valid.');
+  if (!(authorAff['country'] && authorAff['country']['@_country'])) {
+    throw new VError('Country code for an author is missing.');
   }
 
   const rawAuthor: RawAuthorProps = {
-    affiliationName: authorAff['institution-wrap']['institution'],
-    affiliationRorId: '',
-    affiliationRinggoldId,
-    countryCode: authorAff['country']['@_country'],
+    affiliationName: (authorAff['institution-wrap'] && authorAff['institution-wrap']['institution']) || null,
+    affiliationRorId: '__MISSING__',
+    affiliationRinggoldId: ringgolId,
+    countryCode: (authorAff['country'] && authorAff['country']['@_country']) || null,
     email: author['email'],
-    givenName: author['name']['given-names'],
+    givenName: (author['name'] && author['name']['given-names']) || null,
     surname: author['name']['surname'],
     isCorresponding: author['@_corresp'] === 'yes',
     isSubmitting: author['@_specific-use'] === 'submitting',

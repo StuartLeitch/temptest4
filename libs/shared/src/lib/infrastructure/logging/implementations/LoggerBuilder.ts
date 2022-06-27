@@ -94,7 +94,6 @@ const markErrorsInArgs = (arg: unknown) => {
       error: arg,
     };
   }
-
   return arg;
 };
 
@@ -132,7 +131,6 @@ export class Logger implements LoggerContract {
       if (args.length) {
         newArgs = args.map(markErrorsInArgs);
       }
-
       this.protocol.log(level, message, {
         logger: this.scope,
         scope: this.scope,
