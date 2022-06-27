@@ -46,6 +46,7 @@ export const articleFragment = gql`
     authorSurname
     authorFirstName
     preprintValue
+    datePublished
   }
 `;
 
