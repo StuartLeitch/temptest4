@@ -627,8 +627,8 @@ Deploy:gsw-prod-invoicing:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-    KUBERNETES_CPU_REQUEST: 2
+    KUBERNETES_MEMORY_REQUEST: 2Gi
+    KUBERNETES_CPU_REQUEST: 1
 
 # Deploy:gsw-prod-import:
 #   stage: deploy-import
@@ -667,8 +667,8 @@ Deploy:gsw-prod-reporting:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'reporting-backend'
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-    KUBERNETES_CPU_REQUEST: 2
+    KUBERNETES_MEMORY_REQUEST: 2Gi
+    KUBERNETES_CPU_REQUEST: 1
 
 Deploy:hindawi-prod-invoicing:
   stage: deploy-invoicing
@@ -687,8 +687,8 @@ Deploy:hindawi-prod-invoicing:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web'
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-    KUBERNETES_CPU_REQUEST: 2
+    KUBERNETES_MEMORY_REQUEST: 2Gi
+    KUBERNETES_CPU_REQUEST: 1
 
 # Deploy:hindawi-prod-import:
 #   stage: deploy-import
@@ -727,5 +727,5 @@ Deploy:hindawi-prod-reporting:
     AWS_REGISTRY: $AWS_DEV_REGISTRY
     COMMAND: build-manifests
     REQUIRED_APPS: 'reporting-backend'
-    KUBERNETES_MEMORY_REQUEST: 3Gi
-    KUBERNETES_CPU_REQUEST: 2
+    KUBERNETES_MEMORY_REQUEST: 2Gi
+    KUBERNETES_CPU_REQUEST: 1
