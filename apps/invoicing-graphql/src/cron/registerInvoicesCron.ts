@@ -33,7 +33,7 @@ export class RegisterInvoicesCron {
         payer,
         erpReference,
       },
-      services: { erp, vatService },
+      services: { erp, vatService, exchangeRateService },
     } = context;
 
     const retryFailedNetsuiteErpInvoicesUsecase =
@@ -50,7 +50,8 @@ export class RegisterInvoicesCron {
         erp?.netsuite || null,
         publisher,
         loggerService,
-        vatService
+        vatService,
+        exchangeRateService
       );
 
     const maybeResponse = await retryFailedNetsuiteErpInvoicesUsecase.execute(

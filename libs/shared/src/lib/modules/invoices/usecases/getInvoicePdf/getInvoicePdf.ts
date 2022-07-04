@@ -43,8 +43,8 @@ import {
   InvoicePayload,
 } from '../../../../domain/services/PdfGenerator';
 
+import { ExchangeRateServiceContract } from '../../../exchange-rate/services/exchangeRateService';
 import { VATService } from '../../../../domain/services/VATService';
-import { ExchangeRateService } from '../../../../domain/services/ExchangeRateService';
 
 import { LoggerContract } from '../../../../infrastructure/logging';
 
@@ -68,7 +68,9 @@ export class GetInvoicePdfUsecase
     private couponRepo: CouponRepoContract,
     private waiverRepo: WaiverRepoContract,
     private pdfGenerator: PdfGeneratorService,
-    private logger: LoggerContract
+    private logger: LoggerContract,
+    private exchangeRateService: ExchangeRateServiceContract,
+    private vatService: VATService
   ) {
     super();
 
@@ -84,9 +86,6 @@ export class GetInvoicePdfUsecase
 
   @Authorize('invoice:getPDF')
   public async execute(request: DTO, context?: Context): Promise<Response> {
-    const exchangeRateService = new ExchangeRateService();
-    const vatService = new VATService();
-
     this.authorizationContext = context;
     const { payerId } = request;
 
@@ -106,7 +105,7 @@ export class GetInvoicePdfUsecase
       .then(this.getPayloadWithArticle)
       .then(this.getPayloadWithAuthor)
       .then(this.addJournalTitle)
-      .then(this.addExchangeRate(exchangeRateService, vatService))
+      .then(this.addExchangeRate)
       .execute();
 
     const pdfExecution = await new AsyncEither(null)
@@ -166,15 +165,11 @@ export class GetInvoicePdfUsecase
     return right(payload);
   }
 
-  private addExchangeRate(
-    exchangeRateService: ExchangeRateService,
-    vatService: VATService
-  ) {
-    return async (
-      payload: InvoicePayload
-    ): Promise<Either<UnexpectedError, InvoicePayload>> => {
-      let rate = 1.42; // ! Average value for the last seven years
-      const { template } = vatService.getVATNote(
+  private async addExchangeRate(
+    payload: InvoicePayload
+  ): Promise<Either<UnexpectedError, InvoicePayload>> {
+    try {
+      const { template } = this.vatService.getVATNote(
         {
           postalCode: payload.address.postalCode,
           countryCode: payload.address.country,
@@ -184,28 +179,21 @@ export class GetInvoicePdfUsecase
         new Date(payload.invoice.dateIssued)
       );
 
-      if (payload && payload.invoice && payload.invoice.dateIssued) {
-        let exchangeRate = null;
-        try {
-          exchangeRate = await exchangeRateService.getExchangeRate(
-            new Date(payload.invoice.dateIssued),
-            'USD'
-          );
-          this.logger.info('PublishInvoiceToERP exchangeRate', exchangeRate);
-        } catch (error) {
-          this.logger.error('PublishInvoiceToERP exchangeRate', error);
-          return left(new UnexpectedError(error));
-        }
-        if (exchangeRate?.exchangeRate) {
-          rate = exchangeRate.exchangeRate;
-        }
-      }
+      const exchangeRate = await this.exchangeRateService.getExchangeRate(
+        new Date(payload?.invoice?.dateIssued)
+      );
+      this.logger.info('PublishInvoiceToERP exchangeRate', exchangeRate);
+
+      const rate = exchangeRate.exchangeRate;
 
       payload.invoice.props.rate = Math.round(rate * 10000) / 10000;
       payload.invoice.props.vatnote = template;
 
       return right(payload);
-    };
+    } catch (error) {
+      this.logger.error('PublishInvoiceToERP exchangeRate', error);
+      return left(new UnexpectedError(error));
+    }
   }
 
   private addFileNameToResponse<A, B>(

@@ -1,6 +1,5 @@
 import * as path from 'path';
 import Knex from 'knex';
-// import knexTinyLogger from 'knex-tiny-logger';
 
 export { Knex };
 
@@ -28,6 +27,7 @@ export enum TABLES {
   PAUSED_REMINDERS = 'paused_reminders',
   ERP_REFERENCES = 'erp_references',
   AUDIT_LOGS = 'audit_logs',
+  USD_GBP_EXCHANGE_RATE = 'usd_gbp_exchange_rate',
 }
 
 interface DbOptions {

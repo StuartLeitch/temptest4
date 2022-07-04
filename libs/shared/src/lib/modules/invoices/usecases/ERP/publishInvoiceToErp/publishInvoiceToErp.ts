@@ -23,7 +23,7 @@ import { CatalogRepoContract } from '../../../../journals/repos';
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
 
-import { ExchangeRateService } from '../../../../../domain/services/ExchangeRateService';
+import { ExchangeRateServiceContract } from '../../../../exchange-rate/services';
 import { LoggerContract } from '../../../../../infrastructure/logging';
 import { VATService } from '../../../../../domain/services/VATService';
 import {
@@ -58,7 +58,8 @@ export class PublishInvoiceToErpUsecase
     private erpService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
     private loggerService: LoggerContract,
-    private vatService: VATService
+    private vatService: VATService,
+    private exchangeRateService: ExchangeRateServiceContract
   ) {
     super();
   }
@@ -217,18 +218,13 @@ export class PublishInvoiceToErpUsecase
         invoice.dateIssued
       );
       this.loggerService.info('PublishInvoiceToERP vatNote', vatNote);
-      const exchangeRateService = new ExchangeRateService();
-      this.loggerService.info(
-        'PublishInvoiceToERP exchangeService',
-        exchangeRateService
-      );
+      this.loggerService.info('PublishInvoiceToERP exchangeService');
       let finalExchangeRate = 1.42; // ! Average value for the last seven years
       if (invoice && invoice.dateIssued) {
         let exchangeRate = null;
         try {
-          exchangeRate = await exchangeRateService.getExchangeRate(
-            new Date(invoice.dateIssued),
-            'USD'
+          exchangeRate = await this.exchangeRateService.getExchangeRate(
+            new Date(invoice.dateIssued)
           );
           this.loggerService.info(
             'PublishInvoiceToERP exchangeRate',

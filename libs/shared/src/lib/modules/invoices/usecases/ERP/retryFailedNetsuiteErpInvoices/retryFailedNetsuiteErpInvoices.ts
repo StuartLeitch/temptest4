@@ -25,6 +25,7 @@ import { InvoiceRepoContract } from '../../../repos/invoiceRepo';
 import { CouponRepoContract } from '../../../../coupons/repos';
 import { WaiverRepoContract } from '../../../../waivers/repos';
 
+import { ExchangeRateServiceContract } from '../../../../exchange-rate/services';
 import { ErpServiceContract } from '../../../../../domain/services/ErpService';
 import { VATService } from '../../../../../domain/services/VATService';
 
@@ -53,7 +54,8 @@ export class RetryFailedNetsuiteErpInvoicesUsecase
     private netSuiteService: ErpServiceContract,
     private publisherRepo: PublisherRepoContract,
     private loggerService: LoggerContract,
-    private vatService: VATService
+    private vatService: VATService,
+    private exchangeRateService: ExchangeRateServiceContract
   ) {
     super();
 
@@ -70,7 +72,8 @@ export class RetryFailedNetsuiteErpInvoicesUsecase
       this.netSuiteService,
       this.publisherRepo,
       this.loggerService,
-      this.vatService
+      this.vatService,
+      this.exchangeRateService
     );
   }
 

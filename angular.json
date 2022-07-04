@@ -503,11 +503,6 @@
                 "glob": "**/*",
                 "input": "libs/shared/src/lib/domain/services/PdfGenerator/templates",
                 "output": "templates"
-              },
-              {
-                "glob": "**/*.xml",
-                "input": "libs/shared/src/lib/domain/services/exrates",
-                "output": "exrates"
               }
             ],
             "webpackConfig": "apps/invoicing-graphql/webpack.config.js"

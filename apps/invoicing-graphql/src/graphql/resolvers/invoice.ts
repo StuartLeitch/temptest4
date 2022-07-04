@@ -246,7 +246,6 @@ export const invoice: Resolvers<Context> = {
         return undefined;
       }
 
-      // There is a TSLint error for when try to use a shadowed variable!
       const invoiceIds = result.value;
 
       return { invoiceId: invoiceIds.map((ii) => ii.id.toString()) };
@@ -282,22 +281,13 @@ export const invoice: Resolvers<Context> = {
         return undefined;
       }
 
-      // There is a TSLint error for when try to use a shadowed variable!
       const invoiceDetails = result.value;
 
-      let rate = 1.42; // ! Average value for the last seven years
+      const exchangeRate = await exchangeRateService.getExchangeRate(
+        new Date(invoiceDetails.dateIssued || invoiceDetails.dateCreated)
+      );
 
-      try {
-        const exchangeRate = await exchangeRateService.getExchangeRate(
-          new Date(invoiceDetails.dateIssued || invoiceDetails.dateCreated),
-          'USD'
-        );
-        if (exchangeRate?.exchangeRate) {
-          rate = exchangeRate.exchangeRate;
-        }
-      } catch (error) {
-        // do nothing yet
-      }
+      const rate = exchangeRate.exchangeRate;
 
       const vatNote = vatService.getVATNote(
         {
@@ -380,20 +370,11 @@ export const invoice: Resolvers<Context> = {
         rawItem = InvoiceItemMap.toPersistence(item);
       }
 
-      let rate = 1.42; // ! Average value for the last seven years
-      if (parent && parent.dateIssued) {
-        try {
-          const exchangeRate = await exchangeRateService.getExchangeRate(
-            new Date(parent.dateIssued),
-            'USD'
-          );
-          if (exchangeRate?.exchangeRate) {
-            rate = exchangeRate?.exchangeRate;
-          }
-        } catch (error) {
-          // do nothing yet
-        }
-      }
+      const exchangeRate = await exchangeRateService.getExchangeRate(
+        new Date(parent?.dateIssued || null)
+      );
+
+      const rate = exchangeRate.exchangeRate;
 
       let vatnote = ' ';
       const getVatNoteUsecase = new GetVATNoteUsecase(

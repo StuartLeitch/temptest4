@@ -10,6 +10,7 @@ import {
   KnexCreditNoteRepo,
   KnexPublisherRepo,
   KnexAuditLogRepo,
+  KnexExchangeRepo,
   KnexAddressRepo,
   KnexArticleRepo,
   KnexCatalogRepo,
@@ -41,6 +42,7 @@ export interface Repos {
   pausedReminder: KnexPausedReminderRepo;
   erpReference: KnexErpReferenceRepo;
   audit: KnexAuditLogRepo;
+  exchangeRate: KnexExchangeRepo;
 }
 
 export function buildRepos(db: Knex, loggerBuilder: LoggerBuilder): Repos {
@@ -85,5 +87,6 @@ export function buildRepos(db: Knex, loggerBuilder: LoggerBuilder): Repos {
     pausedReminder: new KnexPausedReminderRepo(db, loggerBuilder.getLogger(KnexPausedReminderRepo.name)),
     erpReference: new KnexErpReferenceRepo(db, loggerBuilder.getLogger(KnexErpReferenceRepo.name)),
     audit: new KnexAuditLogRepo(db, loggerBuilder.getLogger(KnexAuditLogRepo.name)),
+    exchangeRate: new KnexExchangeRepo(db)
   };
 }

@@ -22,6 +22,8 @@ import { PublisherMap } from '../../../../../../src/lib/modules/publishers/mappe
 import { MockPublisherRepo } from '../../../../../../src/lib/modules/publishers/repos/mocks/mockPublisherRepo';
 import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
 import { setupVatService } from '../../../../../../src/lib/domain/services/mocks/VatSoapClient';
+import { MockExchangeRateService } from '../../../../../../src/lib/modules/exchange-rate/services/mocks';
+import { ExchangeRateServiceContract } from '../../../../../../src/lib/modules/exchange-rate/services/';
 import {
   AddressMap,
   ArticleMap,
@@ -53,10 +55,11 @@ let mockPublisherRepo: MockPublisherRepo;
 let mockErpReferenceRepo: MockErpReferenceRepo;
 let mockLogger: MockLogger;
 let vatService: VATService;
+let exchangeRateService: ExchangeRateServiceContract;
 
 let useCase: PublishInvoiceToErpUsecase;
 let response: PublishInvoiceToErpResponse;
-let invoice: Invoice;
+let invoice: Invoice | null;
 
 const context: UsecaseAuthorizationContext = {
   roles: [Roles.CHRON_JOB],
@@ -77,8 +80,9 @@ Before({ tags: '@ValidatePublishInvoiceToErp' }, function () {
   mockLogger = new MockLoggerBuilder().getLogger();
   mockPublisherRepo = new MockPublisherRepo();
   vatService = new VATService();
+  exchangeRateService = new MockExchangeRateService();
 
-  mockInvoiceRepo = new MockInvoiceRepo(null, null, mockErpReferenceRepo);
+  mockInvoiceRepo = new MockInvoiceRepo(undefined, undefined, mockErpReferenceRepo);
 
   setupVatService();
 
@@ -95,7 +99,8 @@ Before({ tags: '@ValidatePublishInvoiceToErp' }, function () {
     mockErpService,
     mockPublisherRepo,
     mockLogger,
-    vatService
+    vatService,
+    exchangeRateService
   );
 });
 
@@ -341,7 +346,7 @@ Given(
     const maybePayer = PayerMap.toDomain({
       name: 'John',
       addressId: address.id.toValue(),
-      invoiceId: invoice.invoiceId.id.toValue(),
+      invoiceId: invoice?.invoiceId.id.toValue(),
       type: payerType,
     });
 
@@ -385,7 +390,7 @@ Then(
       testInvoice
         .getErpReferences()
         .getItems()
-        .find((ef) => ef.attribute === 'confirmation').value
+        .find((ef) => ef.attribute === 'confirmation')?.value
     ).to.equal('FOO');
   }
 );

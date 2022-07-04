@@ -1,10 +1,10 @@
 import { createQueueService } from '@hindawi/queue-service';
 import { BullScheduler } from '@hindawi/sisif';
 import {
+  AbstractApiExchangeRateService,
   PaymentMethodRepoContract,
   PaymentStrategyFactory,
   BraintreeClientToken,
-  ExchangeRateService,
   PdfGeneratorService,
   createPdfGenerator,
   PayPalCaptureMoney,
@@ -28,12 +28,12 @@ import { env } from '../env';
 import { Repos } from './repo.builder';
 
 export interface Services {
+  exchangeRateService: AbstractApiExchangeRateService;
   paymentStrategyFactory: PaymentStrategyFactory;
-  exchangeRateService: ExchangeRateService;
   pdfGenerator: PdfGeneratorService;
   schedulingService: BullScheduler;
-  waiverService: WaiverService;
   queue: PhenomSqsServiceContract;
+  waiverService: WaiverService;
   emailService: EmailService;
   vatService: VATService;
   erp: {
@@ -127,7 +127,6 @@ export async function buildServices(
       env.antiFraud.supportEmail,
       env.antiFraud.policyUrl
     ),
-    exchangeRateService: new ExchangeRateService(),
     schedulingService: sisifEnabled
       ? new BullScheduler(bullData, loggerBuilder.getLogger(BullScheduler.name))
       : null,
@@ -139,5 +138,10 @@ export async function buildServices(
     queue: env.loaders.queueServiceEnabled
       ? await setupQueueService(loggerBuilder)
       : null,
+    exchangeRateService: new AbstractApiExchangeRateService(
+      repos.exchangeRate,
+      loggerBuilder.getLogger(AbstractApiExchangeRateService.name),
+      env.app.abstractApiKey
+    ),
   };
 }

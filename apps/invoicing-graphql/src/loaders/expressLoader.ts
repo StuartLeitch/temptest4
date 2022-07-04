@@ -1,14 +1,13 @@
 import KeycloakConnect, { Keycloak, Token } from 'keycloak-connect';
-import express, {Express, Request, RequestHandler} from 'express';
+import express, { Express, Request, RequestHandler } from 'express';
+import express_prom_bundle from 'express-prom-bundle';
 import session, { Store } from 'express-session';
+import { register } from 'prom-client';
 import * as csv from '@fast-csv/parse';
 import memorystore from 'memorystore';
 import corsMiddleware from 'cors';
 import { Parser } from 'json2csv';
-import moment from 'moment';
 import multer from 'multer';
-import express_prom_bundle, {Opts, Labels}  from 'express-prom-bundle';
-import { register } from 'prom-client'
 
 import {
   MicroframeworkSettings,
@@ -153,8 +152,8 @@ export const expressLoader: MicroframeworkLoader = (
       urlValueParser: {
         minHexLength: 5,
         extraMasks: [
-          '^[0-9]+\\.[0-9]+\\.[0-9]+$' // replace dot-separated dates with #val
-        ]
+          '^[0-9]+\\.[0-9]+\\.[0-9]+$', // replace dot-separated dates with #val
+        ],
       },
     });
 
@@ -176,7 +175,7 @@ export const expressLoader: MicroframeworkLoader = (
     app.get('/api/invoice/:payerId', async (req, res) => {
       const {
         repos,
-        services: { pdfGenerator },
+        services: { exchangeRateService, pdfGenerator, vatService },
         loggerBuilder,
       } = context;
 
@@ -194,7 +193,9 @@ export const expressLoader: MicroframeworkLoader = (
         repos.coupon,
         repos.waiver,
         pdfGenerator,
-        logger
+        logger,
+        exchangeRateService,
+        vatService
       );
 
       const invoiceLink = req.headers.referer;

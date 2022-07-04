@@ -73,6 +73,7 @@ export const env = {
     doiNumber: getOsEnv('DOI_NUMBER'),
     keycloakConfig: toObject(getOsEnv('KEYCLOAK_CONFIG')),
     sessionSecret: getOsEnv('SESSION_SECRET'),
+    abstractApiKey: getOsEnv('ABSTRACT_API_KEY'),
   },
   loaders: {
     knexEnabled: toBool(getOsEnvOptional('KNEX_LOADER_ENABLED')),
@@ -103,7 +104,7 @@ export const env = {
     route: getOsEnv('GRAPHQL_ROUTE'),
     editor: toBool(getOsEnv('GRAPHQL_EDITOR')),
     serviceUrl: getOsEnv('GRAPHQL_SERVICE_URL'),
-    schemaRegistryUrl: getOsEnv('SCHEMA_REGISTRY_URL')
+    schemaRegistryUrl: getOsEnv('SCHEMA_REGISTRY_URL'),
   },
   aws: {
     enabled: toBool(getOsEnv('AWS_ENABLED')),

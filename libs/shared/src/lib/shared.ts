@@ -276,8 +276,6 @@ export * from './modules/creditNotes/subscriptions/AfterCreditNoteCreatedEvent';
 export * from './modules/invoices/usecases/ERP/retryFailedNetsuiteErpInvoices/retryFailedNetsuiteErpInvoices';
 export * from './modules/payments/usecases/retryPaymentsRegistration/retryPaymentRegistration';
 export * from './modules/creditNotes/usecases/ERP/retryCreditNotes/retryCreditNotesUsecase';
-export * from './modules/invoices/usecases/ERP/retryFailedSageErpInvoices/retryFailedSageErpInvoices';
-export * from './modules/invoices/usecases/ERP/retryRevenueRecognizedSageErpInvoices/retryRevenueRecognitionSageErpInvoices';
 
 // * Export ERP Reference
 export * from './modules/vendors/domain/ErpReference';
@@ -310,6 +308,14 @@ export * from './modules/audit/repos/auditLogRepo';
 export * from './modules/audit/repos/implementations/knexAuditLogRepo';
 export * from './modules/audit/mappers/AuditLogMap';
 export * from './modules/audit/usecases/getRecentLogs/getRecentLogs';
+
+// * Exchange Rate
+export * from './modules/exchange-rate/domain/ExchangeRate';
+export * from './modules/exchange-rate/domain/Currency';
+export * from './modules/exchange-rate/services';
+export * from './modules/exchange-rate/services/implementations';
+export * from './modules/exchange-rate/repos';
+export * from './modules/exchange-rate/repos/implementations';
 
 // * Domain Types
 export * from './domain/PaymentClientToken';
