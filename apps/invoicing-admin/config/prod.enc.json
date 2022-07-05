@@ -1,0 +1,32 @@
+{
+	"API_ROOT": "ENC[AES256_GCM,data:w3BWFyfpjLEd/9yROacyYhHvGiUX3PKdgDvVLLsFrjEJYhF/,iv:q00o3Dtj0bkHoTE9ljlOBt4HWV31CGqS3/Qo3d7x5CA=,tag:dQF07UmH0Hr109fD/BATzg==,type:str]",
+	"APP_NAME": "ENC[AES256_GCM,data:NM+qCHWeeD82ewdNA8Rh,iv:ro0a81JWzEjY+QZ4kF58xVFrQz8MrgadjPGXCOzd0M0=,tag:xpKyCZWxBZcx57wSQhMhEA==,type:str]",
+	"APP_URL": "ENC[AES256_GCM,data:8zOB6ZqABmnEajP44m3rzQfmklDDWYKjUrbBJkzhxPM=,iv:BRtL7MBo0ePUkdzVblQpralK0aFc+27HbS3/lqyAjgk=,tag:3y7F/Zp8F6XdSrnzy8J8DA==,type:str]",
+	"AUTH_ENABLED": "ENC[AES256_GCM,data:AgO3pw==,iv:XJQLKKveLhtW0PpY3B7i7UrIfSmrxGr3SxXq4SVmmJA=,tag:/90Pcfl0hsJkxujeNZcXZA==,type:str]",
+	"AUTH_SERVER_CLIENT_ID": "ENC[AES256_GCM,data:cAhfxO7AdE9t,iv:KrBw6wqJltAxlAy/CqVbY4nBFCLEKas7SEDZaCznvZM=,tag:2AUAA3SnRWZ5aaQ5JLqH2Q==,type:str]",
+	"AUTH_SERVER_REALM": "ENC[AES256_GCM,data:YlJiowlGPQ==,iv:nOVOA3hj3/j2ror6iv5oOzIFQ1x4TemJkSyJtrVgLuE=,tag:s0Ab7o3OiNsBMCBSJGtM9w==,type:str]",
+	"AUTH_SERVER_URL": "ENC[AES256_GCM,data:Ly6PeJo7sKlPPW+4DttuN4AoDQ+GXSgZNmWnBg==,iv:h+Xoe8rr7IAcahihFwvoBHOnyAiJp1iz0vpNl1KEplE=,tag:P7XyEdq27Vp0vQrIsGlRlw==,type:str]",
+	"BACKEND_URL": "ENC[AES256_GCM,data:QYJf6ZYOTOc7Dqd9ZlmHgZV/6yaz5dNSFGjWZglCJiQ=,iv:rgpd/GxL1Wg1ZFp+QS6RR3e9ihfdt7x1Z68YlD04TrE=,tag:84ymc2XWQav3n+oCCulLxA==,type:str]",
+	"FE_ROOT": "ENC[AES256_GCM,data:InTa26NgVRBCqk6OAHtPCh+NHLf3194=,iv:AS4f9BXVga9d5j0HVpJDMyl4NnJb6g7QEVZMqJJRW5w=,tag:dlRa7ujxZuhXBK6Izg/AMA==,type:str]",
+	"GQL_ROOT": "ENC[AES256_GCM,data:gppafCbERZk6U99NGkY/kEFsom1ucUiOQA==,iv:e/HeuOB9fmg3SNmowOZjKCuxLrDJz8R2Aa8RQVyaW7k=,tag:jMDCtZG3xA6Ibp4Cg6NH8w==,type:str]",
+	"AUTH_IDP_HINT": "ENC[AES256_GCM,data:5ABQtQ==,iv:B7gFs3X8k9vm6ZBrB9UZInURIamf4jszbt+iJuCH2Is=,tag:fn+Gka+ZwbyVNUAdjGShJw==,type:str]",
+	"sops": {
+		"kms": [
+			{
+				"arn": "arn:aws:kms:eu-west-1:916437579680:key/1fbe0a96-3785-42f6-856f-81e56bb9131b",
+				"created_at": "2022-07-04T10:12:52Z",
+				"enc": "AQICAHhZUaVA8W191Vg6SiBY8cFqIj4mGQYPyNXgHpN4hr8BTQGwtqY1LgD31vvdSNFkQ/eAAAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMwrOsDasIsydDsxaaAgEQgDthdvbqOfagnEnEZHLOK7tf2EMyZRzaMDRQtpLLBDUW0n8tbMcMNm2ijaPoV0txFHgJwr6WoKYepIGVGQ==",
+				"aws_profile": ""
+			}
+		],
+		"gcp_kms": null,
+		"azure_kv": null,
+		"hc_vault": null,
+		"age": null,
+		"lastmodified": "2022-07-07T06:26:21Z",
+		"mac": "ENC[AES256_GCM,data:ap1NikU2r6aZdsIS9t89kTrodlqzyoI5kqOf1jxZMLlPXqTZoRoNgKn68LiL/+AawKRUN3RZFghguGM+9u+oTPVb3aKDOZ1TAqHkVPmYKlb/1NGLfcKQlxd6QtnpPUdtSABvCD1oejwxHXlgkqAS+pSzumm5ljg4UbLJkLh5CBI=,iv:VVxScj014zKPYvqq1hipFnljlMWmkLTSzjOFHQoqntc=,tag:oB0hLzIOsoUMg5nHORXbEg==,type:str]",
+		"pgp": null,
+		"unencrypted_suffix": "_unencrypted",
+		"version": "3.7.3"
+	}
+}

@@ -1,10 +1,10 @@
 import {
-  WithAwsSecretsServiceProps,
+  WithSopsSecretsServiceProps,
   ServiceType,
 } from '@hindawi/phenom-charts';
 
-const defaultValues: WithAwsSecretsServiceProps = {
-  secretNames: [],
+const defaultValues: WithSopsSecretsServiceProps = {
+  sopsSecrets: null,
   serviceProps: {
     image: {
       repository:
@@ -13,9 +13,6 @@ const defaultValues: WithAwsSecretsServiceProps = {
     },
     replicaCount: 1,
     containerPort: 3000,
-    envVars: {
-      PORT: '3000',
-    },
     service: {
       port: 80,
       type: ServiceType.NODE_PORT,
@@ -28,7 +25,7 @@ const defaultValues: WithAwsSecretsServiceProps = {
       path: '/livez'
     },
     readinessProbe: {
-      path: 'readyz'
+      path: '/readyz'
 
     },
     metrics: {

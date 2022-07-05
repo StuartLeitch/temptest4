@@ -8,17 +8,18 @@ import {
 import { Path } from './path';
 
 export enum MecaFileType {
-  conflictOfInterestStatement = 'conflict-of-interest-statement',
-  supportingInformation = 'supporting-information',
-  reportsAndResponses = 'reports-and-responses',
+  conflictOfInterestStatement = 'ConflictOfInterestStatement',
+  supportingInformation = 'SupportingInformation',
+  reportsAndResponses = 'ReportsAndResponses',
+  supplementary = 'Supplementary',
+  coverLetter = 'CoverLetter',
+  manuscript = 'Manuscript',
+  figure = 'Figure',
+  table = 'Table',
   manifestMetadata = 'manifest-metadata',
   transferMetadata = 'transfer-metadata',
   articleMetadata = 'article-metadata',
   reviewMetadata = 'review-metadata',
-  supplementary = 'supplementary',
-  coverLetter = 'cover-letter',
-  manuscript = 'manuscript',
-  figure = 'figure',
 }
 
 export interface FileProps extends ValueObjectProps {

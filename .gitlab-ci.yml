@@ -406,26 +406,26 @@ Deploy:automation-invoicing:
     KUBERNETES_MEMORY_REQUEST: 3Gi
     KUBERNETES_CPU_REQUEST: 2
 
-# Deploy:automation-import:
-#   stage: deploy-import
-#   tags:
-#     - 'cluster:hindawi-dev'
-#   dependencies:
-#     - Package Images:dev
-#   <<: *script_deploy
-#   interruptible: true
-#   when: on_success
-#   allow_failure: true
-#   variables:
-#     TENANT: hindawi
-#     NODE_ENV: automation
-#     NAMESPACE: automation
-#     CLUSTER: hindawi-dev
-#     AWS_REGISTRY: $AWS_DEV_REGISTRY
-#     COMMAND: build-manifests
-#     REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
-#     KUBERNETES_MEMORY_REQUEST: 3Gi
-#     KUBERNETES_CPU_REQUEST: 2
+Deploy:automation-import:
+   stage: deploy-import
+   tags:
+     - 'cluster:hindawi-dev'
+   dependencies:
+     - Package Images:dev
+   <<: *script_deploy
+   interruptible: true
+   when: on_success
+   allow_failure: true
+   variables:
+     TENANT: hindawi
+     NODE_ENV: automation
+     NAMESPACE: automation
+     CLUSTER: hindawi-dev
+     AWS_REGISTRY: $AWS_DEV_REGISTRY
+     COMMAND: build-manifests
+     REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
+     KUBERNETES_MEMORY_REQUEST: 3Gi
+     KUBERNETES_CPU_REQUEST: 2
 
 # Deploy:automation-reporting:
 #   stage: deploy-reporting

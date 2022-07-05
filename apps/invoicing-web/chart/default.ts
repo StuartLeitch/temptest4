@@ -1,10 +1,10 @@
 import {
-  WithAwsSecretsServiceProps,
+  WithSopsSecretsServiceProps,
   ServiceType,
 } from "@hindawi/phenom-charts";
 
-const defaultValues: WithAwsSecretsServiceProps = {
-  secretNames: [],
+const defaultValues: WithSopsSecretsServiceProps = {
+  sopsSecrets: null,
   serviceProps: {
     image: {
       repository: "916437579680.dkr.ecr.eu-west-1.amazonaws.com/invoicing-web",

@@ -61,6 +61,7 @@ export function toArray(value: string, delimiter = ','): string[] {
 }
 
 export function toObject(value: string): any {
+  console.log(value)
   return JSON.parse(value);
 }
 

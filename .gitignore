@@ -63,3 +63,6 @@ tools/scripts/aws/sqs/dlq/failedEvents.json
 tools/scripts/aws/sqs/dlq/delete-message-batch.json
 *.nx-tmp
 /apps/import-manuscript-backend/src/environments/
+
+# sops decripted files
+*.dec.json

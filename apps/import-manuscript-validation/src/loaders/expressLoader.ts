@@ -50,7 +50,7 @@ export const expressLoader: MicroframeworkLoader = async (
 
     // Run application to listen on given port
     if (!env.isTest) {
-      const server = app.listen(env.app.appPort);
+      const server = app.listen(env.app.port);
       settings.setData('express_server', server);
     }
 

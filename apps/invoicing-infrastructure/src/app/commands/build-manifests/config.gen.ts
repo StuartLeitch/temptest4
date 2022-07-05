@@ -1,5 +1,4 @@
 import { App, Tenant } from '../../types';
-import { WithAwsSecretsServiceProps } from '@hindawi/phenom-charts';
 
 // `import { values as ${env}${invoicingAdmin}Values } from 'apps/${app}/chart/${tenant}/${env}'`
 
@@ -45,13 +44,14 @@ import { values as hindawiProdInvoicingWebValues } from 'apps/invoicing-web/char
 import { values as automationInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/hindawi/automation';
 import { values as automationInvoicingAdminValues } from 'apps/invoicing-admin/chart/hindawi/automation';
 import { values as automationInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/automation';
-// import { values as automationImportManuscriptValidation } from 'apps/import-manuscript-validation/chart/hindawi/automation';
-// import { values as automationImportManuscriptBackend } from 'apps/import-manuscript-backend/chart/hindawi/automation';
-// import { values as automationImportManuscriptWeb } from 'apps/import-manuscript-web/chart/hindawi/automation';
+import {WithSopsSecretsServiceProps} from "@hindawi/phenom-charts/src/lib/Components/charts";
+import { values as automationImportManuscriptValidation } from 'apps/import-manuscript-validation/chart/hindawi/automation';
+import { values as automationImportManuscriptBackend } from 'apps/import-manuscript-backend/chart/hindawi/automation';
+import { values as automationImportManuscriptWeb } from 'apps/import-manuscript-web/chart/hindawi/automation';
 
 const masterConfig: {
   [tenant: string]: {
-    [env: string]: { [app: string]: WithAwsSecretsServiceProps };
+    [env: string]: { [app: string]: WithSopsSecretsServiceProps };
   };
 } = {
   [Tenant.hindawi]: {
@@ -93,9 +93,9 @@ const masterConfig: {
       [App.graphql]: automationInvoicingGraphqlValues,
       [App.admin]: automationInvoicingAdminValues,
       [App.web]: automationInvoicingWebValues,
-      // [App.importManuscriptValidation]: automationImportManuscriptValidation,
-      // [App.importManuscriptBackend]: automationImportManuscriptBackend,
-      // [App.importManuscriptWeb]: automationImportManuscriptWeb,
+      [App.importManuscriptValidation]: automationImportManuscriptValidation,
+      [App.importManuscriptBackend]: automationImportManuscriptBackend,
+      [App.importManuscriptWeb]: automationImportManuscriptWeb,
     },
   },
   [Tenant.gsw]: {

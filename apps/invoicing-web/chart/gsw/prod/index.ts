@@ -1,12 +1,13 @@
 import {
-  WithAwsSecretsServiceProps,
+  WithSopsSecretsServiceProps,
   IngressOptionsSpec,
 } from "@hindawi/phenom-charts";
 import { defaultValues } from "../../default";
 
-const values: WithAwsSecretsServiceProps = {
+const values: WithSopsSecretsServiceProps = {
   ...defaultValues,
-  secretNames: ["gsw-prod/invoicing/invoicing-web-legacy"],
+  // secretNames: ["gsw-prod/invoicing/invoicing-web-legacy"],
+  sopsSecrets: require('../../../config/gsw-prod.enc.json'),
   serviceProps: {
     ...defaultValues.serviceProps,
     envVars: {},

@@ -1,9 +1,9 @@
-import { WithAwsSecretsServiceProps } from '@hindawi/phenom-charts';
+import { WithSopsSecretsServiceProps } from '@hindawi/phenom-charts';
 import { defaultValues } from '../../default';
 
-const values: WithAwsSecretsServiceProps = {
+const values: WithSopsSecretsServiceProps = {
   ...defaultValues,
-  secretNames: ['demo-sales/review/import-manuscript-web'],
+  sopsSecrets: require('../../../config/demo-sales.enc.json'),
   serviceProps: {
     ...defaultValues.serviceProps,
     envVars: {

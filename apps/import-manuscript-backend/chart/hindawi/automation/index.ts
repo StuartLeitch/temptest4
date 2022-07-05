@@ -1,13 +1,13 @@
 import {
-  WithAwsSecretsServiceProps,
+  WithSopsSecretsServiceProps,
   ConfigurationMountType,
   IngressOptionsSpec,
 } from '@hindawi/phenom-charts';
 import { defaultValues } from '../../default';
 
-const values: WithAwsSecretsServiceProps = {
+const values: WithSopsSecretsServiceProps = {
   ...defaultValues,
-  secretNames: ['automation/review/import-manuscript-backend'],
+  sopsSecrets: require('../../../config/automation.enc.json'),
   serviceProps: {
     ...defaultValues.serviceProps,
     ingressOptions: {

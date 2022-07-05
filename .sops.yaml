@@ -1,0 +1,2 @@
+creation_rules:
+  - kms: arn:aws:kms:eu-west-1:916437579680:key/1fbe0a96-3785-42f6-856f-81e56bb9131b

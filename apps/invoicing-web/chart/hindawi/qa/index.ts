@@ -1,12 +1,12 @@
 import {
-  WithAwsSecretsServiceProps,
+  WithSopsSecretsServiceProps,
   IngressOptionsSpec,
 } from "@hindawi/phenom-charts";
 import { defaultValues } from "../../default";
 
-const values: WithAwsSecretsServiceProps = {
+const values: WithSopsSecretsServiceProps = {
   ...defaultValues,
-  secretNames: ["qa/invoicing/invoicing-web"],
+  sopsSecrets: require('../../../config/qa.enc.json'),
   serviceProps: {
     ...defaultValues.serviceProps,
     envVars: {

@@ -1,6 +1,5 @@
 import {
-  HindawiServiceChart,
-  WithAwsSecretsServiceProps,
+  HindawiServiceChart, WithSopsSecretsServiceProps,
 } from '@hindawi/phenom-charts';
 import { App as Cdk8sApp } from 'cdk8s';
 import url from 'url';
@@ -68,7 +67,7 @@ export class BuildManifestsCommand implements Command {
     const env = this.parseEnv();
     const rootConstruct = new Cdk8sApp({ outdir: 'dist-k8s' });
     for (const app of env.requiredApps) {
-      let appProps: WithAwsSecretsServiceProps;
+      let appProps: WithSopsSecretsServiceProps;
       try {
         appProps = masterConfig[env.tenant][env.environment][app];
         appProps.serviceProps.image.repository = `${env.awsRegistry}/${app}`;
@@ -90,7 +89,7 @@ export class BuildManifestsCommand implements Command {
         continue;
       }
       console.log('building ' + app);
-      await HindawiServiceChart.withAwsSecrets(rootConstruct, app, appProps);
+      await HindawiServiceChart.withSopsSecrets(rootConstruct, app, appProps);
     }
     rootConstruct.synth();
     console.log(`Successfully built: ${env.affectedApps}`);

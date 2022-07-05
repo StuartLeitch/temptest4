@@ -1,0 +1,53 @@
+{
+	"NODE_ENV": "ENC[AES256_GCM,data:DOC4IcH/SLxWbA==,iv:q1z5dSH6EVnn4RYHVemguNtXbTJmwpZQSsEnUnajCgA=,tag:UdaHV8szrNneBIg59rr0xQ==,type:str]",
+	"IMPORT_MANUSCRIPT_VALIDATION_SERVICE_NAME": "ENC[AES256_GCM,data:lc9I9iDNirDhq2IZo5ozPkuT0VVrYdKJUvCbwg==,iv:u1J7l+WRotqzh8nZrOnFYeXFSA3TDtG3ZapAv7QwVtc=,tag:26Eo+HKFeOpVueqlc4I87Q==,type:str]",
+	"APP_BANNER": "ENC[AES256_GCM,data:c7DLuQ==,iv:jKnCz9SPf4cfNN7FA6Tu8z2IiKZUMzZyBY+oBdQFav8=,tag:RNhV3AkyAa/gQV44QsM6DQ==,type:str]",
+	"LOG_LEVEL": "ENC[AES256_GCM,data:jLYIWRk=,iv:jjf7BPAf058AR/U9yW8Uj3/EaIeZqQNoi42dJOIqhEg=,tag:USM2VAU3zmIit7Tr+HLW4A==,type:str]",
+	"IMPORT_MANUSCRIPT_AWS_REGION": "ENC[AES256_GCM,data:2FMuTGPInDqg,iv:7p2wx5ud/Rf02LZ1J/1+2L0s0uJuiMnJmE8RegYaL4A=,tag:A23JdDU0vFOnHI/YFjsIcg==,type:str]",
+	"IMPORT_MANUSCRIPT_AWS_ACCESS_KEY": "ENC[AES256_GCM,data:UrnZKgCIYngWlXqaPPvRigUmBuk=,iv:QtirEiFWA8OjnbZ3cKqi2KlUud5+ZvQ7egvDjidVPoA=,tag:4MsK3k0kEXovuUFbBHZDYw==,type:str]",
+	"IMPORT_MANUSCRIPT_AWS_SECRET_KEY": "ENC[AES256_GCM,data:o9oOKCzOBJNZ6AGCmDCUIgbrpj1g/DKNkAStzQVrjkOtgZyaEbwTYQ==,iv:frB0i3npCCZNSeilnlkh1igecGkfA/BZcxDPu4L/SeI=,tag:lEtXk0AX0yCMv8UzfplfBg==,type:str]",
+	"IMPORT_MANUSCRIPT_AWS_SQS_QUEUE_NAME": "ENC[AES256_GCM,data:xhvb4jecOhHTrCzJ8SjSH9k4z51qrJXU2ZKs9JMhupPg/pJSOTR9VR4FCw==,iv:x7j7g9wsiAD/udGRw2Kc1TUiO8plHjnYLHX1aY+CaBY=,tag:BStR0zBnSlGuXdD4GXKk/Q==,type:str]",
+	"IMPORT_MANUSCRIPT_AWS_SQS_ENDPOINT": "ENC[AES256_GCM,data:B9xMiffg2kRKDPmtXCF76S5HBjOv1ZkZRIPp9pgCMxRv9zA=,iv:AoMCivradgVSHZNGuNmsw0OJ50eA7+DRijTpiJ1DekE=,tag:+VKWelBehPIKo0wmT8OvuQ==,type:str]",
+	"IMPORT_MANUSCRIPT_AWS_S3_ZIP_BUCKET": "ENC[AES256_GCM,data:aQWD9ebEyreyEtgkEQo+sXw68XGb9lRXP77B48nbxA==,iv:mbeP2Ho8JKVcxAxwxQo/8EUIsl3U53rkOK2fp3nvDes=,tag:MBLL1OsKptPByOchsc/itw==,type:str]",
+	"IMPORT_MANUSCRIPT_AWS_S3_ENDPOINT": "ENC[AES256_GCM,data:PuqOMlFY5ohNhceX6S2k+oCwSrjpqsOqyJjwfng6qVnuucH3V9pAmaw/Tgtg99tH+D6JBtwhHxCEGdDP0ec7MBrRyqIF7wJ/U25O2wOjbQ==,iv:E1xOTqbjymD+pSs5ElKp5O2oeDjUF1znGlvPyD4xJnI=,tag:Wb9GjlGtB94IoTjlWYLcHg==,type:str]",
+	"IMPORT_MANUSCRIPT_ZIP_SAVE_LOCATION": "ENC[AES256_GCM,data:75rIrRT5Cx2bg6GK,iv:fas21i63MOzNo0Kt0Jzv23rC6D6TSZHnBf9HxMkY2wE=,tag:cEzyth4uV18iDuFk2v6H9A==,type:str]",
+	"IMPORT_MANUSCRIPT_XML_DEFINITION_PATH": "ENC[AES256_GCM,data:cANJT0rJotqt,iv:TTfO+JAAHDS23TKKBNoDG+dw3eLbhc5yVbJyB0+K1i4=,tag:7Kha693ud4lXbWHVnpT+BA==,type:str]",
+	"IMPORT_MANUSCRIPT_AWS_SES_ACCESS_KEY": "ENC[AES256_GCM,data:e+DGyu1Gi+e7N78xclVHTvtx5r0=,iv:9yQIe2kGtReHu351Ad0kSAbieaomVtX1rVKwLKAveWQ=,tag:ZeWiseB3Nd7f24+F1JF+Cw==,type:str]",
+	"IMPORT_MANUSCRIPT_AWS_SES_SECRET_KEY": "ENC[AES256_GCM,data:pAlXSK5EjRMn1FmLKgWLiA1gsabdgf7eY4SalQCV/Hn0Mq+2olBesQ==,iv:9MqJO6kBczL47CWrdW6IpzzBelBrLPR2tDePaOTpVyw=,tag:Qlb7juIfXEidvvJUnyD8vA==,type:str]",
+	"IMPORT_MANUSCRIPT_SUPPORTED_ARTICLE_TYPES": "ENC[AES256_GCM,data:OgPKVSdqwzdPUWBs6bMe3u7N8MthXchLSNCBTN9V8v3GzEwxvHJ5lMb+gA64Mpj+Gn+0hg==,iv:MZUUYYeoasVaBIbBcjE2nx7dFxA0PbMqgIveDxlkCEQ=,tag:D8b4YhykO50RNFtsbMRgfw==,type:str]",
+	"IMPORT_MANUSCRIPT_MECA_ARTICLE_TYPES": "ENC[AES256_GCM,data:wIVU49swwssBX9P4181IyVuxP9teKA7mR2QFTBuVG3HIeP3nAAGuBPIjRAvrV4e1JQtQnVNXvYysOucUYO2voaa9LOOYmT7LncYYfYA8+JucmbvcyF7gD0i3HbRD/6qNl6jEebfk,iv:/5UmNDRYjQNOCBTOBuI+tdesYok+Lgyq3ciw6m2uANc=,tag:X8ubBv4DyeuVqlq0qWl1pA==,type:str]",
+	"IMPORT_MANUSCRIPT_REVIEW_APP_BASE_PATH": "ENC[AES256_GCM,data:9QG8avKgdaBrKBH4I0q/MWMzi92Hf0mXl1yiCJe4zxnMWiIM,iv:hnyTG/eSsKQD5J8b85OStTA3uH+xkwe9BBRf4ACq47o=,tag:YKSD7lcfx8CHeBAEnLXuYA==,type:str]",
+	"IMPORT_MANUSCRIPT_SUBMISSION_GRAPHQL": "ENC[AES256_GCM,data:avpA+8cD98oavp1Dlt6WPs52VHxlc/DukIxdDDhr9IoEZnwgGLE=,iv:DXVwR3jCcGC8IjAw5ueeGkCoO1T+e0vUkuRcp/d2kUg=,tag:ywYgW1R7jJ1U5nNCRO/X4g==,type:str]",
+	"IMPORT_MANUSCRIPT_SUBMISSION_ADMIN_USERNAME": "ENC[AES256_GCM,data:hO2sFVA84gQOsr+iLc0J7sLSozxukfSu,iv:0uly34nrWJTjNw3SG54Uj+Ezsh3wnbVp1B+QVGdrhyY=,tag:JygFo0rN5OHGr+NOzY9Q7g==,type:str]",
+	"IMPORT_MANUSCRIPT_SUBMISSION_ADMIN_PASSWORD": "ENC[AES256_GCM,data:Ct4kz0im1vGtFQ==,iv:o07JjUkUbRXqQ1eWxZkJOlY0Fh8OqlCITFP4pkanapE=,tag:u6Kpa4liTywtONEYwNLrcg==,type:str]",
+	"IMPORT_MANUSCRIPT_SUBMISSION_KEYCLOAK_CONFIG": "ENC[AES256_GCM,data:k9wMpxlVJo3q3veAofaC5Ml1fmZnAeE3wYeRv1HJnr6erkuEqO+EqaAFQlwHxmRjyW+vs8V+l9JcSwCjEJBtbFTY2xt1icxhB/bQGXo1v9eaXVdRNrSylLFFl2VyD4b4urLsVABtzmHRTO89XjWNrELE6owoSrFbSLEyp0+hgmPsRRVftOelqHaDQM0RLpYS+6Q8upctje9ZOpAQK440e2p+d4lYSy5NGSN6PO3oqKna6P6Z1yl/+QJCn2XeJhczG4cWEvS9dy1WKuDB4cRNkAAkpoRQxgO23j5wB6GEITeEMP+kijI=,iv:pOr+EAeb41jjX1o+FGMBL1Z1naJFtxuv15G561EPKX0=,tag:ZDFmB5u3YVe0N11n3XX8AA==,type:str]",
+	"IMPORT_MANUSCRIPT_SUBMISSION_KEYCLOAK_CLIENT_ID": "ENC[AES256_GCM,data:Vx7iqMrPvzLLfw1XTGljsMk=,iv:rO5moDurJoi7T3pJprKzuH1EzO0UZFNPhtW2k85vOjE=,tag:obIlZgGqUb5CCkLzrrY/8g==,type:str]",
+	"VALIDATION_SENDER_EMAIL": "ENC[AES256_GCM,data:rZqyDkqVwJ1xIkWJouqbYzxG22NMV/O+5LnVN+0=,iv:8z7k+XxVemM9HbhBSgQivabXglt+faSZy9I3MveZFyw=,tag:F86XZlqtk8ZoUCBj5P59Sw==,type:str]",
+	"TENANT_NAME": "ENC[AES256_GCM,data:7zE++FABvyKjG8BWdfuYkQ==,iv:P2aEv6l6LDJ0cJUmxTs2f4sT+peVBq8VtDK+jw0V0Cc=,tag:m9yY/i0WJKLhI5CrGe0pzQ==,type:str]",
+	"FE_ROOT": "ENC[AES256_GCM,data:nIVhWdduaGNvu1pp15eMoQCQzWHzwq1BjG29FHH5NqdBtYyEyV4TKP0+wIF1hfspVyllHZ3h9+xXcEtc0w+vabReIg==,iv:yBTTrEn/SLgvoO8ocld96UBdtrQrfLZsnZvUEwK1dWw=,tag:qfPZjpYs0xpzZK5jH+/OLA==,type:str]",
+	"MAILING_DISABLED": "ENC[AES256_GCM,data:xWcvlVI=,iv:UOQ8DkyTnMqkSYVD/XedItZ5oIKHTWGrcKVPkPBdoEk=,tag:v1JYuUZIgW5cS7L9mIPUqA==,type:str]",
+	"AWS_SES_REGION": "ENC[AES256_GCM,data:JvH6MBYx3jsR,iv:4LHIfL2/Xz9xeZUksKTafm3JzcLezg/KOFa3GzrEoOw=,tag:0FFlSiR/kNtAW2VxNLv15A==,type:str]",
+	"AWS_SES_ACCESS_KEY": "ENC[AES256_GCM,data:ySKcJK88QJpcukH4+q+KD6Y/I6U=,iv:iJJfhA9sORmme7hyR4ve7jkrr0M43gJFukgI3HHMTck=,tag:PXQ7mLY1VFI8tbb4nO9t3g==,type:str]",
+	"AWS_SES_SECRET_KEY": "ENC[AES256_GCM,data:cZCa8mVDS1gb8aCRiRsTNIwJ9ndxZ0/AuayxCym/lNMMNsVDSwqOOg==,iv:tO3+17wRva0Kxhm1WQIVOKZlhBkuK4xFgF83W2vfgyg=,tag:KhHUQCL4jva5DlJaptpX0w==,type:str]",
+	"IMPORT_MANUSCRIPT_APP_BASE_PATH": "ENC[AES256_GCM,data:oyzGa1VqYq4rcgrDb6aSBV1n8zxBLkinwnvt/kuR3sXyPSkxl/kOFJZ2/7a/qAJUtuEedPsBqb1LUYMphLDoSOOHPg==,iv:FPEkqW0Nks3le5vjZf/OeaTPIOSUBA75S7q+Ewa+DW8=,tag:XAnC0PJTkk3LA5Ys3rikvA==,type:str]",
+	"PORT": "ENC[AES256_GCM,data:SMK7hQ==,iv:gjA35oDqenYVFbzA3IQD/2bPqa+Jv1jkzjKbvt3JZjk=,tag:vzPF3tVnvdRCN6YIRf/OsQ==,type:str]",
+	"sops": {
+		"kms": [
+			{
+				"arn": "arn:aws:kms:eu-west-1:916437579680:key/1fbe0a96-3785-42f6-856f-81e56bb9131b",
+				"created_at": "2022-07-05T09:13:02Z",
+				"enc": "AQICAHhZUaVA8W191Vg6SiBY8cFqIj4mGQYPyNXgHpN4hr8BTQHnsddoCSnfUEcb5/hLKSlVAAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMK6aQby711hNNTOF9AgEQgDtuJ+QhmvobueUUooQ88FRvNkDgRLer0KyytgBK2+18ItOq7Du0LdBQKEBxw6+vml7lNIn/gFQ3wH0yTA==",
+				"aws_profile": ""
+			}
+		],
+		"gcp_kms": null,
+		"azure_kv": null,
+		"hc_vault": null,
+		"age": null,
+		"lastmodified": "2022-07-18T11:31:10Z",
+		"mac": "ENC[AES256_GCM,data:74kEHkp/TruRD4FFp+0sFqgjNCV6RSsRK9wLY0GNa96HfM7bz1dgEyDaZRupYzzCzlqjj3nY+tQLXBCWxsW0iOlGYg8378+M0oq9U9BQ591FQ47YBd+uEqS1xxNEEtkzk9TLRzE3LAyNAg5xuReu6C8d/dq4pqt9GjyVBs8KEz4=,iv:Zq3dJzCXMMV1SYlkiVKZ3f7SUR4KvrWSmXdSamkUdoo=,tag:PrxbfM2jkWkIseInCnrhhg==,type:str]",
+		"pgp": null,
+		"unencrypted_suffix": "_unencrypted",
+		"version": "3.7.3"
+	}
+}

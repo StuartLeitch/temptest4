@@ -38,13 +38,13 @@ export class Journal extends ValueObject<JournalProps> {
 
   static create(props: JournalProps): Journal {
     const guardArgs: GuardArgument[] = [
-      {argument: props.phenomId, argumentName: 'phenomId'},
-      {argument: props.code, argumentName: 'code'},
-      {argument: props.name, argumentName: 'name'},
+      {argument: props.phenomId, argumentName: 'journal.phenomId'},
+      {argument: props.code, argumentName: 'journal.code'},
+      {argument: props.name, argumentName: 'journal.name'},
     ];
 
     Guard.againstNullOrUndefinedBulk(guardArgs).throwIfFailed();
-    Guard.againstEmpty(props.name, "name").throwIfFailed()
+    Guard.againstEmpty(props.name, "journal.name").throwIfFailed()
 
     return new Journal(props);
   }
@@ -84,12 +84,6 @@ export class SourceJournal extends ValueObject<SourceJournalProps> {
 
     Guard.againstNullOrUndefinedBulk(guardArgs).throwIfFailed();
     Guard.againstEmpty(props.name, "source journal title").throwIfFailed()
-    //TODO Seems like neither the pissn or eissn is actually required
-    // Guard.aOrB(props.pissn, "source journal pissn", props.eissn, "source journal eissn").throwIfFailed()
-    // const emptyPissn = Guard.againstEmpty(props.pissn.value, "source journal pissn")
-    // const emptyEissn = Guard.againstEmpty(props.eissn.value, "source journal eissn")
-    // if(emptyEissn.failed && emptyPissn.failed)
-    //   throw new GuardFail(`Both the issn and pissn are empty`)
     return new SourceJournal(props);
   }
 }
