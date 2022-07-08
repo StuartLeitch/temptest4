@@ -42,29 +42,11 @@ id: '825fae9e-c227-48c2-936c-620dbc7ec914'
 modelType: 'Application'
 appCode: 'phenom-reporting-backend'
 atlasId: 'APP-9724'
-name: 'Phenom Reporting'
+name: 'Phenom Reporting Backend'
 appType: 'Built'
 description:
   "Reporting backend listens to phenom events and saves them in a database\
-  \ used by Iris."
+  \ used by Superset and external consumers."
 state: 'Active'
-documentationUrl: 'https://hindawi.atlassian.net/wiki/spaces/PPT/pages/2571304987/Phenom+Reporting'
-issueTrackerUrl: 'https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74'
-financialData:
-  applies: true
-  scope:
-    - 'Other'
-  supports:
-    - 'SOXReporting'
-personalData:
-  applies: true
-  scope:
-    - 'Customer'
-    - 'Employee'
-  supports:
-    - 'Country'
-usages:
-  - 'Product'
-systemId: '318c5bb2-ffff-4ee5-b536-1df0dfe4d59c'
+systemId: '6a243b92-d277-47a8-b670-19fc631ae882'
 shortCode: 'phenom-rprtngb'
-isSystem: false
