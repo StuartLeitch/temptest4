@@ -8,25 +8,8 @@ name: 'Phenom Invoicing Admin Service'
 appType: 'Built'
 description: 'Invoicing admin UI used by the finance team.'
 state: 'Active'
-documentationUrl: 'https://hindawi.atlassian.net/wiki/spaces/PPT/pages/1137344514/Phenom+Finance'
-issueTrackerUrl: 'https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74'
-financialData:
-  applies: true
-  scope:
-    - 'SalesTax'
-    - 'Other'
-personalData:
-  applies: true
-  scope:
-    - 'Customer'
-    - 'Employee'
-  supports:
-    - 'Country'
-usages:
-  - 'Product'
-systemId: '318c5bb2-ffff-4ee5-b536-1df0dfe4d59c'
+systemId: 'c4465d6e-55de-4e9f-89a3-79ce6476df2d'
 shortCode: 'phenom-invcngd'
-isSystem: false
 ---
 !<Application>
 id: '37465ecf-8aa5-4ccb-8f03-7dc7ce6db044'
@@ -39,24 +22,8 @@ description:
   "Invoicing graphql backend. Alse includes express endpoints, event listener,\
   \ erp scheduler, internal scheduling system - sisif, etc."
 state: 'Active'
-documentationUrl: 'https://hindawi.atlassian.net/wiki/spaces/PPT/pages/1137344514/Phenom+Finance'
-issueTrackerUrl: 'https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74'
-financialData:
-  applies: true
-  scope:
-    - 'Other'
-personalData:
-  applies: true
-  scope:
-    - 'Customer'
-    - 'Employee'
-  supports:
-    - 'Country'
-usages:
-  - 'Product'
-systemId: '318c5bb2-ffff-4ee5-b536-1df0dfe4d59c'
+systemId: 'c4465d6e-55de-4e9f-89a3-79ce6476df2d'
 shortCode: 'phenom-invcngg'
-isSystem: false
 ---
 !<Application>
 id: '146bb74f-70cb-49db-90f8-e9d78944fa94'
@@ -67,24 +34,8 @@ name: 'Phenom Invoicing Client App'
 appType: 'Built'
 description: 'Payment details pages used by users to pay invoices for manuscripts.'
 state: 'Active'
-documentationUrl: 'https://hindawi.atlassian.net/wiki/spaces/PPT/pages/1137344514/Phenom+Finance'
-issueTrackerUrl: 'https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74'
-financialData:
-  applies: true
-  scope:
-    - 'Other'
-personalData:
-  applies: true
-  scope:
-    - 'Customer'
-    - 'Employee'
-  supports:
-    - 'Country'
-usages:
-  - 'Product'
-systemId: '318c5bb2-ffff-4ee5-b536-1df0dfe4d59c'
+systemId: 'c4465d6e-55de-4e9f-89a3-79ce6476df2d'
 shortCode: 'phenom-invcngw'
-isSystem: false
 ---
 !<Application>
 id: '825fae9e-c227-48c2-936c-620dbc7ec914'

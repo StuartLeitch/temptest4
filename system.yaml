@@ -1,0 +1,24 @@
+id: c4465d6e-55de-4e9f-89a3-79ce6476df2d
+modelType: System
+sysCode: phenom-invoicing
+name: Phenom Invoicing
+description: Phenom system facilitating payment of article processing fees
+state: Active
+documentationUrl: https://confluence.wiley.com/display/PPT/Phenom+Finance
+issueTrackerUrl: https://jira.wiley.com/secure/RapidBoard.jspa?projectKey=PPBK
+financialData:
+  applies: true
+  scope:
+    - 'SalesTax'
+    - 'Other'
+  supports:
+    - 'SOXReporting'
+personalData:
+  applies: true
+  scope:
+    - 'Customer'
+    - 'Employee'
+  supports:
+    - 'Country'
+usages:
+  - Product
