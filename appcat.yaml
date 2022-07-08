@@ -70,28 +70,6 @@ shortCode: 'phenom-rprtngb'
 isSystem: false
 ---
 !<Application>
-id: '448f6c6d-9398-4dc1-9673-cd210ada92f9'
-modelType: 'Application'
-appCode: 'phenom-eve'
-atlasId: 'APP-9725'
-name: 'Phenom Eve'
-appType: 'Built'
-description:
-  "Multi purpose utility app, usecases: pull events from s3 and write them\
-  \ to sqs, pull events from s3 send to rest endpoint, etc."
-state: 'Active'
-issueTrackerUrl: 'https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74'
-financialData:
-  applies: false
-personalData:
-  applies: false
-usages:
-  - 'Product'
-systemId: '318c5bb2-ffff-4ee5-b536-1df0dfe4d59c'
-shortCode: 'phenom-eve'
-isSystem: false
----
-!<Application>
 id: '9f3e5c09-92ec-48b0-a2c7-4b64800ca158'
 modelType: 'Application'
 appCode: 'phenom-iris'
@@ -121,27 +99,4 @@ usages:
   - 'Product'
 systemId: '318c5bb2-ffff-4ee5-b536-1df0dfe4d59c'
 shortCode: 'phenom-iris'
-isSystem: false
----
-!<Application>
-id: '0bda3229-a381-4b0e-8edd-6a03ba32d21b'
-modelType: 'Application'
-appCode: 'phenom-sisif'
-atlasId: 'APP-9727'
-name: 'Phenom Sisif'
-appType: 'Built'
-description:
-  "Job scheduling system. Uses redis as backend to schedule jobs after\
-  \ a delay or by cron."
-state: 'Active'
-documentationUrl: 'https://hindawi.atlassian.net/wiki/spaces/PPT/pages/2571304987/Phenom+Reporting'
-issueTrackerUrl: 'https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74'
-financialData:
-  applies: false
-personalData:
-  applies: false
-usages:
-  - 'Product'
-systemId: '318c5bb2-ffff-4ee5-b536-1df0dfe4d59c'
-shortCode: 'phenom-sisif'
 isSystem: false
