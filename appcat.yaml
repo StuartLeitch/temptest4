@@ -72,7 +72,7 @@ isSystem: false
 !<Application>
 id: '9f3e5c09-92ec-48b0-a2c7-4b64800ca158'
 modelType: 'Application'
-appCode: 'phenom-iris'
+appCode: 'phenom-superset'
 atlasId: 'APP-9726'
 name: 'Phenom Iris'
 appType: 'Built'
