@@ -68,35 +68,3 @@ usages:
 systemId: '318c5bb2-ffff-4ee5-b536-1df0dfe4d59c'
 shortCode: 'phenom-rprtngb'
 isSystem: false
----
-!<Application>
-id: '9f3e5c09-92ec-48b0-a2c7-4b64800ca158'
-modelType: 'Application'
-appCode: 'phenom-superset'
-atlasId: 'APP-9726'
-name: 'Phenom Iris'
-appType: 'Built'
-description:
-  "apache-superset server. In Greek mythology, Iris is the personification\
-  \ and goddess of the rainbow and messenger of the gods."
-state: 'Active'
-documentationUrl: 'https://hindawi.atlassian.net/wiki/spaces/PPT/pages/2571304987/Phenom+Reporting'
-issueTrackerUrl: 'https://hindawi.atlassian.net/secure/RapidBoard.jspa?rapidView=74'
-financialData:
-  applies: true
-  scope:
-    - 'Other'
-  supports:
-    - 'SOXReporting'
-personalData:
-  applies: true
-  scope:
-    - 'Customer'
-    - 'Employee'
-  supports:
-    - 'Country'
-usages:
-  - 'Product'
-systemId: '318c5bb2-ffff-4ee5-b536-1df0dfe4d59c'
-shortCode: 'phenom-iris'
-isSystem: false
