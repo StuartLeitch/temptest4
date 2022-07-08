@@ -50,3 +50,15 @@ description:
 state: 'Active'
 systemId: '6a243b92-d277-47a8-b670-19fc631ae882'
 shortCode: 'phenom-rprtngb'
+---
+!<Application>
+id: 'd3efc813-c9c9-4424-a0ec-af74a2204899'
+modelType: 'Application'
+appCode: 'phenom-import-manuscript'
+name: 'Phenom Import Manuscript'
+appType: 'Built'
+description: 'Facilitates transferring manuscripts from external systems/journals'
+state: 'Active'
+documentationUrl: https://confluence.wiley.com/display/PPT/Manuscript+transfer+-+Solution+Document
+issueTrackerUrl: https://jira.wiley.com/secure/RapidBoard.jspa?projectKey=PPBK
+systemId: '318c5bb2-ffff-4ee5-b536-1df0dfe4d59c'
