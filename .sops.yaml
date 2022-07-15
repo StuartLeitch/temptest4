@@ -1,2 +1,3 @@
 creation_rules:
   - kms: arn:aws:kms:eu-west-1:916437579680:key/1fbe0a96-3785-42f6-856f-81e56bb9131b
+    encrypted_regex: (AWS_ACCESS_KEY|AWS_SECRET_KEY|DB_PASSWORD|DB_USERNAME|DB_HOST)

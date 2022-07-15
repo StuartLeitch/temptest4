@@ -19,7 +19,6 @@ export interface CatalogItemProps {
   created?: Date;
   updated?: Date;
   publisherId?: PublisherId;
-  isActive?: boolean;
   zeroPriced: boolean;
 }
 
@@ -118,14 +117,6 @@ export class CatalogItem extends AggregateRoot<CatalogItemProps> {
 
   set updated(updated: Date) {
     this.props.updated = updated;
-  }
-
-  get isActive(): boolean {
-    return this.props.isActive;
-  }
-
-  set isActive(isActive: boolean) {
-    this.props.isActive = isActive;
   }
 
   get publisherId(): PublisherId {

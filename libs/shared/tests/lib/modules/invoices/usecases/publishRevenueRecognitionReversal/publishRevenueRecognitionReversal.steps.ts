@@ -133,7 +133,6 @@ Given(/A regular invoice/, async function () {
 
   const maybeCatalog = CatalogMap.toDomain({
     publisherId: publisher.publisherId.id.toString(),
-    isActive: true,
     journalId: 'testingJournal',
   });
 

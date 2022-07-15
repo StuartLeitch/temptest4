@@ -29,7 +29,6 @@ export const JournalAddedHandler: EventHandler<JournalAdded> = {
       );
 
       const request: AddCatalogItemToCatalogUseCaseDTO = {
-        isActive: data.isActive,
         journalTitle: data.name,
         created: data.created,
         updated: data.updated,

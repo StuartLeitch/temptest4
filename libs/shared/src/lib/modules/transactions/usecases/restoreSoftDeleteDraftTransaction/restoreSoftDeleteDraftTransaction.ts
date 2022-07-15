@@ -5,11 +5,7 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
-import {
-  AccessControlledUsecase,
-  AccessControlContext,
-  Authorize,
-} from '../../../../domain/authorization';
+import { AccessControlledUsecase, AccessControlContext, Authorize } from '../../../../domain/authorization';
 
 //* Repo Imports
 import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
@@ -32,7 +28,8 @@ import * as Errors from './restoreSoftDeleteDraftTransaction.errors';
 
 export class RestoreSoftDeleteDraftTransactionUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(
     private transactionRepo: TransactionRepoContract,
     private invoiceItemRepo: InvoiceItemRepoContract,
@@ -60,25 +57,13 @@ export class RestoreSoftDeleteDraftTransactionUsecase
       this.manuscriptRepo,
       this.invoiceRepo
     );
-    const getInvoiceId = new GetInvoiceIdByManuscriptCustomIdUsecase(
-      this.manuscriptRepo,
-      this.invoiceItemRepo
-    );
-    const getInvoiceItems = new GetItemsForInvoiceUsecase(
-      this.invoiceItemRepo,
-      this.couponRepo,
-      this.waiverRepo
-    );
-    const getManuscript = new GetManuscriptByManuscriptIdUsecase(
-      this.manuscriptRepo
-    );
+    const getInvoiceId = new GetInvoiceIdByManuscriptCustomIdUsecase(this.manuscriptRepo, this.invoiceItemRepo);
+    const getInvoiceItems = new GetItemsForInvoiceUsecase(this.invoiceItemRepo, this.couponRepo, this.waiverRepo);
+    const getManuscript = new GetManuscriptByManuscriptIdUsecase(this.manuscriptRepo);
 
     try {
       // * System identifies article by manuscript Id
-      const maybeManuscript = await getManuscript.execute(
-        { manuscriptId },
-        context
-      );
+      const maybeManuscript = await getManuscript.execute({ manuscriptId }, context);
 
       if (!maybeManuscript || maybeManuscript.isLeft()) {
         throw new Errors.ManuscriptNotFoundError(request.manuscriptId);
@@ -92,7 +77,7 @@ export class RestoreSoftDeleteDraftTransactionUsecase
         throw new Errors.InvoiceIdNotFoundError(customId);
       }
 
-      const invoiceId = maybeInvoiceId.value.toString();
+      const invoiceId = maybeInvoiceId.value[0].toString();
 
       // * System identifies invoice by invoice Id
       const maybeInvoice = await getInvoice.execute({ invoiceId }, context);
@@ -103,20 +88,14 @@ export class RestoreSoftDeleteDraftTransactionUsecase
       const invoice = maybeInvoice.value;
 
       // * System identifies invoice item by invoice Id
-      const maybeInvoiceItems = await getInvoiceItems.execute(
-        { invoiceId },
-        context
-      );
+      const maybeInvoiceItems = await getInvoiceItems.execute({ invoiceId }, context);
       if (!maybeInvoiceItems || maybeInvoiceItems.isLeft()) {
         throw new Errors.InvoiceItemNotFoundError(invoiceId);
       }
       const invoiceItem = maybeInvoiceItems.value[0];
 
       // * System identifies transaction by manuscript custom Id
-      const maybeTransaction = await getTransaction.execute(
-        { customId },
-        context
-      );
+      const maybeTransaction = await getTransaction.execute({ customId }, context);
       if (!maybeTransaction || maybeTransaction.isLeft()) {
         throw new Errors.TransactionNotFoundError(manuscriptId);
       }
@@ -153,9 +132,7 @@ export class RestoreSoftDeleteDraftTransactionUsecase
     }
   }
 
-  private verifyData(
-    request: DTO
-  ): Either<Errors.ManuscriptRequiredError, void> {
+  private verifyData(request: DTO): Either<Errors.ManuscriptRequiredError, void> {
     if (!request.manuscriptId) {
       return left(new Errors.ManuscriptRequiredError());
     }

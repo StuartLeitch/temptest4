@@ -31,6 +31,8 @@ export * from './modules/manuscripts/usecases/editManuscript/editManuscript';
 export * from './modules/manuscripts/usecases/editManuscript/editManuscriptDTO';
 export * from './modules/manuscripts/usecases/existsManuscriptById';
 export * from './modules/manuscripts/usecases/epicOnArticlePublished';
+export * from './modules/manuscripts/usecases/updateManuscriptAuthor';
+export * from './modules/manuscripts/usecases/updateTaEligibility';
 
 // * Export Transaction Subdomain
 export * from './modules/transactions/domain/Transaction';
@@ -51,6 +53,8 @@ export * from './modules/transactions/usecases/restoreSoftDeleteDraftTransaction
 export * from './modules/transactions/usecases/restoreSoftDeleteDraftTransaction/restoreSoftDeleteDraftTransaction.dto';
 export * from './modules/transactions/usecases/getTransactionByInvoiceId/getTransactionByInvoiceId';
 export * from './modules/transactions/usecases/getTransactionByInvoiceId/getTransactionByInvoiceIdDTO';
+export * from './modules/transactions/usecases/updateTransactionOnTADecision';
+export * from './modules/transactions/usecases/setTransactionStatusToActiveUsecase';
 
 // * Export Invoice Subdomain
 export * from './modules/invoices/domain/Invoice';
@@ -97,6 +101,9 @@ export * from './modules/invoices/usecases/ERP/publishInvoiceToErp/publishInvoic
 export * from './modules/invoices/usecases/ERP/publishRevenueRecognitionToErp/publishRevenueRecognitionToErp';
 export * from './modules/invoices/usecases/getVATNote/getVATNoteDTO';
 export * from './modules/invoices/usecases/getVATNote/getVATNote';
+export * from './modules/invoices/usecases/updateInvoiceDetails';
+export * from './modules/invoices/usecases/updateInvoiceDateAccepted';
+export * from './modules/invoices/usecases/applyWaivers';
 
 export * from './modules/invoices/subscriptions/AfterInvoiceCreatedEvents';
 export * from './modules/invoices/subscriptions/AfterInvoiceFinalizedEvent';
@@ -341,11 +348,7 @@ export * from './core/logic';
 export * from './core/domain';
 export * from './core/tests';
 export * from './domain';
-export {
-  AccessControlledUsecase,
-  isAuthorizationError,
-  GenericAuthorize,
-} from './domain/authorization/decorators';
+export { AccessControlledUsecase, isAuthorizationError, GenericAuthorize } from './domain/authorization/decorators';
 export type {
   AccessControlledUsecaseContract,
   AccessControlContext,

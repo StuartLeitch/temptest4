@@ -16,11 +16,10 @@ import { ArticleMap } from '../../mappers/ArticleMap';
 import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
 import { ArticleRepoContract } from '../articleRepo';
 import Knex from 'knex';
+import { Guard } from '@hindawi/shared';
+import { VError } from 'verror';
 
-export class KnexArticleRepo
-  extends AbstractBaseDBRepo<Knex, Article | Manuscript>
-  implements ArticleRepoContract
-{
+export class KnexArticleRepo extends AbstractBaseDBRepo<Knex, Article | Manuscript> implements ArticleRepoContract {
   constructor(
     protected db: Knex,
     protected logger?: any,
@@ -30,18 +29,11 @@ export class KnexArticleRepo
     super(db, logger);
   }
 
-  async findById(
-    manuscriptId: ManuscriptId
-  ): Promise<Either<GuardFailure | RepoError, Article | Manuscript>> {
-    const articleData = await this.db(TABLES.ARTICLES)
-      .select()
-      .where('id', manuscriptId.toString())
-      .first();
+  async findById(manuscriptId: ManuscriptId): Promise<Either<GuardFailure | RepoError, Article | Manuscript>> {
+    const articleData = await this.db(TABLES.ARTICLES).select().where('id', manuscriptId.toString()).first();
 
     if (!articleData) {
-      return left(
-        RepoError.createEntityNotFoundError('article', manuscriptId.toString())
-      );
+      return left(RepoError.createEntityNotFoundError('article', manuscriptId.toString()));
     }
 
     return ArticleMap.toDomain(articleData);
@@ -54,10 +46,7 @@ export class KnexArticleRepo
 
     const articleDataQuery = db(TABLES.ARTICLES)
       .select()
-      .where(
-        'customId',
-        typeof customId === 'string' ? customId : customId.id.toString()
-      )
+      .where('customId', typeof customId === 'string' ? customId : customId.id.toString())
       .first();
 
     logger.debug('select', {
@@ -84,23 +73,16 @@ export class KnexArticleRepo
 
     return db(TABLES.ARTICLES)
       .select('articles.*', 'invoices.id as invoiceId')
-      .leftJoin(
-        TABLES.INVOICE_ITEMS,
-        'invoice_items.manuscriptId',
-        'articles.id'
-      )
+      .leftJoin(TABLES.INVOICE_ITEMS, 'invoice_items.manuscriptId', 'articles.id')
       .leftJoin(TABLES.INVOICES, 'invoice_items.invoiceId', 'invoices.id');
   }
 
-  async findByInvoiceId(
-    invoiceId: InvoiceId
-  ): Promise<Either<GuardFailure | RepoError, Article | Manuscript>> {
+  async findByInvoiceId(invoiceId: InvoiceId): Promise<Either<GuardFailure | RepoError, Article | Manuscript>> {
     const { logger } = this;
 
     const detailsQuery = this.createInvoiceDetailsQuery();
 
-    const filterInvoicesById: any =
-      this.invoiceRepo.filterByInvoiceId(invoiceId);
+    const filterInvoicesById: any = this.invoiceRepo.filterByInvoiceId(invoiceId);
     const sql = filterInvoicesById(detailsQuery);
 
     logger.debug('select', {
@@ -111,15 +93,11 @@ export class KnexArticleRepo
     return ArticleMap.toDomain(articleData);
   }
 
-  async exists(
-    article: Article
-  ): Promise<Either<GuardFailure | RepoError, boolean>> {
+  async exists(article: Article): Promise<Either<GuardFailure | RepoError, boolean>> {
     return right(true);
   }
 
-  async save(
-    article: Article
-  ): Promise<Either<GuardFailure | RepoError, Article | Manuscript>> {
+  async save(article: Article): Promise<Either<GuardFailure | RepoError, Article | Manuscript>> {
     const { db } = this;
     try {
       await db(TABLES.ARTICLES).insert(ArticleMap.toPersistence(article));
@@ -129,9 +107,31 @@ export class KnexArticleRepo
     return this.findById(article.manuscriptId);
   }
 
-  async update(
-    manuscript: Manuscript
-  ): Promise<Either<GuardFailure | RepoError, Article | Manuscript>> {
+  async updateManuscriptTAEligibility(manuscriptId: ManuscriptId, isEligible: boolean): Promise<Either<GuardFailure | RepoError, Manuscript>>{
+    const updateEligibility = await this.db(TABLES.ARTICLES)
+      .where({ id: manuscriptId.id.toString() })
+      .update({ taEligible: isEligible });
+
+    if (!updateEligibility) {
+      return left(RepoError.createEntityNotFoundError('manuscript', manuscriptId.id.toString()));
+    } else {
+      return this.findById(manuscriptId);
+    }
+  }
+
+  async updateManuscriptTAApproval(manuscriptId: ManuscriptId, isApproved: boolean): Promise<Either<GuardFailure | RepoError, Manuscript>>{
+    const updateFundingApproved = await this.db(TABLES.ARTICLES)
+      .where({ id: manuscriptId.id.toString() })
+      .update({ taFundingApproved: isApproved });
+
+    if (!updateFundingApproved) {
+      return left(RepoError.createEntityNotFoundError('manuscript', manuscriptId.id.toString()));
+    } else {
+      return this.findById(manuscriptId);
+    }
+  }
+
+  async update(manuscript: Manuscript): Promise<Either<GuardFailure | RepoError, Article | Manuscript>> {
     const { db } = this;
 
     const updated = await db(TABLES.ARTICLES)
@@ -139,20 +139,13 @@ export class KnexArticleRepo
       .update(ManuscriptMap.toPersistence(manuscript));
 
     if (!updated) {
-      return left(
-        RepoError.createEntityNotFoundError(
-          'manuscript',
-          manuscript.id.toString()
-        )
-      );
+      return left(RepoError.createEntityNotFoundError('manuscript', manuscript.id.toString()));
     }
 
     return this.findById(manuscript.manuscriptId);
   }
 
-  async delete(
-    manuscript: Manuscript
-  ): Promise<Either<GuardFailure | RepoError, void>> {
+  async delete(manuscript: Manuscript): Promise<Either<GuardFailure | RepoError, void>> {
     const { db } = this;
 
     const deletedRows = await db(TABLES.ARTICLES)
@@ -160,20 +153,13 @@ export class KnexArticleRepo
       .update({ ...ManuscriptMap.toPersistence(manuscript), deleted: 1 });
 
     if (!deletedRows) {
-      return left(
-        RepoError.createEntityNotFoundError(
-          'manuscript',
-          manuscript.id.toString()
-        )
-      );
+      return left(RepoError.createEntityNotFoundError('manuscript', manuscript.id.toString()));
     }
 
     return right(null);
   }
 
-  async restore(
-    manuscript: Manuscript
-  ): Promise<Either<GuardFailure | RepoError, void>> {
+  async restore(manuscript: Manuscript): Promise<Either<GuardFailure | RepoError, void>> {
     const { db } = this;
 
     const restoredRows = await db(TABLES.ARTICLES)
@@ -181,12 +167,7 @@ export class KnexArticleRepo
       .update({ ...ManuscriptMap.toPersistence(manuscript), deleted: 0 });
 
     if (!restoredRows) {
-      return left(
-        RepoError.createEntityNotFoundError(
-          'manuscript',
-          manuscript.id.toString()
-        )
-      );
+      return left(RepoError.createEntityNotFoundError('manuscript', manuscript.id.toString()));
     }
 
     return right(null);
@@ -195,9 +176,7 @@ export class KnexArticleRepo
   filterBy(criteria): unknown {
     const [condition, field] = Object.entries(criteria)[0];
     return (query) => {
-      const join = query
-        .leftJoin(TABLES.ARTICLES, 'articles.id', 'invoice_items.manuscriptId')
-        .orderBy(field, 'desc');
+      const join = query.leftJoin(TABLES.ARTICLES, 'articles.id', 'invoice_items.manuscriptId').orderBy(field, 'desc');
 
       return join[condition](field);
     };
@@ -205,13 +184,6 @@ export class KnexArticleRepo
 
   public articleInvoiceItemJoinQuery(): any {
     return (query) =>
-      query
-        .from('articles')
-        .leftJoin(
-          'invoice_items',
-          'invoice_items.manuscriptId',
-          '=',
-          'articles.id'
-        );
+      query.from('articles').leftJoin('invoice_items', 'invoice_items.manuscriptId', '=', 'articles.id');
   }
 }

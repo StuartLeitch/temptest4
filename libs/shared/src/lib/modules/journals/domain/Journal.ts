@@ -16,7 +16,6 @@ export interface JournalProps {
   articleProcessingCharge: number; // * this should be a currency object value
   code: string; // * unique journal reference
   issn: string; // * external journal reference, just like
-  isActive: boolean;
   editorialBoard?: EditorialBoard;
 }
 
@@ -45,10 +44,6 @@ export class Journal extends AggregateRoot<JournalProps> {
 
   get articleProcessingCharge(): number {
     return this.props.articleProcessingCharge;
-  }
-
-  get isActive(): boolean {
-    return this.props.isActive;
   }
 
   get editorialBoard(): EditorialBoard {

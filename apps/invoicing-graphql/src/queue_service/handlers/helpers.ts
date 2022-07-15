@@ -15,9 +15,8 @@ import {
   GetJournalUsecase,
   VersionCompare,
   InvoiceItem,
-  Manuscript,
   InvoiceId,
-  Roles,
+  Roles, Manuscript,
 } from '@hindawi/shared';
 
 import { Context } from '../../builders';
@@ -27,7 +26,7 @@ const defaultContext: UsecaseAuthorizationContext = {
 };
 
 export function hasSourceJournal(data: SubmissionSubmitted): boolean {
-  const manuscript = getLatestManuscript(data);
+  const manuscript = extractLatestManuscript(data);
 
   if (!manuscript.sourceJournal) {
     return false;
@@ -47,9 +46,7 @@ export function hasSourceJournal(data: SubmissionSubmitted): boolean {
   return true;
 }
 
-export function getLatestManuscript({
-  manuscripts,
-}: SubmissionSubmitted | SubmissionPeerReviewCycleCheckPassed) {
+export function extractLatestManuscript({manuscripts,}: SubmissionSubmitted | SubmissionPeerReviewCycleCheckPassed) {
   const maxVersion = manuscripts.reduce((max, m) => {
     const version = VersionCompare.versionCompare(m.version, max)
       ? m.version
@@ -277,7 +274,7 @@ function updateManuscript(context: Context) {
       manuscriptRepo
     );
 
-    const newManuscript = getLatestManuscript(data);
+    const newManuscript = extractLatestManuscript(data);
 
     const author = newManuscript.authors.find((a) => a.isCorresponding);
 

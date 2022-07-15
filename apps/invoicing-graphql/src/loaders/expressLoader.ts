@@ -9,10 +9,7 @@ import corsMiddleware from 'cors';
 import { Parser } from 'json2csv';
 import multer from 'multer';
 
-import {
-  MicroframeworkSettings,
-  MicroframeworkLoader,
-} from 'microframework-w3tec';
+import { MicroframeworkSettings, MicroframeworkLoader } from 'microframework-w3tec';
 
 import {
   PayPalProcessFinishedUsecase,
@@ -33,10 +30,7 @@ import {
   GetReceiptPdfUsecase,
 } from '@hindawi/shared';
 
-import {
-  PayPalWebhookResponse,
-  PayPalPaymentCapture,
-} from '../services/paypal/types/webhooks';
+import { PayPalWebhookResponse, PayPalPaymentCapture } from '../services/paypal/types/webhooks';
 import { Context, Repos } from '../builders';
 import { env } from '../env';
 
@@ -46,9 +40,7 @@ type JournalJson = {
 };
 
 function extractRoles(req: Request): Array<Roles> {
-  return (<any>req).kauth.grant.access_token.content.resource_access[
-    env.app.keycloakConfig.resource
-  ].roles
+  return (<any>req).kauth.grant.access_token.content.resource_access[env.app.keycloakConfig.resource].roles
     .map((role: string) => role.toUpperCase())
     .map((role: string) => Roles[role]);
 }
@@ -58,10 +50,7 @@ function extractEmail(req: Request): string {
 }
 
 function extractCaptureId(data: PayPalPaymentCapture): string {
-  const orderLink = data.links.find(
-    (link) =>
-      link.href.indexOf('captures') > -1 && link.href.indexOf('refund') === -1
-  );
+  const orderLink = data.links.find((link) => link.href.indexOf('captures') > -1 && link.href.indexOf('refund') === -1);
   const linkPathSplitted = orderLink.href.split('/');
   const orderId = linkPathSplitted[linkPathSplitted.length - 1];
   return orderId;
@@ -121,9 +110,7 @@ function getStore(maxAge: number) {
   });
 }
 
-export const expressLoader: MicroframeworkLoader = (
-  settings: MicroframeworkSettings | undefined
-) => {
+export const expressLoader: MicroframeworkLoader = (settings: MicroframeworkSettings | undefined) => {
   if (settings) {
     const context: Context = settings.getData('context');
 
@@ -268,15 +255,19 @@ export const expressLoader: MicroframeworkLoader = (
 
         if (result.isLeft()) {
           logger.error(
-            `Handling PayPal event finished with error ${
-              result.value.message
-            }. \nEvent had body {${JSON.stringify(req.body, null, 2)}}`,
+            `Handling PayPal event finished with error ${result.value.message}. \nEvent had body {${JSON.stringify(
+              req.body,
+              null,
+              2
+            )}}`,
             result.value
           );
           console.error(
-            `Handling PayPal event finished with error ${
-              result.value.message
-            }. \nEvent had body {${JSON.stringify(req.body, null, 2)}}\n`,
+            `Handling PayPal event finished with error ${result.value.message}. \nEvent had body {${JSON.stringify(
+              req.body,
+              null,
+              2
+            )}}\n`,
             JSON.stringify(result.value, null, 2)
           );
           res.status(500);
@@ -285,15 +276,19 @@ export const expressLoader: MicroframeworkLoader = (
         }
       } catch (e) {
         logger.error(
-          `While handling PayPal event an error ocurred {${
-            e.message
-          }}. \nEvent had body {${JSON.stringify(req.body, null, 2)}}`,
+          `While handling PayPal event an error ocurred {${e.message}}. \nEvent had body {${JSON.stringify(
+            req.body,
+            null,
+            2
+          )}}`,
           e
         );
         console.error(
-          `While handling PayPal event an error ocurred {${
-            e.message
-          }}. \nEvent had body {${JSON.stringify(req.body, null, 2)}}\n`,
+          `While handling PayPal event an error ocurred {${e.message}}. \nEvent had body {${JSON.stringify(
+            req.body,
+            null,
+            2
+          )}}\n`,
           JSON.stringify(e, null, 2)
         );
         res.status(500);
@@ -307,15 +302,7 @@ export const expressLoader: MicroframeworkLoader = (
       const authContext = { roles: extractRoles(req) };
       const usecase = new GetRecentLogsUsecase(repos.audit);
 
-      const fields = [
-        'id',
-        'userAccount',
-        'timestamp',
-        'action',
-        'entity',
-        'item_reference',
-        'target',
-      ];
+      const fields = ['id', 'userAccount', 'timestamp', 'action', 'entity', 'item_reference', 'target'];
       const opts = { fields };
       const csvConverter = new Parser(opts);
 
@@ -323,8 +310,7 @@ export const expressLoader: MicroframeworkLoader = (
         {
           pagination: { offset: 0, limit: 10 },
           filters: {
-            startDate:
-              new Date(String(req.query.startDate)).toISOString() ?? null,
+            startDate: new Date(String(req.query.startDate)).toISOString() ?? null,
             endDate: new Date(String(req.query.endDate)).toISOString() ?? null,
             download: req.query.download ?? 1,
           },
@@ -373,9 +359,7 @@ export const expressLoader: MicroframeworkLoader = (
         return left(listResponse.value);
       }
 
-      const logs = listResponse.value.catalogItems.map(
-        CatalogMap.toPersistence
-      );
+      const logs = listResponse.value.catalogItems.map(CatalogMap.toPersistence);
 
       const jsonData = JSON.parse(JSON.stringify(logs));
       const csv = csvConverter.parse(jsonData);
@@ -388,13 +372,7 @@ export const expressLoader: MicroframeworkLoader = (
     app.post(
       '/api/apc/upload-csv',
       upload.single('file'),
-      keycloak.protect(
-        protectMultiRole(
-          Roles.FINANCIAL_CONTROLLER,
-          Roles.SUPER_ADMIN,
-          Roles.ADMIN
-        )
-      ),
+      keycloak.protect(protectMultiRole(Roles.FINANCIAL_CONTROLLER, Roles.SUPER_ADMIN, Roles.ADMIN)),
       async (req, res) => {
         const { repos, loggerBuilder, auditLoggerServiceProvider } = context;
 
@@ -406,10 +384,7 @@ export const expressLoader: MicroframeworkLoader = (
           email: extractEmail(req),
         });
 
-        const usecase = new CatalogBulkUpdateUsecase(
-          repos.catalog,
-          auditLoggerService
-        );
+        const usecase = new CatalogBulkUpdateUsecase(repos.catalog, auditLoggerService);
 
         if (!req.file) {
           return res.status(400).send('Please upload a file');
@@ -422,20 +397,14 @@ export const expressLoader: MicroframeworkLoader = (
         }));
 
         try {
-          const updatedList = await usecase.execute(
-            { catalogItems: newPrices },
-            authContext
-          );
+          const updatedList = await usecase.execute({ catalogItems: newPrices }, authContext);
 
           if (updatedList.isLeft()) {
             if (isAuthorizationError(updatedList.value)) {
               res.status(403);
               res.send(updatedList.value.message);
             }
-            logger.error(
-              `Error updating APC: ${updatedList.value.message}.`,
-              updatedList.value
-            );
+            logger.error(`Error updating APC: ${updatedList.value.message}.`, updatedList.value);
             res.status(406).send(updatedList.value.message);
           } else {
             if (updatedList.value === 0) {
@@ -444,9 +413,7 @@ export const expressLoader: MicroframeworkLoader = (
             res.status(200).send();
           }
         } catch (err) {
-          logger.error(
-            `While handling APC Update event an error occurred {${err.message}}`
-          );
+          logger.error(`While handling APC Update event an error occurred {${err.message}}`);
           res.status(500).send();
         }
       }
@@ -489,12 +456,9 @@ async function generateInvoicePdf(
     exchangeRateService,
     vatService
   );
-
   const invoiceLink = req.headers.referer;
-  const pdfEither = await usecase.execute(
-    { payerId: req.params.payerId, invoiceLink },
-    authContext
-  );
+  logger.info(`Get Invoice pdf referer '${invoiceLink}'`);
+  const pdfEither = await usecase.execute({ payerId: req.params.payerId, invoiceLink }, authContext);
 
   return pdfEither;
 }
@@ -526,10 +490,7 @@ async function generateReceiptPdf(
   );
 
   const receiptLink = req.headers.referer;
-  const pdfEither = await usecase.execute(
-    { payerId: req.params.payerId, receiptLink },
-    authContext
-  );
+  const pdfEither = await usecase.execute({ payerId: req.params.payerId, receiptLink }, authContext);
 
   return pdfEither;
 }

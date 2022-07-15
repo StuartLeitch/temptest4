@@ -16,9 +16,6 @@ const values: WithSopsSecretsServiceProps = {
         {
           host: 'invoicing-graphql.demo.phenom.pub',
         },
-        {
-          host: 'demo-gql.invoicing.hindawi.com',
-        },
       ],
     },
   },

@@ -139,7 +139,6 @@ Given(
 
     const maybeCatalog = CatalogMap.toDomain({
       publisherId: publisher.publisherId.id.toString(),
-      isActive: true,
       journalId: 'journal1',
     });
 
@@ -275,7 +274,6 @@ Given(
 
     const maybeCatalog = CatalogMap.toDomain({
       publisherId: publisher.publisherId.id.toString(),
-      isActive: true,
       journalId: 'journal1',
     });
 

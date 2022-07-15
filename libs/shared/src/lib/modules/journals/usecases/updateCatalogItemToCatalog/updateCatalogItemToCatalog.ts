@@ -44,7 +44,6 @@ export class UpdateCatalogItemToCatalogUseCase
     const {
       created,
       currency,
-      isActive,
       issn,
       code,
       journalId: rawJournalId,
@@ -103,7 +102,6 @@ export class UpdateCatalogItemToCatalogUseCase
         created: created ? new Date(created) : null,
         updated: updated ? new Date(updated) : null,
         currency,
-        isActive,
         issn,
         code,
         journalId: rawJournalId,

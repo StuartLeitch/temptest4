@@ -13,7 +13,7 @@ const values: WithSopsSecretsServiceProps = {
     ingressOptions: {
       rules: [
         {
-          host: 'import-manuscriptl.prod.phenom.pub',
+          host: 'import-manuscript.prod.phenom.pub',
         },
         {
           host: 'prod-gql.import-manuscript.hindawi.com',

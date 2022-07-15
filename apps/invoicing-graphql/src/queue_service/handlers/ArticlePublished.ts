@@ -1,10 +1,10 @@
 import { ArticlePublished } from '@hindawi/phenom-events';
 
 import {
-  EpicOnArticlePublishedUsecase,
+  UsecaseAuthorizationContext,
   ManuscriptTypeNotInvoiceable,
+  EpicOnArticlePublishedUsecase,
   EpicOnArticlePublishedDTO,
-  executionContext,
   Roles,
 } from '@hindawi/shared';
 
@@ -15,6 +15,10 @@ import { EventHandler } from '../event-handler';
 import { env } from '../../env';
 
 const ARTICLE_PUBLISHED = 'ArticlePublished';
+
+const defaultContext: UsecaseAuthorizationContext = {
+  roles: [Roles.QUEUE_EVENT_HANDLER],
+};
 
 export const ArticlePublishedHandler: EventHandler<ArticlePublished> = {
   event: ARTICLE_PUBLISHED,
@@ -72,9 +76,10 @@ export const ArticlePublishedHandler: EventHandler<ArticlePublished> = {
         sanctionedCountryNotificationSender,
       };
 
-      const result = await epicOnArticlePublishedUsecase.execute(args, {
-        roles: [Roles.QUEUE_EVENT_HANDLER],
-      });
+      const result = await epicOnArticlePublishedUsecase.execute(
+        args,
+        defaultContext
+      );
 
       if (result.isLeft()) {
         logger.error(result.value.message);

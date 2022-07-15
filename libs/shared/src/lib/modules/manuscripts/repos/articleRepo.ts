@@ -29,4 +29,8 @@ export interface ArticleRepoContract extends Repo<Article | Manuscript> {
   findByInvoiceId?(
     invoiceId: InvoiceId
   ): Promise<Either<GuardFailure | RepoError, Manuscript>>;
+  updateManuscriptTAApproval(manuscriptId: ManuscriptId, isApproved: boolean): Promise<Either<GuardFailure | RepoError, Manuscript>>;
+
+  updateManuscriptTAEligibility(manuscriptId: ManuscriptId, isEligible: boolean): Promise<Either<GuardFailure | RepoError, Manuscript>>;
+
 }

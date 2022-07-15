@@ -15,9 +15,6 @@ const values: WithSopsSecretsServiceProps = {
         {
           host: 'import-manuscript-validation.demo.phenom.pub',
         },
-        {
-          host: 'demo-gql.import-manuscript-validation.hindawi.com',
-        },
       ],
     },
   },

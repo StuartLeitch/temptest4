@@ -29,7 +29,6 @@ export const JournalUpdatedHandler: EventHandler<JournalUpdated> = {
 
       const result = await updateJournalUsecase.execute(
         {
-          isActive: data.isActive,
           journalTitle: data.name,
           created: data.created,
           updated: data.updated,

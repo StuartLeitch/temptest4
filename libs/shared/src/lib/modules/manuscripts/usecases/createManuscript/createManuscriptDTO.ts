@@ -11,4 +11,6 @@ export interface CreateManuscriptDTO {
   created: Date;
   preprintValue: string;
   is_cascaded: number;
+  taEligible: boolean;
+  taFundingApproved: boolean;
 }

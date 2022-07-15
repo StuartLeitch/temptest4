@@ -36,7 +36,7 @@ import {
 
 import { Context } from '../../../src/builders';
 
-import { SubmissionSubmittedHandler as Handler } from '../../../src/queue_service/handlers/submission-submitted/SubmissionSubmitted';
+import { SubmissionSubmittedHandler as Handler } from '../../../../invoicing-graphql/src/queue_service/handlers/submission-events/SubmissionSubmitted';
 
 interface MockContext {
   repos: {
@@ -88,10 +88,7 @@ Before({ tags: '@ValidateSubmissionSubmitted' }, () => {
   context.repos.transaction = new MockTransactionRepo();
   context.repos.manuscript = new MockArticleRepo();
   context.repos.catalog = new MockCatalogRepo();
-  context.repos.invoice = new MockInvoiceRepo(
-    context.repos.manuscript,
-    context.repos.invoiceItem
-  );
+  context.repos.invoice = new MockInvoiceRepo(context.repos.manuscript, context.repos.invoiceItem);
   context.repos.coupon = new MockCouponRepo();
   context.repos.editor = new MockEditorRepo();
   context.repos.waiver = new MockWaiverRepo();
@@ -128,24 +125,21 @@ After({ tags: '@ValidateSubmissionSubmitted' }, () => {
   };
 });
 
-Given(
-  /^There is a Journal "([\w-]+)" with APC "([\d]+)"$/,
-  async (journalId: string, apc: string) => {
-    const journal = CatalogMap.toDomain({
-      journalId,
-      journalTitle: journalId,
-      id: journalId,
-      type: 'mock',
-      amount: Number.parseFloat(apc),
-    });
+Given(/^There is a Journal "([\w-]+)" with APC "([\d]+)"$/, async (journalId: string, apc: string) => {
+  const journal = CatalogMap.toDomain({
+    journalId,
+    journalTitle: journalId,
+    id: journalId,
+    type: 'mock',
+    amount: Number.parseFloat(apc),
+  });
 
-    if (journal.isLeft()) {
-      throw journal.value;
-    }
-
-    context.repos.catalog.addMockItem(journal.value);
+  if (journal.isLeft()) {
+    throw journal.value;
   }
-);
+
+  context.repos.catalog.addMockItem(journal.value);
+});
 
 Given(
   /^A "([\w\s]+)" with CustomId "([\w\d]+)" is submitted on journal "([\w-]+)"$/,
@@ -185,86 +179,65 @@ When(`The "Submission Submitted" event is triggered`, async () => {
   await Handler.handler(context as unknown as Context)(event);
 });
 
-Then(
-  /^The invoice for CustomId "([\w\d]+)" is created$/,
-  async (customId: string) => {
-    const invoiceIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
-      context.repos.manuscript,
-      context.repos.invoiceItem
-    );
+Then(/^The invoice for CustomId "([\w\d]+)" is created$/, async (customId: string) => {
+  const invoiceIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
+    context.repos.manuscript,
+    context.repos.invoiceItem
+  );
 
-    const maybeInvoiceId = await invoiceIdUsecase.execute(
-      { customId },
-      defaultUsecaseContext
-    );
+  const maybeInvoiceId = await invoiceIdUsecase.execute({ customId }, defaultUsecaseContext);
 
-    expect(maybeInvoiceId.isRight()).to.be.true;
-    expect(maybeInvoiceId.value).to.be.ok;
+  expect(maybeInvoiceId.isRight()).to.be.true;
+  expect(maybeInvoiceId.value).to.be.ok;
+});
+
+Then(/^The invoice for CustomId "([\w\d]+)" has price "([\d]+)"$/, async (customId: string, price: string) => {
+  const invoiceIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
+    context.repos.manuscript,
+    context.repos.invoiceItem
+  );
+  const invoiceUsecase = new GetInvoiceDetailsUsecase(context.repos.invoice);
+  const invoiceItemsUsecase = new GetItemsForInvoiceUsecase(
+    context.repos.invoiceItem,
+    context.repos.coupon,
+    context.repos.waiver
+  );
+
+  const maybeInvoiceId = await invoiceIdUsecase.execute({ customId }, defaultUsecaseContext);
+
+  if (maybeInvoiceId.isLeft()) {
+    throw maybeInvoiceId.value;
   }
-);
+  expect(maybeInvoiceId.isRight()).to.be.true;
 
-Then(
-  /^The invoice for CustomId "([\w\d]+)" has price "([\d]+)"$/,
-  async (customId: string, price: string) => {
-    const invoiceIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
-      context.repos.manuscript,
-      context.repos.invoiceItem
-    );
-    const invoiceUsecase = new GetInvoiceDetailsUsecase(context.repos.invoice);
-    const invoiceItemsUsecase = new GetItemsForInvoiceUsecase(
-      context.repos.invoiceItem,
-      context.repos.coupon,
-      context.repos.waiver
-    );
+  const invoiceId = maybeInvoiceId.value[0].id.toString();
 
-    const maybeInvoiceId = await invoiceIdUsecase.execute(
-      { customId },
-      defaultUsecaseContext
-    );
+  const maybeInvoice = await invoiceUsecase.execute({ invoiceId }, defaultUsecaseContext);
 
-    if (maybeInvoiceId.isLeft()) {
-      throw maybeInvoiceId.value;
-    }
-    expect(maybeInvoiceId.isRight()).to.be.true;
-
-    const invoiceId = maybeInvoiceId.value[0].id.toString();
-
-    const maybeInvoice = await invoiceUsecase.execute(
-      { invoiceId },
-      defaultUsecaseContext
-    );
-
-    if (maybeInvoice.isLeft()) {
-      throw maybeInvoice.value;
-    }
-    expect(maybeInvoice.isRight()).to.be.true;
-
-    const invoice = maybeInvoice.value;
-
-    const maybeInvoiceItems = await invoiceItemsUsecase.execute(
-      { invoiceId },
-      defaultUsecaseContext
-    );
-
-    if (maybeInvoiceItems.isLeft()) {
-      throw maybeInvoiceItems.value;
-    }
-    expect(maybeInvoiceItems.isRight()).to.be.true;
-
-    invoice.addItems(maybeInvoiceItems.value);
-
-    expect(invoice.invoiceTotal).to.equal(Number.parseFloat(price));
+  if (maybeInvoice.isLeft()) {
+    throw maybeInvoice.value;
   }
-);
+  expect(maybeInvoice.isRight()).to.be.true;
 
-Then(
-  /^The invoice for CustomId "([\w\d]+)" is not created$/,
-  async (customId: string) => {
-    const article = await context.repos.manuscript.findByCustomId(customId);
+  const invoice = maybeInvoice.value;
 
-    expect(article.isLeft()).to.be.true;
+  const maybeInvoiceItems = await invoiceItemsUsecase.execute({ invoiceId }, defaultUsecaseContext);
+
+  if (maybeInvoiceItems.isLeft()) {
+    throw maybeInvoiceItems.value;
   }
-);
+  expect(maybeInvoiceItems.isRight()).to.be.true;
+
+  invoice.addItems(maybeInvoiceItems.value);
+
+  expect(invoice.invoiceTotal).to.equal(Number.parseFloat(price));
+});
+
+Then(/^The invoice for CustomId "([\w\d]+)" is not created$/, async (customId: string) => {
+  const article = await context.repos.manuscript.findByCustomId(customId);
+
+  expect(article.isLeft()).to.be.true;
+});
 
 Given(
   /^A "([\w\s]+)" with CustomId "([\w\d]+)" is on "([\w-]+)"$/,
@@ -322,48 +295,33 @@ Given(
   }
 );
 
-Then(
-  /^The invoice for CustomId "([\w\d]+)" is deleted$/,
-  async (customId: string) => {
-    const index = context.repos.manuscript.deletedItems.findIndex(
-      (item) => item.customId === customId
-    );
+Then(/^The invoice for CustomId "([\w\d]+)" is deleted$/, async (customId: string) => {
+  const index = context.repos.manuscript.deletedItems.findIndex((item) => item.customId === customId);
+  expect(index).to.not.equal(-1);
+});
 
-    expect(index).to.not.equal(-1);
+Given(/^Article with CustomId "([\w\d]+)" is deleted$/, async (customId: string) => {
+  const usecase = new SoftDeleteDraftTransactionUsecase(
+    context.repos.transaction,
+    context.repos.invoiceItem,
+    context.repos.invoice,
+    context.repos.manuscript,
+    context.loggerBuilder.getLogger()
+  );
+
+  const maybeResult = await usecase.execute({ manuscriptId: customId }, defaultUsecaseContext);
+
+  if (maybeResult.isLeft()) {
+    throw maybeResult.value;
   }
-);
+});
 
-Given(
-  /^Article with CustomId "([\w\d]+)" is deleted$/,
-  async (customId: string) => {
-    const usecase = new SoftDeleteDraftTransactionUsecase(
-      context.repos.transaction,
-      context.repos.invoiceItem,
-      context.repos.invoice,
-      context.repos.manuscript,
-      context.loggerBuilder.getLogger()
-    );
-
-    const maybeResult = await usecase.execute(
-      { manuscriptId: customId },
-      defaultUsecaseContext
-    );
-
-    if (maybeResult.isLeft()) {
-      throw maybeResult.value;
-    }
-  }
-);
-
-Then(
-  /^The invoice for CustomId "([\w\d]+)" is restored$/,
-  async (customId: string) => {
-    expect(context.repos.invoiceItem.deletedItems.length).to.be.equal(0);
-    expect(context.repos.transaction.deletedItems.length).to.be.equal(0);
-    expect(context.repos.manuscript.deletedItems.length).to.be.equal(0);
-    expect(context.repos.invoice.deletedItems.length).to.be.equal(0);
-  }
-);
+Then(/^The invoice for CustomId "([\w\d]+)" is restored$/, async (customId: string) => {
+  expect(context.repos.invoiceItem.deletedItems.length).to.be.equal(0);
+  expect(context.repos.transaction.deletedItems.length).to.be.equal(0);
+  expect(context.repos.manuscript.deletedItems.length).to.be.equal(0);
+  expect(context.repos.invoice.deletedItems.length).to.be.equal(0);
+});
 
 Given(
   /^There is an editor for Journal "([\w-]+)" with email "([\w_.@]+)"$/,
@@ -398,12 +356,9 @@ Given('There is a waiver for editors', async () => {
   context.repos.waiver.addMockItem(waiver.value);
 });
 
-Given(
-  /^The corresponding author has email "([\w_.@]+)"$/,
-  async (email: string) => {
-    submittingManuscript.authorEmail = email;
-  }
-);
+Given(/^The corresponding author has email "([\w_.@]+)"$/, async (email: string) => {
+  submittingManuscript.authorEmail = email;
+});
 
 Then(
   /^The invoice for CustomId "([\w\d]+)" has "([\d]+)" waivers applied$/,
@@ -420,10 +375,7 @@ Then(
       context.repos.waiver
     );
 
-    const maybeInvoiceId = await invoiceIdUsecase.execute(
-      { customId },
-      defaultUsecaseContext
-    );
+    const maybeInvoiceId = await invoiceIdUsecase.execute({ customId }, defaultUsecaseContext);
 
     if (maybeInvoiceId.isLeft()) {
       throw maybeInvoiceId.value;
@@ -432,10 +384,7 @@ Then(
 
     const invoiceId = maybeInvoiceId.value[0].id.toString();
 
-    const maybeInvoiceItems = await invoiceItemsUsecase.execute(
-      { invoiceId },
-      defaultUsecaseContext
-    );
+    const maybeInvoiceItems = await invoiceItemsUsecase.execute({ invoiceId }, defaultUsecaseContext);
 
     if (maybeInvoiceItems.isLeft()) {
       throw maybeInvoiceItems.value;
@@ -448,90 +397,65 @@ Then(
   }
 );
 
-Then(
-  /^The invoice for CustomId "([\w\d]+)" remains in DRAFT state$/,
-  async (customId: string) => {
-    const invoiceIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
-      context.repos.manuscript,
-      context.repos.invoiceItem
-    );
-    const invoiceUsecase = new GetInvoiceDetailsUsecase(context.repos.invoice);
+Then(/^The invoice for CustomId "([\w\d]+)" remains in DRAFT state$/, async (customId: string) => {
+  const invoiceIdUsecase = new GetInvoiceIdByManuscriptCustomIdUsecase(
+    context.repos.manuscript,
+    context.repos.invoiceItem
+  );
+  const invoiceUsecase = new GetInvoiceDetailsUsecase(context.repos.invoice);
 
-    const maybeInvoiceId = await invoiceIdUsecase.execute(
-      { customId },
-      defaultUsecaseContext
-    );
+  const maybeInvoiceId = await invoiceIdUsecase.execute({ customId }, defaultUsecaseContext);
 
-    if (maybeInvoiceId.isLeft()) {
-      throw maybeInvoiceId.value;
-    }
-    expect(maybeInvoiceId.isRight()).to.be.true;
-
-    const invoiceId = maybeInvoiceId.value[0].id.toString();
-
-    const maybeInvoice = await invoiceUsecase.execute(
-      { invoiceId },
-      defaultUsecaseContext
-    );
-
-    if (maybeInvoice.isLeft()) {
-      throw maybeInvoice.value;
-    }
-    expect(maybeInvoice.isRight()).to.be.true;
-
-    const invoice = maybeInvoice.value;
-
-    expect(invoice.status).to.be.equal(InvoiceStatus.DRAFT);
+  if (maybeInvoiceId.isLeft()) {
+    throw maybeInvoiceId.value;
   }
-);
+  expect(maybeInvoiceId.isRight()).to.be.true;
 
-Given(
-  /^Invoice for article with CustomId "([\w\d]+)" has waiver applied$/,
-  async (customId: string) => {
-    const maybeManuscript = await context.repos.manuscript.findByCustomId(
-      customId
-    );
+  const invoiceId = maybeInvoiceId.value[0].id.toString();
 
-    if (maybeManuscript.isLeft()) {
-      throw maybeManuscript.value;
-    }
+  const maybeInvoice = await invoiceUsecase.execute({ invoiceId }, defaultUsecaseContext);
 
-    const manuscript = maybeManuscript.value;
-
-    const maybeItems =
-      await context.repos.invoiceItem.getInvoiceItemByManuscriptId(
-        manuscript.manuscriptId
-      );
-
-    if (maybeItems.isLeft()) {
-      throw maybeItems.value;
-    }
-
-    const item = maybeItems.value[0];
-
-    const maybeWaiver = await context.repos.waiver.getWaiverByType(
-      WaiverType.EDITOR_DISCOUNT
-    );
-
-    if (maybeWaiver.isLeft()) {
-      throw maybeWaiver.value;
-    }
-
-    const waiver = maybeWaiver.value;
-
-    context.repos.waiver.addMockWaiverForInvoiceItem(
-      waiver,
-      item.invoiceItemId
-    );
+  if (maybeInvoice.isLeft()) {
+    throw maybeInvoice.value;
   }
-);
+  expect(maybeInvoice.isRight()).to.be.true;
 
-Given(
-  /^There is an additional author with email "([\w_.@]+)"$/,
-  async (email: string) => {
-    additionalAuthors.push({
-      email,
-      isCorresponding: false,
-    });
+  const invoice = maybeInvoice.value;
+
+  expect(invoice.status).to.be.equal(InvoiceStatus.DRAFT);
+});
+
+Given(/^Invoice for article with CustomId "([\w\d]+)" has waiver applied$/, async (customId: string) => {
+  const maybeManuscript = await context.repos.manuscript.findByCustomId(customId);
+
+  if (maybeManuscript.isLeft()) {
+    throw maybeManuscript.value;
   }
-);
+
+  const manuscript = maybeManuscript.value;
+
+  const maybeItems = await context.repos.invoiceItem.getInvoiceItemByManuscriptId(manuscript.manuscriptId);
+
+  if (maybeItems.isLeft()) {
+    throw maybeItems.value;
+  }
+
+  const item = maybeItems.value[0];
+
+  const maybeWaiver = await context.repos.waiver.getWaiverByType(WaiverType.EDITOR_DISCOUNT);
+
+  if (maybeWaiver.isLeft()) {
+    throw maybeWaiver.value;
+  }
+
+  const waiver = maybeWaiver.value;
+
+  context.repos.waiver.addMockWaiverForInvoiceItem(waiver, item.invoiceItemId);
+});
+
+Given(/^There is an additional author with email "([\w_.@]+)"$/, async (email: string) => {
+  additionalAuthors.push({
+    email,
+    isCorresponding: false,
+  });
+});

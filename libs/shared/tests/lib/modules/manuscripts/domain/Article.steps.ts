@@ -19,19 +19,19 @@ Given('There is an Article Domain Entity', function () {
   return;
 });
 
-When(
-  /^The Article.create method is called for a given ID "([\w-]+)"$/,
-  function (testArticleId: string) {
-    const articleId = new UniqueEntityID(testArticleId);
-    maybeArticle = Article.create({ customId: 'custom-id' }, articleId);
-  }
-);
+When(/^The Article.create method is called for a given ID "([\w-]+)"$/, function (testArticleId: string) {
+  const articleId = new UniqueEntityID(testArticleId);
+  maybeArticle = Article.create({ customId: 'custom-id', taEligible: false, taFundingApproved: null }, articleId);
+});
 
 When(
   /^I try to mark as published an article with ID "([\w-]+)" on "([\w-]+)"$/,
   function (testArticleId: string, datePublished: string) {
     const articleId = new UniqueEntityID(testArticleId);
-    const maybeArticle = Article.create({ customId: 'custom-id' }, articleId);
+    const maybeArticle = Article.create(
+      { customId: 'custom-id', taEligible: false, taFundingApproved: null },
+      articleId
+    );
 
     if (maybeArticle.isLeft()) {
       throw maybeArticle.value;
@@ -41,19 +41,16 @@ When(
   }
 );
 
-Then(
-  /^A new Article is successfully created with ID "([\w-]+)"$/,
-  function (testArticleId: string) {
-    expect(maybeArticle.isRight()).to.equal(true);
+Then(/^A new Article is successfully created with ID "([\w-]+)"$/, function (testArticleId: string) {
+  expect(maybeArticle.isRight()).to.equal(true);
 
-    if (maybeArticle.isLeft()) {
-      throw maybeArticle.value;
-    }
-
-    article = maybeArticle.value;
-    expect(article.id.toValue()).to.equal(testArticleId);
+  if (maybeArticle.isLeft()) {
+    throw maybeArticle.value;
   }
-);
+
+  article = maybeArticle.value;
+  expect(article.id.toValue()).to.equal(testArticleId);
+});
 
 Then(
   /^The published date for the Article with ID "([\w-]+)" is successfully updated to "([\w-]+)"$/,

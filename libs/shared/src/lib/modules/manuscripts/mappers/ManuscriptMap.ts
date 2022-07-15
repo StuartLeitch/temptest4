@@ -20,6 +20,8 @@ export class ManuscriptMap extends Mapper<Manuscript> {
         datePublished: raw.datePublished,
         preprintValue: raw.preprintValue,
         journalId: raw.journalId,
+        taEligible: raw.taEligible,
+        taFundingApproved: raw.taFundingApproved,
       },
       new UniqueEntityID(raw.id)
     );
@@ -42,6 +44,8 @@ export class ManuscriptMap extends Mapper<Manuscript> {
       customId: manuscript.props.customId,
       datePublished: manuscript.props.datePublished,
       preprintValue: manuscript.props.preprintValue,
+      taEligible: manuscript.props.taEligible,
+      taFundingApproved: manuscript.props.taFundingApproved,
     };
   }
 }

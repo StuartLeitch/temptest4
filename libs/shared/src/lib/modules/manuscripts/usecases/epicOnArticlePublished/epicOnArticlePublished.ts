@@ -6,11 +6,7 @@ import { UseCase } from '../../../../core/domain/UseCase';
 
 // * Authorization Logic
 import type { UsecaseAuthorizationContext } from '../../../../domain/authorization';
-import {
-  AccessControlledUsecase,
-  AccessControlContext,
-  Authorize,
-} from '../../../../domain/authorization';
+import { AccessControlledUsecase, AccessControlContext, Authorize } from '../../../../domain/authorization';
 
 import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 import { InvoiceStatus } from '../../../invoices/domain/Invoice';
@@ -34,16 +30,13 @@ import { PayerRepoContract } from '../../../payers/repos/payerRepo';
 
 import { EmailService } from '../../../../infrastructure/communication-channels';
 import { VATService } from '../../../../domain/services/VATService';
-
 import { GetInvoiceIdByManuscriptCustomIdUsecase } from '../../../invoices/usecases/getInvoiceIdByManuscriptCustomId';
-import {
-  ConfirmInvoiceUsecase,
-  ConfirmInvoiceDTO,
-} from '../../../invoices/usecases/confirmInvoice';
+import { ConfirmInvoiceUsecase, ConfirmInvoiceDTO } from '../../../invoices/usecases/confirmInvoice';
 
 import { EpicOnArticlePublishedResponse as Response } from './epicOnArticlePublishedResponse';
 import type { EpicOnArticlePublishedDTO as DTO } from './epicOnArticlePublishedDTO';
 import * as Errors from './epicOnArticlePublishedErrors';
+import { TransactionStatus } from '../../../transactions/domain/Transaction';
 
 type Context = UsecaseAuthorizationContext;
 export class EpicOnArticlePublishedUsecase
@@ -71,12 +64,7 @@ export class EpicOnArticlePublishedUsecase
     let manuscript: Manuscript;
 
     const { manuscriptRepo, loggerService } = this;
-    const {
-      customId,
-      published,
-      sanctionedCountryNotificationReceiver,
-      sanctionedCountryNotificationSender,
-    } = request;
+    const { customId, published, sanctionedCountryNotificationReceiver, sanctionedCountryNotificationSender } = request;
 
     // * It should describe the business rules with minimal amount of implementation details.
 
@@ -87,14 +75,10 @@ export class EpicOnArticlePublishedUsecase
         manuscriptId: manuscriptId.id.toString(),
       });
       try {
-        const maybeManuscript = await manuscriptRepo.findByCustomId(
-          manuscriptId
-        );
+        const maybeManuscript = await manuscriptRepo.findByCustomId(manuscriptId);
 
         if (maybeManuscript.isLeft()) {
-          return left(
-            new UnexpectedError(new Error(maybeManuscript.value.message))
-          );
+          return left(new UnexpectedError(new Error(maybeManuscript.value.message)));
         }
 
         manuscript = maybeManuscript.value;
@@ -140,10 +124,7 @@ export class EpicOnArticlePublishedUsecase
     emailSender: string,
     context: Context
   ): Promise<Either<UnexpectedError, void>> {
-    const getInvoiceIds = new GetInvoiceIdByManuscriptCustomIdUsecase(
-      this.manuscriptRepo,
-      this.invoiceItemRepo
-    );
+    const getInvoiceIds = new GetInvoiceIdByManuscriptCustomIdUsecase(this.manuscriptRepo, this.invoiceItemRepo);
 
     this.loggerService.info('Find Invoice Ids by Manuscript Id', {
       manuscriptId: manuscript.id.toString(),
@@ -157,9 +138,7 @@ export class EpicOnArticlePublishedUsecase
     );
 
     if (maybeInvoiceIds.isLeft()) {
-      return left(
-        new UnexpectedError(new Error(maybeInvoiceIds.value.message))
-      );
+      return left(new UnexpectedError(new Error(maybeInvoiceIds.value.message)));
     }
 
     const invoiceIds = maybeInvoiceIds.value;
@@ -177,6 +156,26 @@ export class EpicOnArticlePublishedUsecase
 
       const invoice = maybeInvoice.value;
 
+      // look for corresponding transaction and check for status
+      const maybeTransaction = await this.transactionRepo.getTransactionById(invoice.transactionId);
+
+      if (maybeTransaction.isLeft()) {
+        return left(new UnexpectedError(new Error(maybeTransaction.value.message)));
+      }
+
+      const transaction = maybeTransaction.value;
+
+      if (transaction.status === TransactionStatus.DRAFT) {
+        transaction.markAsActive();
+        await this.transactionRepo.update(transaction);
+      }
+
+      // verify if dateAccepted is set on Invoice, if not add it
+      if (invoice.dateAccepted == null) {
+        invoice.dateAccepted = manuscript.datePublished ? new Date(manuscript.datePublished) : new Date();
+        await this.invoiceRepo.update(invoice);
+      }
+
       if (invoice.status === InvoiceStatus.DRAFT) {
         if (typeof manuscript.authorCountry === 'undefined') {
           this.loggerService.info('sendEmail', {
@@ -186,12 +185,7 @@ export class EpicOnArticlePublishedUsecase
             sanctionedCountryNotificationSender: emailSender,
           });
           this.emailService
-            .autoConfirmMissingCountryNotification(
-              invoice,
-              manuscript,
-              emailReceiver,
-              emailSender
-            )
+            .autoConfirmMissingCountryNotification(invoice, manuscript, emailReceiver, emailSender)
             .sendEmail();
         }
 
@@ -200,9 +194,7 @@ export class EpicOnArticlePublishedUsecase
         });
 
         if (maybeNewAddress.isLeft()) {
-          return left(
-            new UnexpectedError(new Error(maybeNewAddress.value.message))
-          );
+          return left(new UnexpectedError(new Error(maybeNewAddress.value.message)));
         }
 
         const newAddress = maybeNewAddress.value;
@@ -218,9 +210,7 @@ export class EpicOnArticlePublishedUsecase
         });
 
         if (maybeNewPayer.isLeft()) {
-          return left(
-            new UnexpectedError(new Error(maybeNewPayer.value.message))
-          );
+          return left(new UnexpectedError(new Error(maybeNewPayer.value.message)));
         }
 
         const newPayer = maybeNewPayer.value;
@@ -252,17 +242,12 @@ export class EpicOnArticlePublishedUsecase
 
         // * Confirm the invoice automagically
         try {
-          const resp = await confirmInvoiceUsecase.execute(
-            confirmInvoiceArgs,
-            context
-          );
+          const resp = await confirmInvoiceUsecase.execute(confirmInvoiceArgs, context);
           if (resp.isLeft()) {
             return left(
               new UnexpectedError(
                 new Error(
-                  `While auto-confirming on article published an error ocurred: ${JSON.stringify(
-                    resp.value.message
-                  )}`
+                  `While auto-confirming on article published an error ocurred: ${JSON.stringify(resp.value.message)}`
                 )
               )
             );

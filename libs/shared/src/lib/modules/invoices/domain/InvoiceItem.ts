@@ -167,6 +167,11 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     return (totalDiscount * this.price) / 100;
   }
 
+  public calculateTADiscountedPrice(discount: number): number {
+    const discountSum = this.price * (discount / 100);
+    return this.price - discountSum;
+  }
+
   public calculateVat(withAdditionalReductions?: Reduction<unknown>[]): number {
     const net = this.calculateNetPrice(withAdditionalReductions);
 

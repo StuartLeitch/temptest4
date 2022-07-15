@@ -9,12 +9,14 @@ import { Manuscript } from '../../domain/Manuscript';
 import { Article } from '../../domain/Article';
 
 import { ArticleRepoContract } from '../articleRepo';
+import {TABLES} from "@hindawi/shared";
 
 type PhenomManuscript = Article | Manuscript;
 
 export class MockArticleRepo
   extends BaseMockRepo<PhenomManuscript>
-  implements ArticleRepoContract {
+  implements ArticleRepoContract
+{
   deletedItems: Manuscript[] = [];
 
   constructor() {
@@ -31,6 +33,18 @@ export class MockArticleRepo
     }
 
     return right(match);
+  }
+
+  async updateManuscriptTAEligibility(manuscriptId: ManuscriptId, isEligible: boolean): Promise<Either<GuardFailure | RepoError, Manuscript>>{
+    const index = this._items.findIndex((item) => item.id === manuscriptId.id);
+    this._items[index].taEligible = isEligible;
+    return right(this._items[index]);
+  }
+
+  async updateManuscriptTAApproval(manuscriptId: ManuscriptId, isApproved: boolean): Promise<Either<GuardFailure | RepoError, Manuscript>>{
+    const index = this._items.findIndex((item) => item.id === manuscriptId.id);
+    this._items[index].taFundingApproved = isApproved;
+    return right(this._items[index]);
   }
 
   public async findByCustomId(

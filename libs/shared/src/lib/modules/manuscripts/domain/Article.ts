@@ -20,6 +20,8 @@ interface ArticleProps {
   preprintValue?: string;
   journalTitle?: string;
   is_cascaded?: number;
+  taEligible: boolean;
+  taFundingApproved: boolean | null;
 }
 
 export class Article extends AggregateRoot<ArticleProps> {
@@ -131,14 +133,27 @@ export class Article extends AggregateRoot<ArticleProps> {
     this.props.is_cascaded = isCascaded;
   }
 
+  get taEligible(): boolean {
+    return this.props.taEligible;
+  }
+
+  set taEligible(taEligible: boolean) {
+    this.props.taEligible = taEligible;
+  }
+
+  get taFundingApproved(): boolean {
+    return this.props.taFundingApproved;
+  }
+
+  set taFundingApproved(taFundingApproved: boolean) {
+    this.props.taFundingApproved = taFundingApproved;
+  }
+
   private constructor(props: ArticleProps, id?: UniqueEntityID) {
     super(props, id);
   }
 
-  public static create(
-    props: ArticleProps,
-    id?: UniqueEntityID
-  ): Either<GuardFailure, Article> {
+  public static create(props: ArticleProps, id?: UniqueEntityID): Either<GuardFailure, Article> {
     const article = new Article(
       {
         ...props,

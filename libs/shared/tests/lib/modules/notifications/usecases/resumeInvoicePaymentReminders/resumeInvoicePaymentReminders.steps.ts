@@ -168,7 +168,6 @@ Given(/^the invoice with the id "([\w-]+)"/, async (testInvoiceId: string) => {
 
   const maybeCatalog = CatalogMap.toDomain({
     publisherId: publisher.publisherId.id.toString(),
-    isActive: true,
     journalId: 'testingJournal',
   });
 

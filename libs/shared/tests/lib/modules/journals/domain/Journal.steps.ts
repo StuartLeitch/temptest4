@@ -44,7 +44,6 @@ When(
         articleProcessingCharge: articleProcessingCharge,
         code: 'journal-code',
         issn: 'journal-issn',
-        isActive: false,
       },
       journalId
     );

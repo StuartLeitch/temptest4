@@ -8,5 +8,4 @@ export interface AddCatalogItemToCatalogUseCaseDTO {
   code?: string;
   created?: string;
   updated?: string;
-  isActive?: boolean;
 }

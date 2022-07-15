@@ -17,14 +17,13 @@ export class CatalogMap extends Mapper<CatalogItem> {
         created: raw.created ? new Date(raw.created) : null,
         updated: raw.updated ? new Date(raw.updated) : null,
         currency: raw.currency,
-        isActive: !!raw.isActive,
         journalTitle: raw.journalTitle,
         publisherId: raw.publisherId
           ? PublisherId.create(new UniqueEntityID(raw.publisherId))
           : null,
         issn: raw.issn,
         code: raw.code,
-        zeroPriced: raw.zeroPriced
+        zeroPriced: raw.zeroPriced,
       },
       new UniqueEntityID(raw.id)
     );
@@ -38,13 +37,12 @@ export class CatalogMap extends Mapper<CatalogItem> {
       journalId: catalogItem.journalId.id.toString(),
       created: catalogItem.created,
       updated: catalogItem.updated,
-      isActive: catalogItem.isActive ? 1 : 0,
       currency: catalogItem.currency,
       journalTitle: catalogItem.journalTitle,
       publisherId: catalogItem.publisherId.id.toString(),
       issn: catalogItem.issn,
       code: catalogItem.code,
-      zeroPriced: catalogItem.isZeroPriced
+      zeroPriced: catalogItem.isZeroPriced,
     };
   }
 }

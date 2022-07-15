@@ -6,11 +6,7 @@ import { right, left } from '../../../../core/logic/Either';
 import { UseCase } from '../../../../core/domain/UseCase';
 
 import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
-import {
-  AccessControlledUsecase,
-  AccessControlContext,
-  Authorize,
-} from '../../../../domain/authorization';
+import { AccessControlledUsecase, AccessControlContext, Authorize } from '../../../../domain/authorization';
 
 import { EmailService } from '../../../../infrastructure/communication-channels';
 import { WaiverService } from '../../../../domain/services/WaiverService';
@@ -18,8 +14,6 @@ import { LoggerContract } from '../../../../infrastructure/logging';
 import { VATService } from '../../../../domain/services/VATService';
 
 import { ManuscriptId } from './../../../manuscripts/domain/ManuscriptId';
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { CatalogItem } from '../../../journals/domain/CatalogItem';
 import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
 import { JournalId } from '../../../journals/domain/JournalId';
 import { Invoice } from '../../../invoices/domain/Invoice';
@@ -40,20 +34,27 @@ import { CouponRepoContract } from '../../../coupons/repos';
 import { WaiverRepoContract } from '../../../waivers/repos';
 
 import { GetItemsForInvoiceUsecase } from '../../../invoices/usecases/getItemsForInvoice/getItemsForInvoice';
-import {
-  ConfirmInvoiceUsecase,
-  ConfirmInvoiceDTO,
-} from '../../../invoices/usecases/confirmInvoice';
+import { ConfirmInvoiceUsecase, ConfirmInvoiceDTO } from '../../../invoices/usecases/confirmInvoice';
 
 // * Usecase specifics
 import { UpdateTransactionOnAcceptManuscriptResponse as Response } from './updateTransactionOnAcceptManuscriptResponse';
-import type { UpdateTransactionOnAcceptManuscriptDTO as DTO } from './updateTransactionOnAcceptManuscriptDTO';
+import type {
+  UpdateTransactionOnAcceptManuscriptDTO,
+  UpdateTransactionOnAcceptManuscriptDTO as DTO,
+} from './updateTransactionOnAcceptManuscriptDTO';
 import * as Errors from './updateTransactionOnAcceptManuscriptErrors';
+import { VError } from 'verror';
+import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails';
+import { Manuscript } from '../../../manuscripts/domain/Manuscript';
 
 export class UpdateTransactionOnAcceptManuscriptUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context>
 {
+  private invoiceDetailsUsecase: GetInvoiceDetailsUsecase;
+  private invoiceItemsUsecase: GetItemsForInvoiceUsecase;
+  private confirmInvoiceUsecase: ConfirmInvoiceUsecase;
+
   constructor(
     private addressRepo: AddressRepoContract,
     private catalogRepo: CatalogRepoContract,
@@ -62,178 +63,54 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
     private invoiceRepo: InvoiceRepoContract,
     private articleRepo: ArticleRepoContract,
     private waiverRepo: WaiverRepoContract,
+    private waiverService: WaiverService,
     private payerRepo: PayerRepoContract,
     private couponRepo: CouponRepoContract,
-    private waiverService: WaiverService,
     private emailService: EmailService,
     private vatService: VATService,
-    private loggerService: LoggerContract
+    private logger: LoggerContract
   ) {
     super();
+
+    this.invoiceDetailsUsecase = new GetInvoiceDetailsUsecase(this.invoiceRepo);
+    this.invoiceItemsUsecase = new GetItemsForInvoiceUsecase(this.invoiceItemRepo, this.couponRepo, this.waiverRepo);
+
+    this.confirmInvoiceUsecase = new ConfirmInvoiceUsecase(
+      this.invoiceItemRepo,
+      this.transactionRepo,
+      this.addressRepo,
+      this.invoiceRepo,
+      this.couponRepo,
+      this.waiverRepo,
+      this.payerRepo,
+      this.logger,
+      this.vatService
+    );
   }
 
   @Authorize('transaction:update')
   public async execute(request: DTO, context?: Context): Promise<Response> {
-    let transaction: Transaction;
-    let invoice: Invoice;
-    let invoiceItem: InvoiceItem;
-    let manuscript: Manuscript;
-    let catalogItem: CatalogItem;
-
-    // * get a proper ManuscriptId
-    const manuscriptId = ManuscriptId.create(
-      new UniqueEntityID(request.manuscriptId)
-    );
-
-    const {
-      sanctionedCountryNotificationReceiver,
-      sanctionedCountryNotificationSender,
-    } = request;
-
     try {
-      try {
-        // * System identifies manuscript by Id
-        const maybeManuscript = await this.articleRepo.findById(manuscriptId);
+      const { sanctionedCountryNotificationReceiver, sanctionedCountryNotificationSender } = request;
 
-        if (maybeManuscript.isLeft()) {
-          return left(
-            new UnexpectedError(new Error(maybeManuscript.value.message))
-          );
-        }
-
-        manuscript = maybeManuscript.value;
-      } catch (err) {
-        return left(new Errors.ManuscriptNotFoundError(request.manuscriptId));
-      }
-
-      try {
-        // * System identifies invoice item by manuscript Id
-        const maybeInvoiceItem =
-          await this.invoiceItemRepo.getInvoiceItemByManuscriptId(manuscriptId);
-
-        if (maybeInvoiceItem.isLeft()) {
-          return left(
-            new UnexpectedError(new Error(maybeInvoiceItem.value.message))
-          );
-        }
-
-        invoiceItem = maybeInvoiceItem.value[0];
-      } catch (err) {
-        return left(new Errors.InvoiceItemNotFoundError(request.manuscriptId));
-      }
-
-      try {
-        // * System identifies invoice by invoice item Id
-        const maybeInvoice = await this.invoiceRepo.getInvoiceById(
-          invoiceItem.invoiceId
-        );
-
-        if (maybeInvoice.isLeft()) {
-          return left(
-            new UnexpectedError(new Error(maybeInvoice.value.message))
-          );
-        }
-
-        invoice = maybeInvoice.value;
-      } catch (err) {
-        return left(
-          new Errors.InvoiceNotFoundError(invoiceItem.invoiceId.id.toString())
-        );
-      }
-
+      const manuscript = await this.getManuscriptDetails(request);
+      const invoiceItem = await this.getInvoiceItems(manuscript, request);
+      const catalogItem = await this.getJournal(manuscript);
+      const invoice = await this.getInvoiceDetails(invoiceItem, context);
+      const transaction = await this.getTransaction(invoice);
+      //TODO maybe we should add a mapper which returns a populated invoice
       invoice.addInvoiceItem(invoiceItem);
 
-      try {
-        // * System looks-up the transaction
-        const maybeTransaction = await this.transactionRepo.getTransactionById(
-          invoice.transactionId
-        );
-
-        if (maybeTransaction.isLeft()) {
-          return left(
-            new UnexpectedError(new Error(maybeTransaction.value.message))
-          );
-        }
-
-        transaction = maybeTransaction.value;
-      } catch (err) {
-        return left(
-          new Errors.TransactionNotFoundError(invoice.invoiceId.id.toString())
-        );
-      }
-
-      try {
-        // * System looks-up the catalog item for the manuscript
-        const maybeCatalogItem =
-          await this.catalogRepo.getCatalogItemByJournalId(
-            JournalId.create(new UniqueEntityID(manuscript.journalId))
-          );
-
-        if (maybeCatalogItem.isLeft()) {
-          return left(
-            new UnexpectedError(new Error(maybeCatalogItem.value.message))
-          );
-        }
-
-        catalogItem = maybeCatalogItem.value;
-      } catch (err) {
-        return left(new Errors.CatalogItemNotFoundError(manuscript.journalId));
-      }
-
       // * Mark transaction as ACTIVE
-      transaction.markAsActive();
+      await this.activateTransaction(transaction);
 
-      // * get author details
-      manuscript.authorFirstName = request?.correspondingAuthorFirstName;
-      manuscript.authorCountry = request?.correspondingAuthorCountry;
-      manuscript.authorSurname = request?.correspondingAuthorSurname;
-      manuscript.articleType = request?.articleType;
-      manuscript.authorEmail = request?.correspondingAuthorEmail;
-      manuscript.customId = request?.customId;
-      manuscript.title = request?.title;
+      await this.calculateWaivers(invoiceItem, invoice, request, manuscript);
 
-      // * Identify applicable waiver
-      try {
-        await this.waiverRepo.removeInvoiceItemWaivers(
-          invoiceItem.invoiceItemId
-        );
-        await this.waiverService.applyWaiver({
-          invoiceId: invoice.invoiceId.id.toString(),
-          allAuthorsEmails: request.authorsEmails,
-          country: manuscript.authorCountry,
-          journalId: manuscript.journalId,
-        });
-      } catch (error) {
-        return left(
-          new UnexpectedError(
-            new Error(
-              `Failed to save waiver due to error: ${error.message}: ${error.stack}`
-            )
-          )
-        );
-      }
-
-      await this.transactionRepo.update(transaction);
-      await this.articleRepo.update(manuscript);
-
-      invoice.dateAccepted = request.acceptanceDate
-        ? new Date(request.acceptanceDate)
-        : new Date();
-
-      await this.invoiceRepo.update(invoice);
-
+      await this.updateInvoiceDateAccepted(invoice, request);
       invoice.generateCreatedEvent();
       DomainEvents.dispatchEventsForAggregate(invoice.id);
 
-      const invoiceItemsUsecase = new GetItemsForInvoiceUsecase(
-        this.invoiceItemRepo,
-        this.couponRepo,
-        this.waiverRepo
-      );
-      const itemsWithReductions = await invoiceItemsUsecase.execute(
-        { invoiceId: invoice.id.toString() },
-        context
-      );
+      const itemsWithReductions = await this.invoiceItemsUsecase.execute({ invoiceId: invoice.id.toString() }, context);
 
       if (itemsWithReductions.isLeft()) {
         return itemsWithReductions.map(() => null);
@@ -245,27 +122,13 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (total <= 0) {
         // * but we can auto-confirm it
-        const confirmInvoiceUsecase = new ConfirmInvoiceUsecase(
-          this.invoiceItemRepo,
-          this.transactionRepo,
-          this.addressRepo,
-          this.invoiceRepo,
-          this.couponRepo,
-          this.waiverRepo,
-          this.payerRepo,
-          this.loggerService,
-          this.vatService
-        );
-
         // * create new address
         const maybeNewAddress = AddressMap.toDomain({
           country: manuscript.authorCountry,
         });
 
         if (maybeNewAddress.isLeft()) {
-          return left(
-            new UnexpectedError(new Error(maybeNewAddress.value.message))
-          );
+          return left(new UnexpectedError(new Error(maybeNewAddress.value.message)));
         }
 
         // * create new payer
@@ -279,9 +142,7 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
         });
 
         if (maybeNewPayer.isLeft()) {
-          return left(
-            new UnexpectedError(new Error(maybeNewPayer.value.message))
-          );
+          return left(new UnexpectedError(new Error(maybeNewPayer.value.message)));
         }
 
         const confirmInvoiceArgs: ConfirmInvoiceDTO = {
@@ -295,17 +156,13 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
 
         // * Confirm the invoice automagically
         try {
-          const maybeConfirmed = await confirmInvoiceUsecase.execute(
-            confirmInvoiceArgs,
-            context
-          );
+          const maybeConfirmed = await this.confirmInvoiceUsecase.execute(confirmInvoiceArgs, context);
           if (maybeConfirmed.isLeft()) {
             return maybeConfirmed.map(() => null);
           }
         } catch (err) {
           return left(new UnexpectedError(err));
         }
-
         return right(null);
       }
 
@@ -323,8 +180,138 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
 
       return right(null);
     } catch (err) {
-      console.error(err);
-      return left(new UnexpectedError(err));
+      const vError = new VError(err, 'Exception while handling submission on peer review cycle check');
+      this.logger.error(err.message, err);
+      return left(vError);
+    }
+  }
+
+  private async updateInvoiceDateAccepted(invoice: Invoice, request: UpdateTransactionOnAcceptManuscriptDTO) {
+    invoice.dateAccepted = request.acceptanceDate ? new Date(request.acceptanceDate) : new Date();
+
+    await this.invoiceRepo.update(invoice);
+  }
+
+  private async activateTransaction(transaction: Transaction) {
+    transaction.markAsActive();
+    await this.transactionRepo.update(transaction);
+  }
+
+  private async getTransaction(invoice: Invoice) {
+    try {
+      // * System looks-up the transaction
+      const maybeTransaction = await this.transactionRepo.getTransactionById(invoice.transactionId);
+
+      if (maybeTransaction.isLeft()) {
+        this.logger.error(maybeTransaction.value.message, maybeTransaction.value);
+        throw maybeTransaction.value;
+      }
+
+      return maybeTransaction.value;
+    } catch (err) {
+      const transactionNotFoundError = new Errors.TransactionNotFoundError(invoice.invoiceId.id.toString());
+      throw new VError(
+        transactionNotFoundError,
+        'Original error %s, %s',
+        err.message,
+        transactionNotFoundError.message
+      );
+    }
+  }
+
+  private async getJournal(manuscriptDetails) {
+    try {
+      // * System looks-up the catalog item for the manuscript
+      const maybeCatalogItem = await this.catalogRepo.getCatalogItemByJournalId(
+        JournalId.create(new UniqueEntityID(manuscriptDetails.journalId))
+      );
+
+      if (maybeCatalogItem.isLeft()) {
+        this.logger.error(maybeCatalogItem.value.message, maybeCatalogItem.value);
+        throw maybeCatalogItem.value;
+      }
+
+      return maybeCatalogItem.value;
+    } catch (err) {
+      const catalogItemNotFound = new Errors.CatalogItemNotFoundError(manuscriptDetails.invoiceId);
+      throw new VError(catalogItemNotFound, 'Original error %s, %s', err.message, catalogItemNotFound.message);
+    }
+  }
+
+  private async getInvoiceDetails(invoiceItem: InvoiceItem, context) {
+    try {
+      const maybeInvoiceDetails = await this.invoiceDetailsUsecase.execute(
+        { invoiceId: invoiceItem.invoiceId.id.toString() },
+        context
+      );
+      if (maybeInvoiceDetails.isLeft()) {
+        this.logger.error(maybeInvoiceDetails.value.message, maybeInvoiceDetails.value);
+        throw maybeInvoiceDetails.value;
+      }
+
+      return maybeInvoiceDetails.value;
+    } catch (err) {
+      const invoiceNotFoundError = new Errors.InvoiceNotFoundError(invoiceItem.invoiceId.id.toString());
+      throw new VError(invoiceNotFoundError, 'Original error %s, %s', err.message, invoiceNotFoundError.message);
+    }
+  }
+
+  private async getInvoiceItems(manuscriptDetails, request) {
+    // * System identifies invoice item by manuscript Id
+    try {
+      const maybeInvoiceItem = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(manuscriptDetails.manuscriptId);
+
+      if (maybeInvoiceItem.isLeft()) {
+        this.logger.error(maybeInvoiceItem.value.message, maybeInvoiceItem.value);
+        throw maybeInvoiceItem.value;
+      }
+      return maybeInvoiceItem.value[0];
+    } catch (err) {
+      const invoiceItemNotFoundError = new Errors.InvoiceItemNotFoundError(request.invoiceId);
+      throw new VError(
+        invoiceItemNotFoundError,
+        'Original error %s, %s',
+        err.message,
+        invoiceItemNotFoundError.message
+      );
+    }
+  }
+
+  private async getManuscriptDetails(request) {
+    try {
+      const manuscriptId = ManuscriptId.create(new UniqueEntityID(request.manuscriptId));
+      // * System identifies manuscript by Id
+      const maybeManuscript = await this.articleRepo.findById(manuscriptId);
+
+      if (maybeManuscript.isLeft()) {
+        this.logger.error(maybeManuscript.value.message, maybeManuscript.value);
+        throw maybeManuscript.value;
+      }
+
+      return maybeManuscript.value;
+    } catch (err) {
+      const manuscriptNotFoundError = new Errors.ManuscriptNotFoundError(request.invoiceId);
+      throw new VError(manuscriptNotFoundError, 'Original error %s, %s', err.message, manuscriptNotFoundError.message);
+    }
+  }
+  private async calculateWaivers(
+    invoiceItem: InvoiceItem,
+    invoice: Invoice,
+    request: UpdateTransactionOnAcceptManuscriptDTO,
+    manuscript: Manuscript
+  ) {
+    try {
+      await this.waiverRepo.removeInvoiceItemWaivers(invoiceItem.invoiceItemId);
+      await this.waiverService.applyWaiver({
+        invoiceId: invoice.invoiceId.id.toString(),
+        allAuthorsEmails: request.authorsEmails,
+        country: manuscript.authorCountry,
+        journalId: manuscript.journalId,
+      });
+    } catch (error) {
+      return left(
+        new UnexpectedError(new Error(`Failed to save waiver due to error: ${error.message}: ${error.stack}`))
+      );
     }
   }
 }

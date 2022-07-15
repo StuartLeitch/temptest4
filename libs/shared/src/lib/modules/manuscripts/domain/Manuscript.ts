@@ -19,6 +19,8 @@ interface ManuscriptProps {
   datePublished?: Date;
   preprintValue?: string;
   is_cascaded?: number;
+  taEligible: boolean;
+  taFundingApproved: boolean | null;
 }
 
 export class Manuscript extends AggregateRoot<ManuscriptProps> {
@@ -122,14 +124,27 @@ export class Manuscript extends AggregateRoot<ManuscriptProps> {
     this.props.is_cascaded = isCascaded;
   }
 
+  get taEligible(): boolean {
+    return this.props.taEligible;
+  }
+
+  set taEligible(taEligible: boolean) {
+    this.props.taEligible = taEligible;
+  }
+
+  get taFundingApproved(): boolean {
+    return this.props.taFundingApproved;
+  }
+
+  set taFundingApproved(taFundingApproved: boolean) {
+    this.props.taFundingApproved = taFundingApproved;
+  }
+
   private constructor(props: ManuscriptProps, id?: UniqueEntityID) {
     super(props, id);
   }
 
-  public static create(
-    props: ManuscriptProps,
-    id?: UniqueEntityID
-  ): Either<GuardFailure, Manuscript> {
+  public static create(props: ManuscriptProps, id?: UniqueEntityID): Either<GuardFailure, Manuscript> {
     const manuscript = new Manuscript(
       {
         ...props,

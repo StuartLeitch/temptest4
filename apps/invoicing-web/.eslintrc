@@ -242,5 +242,8 @@
     "no-useless-constructor": "off",
     "@typescript-eslint/no-useless-constructor": "warn"
   },
-  "extends": ["../../.eslintrc"]
+  "extends": [
+    "prettier",
+    "../../.eslintrc"
+  ]
 }

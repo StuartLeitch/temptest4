@@ -192,6 +192,27 @@ export class MockInvoiceRepo
     return right(cloneDeep(invoice));
   }
 
+  public async updateAcceptedDate(
+    invoice: Invoice,
+    acceptedDate: Date
+  ): Promise<Either<GuardFailure | RepoError, Invoice>> {
+    const maybeAlreadyExists = await this.exists(invoice);
+
+    if (maybeAlreadyExists.isLeft()) {
+      return left(
+        RepoError.fromDBError(new Error(maybeAlreadyExists.value.message))
+      );
+    }
+
+    const alreadyExists = maybeAlreadyExists.value;
+
+    if (alreadyExists) {
+      invoice.dateAccepted = acceptedDate;
+      await this.save(invoice);
+    }
+
+    return right(invoice);
+  }
   public async update(
     invoice: Invoice
   ): Promise<Either<GuardFailure | RepoError, Invoice>> {

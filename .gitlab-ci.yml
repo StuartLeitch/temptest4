@@ -388,6 +388,7 @@ Deploy:automation-invoicing:
   stage: deploy-invoicing
   tags:
     - 'cluster:hindawi-dev'
+  # WIP: To remove when this is all done:
   dependencies:
     - Package Images:dev
   <<: *script_deploy
