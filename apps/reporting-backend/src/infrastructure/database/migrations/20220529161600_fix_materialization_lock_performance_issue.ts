@@ -292,7 +292,6 @@ WITH NO DATA;
 CREATE INDEX a11_manuscript_users_email_idx ON public.manuscript_users USING btree (email);
 CREATE INDEX a11_manuscript_users_journal_name_idx ON public.manuscript_users USING btree (journal_name);
 CREATE INDEX a11_manuscript_users_manuscript_custom_id_idx ON public.manuscript_users USING btree (manuscript_custom_id);
-CREATE UNIQUE INDEX a11_manuscript_users_manuscript_custom_id_unique_idx ON public.manuscript_users USING btree (manuscript_custom_id, email, given_names, surname, status, role);
 CREATE INDEX a11_manuscript_users_manuscript_version_id_idx ON public.manuscript_users USING btree (manuscript_version_id);
 CREATE INDEX a11_manuscript_users_role_idx ON public.manuscript_users USING btree (role);
 CREATE INDEX a11_manuscript_users_special_issue_custom_id_idx ON public.manuscript_users USING btree (special_issue_custom_id);
@@ -607,7 +606,7 @@ BEGIN
 	commit;
 
 	vStartTime = clock_timestamp();
-	refresh materialized view concurrently public.manuscript_users;
+	refresh materialized view public.manuscript_users;
 	call public.sp_log(vRefreshId, clock_timestamp(), 'manuscript_users', clock_timestamp() - vStartTime);
 	commit;
 
@@ -646,10 +645,10 @@ export async function up(knex: Knex): Promise<any> {
 	  knex.raw(index_mvs_for_concurrent_refresh),
 	  
 	  knex.raw(grant_permissions),
-	  
-	  knex.raw(refresh_updated_materialized_views_for_first_time),
 
 	  knex.raw(refresh_all_materialized_views),
+
+	  knex.raw(refresh_updated_materialized_views_for_first_time),
 	  
 	]);
   }
