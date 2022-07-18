@@ -41,7 +41,7 @@ const Charges: React.FC<Props> = ({ invoiceItem, ...rest }: any) => {
       "{Vat/Rate}",
       `${FormatUtils.formatPrice(((vat / 100) * finalPrice) / rate)}`,
     )
-    .replace("{Rate}", rate);
+    .replace("{Rate}", rate.toFixed(2));
 
   let waiverItems;
   const totalDiscountFromWaivers = waivers.reduce(
@@ -49,7 +49,7 @@ const Charges: React.FC<Props> = ({ invoiceItem, ...rest }: any) => {
     0,
   );
   if (waivers && waivers.length > 0) {
-    waiverItems = invoiceItem.waivers.map(waiver => (
+    waiverItems = invoiceItem.waivers.map((waiver) => (
       <ChargeItem
         key={waiver.type_id}
         price={-(waiver.reduction * invoiceItem.price) / 100}
@@ -63,7 +63,7 @@ const Charges: React.FC<Props> = ({ invoiceItem, ...rest }: any) => {
         <ChargeItem
           key={"100%"}
           price={-invoiceItem.price}
-          name={"Waivers: " + waivers.map(w => w.type_id).join(", ")}
+          name={"Waivers: " + waivers.map((w) => w.type_id).join(", ")}
           description={`-100%`}
           mt="2"
         />,
@@ -84,7 +84,7 @@ const Charges: React.FC<Props> = ({ invoiceItem, ...rest }: any) => {
       />
       {waiverItems}
       {invoiceItem.coupons &&
-        invoiceItem.coupons.map(coupon => (
+        invoiceItem.coupons.map((coupon) => (
           <ChargeItem
             key={coupon.code}
             price={-(coupon.reduction * invoiceItem.price) / 100}

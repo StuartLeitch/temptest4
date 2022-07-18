@@ -394,7 +394,7 @@ export const invoice: Resolvers<Context> = {
         vatnote = getVatNoteResult.value;
       }
 
-      return { ...rawItem, rate: Math.round(rate * 10000) / 10000, vatnote };
+      return { ...rawItem, rate, vatnote };
     },
     async payment(parent: Invoice, args, context) {
       const roles = getOptionalAuthRoles(context);

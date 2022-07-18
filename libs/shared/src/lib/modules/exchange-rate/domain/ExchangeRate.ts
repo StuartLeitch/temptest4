@@ -23,7 +23,7 @@ export class ExchangeRate extends ValueObject<ExchangeRateProps> {
   }
 
   get exchangeRate(): number {
-    return this.props.rate;
+    return Number.parseFloat(this.props.rate.toFixed(2));
   }
 
   get fromCurrency(): Currency {
