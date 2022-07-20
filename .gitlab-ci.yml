@@ -333,7 +333,7 @@ Trigger Acceptance Tests:
         if [ "$CI_COMMIT_REF_NAME" != "develop" ]; then
           export AFFECTED_APPS=$(cat .ci_status/affected_apps)      
         fi
-    - echo AFFECTED_APPS
+    - echo $AFFECTED_APPS
     - ./tools/scripts/deploy-ci.sh
   artifacts:
     paths:
