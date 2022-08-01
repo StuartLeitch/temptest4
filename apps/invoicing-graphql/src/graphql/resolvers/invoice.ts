@@ -283,8 +283,13 @@ export const invoice: Resolvers<Context> = {
 
       const invoiceDetails = result.value;
 
+      const exchangeDate =
+        invoiceDetails.dateIssued || invoiceDetails.dateCreated
+          ? new Date(invoiceDetails.dateIssued || invoiceDetails.dateCreated)
+          : null;
+
       const exchangeRate = await exchangeRateService.getExchangeRate(
-        new Date(invoiceDetails.dateIssued || invoiceDetails.dateCreated)
+        exchangeDate
       );
 
       const rate = exchangeRate.exchangeRate;
@@ -370,8 +375,12 @@ export const invoice: Resolvers<Context> = {
         rawItem = InvoiceItemMap.toPersistence(item);
       }
 
+      const exchangeDate = parent?.dateIssued
+        ? new Date(parent?.dateIssued)
+        : null;
+
       const exchangeRate = await exchangeRateService.getExchangeRate(
-        new Date(parent?.dateIssued || null)
+        exchangeDate
       );
 
       const rate = exchangeRate.exchangeRate;

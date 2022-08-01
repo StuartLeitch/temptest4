@@ -11,3 +11,5 @@ export * from './strategy-error';
 export * from './strategy';
 export * from './contracts';
 export * from './execution-context';
+export * from './Queue';
+export * from './AsyncLock';

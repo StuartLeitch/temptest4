@@ -7,5 +7,5 @@ export interface ExchangeRateServiceContract {
    * is available then it will throw an error
    * @param date A date in the format YYYY-DD ex: 2022-05
    */
-  getExchangeRate(date: Date): Promise<ExchangeRate>;
+  getExchangeRate(date: Date | undefined | null): Promise<ExchangeRate>;
 }

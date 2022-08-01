@@ -219,25 +219,18 @@ export class PublishInvoiceToErpUsecase
       );
       this.loggerService.info('PublishInvoiceToERP vatNote', vatNote);
       this.loggerService.info('PublishInvoiceToERP exchangeService');
-      let finalExchangeRate = 1.42; // ! Average value for the last seven years
-      if (invoice && invoice.dateIssued) {
-        let exchangeRate = null;
-        try {
-          exchangeRate = await this.exchangeRateService.getExchangeRate(
-            new Date(invoice.dateIssued)
-          );
-          this.loggerService.info(
-            'PublishInvoiceToERP exchangeRate',
-            exchangeRate
-          );
-        } catch (error) {
-          this.loggerService.error('PublishInvoiceToERP exchangeRate', error);
-        }
-        if (exchangeRate?.exchangeRate) {
-          finalExchangeRate = exchangeRate.exchangeRate;
-        }
-      }
-      this.loggerService.info('PublishInvoiceToERP rate', finalExchangeRate);
+
+      const exchangeDate = invoice?.dateIssued
+        ? new Date(invoice.dateIssued)
+        : null;
+      const exchangeRate = await this.exchangeRateService.getExchangeRate(
+        exchangeDate
+      );
+      const rate = exchangeRate.exchangeRate;
+
+      this.loggerService.info('PublishInvoiceToERP exchangeRate', exchangeRate);
+
+      this.loggerService.info('PublishInvoiceToERP rate', rate);
 
       try {
         await this.invoiceRepo.update(invoice);
@@ -251,7 +244,7 @@ export class PublishInvoiceToErpUsecase
           billingAddress: address,
           journalName: catalog.journalTitle,
           vatNote,
-          exchangeRate: finalExchangeRate,
+          exchangeRate: rate,
           customSegmentId: publisherCustomValues.customSegmentId,
           itemId: publisherCustomValues.itemId,
         };

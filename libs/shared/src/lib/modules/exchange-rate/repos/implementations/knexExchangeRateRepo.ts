@@ -32,7 +32,9 @@ export class KnexExchangeRepo
     }
   }
 
-  async exchangeRateExistsForDate(date: Date): Promise<boolean> {
+  async exchangeRateExistsForDate(
+    date: Readonly<Date> | Date
+  ): Promise<boolean> {
     try {
       const result = await this.db(TABLES.USD_GBP_EXCHANGE_RATE)
         .where('exchangeDate', date)
@@ -82,7 +84,7 @@ export class KnexExchangeRepo
     }
   }
 
-  async getExchangeRate(date: Date): Promise<ExchangeRate> {
+  async getExchangeRate(date: Readonly<Date> | Date): Promise<ExchangeRate> {
     const result = await this.db(TABLES.USD_GBP_EXCHANGE_RATE)
       .select()
       .where('exchangeDate', date)

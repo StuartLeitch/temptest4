@@ -7,14 +7,14 @@ import {
 import { Currency } from './Currency';
 
 export interface ExchangeRateProps extends ValueObjectProps {
-  date: Date;
+  date: Readonly<Date>;
   rate: number;
   from: Currency;
   to: Currency;
 }
 
 export class ExchangeRate extends ValueObject<ExchangeRateProps> {
-  get date(): Date {
+  get date(): Readonly<Date> {
     return this.props.date;
   }
 

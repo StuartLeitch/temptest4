@@ -10,7 +10,7 @@ interface DateRate {
 
 export class MockExchangeRateService implements ExchangeRateServiceContract {
   private defaultExchangeRate: ExchangeRate;
-  private rates: Array<DateRate> = [];
+  private readonly rates: Array<DateRate> = [];
 
   constructor() {
     this.defaultExchangeRate = ExchangeRate.create({
@@ -22,15 +22,23 @@ export class MockExchangeRateService implements ExchangeRateServiceContract {
   }
 
   setDefaultExchangeRate(rate: number = 1.42): void {
-    this.defaultExchangeRate = ExchangeRate.create({
-      date: new Date(0),
-      from: Currency.USD,
-      to: Currency.GBP,
-      rate,
-    });
+    this.defaultExchangeRate = Object.freeze(
+      ExchangeRate.create({
+        date: Object.freeze(new Date(0)),
+        from: Currency.USD,
+        to: Currency.GBP,
+        rate,
+      })
+    );
   }
 
-  async getExchangeRate(exchangeDate: Date): Promise<ExchangeRate> {
+  async getExchangeRate(
+    exchangeDate: Date | undefined | null
+  ): Promise<ExchangeRate> {
+    if (!exchangeDate) {
+      return this.defaultExchangeRate;
+    }
+
     const result = this.rates.find((dateRate) => {
       return dateRate.exchangeDate === exchangeDate;
     });

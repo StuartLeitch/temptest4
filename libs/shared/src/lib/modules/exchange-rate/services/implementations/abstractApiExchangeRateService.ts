@@ -2,6 +2,7 @@ import { VError } from 'verror';
 import axios from 'axios';
 
 import { LoggerContract } from '../../../../infrastructure/logging/LoggerContract';
+import { AsyncLock } from '../../../../core/logic/AsyncLock';
 
 import { ExchangeRate } from '../../domain/ExchangeRate';
 import { Currency } from '../../domain/Currency';
@@ -35,23 +36,35 @@ export class AbstractApiExchangeRateService
     private readonly logger: LoggerContract,
     private readonly apiKey: string
   ) {
-    this.defaultExchangeRate = ExchangeRate.create({
-      date: new Date(0),
-      from: Currency.USD,
-      to: Currency.GBP,
-      rate: 1.42,
-    });
+    this.defaultExchangeRate = Object.freeze(
+      ExchangeRate.create({
+        date: Object.freeze(new Date(0)),
+        from: Currency.USD,
+        to: Currency.GBP,
+        rate: 1.42,
+      })
+    );
   }
 
-  async getExchangeRate(exchangeDate: Date): Promise<ExchangeRate> {
+  async getExchangeRate(
+    exchangeDate: Date | undefined | null
+  ): Promise<ExchangeRate> {
     if (!exchangeDate) {
+      return this.defaultExchangeRate;
+    }
+
+    if (exchangeDate.getUTCFullYear() < 2000) {
       return this.defaultExchangeRate;
     }
 
     const firstOfMonthExchangeDate = new Date(exchangeDate);
     firstOfMonthExchangeDate.setUTCDate(1);
 
-    const exists = await this.exchangeRateRepo.exchangeRateExistsForDate(
+    const LockKey = `ExchangeRate${createYearMonthString(
+      firstOfMonthExchangeDate
+    )}`;
+
+    let exists = await this.exchangeRateRepo.exchangeRateExistsForDate(
       firstOfMonthExchangeDate
     );
 
@@ -64,25 +77,57 @@ export class AbstractApiExchangeRateService
       return this.exchangeRateRepo.getExchangeRate(firstOfMonthExchangeDate);
     }
 
-    this.logger.info(
-      `No exchange rate available in DB for date ${createDateString(
-        firstOfMonthExchangeDate
-      )}`
-    );
+    await AsyncLock.acquire(LockKey);
 
     try {
-      const exchangeRate = await this.getExternalExchangeRate(
+      /*
+      We recheck the existence of the exchange rate after the lock acquisition
+      in case that a parallel call updated the db with the needed exchange
+      rate, so that we reduce the wait time for lock acquisition
+      Reading: https://en.wikipedia.org/wiki/Double-checked_locking
+    */
+      exists = await this.exchangeRateRepo.exchangeRateExistsForDate(
         firstOfMonthExchangeDate
       );
 
-      exchangeRate.date.setUTCDate(1);
-      await this.exchangeRateRepo.save(exchangeRate);
+      if (exists) {
+        this.logger.info(
+          `Retrieving exchange rate from the DB for the date ${createDateString(
+            firstOfMonthExchangeDate
+          )}, after DCL`
+        );
+        return await this.exchangeRateRepo.getExchangeRate(
+          firstOfMonthExchangeDate
+        );
+      }
 
-      return exchangeRate;
-    } catch (err) {
       this.logger.info(
-        `AbstractApi not available, searching for closest exchange rate in DB`
+        `No exchange rate available in DB for date ${createDateString(
+          firstOfMonthExchangeDate
+        )}`
       );
+
+      try {
+        const exchangeRate = await this.getExternalExchangeRate(
+          firstOfMonthExchangeDate
+        );
+
+        exchangeRate.date.setUTCDate(1);
+        await this.exchangeRateRepo.save(exchangeRate);
+
+        return exchangeRate;
+      } catch (err) {
+        this.logger.info(
+          `AbstractApi not available, searching for closest exchange rate in DB`
+        );
+      }
+    } catch (err) {
+      this.logger.error(
+        `Error encountered in the locking section of AbstractApiExchangeRateService, releasing lock. Error: ${err}`
+      );
+      throw err;
+    } finally {
+      AsyncLock.release(LockKey);
     }
 
     try {
@@ -172,7 +217,11 @@ export class AbstractApiExchangeRateService
   }
 }
 
-function createDateString(date: Date): string {
+function createYearMonthString(date: Readonly<Date> | Date): string {
+  return `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}`;
+}
+
+function createDateString(date: Readonly<Date> | Date): string {
   const year = date.getUTCFullYear();
   const month = date.getUTCMonth() + 1;
   const day = date.getUTCDate();

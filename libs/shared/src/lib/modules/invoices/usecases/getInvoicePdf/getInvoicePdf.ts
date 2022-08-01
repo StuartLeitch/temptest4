@@ -179,8 +179,11 @@ export class GetInvoicePdfUsecase
         new Date(payload.invoice.dateIssued)
       );
 
+      const exchangeDate = payload?.invoice?.dateIssued
+        ? new Date(payload?.invoice?.dateIssued)
+        : null;
       const exchangeRate = await this.exchangeRateService.getExchangeRate(
-        new Date(payload?.invoice?.dateIssued)
+        exchangeDate
       );
       this.logger.info('PublishInvoiceToERP exchangeRate', exchangeRate);
 
