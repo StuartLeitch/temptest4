@@ -6,7 +6,7 @@ import { defaultValues } from '../../default';
 
 const values: WithSopsSecretsServiceProps = {
   ...defaultValues,
-  sopsSecrets: require('../../../config/../../../config/qa.enc.json'),
+  sopsSecrets: require('../../../config/qa.enc.json'),
   serviceProps: {
     ...defaultValues.serviceProps,
     envVars: {
