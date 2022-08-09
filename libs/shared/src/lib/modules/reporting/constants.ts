@@ -35,6 +35,7 @@ export const SYNDICATION_EVENTS = [
 export const JOURNAL_EVENTS = [
   'JournalAdded',
   'JournalUpdated',
+  'JournalAPCUpdated',
   'JournalActivated',
   'JournalEditorAssigned',
   'JournalEditorRemoved',

@@ -3,40 +3,38 @@ import {
   AbstractEventView,
   EventViewContract,
 } from './contracts/EventViewContract';
-import uniqueJournalsView from './JournalsView';
+import journalsView from './JournalsView';
 
 class JournalSectionsView
   extends AbstractEventView
   implements EventViewContract {
   getCreateQuery(): string {
     return `
-CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
-AS SELECT 
-  uj.journal_id,
-  uj.journal_name,
-  uj.journal_issn,
-  uj.journal_code,
-  uj.event_date,
-  section_view.id as "section_id",
-  section_view.name as "section_name",
-  section_view.created as "created_date",
-  section_view.updated as "updated_date",
-  section_view."specialIssues" as special_issues_json,
-  section_view."editors" as editors_json
-FROM 
-  ${REPORTING_TABLES.JOURNAL} je 
-  JOIN ${uniqueJournalsView.getViewName()} uj on je.id = uj.event_id,
-  LATERAL jsonb_to_recordset(je.payload -> 'sections') as section_view(id text, name text, created timestamp, updated timestamp, "specialIssues" jsonb, editors jsonb)
+CREATE MATERIALIZED VIEW public.${this.getViewName()}
+TABLESPACE pg_default
+AS SELECT j.journal_id,
+    j.journal_name,
+    j.journal_issn,
+    j.journal_code,
+    j.event_date,
+    js.id::text AS section_id,
+    js.name AS section_name,
+    cast_to_timestamp(js.created) AS created_date,
+    cast_to_timestamp(js.updated) AS updated_date,
+    js.specialissues_json AS special_issues_json,
+    js.editors_json
+   FROM ${journalsView.getViewName()} j
+     JOIN journal_section js ON j.event_id = js.event_id
 WITH NO DATA;
-    `;
+`;
   }
 
   postCreateQueries = [
-    `CREATE INDEX ON ${this.getViewName()} (journal_id)`,
-    `CREATE INDEX ON ${this.getViewName()} (journal_name)`,
-    `CREATE INDEX ON ${this.getViewName()} (event_date)`,
-    `CREATE INDEX ON ${this.getViewName()} (journal_code)`,
-    `CREATE INDEX ON ${this.getViewName()} (journal_issn)`,
+    `CREATE INDEX a11_${this.getViewName()}_event_date_idx ON public.journal_sections USING btree (event_date)`,
+    `CREATE INDEX a11_${this.getViewName()}_journal_code_idx ON public.journal_sections USING btree (journal_code)`,
+    `CREATE INDEX a11_${this.getViewName()}_journal_id_idx ON public.journal_sections USING btree (journal_id)`,
+    `CREATE INDEX a11_${this.getViewName()}_journal_issn_idx ON public.journal_sections USING btree (journal_issn)`,
+    `CREATE INDEX a11_${this.getViewName()}_journal_name_idx ON public.journal_sections USING btree (journal_name)`,
   ];
 
   getViewName(): string {
@@ -45,6 +43,6 @@ WITH NO DATA;
 }
 
 const journalSectionsView = new JournalSectionsView();
-journalSectionsView.addDependency(uniqueJournalsView);
+journalSectionsView.addDependency(journalsView);
 
 export default journalSectionsView;

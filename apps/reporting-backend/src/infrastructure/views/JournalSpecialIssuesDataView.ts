@@ -3,73 +3,74 @@ import {
   AbstractEventView,
   EventViewContract,
 } from './contracts/EventViewContract';
-import uniqueJournalsView from './JournalsView';
-import journalSectionsView from './JournalSectionsView';
+import journalsView from './JournalsView';
 
 class JournalSpecialIssuesDataView
   extends AbstractEventView
   implements EventViewContract {
   getCreateQuery(): string {
     return `
-    CREATE MATERIALIZED VIEW IF NOT EXISTS ${this.getViewName()}
-    AS SELECT 
-      j.journal_id,
-      journal_name,
-      j.journal_issn,
-      j.journal_code,
-      j.event_date,
-      ${this.getSpecialViewSelectFields()}
-      null as section_id,
-      null as section_name,
-      special_issues_view.editors as editors_json
-    FROM 
-      ${REPORTING_TABLES.JOURNAL} je 
-      join ${uniqueJournalsView.getViewName()} j on je.id = j.event_id,
-      lateral jsonb_to_recordset(je.payload -> 'specialIssues') as special_issues_view(${this.getSpecialViewFields()})
-    UNION ALL
-    SELECT 
-      j.journal_id,
-      journal_name,
-      j.journal_issn,
-      j.journal_code,
-      j.event_date,
-      ${this.getSpecialViewSelectFields()}
-      j.section_id,
-      j.section_name,
-      special_issues_view.editors as editors_json
-    FROM ${journalSectionsView.getViewName()} j,
-    LATERAL jsonb_to_recordset(j.special_issues_json) as special_issues_view(${this.getSpecialViewFields()})
-  WITH NO DATA
+CREATE MATERIALIZED VIEW public. ${this.getViewName()}
+TABLESPACE pg_default
+AS SELECT j.journal_id,
+    j.journal_name,
+    j.journal_issn,
+    j.journal_code,
+    j.event_date,
+    jsi.id::text AS special_issue_id,
+    jsi.name AS special_issue_name,
+    jsi.customid AS special_issue_custom_id,
+    cast_to_timestamp(jsi.enddate) AS closed_date,
+    cast_to_timestamp(jsi.startdate) AS open_date,
+        CASE
+            WHEN jsi.isactive::boolean = true THEN 'open'::text
+            WHEN jsi.iscancelled::boolean = true THEN 'cancelled'::text
+            ELSE 'closed'::text
+        END AS status,
+    NULL::text AS section_id,
+    NULL::text AS section_name,
+    jsi.editors_json
+   FROM ${journalsView.getViewName()} j
+     JOIN journal_specialissue jsi ON j.event_id = jsi.event_id AND j.journal_id::uuid = jsi.journal_id
+UNION ALL
+ SELECT js.journal_id::text AS journal_id,
+    js.journal_name,
+    js.journal_issn,
+    js.journal_code,
+    js.event_time AS event_date,
+    jssi.id::text AS special_issue_id,
+    jssi.name AS special_issue_name,
+    jssi.customid AS special_issue_custom_id,
+    cast_to_timestamp(jssi.enddate) AS closed_date,
+    cast_to_timestamp(jssi.startdate) AS open_date,
+        CASE
+            WHEN jssi.isactive::boolean = true THEN 'open'::text
+            WHEN jssi.iscancelled::boolean = true THEN 'cancelled'::text
+            ELSE 'closed'::text
+        END AS status,
+    js.id::text AS section_id,
+    js.name AS section_name,
+    jssi.editors_json
+   FROM ${journalsView.getViewName()} j
+     JOIN journal_section js ON j.event_id = js.event_id
+     JOIN journal_section_specialissue jssi ON js.event_id = jssi.event_id AND js.id = jssi.journal_section_id
+WITH NO DATA;
     `;
   }
 
   postCreateQueries = [
-    `CREATE INDEX ON ${this.getViewName()} (journal_id)`,
-    `CREATE INDEX ON ${this.getViewName()} (special_issue_id)`,
-    `CREATE INDEX ON ${this.getViewName()} (special_issue_name)`,
-    `CREATE INDEX ON ${this.getViewName()} (special_issue_custom_id)`,
-    `CREATE INDEX ON ${this.getViewName()} (event_date)`,
-    `CREATE INDEX ON ${this.getViewName()} (journal_code)`,
-    `CREATE INDEX ON ${this.getViewName()} (journal_name)`,
-    `CREATE INDEX ON ${this.getViewName()} (journal_issn)`,
+    `CREATE INDEX a11_${this.getViewName()}_event_date_idx ON public.${this.getViewName()} USING btree (event_date)`,
+    `CREATE INDEX a11_${this.getViewName()}_journal_code_idx ON public.${this.getViewName()} USING btree (journal_code)`,
+    `CREATE INDEX a11_${this.getViewName()}_journal_id_idx ON public.${this.getViewName()} USING btree (journal_id)`,
+    `CREATE INDEX a11_${this.getViewName()}_journal_issn_idx ON public.${this.getViewName()} USING btree (journal_issn)`,
+    `CREATE INDEX a11_${this.getViewName()}_journal_name_idx ON public.${this.getViewName()} USING btree (journal_name)`,
+    `CREATE INDEX a11_${this.getViewName()}_special_issue_id_idx ON public.${this.getViewName()} USING btree (special_issue_id)`,
+    `CREATE INDEX a11_${this.getViewName()}_special_issue_name_idx ON public.${this.getViewName()} USING btree (special_issue_name)`,
+    `CREATE INDEX a11_${this.getViewName()}_special_issuecustomid_idx ON public.${this.getViewName()} USING btree (special_issue_custom_id)`,
   ];
 
   getViewName(): string {
     return 'journal_special_issues_data';
-  }
-
-  getSpecialViewSelectFields(): string {
-    return `special_issues_view.id as special_issue_id,
-    special_issues_view.name as special_issue_name,
-    special_issues_view."customId" as special_issue_custom_id,
-    cast_to_timestamp(special_issues_view."endDate") as closed_date,
-    cast_to_timestamp(special_issues_view."startDate") as open_date,
-    case
-      when special_issues_view."isActive" = true then 'open'
-      when special_issues_view."isCancelled" = true then 'cancelled'
-      else 'closed'
-    end as status,
-    `;
   }
 
   getSpecialViewFields(): string {
@@ -78,7 +79,6 @@ class JournalSpecialIssuesDataView
 }
 
 const journalSpecialIssuesDataView = new JournalSpecialIssuesDataView();
-journalSpecialIssuesDataView.addDependency(uniqueJournalsView);
-journalSpecialIssuesDataView.addDependency(journalSectionsView);
+journalSpecialIssuesDataView.addDependency(journalsView);
 
 export default journalSpecialIssuesDataView;
