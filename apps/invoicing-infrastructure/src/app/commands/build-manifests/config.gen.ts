@@ -39,7 +39,7 @@ import { values as hindawiProdInvoicingWebValues } from 'apps/invoicing-web/char
 // import { values as hindawiProdImportManuscriptValidation } from 'apps/import-manuscript-validation/chart/hindawi/prod';
 // import { values as hindawiProdImportManuscriptBackend } from 'apps/import-manuscript-backend/chart/hindawi/prod';
 // import { values as hindawiProdImportManuscriptWeb } from 'apps/import-manuscript-web/chart/hindawi/prod';
-// import { values as hindawiProdReportingValues } from 'apps/reporting-backend/chart/hindawi/prod';
+import { values as hindawiProdReportingValues } from 'apps/reporting-backend/chart/hindawi/prod';
 
 import { values as automationInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/hindawi/automation';
 import { values as automationInvoicingAdminValues } from 'apps/invoicing-admin/chart/hindawi/automation';
@@ -62,7 +62,7 @@ const masterConfig: {
       // [App.importManuscriptValidation]: hindawiProdImportManuscriptValidation,
       // [App.importManuscriptBackend]: hindawiProdImportManuscriptBackend,
       // [App.importManuscriptWeb]: hindawiProdImportManuscriptWeb,,
-      // [App.reporting]: hindawiProdReportingValues,
+      [App.reporting]: hindawiProdReportingValues,
     },
     demo: {
       [App.graphql]: demoInvoicingGraphqlValues,
