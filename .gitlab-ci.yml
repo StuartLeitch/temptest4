@@ -712,8 +712,8 @@ Deploy:hindawi-prod-invoicing:
 
 Deploy:hindawi-prod-reporting:
   stage: deploy-reporting
-  # only:
-  #   - develop
+  only:
+    - develop
   tags:
     - 'cluster:hindawi-prod'
   dependencies:
