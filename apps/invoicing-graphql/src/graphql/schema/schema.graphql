@@ -208,6 +208,8 @@ type Payment {
   invoiceId: String
   payerId: String
   paymentMethodId: String
+  authorizationCode: String
+  cardLastDigits: String
   foreignPaymentId: String
   paymentProof: String
   amount: Float

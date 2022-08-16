@@ -2,7 +2,7 @@ import { Before, After, Given, When, Then } from '@cucumber/cucumber';
 import { expect } from 'chai';
 
 import { MockLogger } from '../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
-import { EmailService } from '../../../../../../src/lib/infrastructure/communication-channels/EmailService';
+import { EmailService } from '../../../../../../src/lib/infrastructure/communication-channels/index';
 
 import { ApplyCouponToInvoiceUsecase } from '../../../../../../src/lib/modules/coupons/usecases/applyCouponToInvoice/applyCouponToInvoice';
 import { ApplyCouponToInvoiceResponse } from '../../../../../../src/lib/modules/coupons/usecases/applyCouponToInvoice/applyCouponToInvoiceResponse';

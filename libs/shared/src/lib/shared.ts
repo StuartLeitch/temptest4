@@ -73,6 +73,8 @@ export * from './modules/invoices/usecases/confirmInvoice/confirmInvoice';
 export * from './modules/invoices/usecases/confirmInvoice/confirmInvoiceDTO';
 export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdf';
 export * from './modules/invoices/usecases/getInvoicePdf/getInvoicePdfDTO';
+export * from './modules/invoices/usecases/getReceiptPdf/getReceiptPdf';
+export * from './modules/invoices/usecases/getReceiptPdf/getReceiptPdfDTO';
 export * from './modules/invoices/usecases/getItemsForInvoice/getItemsForInvoice';
 export * from './modules/invoices/usecases/generateInvoiceCompensatoryEvents';
 export * from './modules/invoices/usecases/generateInvoiceDraftCompensatoryEvents';
@@ -290,7 +292,10 @@ export * from './infrastructure/logging';
 export * from './infrastructure/database/knex';
 export * from './infrastructure/message-queues/contracts/Job';
 export * from './infrastructure/message-queues/contracts/Time';
-export { EmailService } from './infrastructure/communication-channels';
+export {
+  EmailService,
+  CommsEmailService,
+} from './infrastructure/communication-channels';
 import * as QueuePayloads from './infrastructure/message-queues/payloads';
 export { QueuePayloads };
 export * from './infrastructure/message-queues/payloadBuilder';

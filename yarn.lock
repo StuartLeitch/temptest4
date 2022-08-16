@@ -4134,10 +4134,10 @@
     constructs "^3.3.161"
     sops-decoder "^0.10.1"
 
-"@hindawi/phenom-events@^1.17.2":
-  version "1.17.2"
-  resolved "https://registry.yarnpkg.com/@hindawi/phenom-events/-/phenom-events-1.17.2.tgz#977fe539da3db5efa84784f12a9b311a673b5886"
-  integrity sha512-kvnP1huYZMEp9D+8M87YBW4uynLej5kQZi6L0N2GVxkoRlsaQ9984EsO9ROkbRc0CyLb3Nr2LSPp1QPlqZ9Fxw==
+"@hindawi/phenom-events@^1.17.3":
+  version "1.17.3"
+  resolved "https://registry.yarnpkg.com/@hindawi/phenom-events/-/phenom-events-1.17.3.tgz#ca452ac5a0a1f92c859c6c2632b4d5a45369907a"
+  integrity sha512-gGQb1BMvu0wzZFU5NYaDA4LhEq4964xZDrPgK2GpByPuh48BOQT8Sui3YgkUb2ByCt8qF3S+dvxdDFZoQ4Uhhg==
 
 "@hindawi/phenom-ui@^1.0.1":
   version "1.0.1"

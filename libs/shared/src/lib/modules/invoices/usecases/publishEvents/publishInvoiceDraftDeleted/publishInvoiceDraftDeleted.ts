@@ -18,7 +18,8 @@ import * as Errors from './publishInvoiceDraftDeleted.errors';
 const INVOICE_DRAFT_DELETED = 'InvoiceDraftDeleted';
 
 export class PublishInvoiceDraftDeletedUseCase
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(private publishService: SQSPublishServiceContract) {}
 
   public async execute(request: DTO, context?: Context): Promise<Response> {

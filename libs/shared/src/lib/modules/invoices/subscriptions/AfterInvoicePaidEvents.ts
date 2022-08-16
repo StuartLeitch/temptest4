@@ -3,6 +3,9 @@ import { DomainEvents } from '../../../core/domain/events/DomainEvents';
 import { LoggerContract } from '../../../infrastructure/logging';
 import { NoOpUseCase } from './../../../core/domain/NoOpUseCase';
 import { Roles } from '../../../domain/authorization';
+import { Right, GuardFailure } from '../../../core/logic';
+import { RepoError } from '../../../infrastructure/RepoError';
+import { CommsEmailService } from '../../../infrastructure/communication-channels';
 
 import { InvoicePaymentAddedEvent } from '../domain/events/invoicePaymentAdded';
 
@@ -20,6 +23,10 @@ import { GetPayerDetailsByInvoiceIdUsecase } from '../../payers/usecases/getPaye
 import { GetItemsForInvoiceUsecase } from '../usecases/getItemsForInvoice/getItemsForInvoice';
 import { PublishInvoicePaidUsecase } from '../usecases/publishEvents/publishInvoicePaid';
 import { GetPaymentMethodsUseCase } from '../../payments/usecases/getPaymentMethods';
+import {
+  PaymentMethod,
+  PaymentMethodNames,
+} from '../../payments/domain/PaymentMethod';
 
 export class AfterInvoicePaidEvent
   implements HandleContract<InvoicePaymentAddedEvent>
@@ -35,7 +42,8 @@ export class AfterInvoicePaidEvent
     private waiverRepo: WaiverRepoContract,
     private payerRepo: PayerRepoContract,
     private publishInvoicePaid: PublishInvoicePaidUsecase | NoOpUseCase,
-    private loggerService: LoggerContract
+    private loggerService: LoggerContract,
+    private commsEmailService: CommsEmailService
   ) {
     this.setupSubscriptions();
   }
@@ -148,6 +156,16 @@ export class AfterInvoicePaidEvent
         );
       }
 
+      const paymentMethod = await this.paymentMethodRepo.getPaymentMethodById(
+        payments.value[0].paymentMethodId
+      );
+
+      if (paymentMethod.isLeft()) {
+        throw new Error(
+          `Payment Method could not be accessed: ${paymentMethod.value.message}`
+        );
+      }
+
       invoice.addItems(invoiceItems);
 
       const publishResult = await this.publishInvoicePaid.execute(
@@ -167,6 +185,20 @@ export class AfterInvoicePaidEvent
         throw publishResult.value;
       }
 
+      if (isCreditCardPayment(paymentMethod)) {
+        const sendEmail =
+          await this.commsEmailService.sendInvoiceReceiptNotification(
+            payer,
+            invoice,
+            payments.value[0],
+            manuscript.value
+          );
+
+        if (sendEmail.isLeft()) {
+          throw sendEmail.value;
+        }
+      }
+
       this.loggerService.info(
         `[AfterInvoicePaid]: Successfully executed onInvoicePaidEvent use case InvoicePaidEvent`
       );
@@ -176,4 +208,10 @@ export class AfterInvoicePaidEvent
       );
     }
   }
+}
+
+function isCreditCardPayment(
+  paymentMethod: Right<GuardFailure | RepoError, PaymentMethod>
+) {
+  return paymentMethod.value.name === PaymentMethodNames.CreditCard;
 }

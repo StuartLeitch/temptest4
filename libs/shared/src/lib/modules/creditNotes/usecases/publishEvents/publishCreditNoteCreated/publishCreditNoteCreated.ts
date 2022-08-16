@@ -28,7 +28,8 @@ import * as Errors from './publishCreditNoteCreatedErrors';
 const CREDIT_NOTE_CREATED = 'InvoiceCreditNoteCreated';
 
 export class PublishCreditNoteCreatedUsecase
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(private publishService: SQSPublishServiceContract) {}
 
   public async execute(request: DTO, context?: Context): Promise<Response> {

@@ -18,7 +18,8 @@ import * as Errors from './publishInvoiceDraftDueAmountUpdated.errors';
 const INVOICE_DRAFT_DUE_AMOUNT_UPDATED = 'InvoiceDraftDueAmountUpdated';
 
 export class PublishInvoiceDraftDueAmountUpdatedUseCase
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(private publishService: SQSPublishServiceContract) {}
 
   public async execute(request: DTO, context?: Context): Promise<Response> {

@@ -1,1 +1,2 @@
-export * from './EmailService';
+export * from './invoicingEmailService/EmailService';
+export * from './phenomCommsEmailService/CommsEmailService';

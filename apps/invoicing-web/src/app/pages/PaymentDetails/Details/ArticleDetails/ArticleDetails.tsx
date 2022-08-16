@@ -12,7 +12,7 @@ interface Props {
 
 const ArticleDetails: React.FunctionComponent<Props> = ({ article }: any) => {
   return (
-    <Expander title="Article details" expanded>
+    <Expander title="Article Details" expanded>
       <Root>
         <DetailItem label="Journal Title" text={article.journalTitle} />
         <DetailItem label="Article Title" text={article.title} />

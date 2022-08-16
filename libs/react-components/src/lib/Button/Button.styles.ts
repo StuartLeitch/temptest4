@@ -1,11 +1,11 @@
-import {capitalize} from 'lodash';
-import {space, layout, flexbox} from 'styled-system';
-import styled, {css, AnyStyledComponent} from 'styled-components';
+import { capitalize } from 'lodash';
+import { space, layout, flexbox } from 'styled-system';
+import styled, { css, AnyStyledComponent } from 'styled-components';
 
-import {lighten, th} from '../Theme';
-import {bold} from '../Typography/fontTypes';
+import { lighten, th } from '../Theme';
+import { bold } from '../Typography/fontTypes';
 
-const buttonType = ({type}: {type: string}) => {
+const buttonType = ({ type }: { type: string }) => {
   switch (type) {
     case 'secondary':
       return css`
@@ -25,8 +25,7 @@ const buttonType = ({type}: {type: string}) => {
         color: ${th('buttons.outline.color')};
 
         &:hover {
-          background-color: ${th('buttons.outline.color')};
-          color: ${th('buttons.outline.bg')};
+          background-color: ${th('buttons.outline.hoverColor')};
         }
       `;
     case 'primary':
@@ -42,7 +41,7 @@ const buttonType = ({type}: {type: string}) => {
   }
 };
 
-const buttonSize = ({size}: {size: string}) => {
+const buttonSize = ({ size }: { size: string }) => {
   switch (size) {
     case 'small':
       return css`
@@ -57,9 +56,10 @@ const buttonSize = ({size}: {size: string}) => {
     case 'large':
     default:
       return css`
-        height: calc(${th('gridUnit')} * 10);
+        height: 32px;
         min-width: calc(${th('gridUnit')} * 35);
-        text-transform: uppercase;
+        font-size: 14px;
+        font-weight: 600;
       `;
   }
 };
@@ -70,7 +70,7 @@ export const Button: AnyStyledComponent = styled.button`
   border-radius: ${th('gridUnit')};
   cursor: pointer;
   display: inline-flex;
-  font-size: ${({size}) => th(`fontSizes.button${capitalize(size)}`)};
+  font-size: ${({ size }) => th(`fontSizes.button${capitalize(size)}`)};
   line-height: ${th('fontSizes.lineHeight')};
   justify-content: center;
   padding: 0 calc(${th('gridUnit')} * 2);

@@ -20,13 +20,19 @@ RUN apk add --no-cache \
   ttf-freefont
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+  PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 COPY --link libs/shared/src/lib/infrastructure/database/knex/migrations/ ./migrations/
 COPY --link libs/shared/src/lib/infrastructure/database/knex/seeds/ ./seeds/
 COPY --link config/ ./config/
 COPY --link dist/apps/invoicing-graphql ./
 COPY --link node_modules_production ./node_modules
+
+COPY apps/invoicing-graphql/src/assets/fonts/ ./fonts
+RUN mkdir -p /usr/share/fonts/truetype/
+RUN install -m644 ./fonts/myriad-pro-regular.ttf /usr/share/fonts/truetype/
+RUN install -m644 ./fonts/myriad-pro-semibold.ttf /usr/share/fonts/truetype/
+RUN rm -r ./fonts
 
 # FROM node:14.7-alpine as dist
 # # Copying the rest of the code to the working directory

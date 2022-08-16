@@ -15,17 +15,25 @@ import {
 import {
   BraintreeServiceContract,
   BraintreeTransactionRequest,
+  BraintreeTransactionResponse,
 } from './service';
 
 export class MockBraintreeService implements BraintreeServiceContract {
   async createTransaction(
     request: BraintreeTransactionRequest
-  ): Promise<Either<UnsuccessfulSale | UnexpectedError, ExternalOrderId>> {
+  ): Promise<
+    Either<UnsuccessfulSale | UnexpectedError, BraintreeTransactionResponse>
+  > {
     if (!request.paymentMethodNonce) {
       return left(new UnsuccessfulSale('payer not existing'));
     }
 
-    return right(ExternalOrderId.create(uuidv4()));
+    let transactionResponse: BraintreeTransactionResponse = {
+      externalOrderId: ExternalOrderId.create(uuidv4()),
+      authorizationCode: '3A2D34D',
+      cardLastDigits: '1111',
+    };
+    return right(transactionResponse);
   }
 
   async generateClientToken(): Promise<

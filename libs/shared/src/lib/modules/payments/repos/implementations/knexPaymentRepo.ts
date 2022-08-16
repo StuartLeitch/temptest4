@@ -14,11 +14,12 @@ import { Payment } from './../../domain/Payment';
 import { PaymentRepoContract } from './../paymentRepo';
 
 import { PaymentMap } from './../../mapper/Payment';
-import Knex from "knex";
+import Knex from 'knex';
 
 export class KnexPaymentRepo
   extends AbstractBaseDBRepo<Knex, Payment>
-  implements PaymentRepoContract {
+  implements PaymentRepoContract
+{
   async getPaymentById(
     paymentId: PaymentId
   ): Promise<Either<GuardFailure | RepoError, Payment>> {
@@ -152,7 +153,8 @@ export class KnexPaymentRepo
     );
 
     // * SQL for retrieving results needed only for Sage registration
-    const filterPaymentsReadyForRegistration = this.filterReadyForRegistration();
+    const filterPaymentsReadyForRegistration =
+      this.filterReadyForRegistration();
 
     const prepareIdsSQL = filterPaymentsReadyForRegistration(
       withPaymentReference(erpReferencesQuery)

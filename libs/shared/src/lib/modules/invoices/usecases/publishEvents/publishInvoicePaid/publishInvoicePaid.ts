@@ -25,7 +25,8 @@ import * as Errors from './publishInvoicePaid.errors';
 const INVOICE_PAID_EVENT = 'InvoicePaid';
 
 export class PublishInvoicePaidUsecase
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(private publishService: SQSPublishServiceContract) {}
 
   async execute(request: DTO, context?: Context): Promise<Response> {

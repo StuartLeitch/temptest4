@@ -29,7 +29,8 @@ const INVOICE_CONFIRMED = 'InvoiceConfirmed';
 
 export class PublishInvoiceConfirmedUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(private publishService: SQSPublishServiceContract) {
     super();
   }

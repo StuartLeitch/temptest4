@@ -26,7 +26,8 @@ import * as Errors from './publishInvoiceFinalized.errors';
 const INVOICE_FINALIZED = 'InvoiceFinalized';
 
 export class PublishInvoiceFinalizedUsecase
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(private publishService: SQSPublishServiceContract) {}
 
   public async execute(request: DTO, context?: Context): Promise<Response> {

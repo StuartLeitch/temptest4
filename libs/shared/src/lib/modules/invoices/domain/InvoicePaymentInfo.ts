@@ -12,6 +12,8 @@ export interface InvoicePaymentInfo {
   country: string;
   vatRegistrationNumber: string;
   foreignPaymentId: string;
+  authorizationCode: string;
+  cardLastDigits: string;
   amount: number;
   paymentDate: string;
   paymentType: string;

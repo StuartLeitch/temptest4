@@ -26,13 +26,18 @@ import {
   CatalogMap,
   Roles,
   left,
+  AbstractApiExchangeRateService,
+  LoggerBuilderContract,
+  PdfGeneratorService,
+  VATService,
+  GetReceiptPdfUsecase,
 } from '@hindawi/shared';
 
 import {
   PayPalWebhookResponse,
   PayPalPaymentCapture,
 } from '../services/paypal/types/webhooks';
-import { Context } from '../builders';
+import { Context, Repos } from '../builders';
 import { env } from '../env';
 
 type JournalJson = {
@@ -179,29 +184,13 @@ export const expressLoader: MicroframeworkLoader = (
         loggerBuilder,
       } = context;
 
-      const logger = loggerBuilder.getLogger(GetInvoicePdfUsecase.name);
-
-      const authContext = { roles: [Roles.PAYER] };
-
-      const usecase = new GetInvoicePdfUsecase(
-        repos.invoiceItem,
-        repos.address,
-        repos.manuscript,
-        repos.invoice,
-        repos.payer,
-        repos.catalog,
-        repos.coupon,
-        repos.waiver,
+      const pdfEither = await generateInvoicePdf(
+        loggerBuilder,
+        repos,
         pdfGenerator,
-        logger,
         exchangeRateService,
-        vatService
-      );
-
-      const invoiceLink = req.headers.referer;
-      const pdfEither = await usecase.execute(
-        { payerId: req.params.payerId, invoiceLink },
-        authContext
+        vatService,
+        req
       );
 
       if (pdfEither.isLeft()) {
@@ -212,7 +201,38 @@ export const expressLoader: MicroframeworkLoader = (
 
       res.writeHead(200, {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename=${fileName}`,
+        'Content-Disposition': `attachment; filename=invoice_${fileName}`,
+        'Content-Length': file.length,
+      });
+
+      res.end(file);
+    });
+
+    app.get('/api/receipt/:payerId', async (req, res) => {
+      const {
+        repos,
+        services: { exchangeRateService, pdfGenerator, vatService },
+        loggerBuilder,
+      } = context;
+
+      const pdfEither = await generateReceiptPdf(
+        loggerBuilder,
+        repos,
+        pdfGenerator,
+        exchangeRateService,
+        vatService,
+        req
+      );
+
+      if (pdfEither.isLeft()) {
+        return res.status(400).send(pdfEither.value.message);
+      }
+
+      const { fileName, file } = pdfEither.value;
+
+      res.writeHead(200, {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename=receipt_${fileName}`,
         'Content-Length': file.length,
       });
 
@@ -442,3 +462,74 @@ export const expressLoader: MicroframeworkLoader = (
     settings.setData('express_app', app);
   }
 };
+
+async function generateInvoicePdf(
+  loggerBuilder: LoggerBuilderContract,
+  repos: Repos,
+  pdfGenerator: PdfGeneratorService,
+  exchangeRateService: AbstractApiExchangeRateService,
+  vatService: VATService,
+  req
+) {
+  const logger = loggerBuilder.getLogger(GetInvoicePdfUsecase.name);
+
+  const authContext = { roles: [Roles.PAYER] };
+
+  const usecase = new GetInvoicePdfUsecase(
+    repos.invoiceItem,
+    repos.address,
+    repos.manuscript,
+    repos.invoice,
+    repos.payer,
+    repos.catalog,
+    repos.coupon,
+    repos.waiver,
+    pdfGenerator,
+    logger,
+    exchangeRateService,
+    vatService
+  );
+
+  const invoiceLink = req.headers.referer;
+  const pdfEither = await usecase.execute(
+    { payerId: req.params.payerId, invoiceLink },
+    authContext
+  );
+
+  return pdfEither;
+}
+
+async function generateReceiptPdf(
+  loggerBuilder: LoggerBuilderContract,
+  repos: Repos,
+  pdfGenerator: PdfGeneratorService,
+  exchangeRateService: AbstractApiExchangeRateService,
+  vatService: VATService,
+  req
+) {
+  const logger = loggerBuilder.getLogger(GetReceiptPdfUsecase.name);
+
+  const authContext = { roles: [Roles.PAYER] };
+
+  const usecase = new GetReceiptPdfUsecase(
+    repos.invoiceItem,
+    repos.address,
+    repos.manuscript,
+    repos.invoice,
+    repos.catalog,
+    repos.payer,
+    repos.payment,
+    repos.coupon,
+    repos.waiver,
+    pdfGenerator,
+    logger
+  );
+
+  const receiptLink = req.headers.referer;
+  const pdfEither = await usecase.execute(
+    { payerId: req.params.payerId, receiptLink },
+    authContext
+  );
+
+  return pdfEither;
+}

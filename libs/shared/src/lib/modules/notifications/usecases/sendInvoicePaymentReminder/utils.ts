@@ -6,7 +6,7 @@ import { Notification } from '../../domain/Notification';
 import {
   PaymentReminderType,
   PaymentReminder,
-} from '../../../../infrastructure/communication-channels/EmailService';
+} from '../../../../infrastructure/communication-channels/invoicingEmailService/EmailService';
 
 import { SendInvoicePaymentReminderDTO as DTO } from './sendInvoicePaymentReminderDTO';
 

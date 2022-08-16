@@ -46,7 +46,7 @@ import { MockCouponRepo } from '../../../../../../src/lib/modules/coupons/repos/
 import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
 import { MockPayerRepo } from '../../../../../../src/lib/modules/payers/repos/mocks/mockPayerRepo';
 
-import { EmailService } from '../../../../../../src/lib/infrastructure/communication-channels/EmailService';
+import { EmailService } from '../../../../../../src/lib/infrastructure/communication-channels/index';
 import { WaiverService } from '../../../../../../src/lib/domain/services/WaiverService';
 import { VATService } from '../../../../../../src/lib/domain/services/VATService';
 
@@ -85,21 +85,22 @@ const emailService: EmailService = new EmailService(
 const vatService: VATService = new VATService();
 const loggerService: any = null;
 
-const usecase: UpdateTransactionOnAcceptManuscriptUsecase = new UpdateTransactionOnAcceptManuscriptUsecase(
-  mockAddressRepo,
-  mockCatalogRepo,
-  mockTransactionRepo,
-  mockInvoiceItemRepo,
-  mockInvoiceRepo,
-  mockArticleRepo,
-  mockWaiverRepo,
-  mockPayerRepo,
-  mockCouponRepo,
-  waiverService,
-  emailService,
-  vatService,
-  loggerService
-);
+const usecase: UpdateTransactionOnAcceptManuscriptUsecase =
+  new UpdateTransactionOnAcceptManuscriptUsecase(
+    mockAddressRepo,
+    mockCatalogRepo,
+    mockTransactionRepo,
+    mockInvoiceItemRepo,
+    mockInvoiceRepo,
+    mockArticleRepo,
+    mockWaiverRepo,
+    mockPayerRepo,
+    mockCouponRepo,
+    waiverService,
+    emailService,
+    vatService,
+    loggerService
+  );
 
 let result: UpdateTransactionOnAcceptManuscriptResponse;
 let transaction: Transaction;
@@ -258,7 +259,8 @@ Then(
 Then(
   'The Invoice Item associated with the manuscript should have the price of {int}',
   async (finalPrice: number) => {
-    const maybeInvoiceItems = await mockInvoiceItemRepo.getInvoiceItemCollection();
+    const maybeInvoiceItems =
+      await mockInvoiceItemRepo.getInvoiceItemCollection();
 
     if (maybeInvoiceItems.isLeft()) {
       throw maybeInvoiceItems.value;

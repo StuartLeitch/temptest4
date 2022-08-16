@@ -51,6 +51,7 @@ accessControl
   .action('applyVAT')
   .action('confirm')
   .action('getPDF')
+  .action('getReceiptPDF')
   .resource('payer')
   .action('create')
   .action('read')

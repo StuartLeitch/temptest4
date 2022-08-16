@@ -9,6 +9,7 @@ import {
 } from 'braintree';
 
 import {
+  BraintreeTransactionResponse as SaleResponse,
   BraintreeServiceContract as ServiceContract,
   BraintreeTransactionRequest as SaleRequest,
   BraintreeServiceErrors as Errors,
@@ -51,9 +52,9 @@ class Service implements ServiceContract {
     paymentMethodNonce,
     paymentTotal,
   }: SaleRequest): Promise<
-    Either<Errors.UnsuccessfulSale | Errors.UnexpectedError, ExternalOrderId>
+    Either<Errors.UnsuccessfulSale | Errors.UnexpectedError, SaleResponse>
   > {
-    const a: TransactionRequest = {
+    const transactionRequest: TransactionRequest = {
       amount: paymentTotal.toString(),
       paymentMethodNonce,
       merchantAccountId: this.merchantAccountId,
@@ -69,7 +70,7 @@ class Service implements ServiceContract {
     let result: ValidatedResponse<Transaction>;
 
     try {
-      result = await this.gateway.transaction.sale(a);
+      result = await this.gateway.transaction.sale(transactionRequest);
     } catch (e) {
       return left(new Errors.UnexpectedError(e));
     }
@@ -81,7 +82,20 @@ class Service implements ServiceContract {
       return left(new Errors.UnsuccessfulSale(result.message));
     }
 
-    return right(ExternalOrderId.create(result.transaction.id));
+    const {
+      transaction: {
+        id,
+        paymentReceipt: { cardLast4, processorAuthorizationCode },
+      },
+    } = result;
+
+    const transactionResponse: SaleResponse = {
+      externalOrderId: ExternalOrderId.create(id),
+      authorizationCode: processorAuthorizationCode,
+      cardLastDigits: cardLast4,
+    };
+
+    return right(transactionResponse);
   }
 
   async generateClientToken(): Promise<

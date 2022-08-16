@@ -1,9 +1,9 @@
 import { EmailContent } from '../EmailProps';
 
-import { Manuscript } from '../../../modules/manuscripts/domain/Manuscript';
-import { CatalogItem } from '../../../modules/journals/domain/CatalogItem';
-import { InvoiceItem } from '../../../modules/invoices/domain/InvoiceItem';
-import { Invoice } from '../../../modules/invoices/domain/Invoice';
+import { Manuscript } from '../../../../modules/manuscripts/domain/Manuscript';
+import { CatalogItem } from '../../../../modules/journals/domain/CatalogItem';
+import { InvoiceItem } from '../../../../modules/invoices/domain/InvoiceItem';
+import { Invoice } from '../../../../modules/invoices/domain/Invoice';
 
 interface TemplateData {
   invoiceItem: InvoiceItem;

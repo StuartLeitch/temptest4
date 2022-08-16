@@ -1,0 +1,683 @@
+<html>
+  <head>
+    <style>
+      body,
+      html {
+        font-size: 9px;
+        font-family:'Myriad Pro', 'Open Sans';
+        color: #6f7a79;
+      }
+
+      #pageFooter {
+        font-size: 1.5rem;
+        font-weight: 400;
+        text-align: left;
+      }
+
+      #pageFooter h2 {
+        margin: 0;
+        padding: 0;
+      }
+
+      #pageFooter p {
+        margin: 0;
+        padding: 0;
+      }
+
+      #pageHeader {
+        position: relative;
+        margin-right: 25px;
+      }
+
+      #pageHeader h2 {
+        color: #575756;
+        font-weight: 600;
+        font-size: 3.75em;
+        text-transform: uppercase;
+        text-align: right;
+        padding-top: 3.5rem;
+      }
+
+      #pageHeader img {
+        position: absolute;
+        left: 0;
+        margin-left: 1.45em;
+        top: 2.75rem;
+        width: 158px;
+        height: 45px;
+      }
+
+      p {
+        margin: 0;
+      }
+
+      a {
+        color: #006f92;
+      }
+
+      h1 {
+        color: #006f92;
+        font-size: 1.5rem;
+        padding: 0.2rem 0;
+        margin-bottom: 0.5rem;
+      }
+
+      h1.withSubheader {
+        margin-bottom: 0;
+      }
+
+      h1.withSubheader + p {
+        margin: 0 0 1rem 0;
+      }
+
+      table.data {
+        border-collapse: collapse;
+        height: 100%;
+        width: 100%;
+        font-size: 1.5rem;
+      }
+
+      table.data th {
+        width: 40%;
+        text-align: left;
+      }
+
+      table.data th em {
+        font-weight: normal;
+        font-style: normal;
+      }
+
+      table.data th {
+        font-weight: normal;
+        font-size: 1.5rem;
+      }
+      table.data td {
+        text-align: right;
+        vertical-align: top;
+        font-weight: 600;
+        font-size: 1.5rem;
+        color: #1d1d1b;
+      }
+
+      table.data.billing th em {
+        font-weight: normal;
+      }
+
+      table.columns {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 100%;
+      }
+
+      table.columns table {
+        width: 100%;
+        height: 100%;
+      }
+
+      table.columns td {
+        width: 47%;
+        vertical-align: top;
+        text-align: left;
+        padding-left: 3%;
+      }
+
+      table.columns td:first-child {
+        padding-left: 0;
+        padding-right: 3%;
+      }
+
+      .isCentered {
+        text-align: center;
+      }
+
+      .cards {
+        margin: 12px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        padding: 6px;
+        height: 3.6rem;
+      }
+
+      table.container {
+        width: 100%;
+        overflow: hidden;
+      }
+
+      table.billingDetail {
+        float: left;
+        margin-left: 0.65em;
+        width: 50%;
+        border-spacing: 0;
+      }
+
+      .email {
+        text-align: left;
+        border-spacing: 0;
+        margin-top: 1rem;
+        padding-top: 1rem;
+      }
+
+      .email th {
+        font-size: 1.5rem;
+        font-weight: normal;
+      }
+
+      .email td {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1d1d1b;
+        padding-left: 2.5rem;
+      }
+
+      .vat {
+        text-align: left;
+        border-spacing: 0;
+        padding-top: 1rem;
+      }
+
+      .vat th {
+        font-size: 1.5rem;
+        font-weight: normal;
+      }
+
+      .vat td {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1d1d1b;
+        padding-left: 2.5rem;
+      }
+
+      .invoiceHeader {
+        position: absolute;
+        left: 73%;
+        vertical-align: text-top;
+      }
+      
+      .invoiceRef {
+        float: right;
+        margin-right: 18px;
+      }
+
+      .invoiceIssue {
+        float: left;
+        margin-left: 0;
+      }
+
+      .separatorFooter {
+        border-top: 0.1rem solid;
+        margin-bottom: 0.5rem;
+        margin-top: 1rem;
+      }
+
+      .amount {
+        text-align: right;
+        padding-right: 25.5px;
+      }
+
+      .amountDue {
+        float: right;
+        font-size: 3rem;
+        font-weight: 700;
+        text-align: left;
+        color: #1d1d1b;
+        padding-right: 25.5px;
+      }
+    
+
+      .midSection {
+        border: 0.15rem solid #c6c6c6;
+        border-top: 0.25rem solid #007890;
+        background: linear-gradient(to right, white 57.25%, #f6f6f6 0%);
+        border-left: none;
+        border-right: none;
+        margin-top: 0.5em;
+        overflow: hidden;
+        position: relative;
+        width: 100%;
+      }
+
+      .chargeDetails {
+        float: right;
+        text-align: left;
+        width: 40%;
+        padding: 0.25rem;
+      }
+
+      .articleDetails {
+        padding: 1rem;
+        float: left;
+        width: 60%;
+        text-align: left;
+      }
+
+      .chargeDetails th {
+        font-size: 1.5rem;
+        font-weight: normal;
+        padding-bottom: 1.5rem;
+      }
+
+      .chargeDetails td {
+        font-weight: 600;
+        font-size: 1.75rem;
+        text-align: right;
+        color: #1d1d1b;
+        padding-bottom: 1.5rem;
+        padding-right: 20px;
+      }
+
+      .articleDetails th {
+        font-size: 1.5rem;
+        font-weight: normal;
+        vertical-align: top;
+        width: 115px;
+        padding-bottom: 0.5em;
+      }
+
+      .articleDetails td {
+        font-weight: 600;
+        font-size: 1.5rem;
+        color: #1d1d1b;
+        padding-bottom: 0.5em;
+        padding-right: 2em;
+        vertical-align: text-top;
+        white-space: initial;
+      }
+
+      .paymentContainer {
+        border: 0.15rem solid #c6c6c6;
+        border-left: none;
+        border-right: none;
+        margin-top: 24px;
+        overflow: hidden;
+        position: relative;
+        width: 100%;
+      }
+
+      .banking {
+        float: left;
+        width: 47%;
+        padding: 1rem;
+        padding-right: 3rem;
+        border-right: 0.15 solid;
+      }
+
+      .banking .billingInfo {
+        padding-top: 24px;
+      }
+
+      .banking th {
+        font-size: 1.5rem;
+        font-weight: normal;
+        text-align: left;
+        margin-top: 0.2em;
+        vertical-align: top;
+        padding-bottom: 0.5em;
+      }
+    
+      .banking td {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1d1d1b;
+        padding-bottom: 0.5em;
+        vertical-align: text-top;
+      }
+
+      .banking .paymentDate {
+        padding-right: 5em;
+      }
+      .banking .paymentInformation {
+        font-size: 2rem;
+        margin-bottom: 0.5em;
+        width: 200%;
+        color: #1d1d1b;
+        font-weight: 700;
+      }
+
+      .paymentFooter div {
+        color: red;
+        display: inline;
+      }
+
+      .paymentFooter {
+        color: #1d1d1b;
+        font-size: 1.5rem;
+        font-weight: 600;
+        width: 55%;
+      }
+
+
+      .paymentOptions {
+        float: right;
+        text-align: left;
+        width: 40%;
+        padding: 0.5rem;
+        padding-right: 1em;
+      }
+
+      .paymentOptions p {
+        font-size: 1.5rem;
+        font-weight: normal;
+      }
+
+      .paymentOptions .termsOfService {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-top: 0.35em;
+        color: #1d1d1b;
+      }
+
+      .divider {
+        position: absolute;
+        left: 57.25%;
+        top: 0;
+        bottom: 0;
+        border-left: 0.15rem solid #c6c6c6;
+      }
+
+      .articleDetailsTitle {
+        float: left;
+        text-align: left;
+        padding-left: 1em;
+      }
+
+      .paymentContainer a {
+        text-decoration: none;
+      }
+
+      .separator {
+        border-top: 0.15rem solid #c6c6c6;
+        margin-top: 1em;
+        margin-bottom: 1em;
+      }
+
+      .pdfWrapper {
+        padding-top: 16px;
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <div id="pageHeader">
+      <img src="<%= logo %>" alt="" />
+      <h2>Receipt</h2>
+    </div>
+
+    <table class="container">
+      <tr>
+        <td>
+          <table class="billingDetail">
+            <tr>
+              <td>
+                <table class="columns">
+                  <tr>
+                    <td>
+                      <h1>Hindawi Limited</h1>
+                      <table class="data">
+                        <tr>
+                          <td>The Atrium, Southern Gate,</td>
+                        </tr>
+                        <tr>
+                          <td>Chichester, West Sussex, PO19 85Q, UK</td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+                <h1>www.hindawi.com</h1>
+              </td>
+            </tr>
+          </table>
+
+          <table class="invoiceHeader">
+            <tr>
+              <td>
+                <table class="invoiceRef">
+                  <tr>
+                    <td>
+                      <table class="column">
+                        <tr>
+                          <td>
+                            <h1>Invoice Reference Number</h1>
+                            <table class="data">
+                              <tr>
+                                <td><%= invoice.persistentReferenceNumber %></td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <div class="pdfWrapper">
+
+    <table class="midSection">
+      <tr>
+        <td>
+          <table class="articleDetails">
+            <tr>
+              <td>
+                <tr>
+                  <th>Journal Title</th>
+                  <td><%= article.props.journalTitle %></td>
+                </tr>
+                <tr>
+                  <th>Article Title</th>
+                  <td><%= article.title %></td>
+                </tr>
+              </td>
+              <td>
+                <tr>
+                  <th>Article ID</th>
+                  <td><%= article.customId %></td>
+                </tr>
+                <tr>
+                  <th>Article Type</th>
+                  <td><%= article.articleType %></td>
+                </tr>
+                <tr>
+                  <th>License</th>
+                  <td>CC-BY 4.0</td>
+                </tr>
+                <tr>
+                  <th>Corresponding Author</th>
+                  <td>
+                    <%= article.authorSurname %> <%= article.authorFirstName %>
+                  </td>
+                </tr>
+              </td>
+            </tr>
+          </table>
+          <div class="divider"></div>
+          <table class="chargeDetails">
+            <tr>
+              <td>
+                <% for (let i = 0; i < invoice.invoiceItems.currentItems.length;
+                i++) { %> <% const item = invoice.invoiceItems.currentItems[i]%>
+                <% if (item.type === 'APC') { %>
+                <tr>
+                  <th>Article Processing Charges</th>
+                  <td>
+                    $<%=
+                    formatPriceFn(invoice.invoiceItems.currentItems[i].price) %>
+                  </td>
+                </tr>
+                <% } %> <% } %>
+                  <% let item = invoice.invoiceItems.currentItems[0] %>
+                  <% let price = invoice.invoiceNetTotal %>
+                  <% let vat = invoice.invoiceVatTotal %>
+                  <% let discount = invoice.invoiceDiscountTotal %>
+                  <% let discountPercentage = invoice.invoiceDiscountPercentageTotal %>
+                  <% if(discount!== 0) { %>
+                <tr>
+                  <th>Discount (-<%= discountPercentage %>%)</th>
+                  <td>
+                    -$<%= formatPriceFn(discount) %>
+                  </td>
+                </tr>
+                <% } %>
+                <tr>
+                  <th>Net Charges</th>
+                  <td>$<%= formatPriceFn(price) %></td>
+                </tr>
+                <tr>
+                  <th>
+                    VAT (<%= item.vat %>%)
+                  </th>
+                  <td>
+                    $<%= formatPriceFn(vat) %>
+                  </td>
+                </tr>
+                <tr>
+                  <th class="summary">Total Paid Amount</th>
+                  <td class="summary">
+                    $<%= formatPriceFn(price + vat)%>
+                  </td>
+                </tr>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <h1 class="amount">Paid Amount</h1>
+      <div class="amountDue">$<%= formatPriceFn(price + vat)%> USD</div>
+      <h1 class="articleDetailsTitle">Article Details</h1>
+    </table>
+
+    <table class="paymentContainer">
+      <tr>
+        <td>
+          <table class="banking">
+            <tr>
+              <td>
+                <h3 class="paymentInformation">PAYMENT INFORMATION</h3>     
+              </td>
+            </tr>
+
+              <tr>
+                <td>
+                  <h1>Payment Method</h1>
+                </td>
+              </tr>
+              <tr>
+                <th>Card No.</th>
+                <% if(cardLastDigits) { %>
+                  <td>xxxxxxxxxxxx<%=cardLastDigits %></td>
+                <% } else { %>
+                  <td>N/A</td>
+                <% } %>
+              </tr>
+              <tr>
+                <th>Authorization Code</th>
+                <% if(authorizationCode) { %>
+                  <td><%= authorizationCode %></td>             
+               <% } else { %>
+                  <td>N/A</td>
+                <%} %>
+              </tr>
+              <tr>
+                <th>Transaction Type</th>
+                <td>Purchase</td>
+              </tr>
+              <tr>
+                <th>Transaction </br> Date & Time</th>
+                <td class="paymentDate">
+                 <%= paymentDate %>
+                </td>
+              </tr>     
+            
+              <tr>
+                <td>
+                  <h1 class="billingInfo">Billing Information</h1>
+                </td>
+              </tr>
+              <tr>
+                <th>Name</th>
+                <td><%= payer.name.value %></td>  
+              </tr>
+              <% if(payer.organization) { %>
+              <tr>
+                <th>Institution</th>
+                <td><%= payer.organization.value %></td>
+              </tr>
+              <% } %>
+              <tr>
+                <th>Address</th>
+                <td><%= address.addressLine1 %> <%= address.addressLine2%></td>
+              </tr>
+              <tr>
+                <th>Country & City</th>
+                <td><%= addressCountry + (addressState ? ', ' + addressState : '') %></td>
+              </tr>
+              <tr> 
+                <th>Email</th>
+                <td><%= payer.email.value %></td>
+              </tr>
+              <tr>
+                <th>EC VAT Reg. No.</th>
+                <td><%= payer.VATId %></td>
+              </tr>
+            </table>
+              
+          <div class="divider"></div>
+          <table class="paymentOptions">
+            <tr>
+              <td>
+                <h3 class="termsOfService">TERMS OF SERVICE</h3>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p>
+                  Publication of an article with us requires 
+                  payment of a non-refundable article
+                  processing charge in accordance with our 
+                  <a href="https://www.hindawi.com/publish-research/authors/article-processing-charges/"> Article Processing Charges Policy</a>
+                </p><br />
+                <p>
+                  Once an article has been accepted for
+                  publication, the submitting author assumes
+                  responsibility for the Article Processing
+                  Charge, and Hindawi will not issue refunds
+                  of any kind.
+                </p><br />
+                <p>
+                  Please refer to our <a href="https://www.hindawi.com/privacy/">Privacy Policy</a>, for details
+                  of how personally identifiable information is
+                  collected and processed by us or shared
+                  with others.
+                </p>
+              </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="separator"></div>     
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div id="pageFooter">
+                    <p>
+                     The Atrium, Southern Gate, Chichester, West Sussex, PO19 85Q, UK •
+                     Company Reg. No.: <%= companyNumber %> VAT Reg. No.: <%= vatNumber %>
+                    </p>
+                    </br>
+                    <p>For assistance, please contact <a>invoices@hindawi.com</a></p>
+                  </div>
+                </td>
+              </tr>
+            </table>
+        </td>
+      </tr>
+    </table>
+    </div>
+  </body>
+</html>

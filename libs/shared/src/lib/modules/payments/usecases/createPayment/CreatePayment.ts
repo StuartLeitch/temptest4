@@ -47,7 +47,8 @@ interface DomainEventsDispatchData extends WithPayment {
 
 export class CreatePaymentUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(private paymentRepo: PaymentRepoContract) {
     super();
 
@@ -121,6 +122,8 @@ export class CreatePaymentUsecase
       datePaid: request.datePaid ? new Date(request.datePaid) : null,
       payerId: PayerId.create(new UniqueEntityID(request.payerId)),
       amount: maybeAmount.value,
+      authorizationCode: request.authorizationCode,
+      cardLastDigits: request.cardLastDigits,
       foreignPaymentId: ExternalOrderId.create(request.foreignPaymentId),
       status: PaymentStatus[request.status],
     };

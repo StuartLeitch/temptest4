@@ -106,14 +106,15 @@ const renderError = (error) => {
   let errorText = error;
 
   if (error.indexOf("INSTRUMENT_DECLINED") > -1) {
-    errorText = 'Payment declined, please choose other payment method from PayPal or choose Credit Card payment.';
+    errorText =
+      "Payment declined, please choose other payment method from PayPal or choose Credit Card payment.";
   }
 
-  return (<Text type="warning">{errorText}</Text>);
-}
+  return <Text type="warning">{errorText}</Text>;
+};
 
 const ServerErrorContext = React.createContext({
-  serverError: null
+  serverError: null,
 });
 
 const InvoicePayment: React.FunctionComponent<Props> = ({
@@ -140,7 +141,6 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
     [methods],
   );
 
-
   let body = null;
   if (invoiceStatus === "PENDING") {
     body = (
@@ -163,65 +163,61 @@ const InvoicePayment: React.FunctionComponent<Props> = ({
           console.info(`./api/invoice/${invoice.payer.id}`);
         }}
         payerId={invoice.payer.id}
+        paymentType={invoice.payments[0]?.paymentMethod?.name}
       />
     );
   } else {
     body = [
-        <Label key={"invoice-download-link"} my="4" ml="4">
-          Your Invoice
-          <InvoiceDownloadLink payer={invoice.payer} />
-        </Label>,
-        <Formik
-          key={"invoice-payment-form"}
-          validate={validateFn(methods)}
-          initialValues={{
-            paymentMethodId: null,
-            payerId: invoice && invoice.payer && invoice.payer.id,
-            amount: invoiceCharge,
-          }}
-          onSubmit={payByCardSubmit}
-        >
-          {({ setFieldValue, values }) => {
-            return (
-                <Root>
-                    <ChoosePayment
-                      methods={parsedMethods}
-                      setFieldValue={setFieldValue}
-                      values={values}
-                    />
-                    {methods[values.paymentMethodId] === "Credit Card" && [
-                      <CreditCardForm
-                        ccToken={ccToken}
-                        payerId={invoice && invoice.payer && invoice.payer.id}
-                        paymentMethodId={values.paymentMethodId}
-                        handleSubmit={payByCardSubmit}
-                        total={calculateTotalToBePaid(invoice)}
-                        serverError={error}
-                        loading={loading}
-                      />
-                    ]}
-                    {methods[values.paymentMethodId] === "Bank Transfer" && [
-                      <BankTransfer invoiceReference={invoice.referenceNumber}/>,
-                      renderError(error)
-                    ]}
-                    {methods[values.paymentMethodId] === "Paypal" && [
-                      <Paypal
-                        createPayPalOrder={createPayPalOrder}
-                        onSuccess={payByPayPalSubmit}
-                      />,
-                      renderError(error)
-                    ]}
-                </Root>
-            );
-          }}
-        </Formik>
+      <Formik
+        key={"invoice-payment-form"}
+        validate={validateFn(methods)}
+        initialValues={{
+          paymentMethodId: null,
+          payerId: invoice && invoice.payer && invoice.payer.id,
+          amount: invoiceCharge,
+        }}
+        onSubmit={payByCardSubmit}
+      >
+        {({ setFieldValue, values }) => {
+          return (
+            <Root>
+              <ChoosePayment
+                methods={parsedMethods}
+                setFieldValue={setFieldValue}
+                values={values}
+              />
+              {methods[values.paymentMethodId] === "Credit Card" && [
+                <CreditCardForm
+                  ccToken={ccToken}
+                  payerId={invoice && invoice.payer && invoice.payer.id}
+                  paymentMethodId={values.paymentMethodId}
+                  handleSubmit={payByCardSubmit}
+                  total={calculateTotalToBePaid(invoice)}
+                  serverError={error}
+                  loading={loading}
+                />,
+              ]}
+              {methods[values.paymentMethodId] === "Bank Transfer" && [
+                <BankTransfer invoiceReference={invoice.referenceNumber} />,
+                renderError(error),
+              ]}
+              {methods[values.paymentMethodId] === "Paypal" && [
+                <Paypal
+                  createPayPalOrder={createPayPalOrder}
+                  onSuccess={payByPayPalSubmit}
+                />,
+                renderError(error),
+              ]}
+            </Root>
+          );
+        }}
+      </Formik>,
     ];
   }
 
-
   return (
     <Expander
-      title="2. Invoice &amp; Payment"
+      title="2. Payment"
       expanded={invoiceStatus !== "DRAFT"}
       disabled={invoiceStatus === "DRAFT"}
       onExpand={() => {

@@ -18,6 +18,8 @@ import {
 
 export interface PaymentDetails {
   foreignPaymentId: ExternalOrderId;
+  authorizationCode: string;
+  cardLastDigits: string;
   paymentMethodId: PaymentMethodId;
   status: PaymentStatus;
 }
@@ -48,11 +50,15 @@ export class PaymentStrategy implements Strategy {
   ): Promise<Either<StrategyError, PaymentDetails>> {
     const maybePayment = await this.payBehavior.makePayment(request);
 
-    return maybePayment.map(({ foreignPaymentId, status }) => ({
-      paymentMethodId: this.paymentMethod,
-      foreignPaymentId,
-      status,
-    }));
+    return maybePayment.map(
+      ({ authorizationCode, cardLastDigits, foreignPaymentId, status }) => ({
+        paymentMethodId: this.paymentMethod,
+        foreignPaymentId,
+        authorizationCode,
+        cardLastDigits,
+        status,
+      })
+    );
   }
 
   async captureMoney(

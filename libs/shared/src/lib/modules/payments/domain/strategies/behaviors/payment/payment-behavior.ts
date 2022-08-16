@@ -21,6 +21,8 @@ export interface PaymentDTO {
 export interface PaymentResponse {
   foreignPaymentId: ExternalOrderId;
   status: PaymentStatus;
+  authorizationCode?: string;
+  cardLastDigits?: string;
 }
 
 export abstract class PaymentBehavior implements Behavior {

@@ -16,7 +16,9 @@ import {
   PayPalPayment,
   WaiverService,
   EmailService,
+  CommsEmailService,
   VATService,
+  NoOpQueueService,
 } from '@hindawi/shared';
 
 import { PhenomSqsServiceContract } from '../queue_service/phenom-queue-service';
@@ -35,6 +37,7 @@ export interface Services {
   queue: PhenomSqsServiceContract;
   waiverService: WaiverService;
   emailService: EmailService;
+  commsEmailService: CommsEmailService;
   vatService: VATService;
   erp: {
     netsuite: NetSuiteService;
@@ -74,8 +77,8 @@ function buildPaymentStrategyFactory(
   );
 }
 
-async function setupQueueService(loggerBuilder: LoggerBuilder) {
-  const logger = loggerBuilder.getLogger('setupQueueService');
+async function setupPhenomQueueService(loggerBuilder: LoggerBuilder) {
+  const logger = loggerBuilder.getLogger('SetupPhenomQueueService');
   const config = {
     region: env.aws.sns.sqsRegion,
     accessKeyId: env.aws.sns.sqsAccessKey,
@@ -103,12 +106,30 @@ async function setupQueueService(loggerBuilder: LoggerBuilder) {
   return queue;
 }
 
+async function setupQueue(
+  loggerBuilder: LoggerBuilder
+): Promise<PhenomSqsServiceContract> {
+  const logger = loggerBuilder.getLogger('QueueServiceSetup');
+
+  try {
+    if (env.loaders.queueServiceEnabled) {
+      return await setupPhenomQueueService(loggerBuilder);
+    }
+    return new NoOpQueueService();
+  } catch (err) {
+    logger.error(err);
+    throw err;
+  }
+}
+
 export async function buildServices(
   repos: Repos,
   loggerBuilder: LoggerBuilder
 ): Promise<Services> {
   const bullData = env.scheduler.db;
   const { sisifEnabled } = env.loaders;
+
+  const queue = await setupQueue(loggerBuilder);
 
   return {
     pdfGenerator: createPdfGenerator(
@@ -127,6 +148,13 @@ export async function buildServices(
       env.antiFraud.supportEmail,
       env.antiFraud.policyUrl
     ),
+    commsEmailService: new CommsEmailService(
+      queue,
+      env.app.FERoot,
+      env.app.invoicePaymentEmailSenderAddress,
+      env.app.invoicePaymentEmailSenderName,
+      env.app.mailingDisabled
+    ),
     schedulingService: sisifEnabled
       ? new BullScheduler(bullData, loggerBuilder.getLogger(BullScheduler.name))
       : null,
@@ -135,9 +163,7 @@ export async function buildServices(
       loggerBuilder
     ),
     erp: null,
-    queue: env.loaders.queueServiceEnabled
-      ? await setupQueueService(loggerBuilder)
-      : null,
+    queue,
     exchangeRateService: new AbstractApiExchangeRateService(
       repos.exchangeRate,
       loggerBuilder.getLogger(AbstractApiExchangeRateService.name),

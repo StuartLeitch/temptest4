@@ -141,6 +141,8 @@ export const payments: Resolvers<Context> = {
         invoiceId: confirmedPayment.invoiceId.id.toString(),
         paymentMethodId: confirmedPayment.paymentMethodId.id.toString(),
         foreignPaymentId: confirmedPayment.foreignPaymentId.toString(),
+        authorizationCode: confirmedPayment.authorizationCode,
+        cardLastDigits: confirmedPayment.cardLastDigits,
         amount: confirmedPayment.amount.value,
         datePaid: confirmedPayment.datePaid.toISOString(),
         status: confirmedPayment.status,

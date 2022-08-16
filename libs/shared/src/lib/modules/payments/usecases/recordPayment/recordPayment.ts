@@ -336,7 +336,6 @@ export class RecordPaymentUsecase
       if (request.paymentDetails.status !== request.payment.status) {
         request.payment.status = request.paymentDetails.status;
       }
-
       const maybeUpdated = await this.paymentRepo.updatePayment(
         request.payment
       );
@@ -373,6 +372,8 @@ export class RecordPaymentUsecase
       const { paymentDetails, datePaid, invoice, amount, payer } = request;
 
       const dto = {
+        authorizationCode: paymentDetails.authorizationCode,
+        cardLastDigits: paymentDetails.cardLastDigits,
         foreignPaymentId: paymentDetails.foreignPaymentId.id.trim(),
         paymentMethodId: paymentDetails.paymentMethodId.toString(),
         isFinalPayment: request.isFinalPayment ?? true,
@@ -397,7 +398,9 @@ export class RecordPaymentUsecase
           return right(true);
         })
         .then((data) => usecaseSave.execute(data, context))
-        .map((payment) => ({ ...request, payment }))
+        .map((payment) => {
+          return { ...request, payment };
+        })
         .execute();
 
       const maybePaymentMethod = await getPaymentMethodById.execute(
@@ -414,6 +417,7 @@ export class RecordPaymentUsecase
         })
         .map((request) => {
           const { existingPayment, foreignPaymentId } = request;
+
           existingPayment.foreignPaymentId =
             ExternalOrderId.create(foreignPaymentId);
 

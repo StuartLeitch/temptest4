@@ -40,7 +40,9 @@ export class BraintreePayment extends PaymentBehavior {
 
     return right({
       status: PaymentStatus.COMPLETED,
-      foreignPaymentId: result.value,
+      foreignPaymentId: result.value.externalOrderId,
+      authorizationCode: result.value.authorizationCode,
+      cardLastDigits: result.value.cardLastDigits,
     });
   }
 }

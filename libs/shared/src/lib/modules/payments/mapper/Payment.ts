@@ -31,6 +31,8 @@ export class PaymentMap extends Mapper<Payment> {
           paymentProof: raw.paymentProof
             ? ExternalOrderId.create(raw.paymentProof)
             : null,
+          authorizationCode: raw.authorizationCode,
+          cardLastDigits: raw.cardLastDigits,
         },
         new UniqueEntityID(raw.id)
       )
@@ -50,6 +52,8 @@ export class PaymentMap extends Mapper<Payment> {
       status: payment.status,
       foreignPaymentId: payment.foreignPaymentId?.toString(),
       paymentProof: payment.paymentProof?.toString(),
+      authorizationCode: payment.authorizationCode,
+      cardLastDigits: payment.cardLastDigits,
     };
   }
 }

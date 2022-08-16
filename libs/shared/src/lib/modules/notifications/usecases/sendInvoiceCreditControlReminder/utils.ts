@@ -3,7 +3,7 @@ import { CatalogItem } from '../../../journals/domain/CatalogItem';
 import { Invoice } from '../../../invoices/domain/Invoice';
 import { Notification } from '../../domain/Notification';
 
-import { PaymentReminder } from '../../../../infrastructure/communication-channels/EmailService';
+import { PaymentReminder } from '../../../../infrastructure/communication-channels/invoicingEmailService/EmailService';
 
 import { SendInvoiceCreditControlReminderDTO as DTO } from './sendInvoiceCreditControlReminderDTO';
 

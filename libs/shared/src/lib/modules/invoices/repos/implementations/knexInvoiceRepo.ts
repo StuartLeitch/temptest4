@@ -282,7 +282,9 @@ export class KnexInvoiceRepo
         'payments.foreignPaymentId as foreignPaymentId',
         'payments.amount as amount',
         'payments.datePaid as paymentDate',
-        'payment_methods.name as paymentType'
+        'payment_methods.name as paymentType',
+        'payments.authorizationCode as authorizationCode',
+        'payments.cardLastDigits as cardLastDigits'
       )
       .from('invoices')
       .leftJoin('payers', 'payers.invoiceId', '=', 'invoices.id')

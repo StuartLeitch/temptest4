@@ -1,13 +1,13 @@
 import { cloneDeep } from 'lodash';
 
-import hindawiDefault from '../../../../../../config/default';
-import gswConfig from '../../../../../../config/default-gsw';
-import importManuscriptConfig from '../../../../../../config/importManuscript';
+import hindawiDefault from '../../../../../../../config/default';
+import gswConfig from '../../../../../../../config/default-gsw';
+import importManuscriptConfig from '../../../../../../../config/importManuscript';
 
-import { Manuscript } from '../../modules/manuscripts/domain/Manuscript';
-import { CatalogItem } from '../../modules/journals/domain/CatalogItem';
-import { InvoiceItem } from '../../modules/invoices/domain/InvoiceItem';
-import { Invoice } from '../../modules/invoices/domain/Invoice';
+import { Manuscript } from '../../../modules/manuscripts/domain/Manuscript';
+import { CatalogItem } from '../../../modules/journals/domain/CatalogItem';
+import { InvoiceItem } from '../../../modules/invoices/domain/InvoiceItem';
+import { Invoice } from '../../../modules/invoices/domain/Invoice';
 
 import { EmailPropsBuilder, EmailReceiver } from './EmailProps';
 import { JournalProps, Email } from './Email';
@@ -154,7 +154,7 @@ export class EmailService {
     error: any,
     importManuscriptPath: string
   ): Email {
-    console.log(JSON.stringify(receiver, null, 2))
+    console.log(JSON.stringify(receiver, null, 2));
     const unsuccessTxt = '⚠ Your uploaded zip file could not be analyzed!';
 
     const gotoPhenomButton = ButtonLinkTemplate.build(

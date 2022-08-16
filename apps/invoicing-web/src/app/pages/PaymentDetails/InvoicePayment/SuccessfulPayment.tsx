@@ -6,13 +6,17 @@ import { config } from "@hindawi/invoicing-web/config";
 interface Props {
   title?: string;
   payerId: string;
+  paymentType: string;
   onViewInvoice?: () => void;
 }
+
+const CREDIT_CARD = "Credit Card";
 
 const SuccessfulPayment: React.FunctionComponent<Props> = ({
   title = "Payment was sent successfully",
   onViewInvoice,
   payerId,
+  paymentType,
 }) => (
   <Flex alignItems="center" vertical flex={2}>
     <Flex vertical alignItems="center" style={{ padding: "40px" }}>
@@ -26,17 +30,11 @@ const SuccessfulPayment: React.FunctionComponent<Props> = ({
         <Separator direction="horizontal"></Separator>
       </div>
       <Title type="small">{title}</Title>
-      <div style={{ height: "50px" }}>
+      <div style={{ height: "25px" }}>
         <Separator direction="horizontal"></Separator>
       </div>
 
-      <Fragment>
-        <a href={`${config.apiRoot}/invoice/${payerId}`}>
-          <Button type="primary" onClick={null} mr={3}>
-            VIEW INVOICE
-          </Button>
-        </a>
-      </Fragment>
+      {isCreditCardPayment(paymentType) && downloadReceipt(payerId)}
     </Flex>
   </Flex>
 );
@@ -49,3 +47,19 @@ const CardContainer = styled(Flex)`
   padding: 0 calc(${th("gridUnit")} * 4);
   padding-top: calc(${th("gridUnit")} * 3);
 `;
+
+function isCreditCardPayment(paymentType: string) {
+  return paymentType === CREDIT_CARD;
+}
+
+function downloadReceipt(payerId: string) {
+  return (
+    <Fragment>
+      <a href={`${config.apiRoot}/receipt/${payerId}`}>
+        <Button type="primary" size="large" onClick={null} mr={3} mt={0}>
+          Download Receipt
+        </Button>
+      </a>
+    </Fragment>
+  );
+}

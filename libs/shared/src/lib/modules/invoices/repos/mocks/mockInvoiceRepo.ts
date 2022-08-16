@@ -22,7 +22,8 @@ import { InvoiceRepoContract } from '../invoiceRepo';
 
 export class MockInvoiceRepo
   extends BaseMockRepo<Invoice>
-  implements InvoiceRepoContract {
+  implements InvoiceRepoContract
+{
   deletedItems: Invoice[] = [];
 
   constructor(
@@ -151,6 +152,8 @@ export class MockInvoiceRepo
       country: '',
       vatRegistrationNumber: '',
       foreignPaymentId: '',
+      authorizationCode: '',
+      cardLastDigits: '',
       amount: null,
       paymentDate: invoice.props.dateAccepted?.toISOString(),
       paymentType: '',
@@ -268,16 +271,16 @@ export class MockInvoiceRepo
   async getUnrecognizedNetsuiteErpInvoices(): Promise<
     Either<GuardFailure | RepoError, InvoiceId[]>
   > {
-    const [
-      filterArticlesByNotNullDatePublished,
-    ] = await this.articleRepo.filterBy({
-      whereNotNull: 'articles.datePublished',
-    });
+    const [filterArticlesByNotNullDatePublished] =
+      await this.articleRepo.filterBy({
+        whereNotNull: 'articles.datePublished',
+      });
 
     // * search invoices through invoice items
-    const maybeInvoiceItems = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
-      filterArticlesByNotNullDatePublished.manuscriptId
-    );
+    const maybeInvoiceItems =
+      await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
+        filterArticlesByNotNullDatePublished.manuscriptId
+      );
 
     if (maybeInvoiceItems.isLeft()) {
       return left(maybeInvoiceItems.value);
@@ -306,16 +309,18 @@ export class MockInvoiceRepo
   async getUnrecognizedNetsuiteErpInvoicesDeprecated(): Promise<
     Either<GuardFailure | RepoError, InvoiceId[]>
   > {
-    const filterInvoicesReadyForRevenueRecognition = this.filterReadyForRevenueRecognition();
+    const filterInvoicesReadyForRevenueRecognition =
+      this.filterReadyForRevenueRecognition();
 
     const [filterArticlesByNotNullDatePublished] = this.articleRepo.filterBy({
       whereNotNull: 'articles.datePublished',
     });
 
     // search invoices through invoice items
-    const maybeInvoiceItems = await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
-      filterArticlesByNotNullDatePublished.manuscriptId
-    );
+    const maybeInvoiceItems =
+      await this.invoiceItemRepo.getInvoiceItemByManuscriptId(
+        filterArticlesByNotNullDatePublished.manuscriptId
+      );
 
     if (maybeInvoiceItems.isLeft()) {
       return left(maybeInvoiceItems.value);

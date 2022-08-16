@@ -34,7 +34,7 @@ const BillingInfo: React.FC<Props> = ({
   refreshInvoice,
 }: any) => {
   return (
-    <Expander mb={6} flex={2} expanded={true} title="1. Payer details">
+    <Expander mb={6} flex={2} expanded={true} title="1. Payer Details">
       <Root>
         {status === "ACTIVE" || status === "FINAL" || status === "PENDING" ? (
           <InvoiceInfo {...payer} />

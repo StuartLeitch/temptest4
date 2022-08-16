@@ -36,6 +36,8 @@ export interface PaymentProps {
   amount: Amount;
   foreignPaymentId?: ExternalOrderId;
   paymentMethodId?: PaymentMethodId;
+  authorizationCode?: string;
+  cardLastDigits?: string;
   paymentType?: string;
   paymentProof?: ExternalOrderId;
   datePaid?: Date;
@@ -84,6 +86,22 @@ export class Payment extends AggregateRoot<PaymentProps> {
 
   get foreignPaymentId(): ExternalOrderId {
     return this.props.foreignPaymentId;
+  }
+
+  set authorizationCode(authorizationCode: string) {
+    this.props.authorizationCode = authorizationCode;
+  }
+
+  get authorizationCode(): string {
+    return this.props.authorizationCode;
+  }
+
+  set cardLastDigits(cardLastDigits: string) {
+    this.props.cardLastDigits = cardLastDigits;
+  }
+
+  get cardLastDigits(): string {
+    return this.props.cardLastDigits;
   }
 
   get status(): PaymentStatus {

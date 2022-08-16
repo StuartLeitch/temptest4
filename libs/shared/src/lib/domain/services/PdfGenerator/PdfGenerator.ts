@@ -7,13 +7,8 @@ import axios from 'axios';
 import path from 'path';
 import ejs from 'ejs';
 import fs from 'fs';
+import { env } from 'process';
 
-async function getBase64(url) {
-  const response = await axios.get(url, {
-    responseType: 'arraybuffer',
-  });
-  return Buffer.from(response.data, 'binary').toString('base64');
-}
 import { LoggerContract } from '../../../infrastructure/logging';
 
 import { Article } from '../../../modules/manuscripts/domain/Article';
@@ -23,7 +18,7 @@ import { Author } from '../../../modules/authors/domain/Author';
 import { Payer } from '../../../modules/payers/domain/Payer';
 
 import { FormatUtils } from '../../../utils/FormatUtils';
-import { env } from 'process';
+import { Payment } from '../../../modules/payments/domain/Payment';
 
 export interface InvoicePayload {
   invoiceLink: string;
@@ -32,6 +27,16 @@ export interface InvoicePayload {
   invoice: Invoice;
   author: Author;
   payer: Payer;
+}
+
+export interface ReceiptPayload {
+  receiptLink: string;
+  address: Address;
+  article: Article;
+  invoice: Invoice;
+  author: Author;
+  payer: Payer;
+  payment: Payment;
 }
 
 export class PdfGeneratorService {
@@ -43,30 +48,39 @@ export class PdfGeneratorService {
     };
   } = {};
 
-  static async convertLogo(url: string): Promise<any> {
-    return await getBase64(url);
+  public async getReceipt(payload: ReceiptPayload): Promise<Readable> {
+    var { imgType, logoData } = await convertLogoType(process.env.LOGO_URL);
+    const { page, browser } = await createNewPage();
+
+    const template = this.getTemplate('receipt');
+    const data = {
+      formatPriceFn: FormatUtils.formatPrice,
+      dateFormatFn: format,
+      ...payload,
+      addressCountry: countryList.getName(payload.address.country),
+      addressState: stateList.name[payload.address.state],
+      companyNumber: process.env.COMPANY_REGISTRATION_NUMBER,
+      vatNumber: process.env.COMPANY_VAT_NUMBER,
+      assistanceEmail: process.env.ASSISTANCE_EMAIL,
+      tenantAddress: process.env.TENANT_ADDRESS,
+      logo: `data:image/${imgType};base64, ${logoData}`,
+    };
+
+    const htmlTemplate = template(data);
+
+    try {
+      return await generatePdf(page, htmlTemplate);
+    } catch (error) {
+      this.logger.error(error.message, error);
+      throw error;
+    } finally {
+      await browser.close();
+    }
   }
 
   public async getInvoice(payload: InvoicePayload): Promise<Readable> {
-    const logoUrl = process.env.LOGO_URL;
-    const logoData = await PdfGeneratorService.convertLogo(logoUrl);
-
-    const logoTermination = logoUrl.substring(logoUrl.length - 3);
-    let imgType = 'png';
-
-    if (logoTermination === 'svg') {
-      imgType = 'svg+xml';
-    }
-
-    if (logoTermination === 'ebp') {
-      imgType = 'webp';
-    }
-
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox'],
-    });
-    const page = await browser.newPage();
+    var { imgType, logoData } = await convertLogoType(process.env.LOGO_URL);
+    const { page, browser } = await createNewPage();
 
     const template = this.getTemplate('invoice');
 
@@ -116,29 +130,12 @@ export class PdfGeneratorService {
     const htmlTemplate = template(data);
 
     try {
-      await page.setContent(htmlTemplate, {
-        waitUntil: 'domcontentloaded',
-        args: ['--disable-dev-shm-usage'],
-      } as any);
-
-      const buffer = await page.pdf({
-        format: 'a4',
-        margin: { top: '0.25cm', right: '1cm', bottom: '0.25cm', left: '1cm' },
-        printBackground: true,
-      });
-
-      await browser.close();
-
-      return new Readable({
-        read() {
-          this.push(buffer);
-          this.push(null);
-        },
-      });
+      return await generatePdf(page, htmlTemplate);
     } catch (error) {
       this.logger.error(error.message, error);
-      await browser.close();
       throw error;
+    } finally {
+      await browser.close();
     }
   }
 
@@ -163,4 +160,59 @@ export class PdfGeneratorService {
 
     return template.compile;
   }
+}
+async function createNewPage() {
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox'],
+  });
+  const page = await browser.newPage();
+  return { page, browser };
+}
+
+async function convertLogoType(url) {
+  const response = await axios.get(url, {
+    responseType: 'arraybuffer',
+  });
+
+  const logoData = Buffer.from(response.data, 'binary').toString('base64');
+  let imgType = convertTypeToBase64(url);
+  return { imgType, logoData };
+}
+
+function convertTypeToBase64(url: any) {
+  const logoTermination = url.substring(url.length - 3);
+  let imgType = 'png';
+
+  if (logoTermination === 'svg') {
+    imgType = 'svg+xml';
+  }
+
+  if (logoTermination === 'ebp') {
+    imgType = 'webp';
+  }
+  return Buffer.from(imgType).toString('base64');
+}
+
+async function generatePdf(
+  page: puppeteer.Page,
+  htmlTemplate: string
+): Promise<Readable> {
+  await page.setContent(htmlTemplate, {
+    waitUntil: 'domcontentloaded',
+    args: ['--disable-dev-shm-usage'],
+  } as any);
+
+  const buffer = await page.pdf({
+    format: 'a4',
+    margin: { top: '0.25cm', right: '1cm', bottom: '0.25cm', left: '1cm' },
+    printBackground: true,
+  });
+
+  return new Readable({
+    read() {
+      this.push(buffer);
+      this.push(null);
+    },
+  });
 }

@@ -1,5 +1,7 @@
 export interface CreatePaymentDTO {
   foreignPaymentId: string;
+  authorizationCode: string;
+  cardLastDigits: string;
   isFinalPayment: boolean;
   paymentMethodId: string;
   datePaid?: string;

@@ -2,8 +2,8 @@ import { differenceInCalendarDays } from 'date-fns';
 
 import { EmailContent } from '../EmailProps';
 
-import { CatalogItem } from '../../../modules/journals/domain/CatalogItem';
-import { Invoice } from '../../../modules/invoices/domain/Invoice';
+import { CatalogItem } from '../../../../modules/journals/domain/CatalogItem';
+import { Invoice } from '../../../../modules/invoices/domain/Invoice';
 
 export class InvoiceCreditControlReminderTemplate {
   static build(

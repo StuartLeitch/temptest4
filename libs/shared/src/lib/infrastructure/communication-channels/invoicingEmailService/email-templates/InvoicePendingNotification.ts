@@ -1,6 +1,6 @@
 import { EmailContent } from '../EmailProps';
 
-import { Invoice } from '../../../modules/invoices/domain/Invoice';
+import { Invoice } from '../../../../modules/invoices/domain/Invoice';
 
 export class InvoicePendingNotificationTemplate {
   static build(invoice: Invoice): EmailContent {
@@ -11,7 +11,7 @@ export class InvoicePendingNotificationTemplate {
 
     return {
       paragraph,
-      subject
+      subject,
     };
   }
 }

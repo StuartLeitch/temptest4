@@ -48,7 +48,12 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
         waiver,
         payer,
       },
-      services: { schedulingService, emailService, queue: queue },
+      services: {
+        schedulingService,
+        emailService,
+        commsEmailService,
+        queue: queue,
+      },
       loggerBuilder,
     } = context;
 
@@ -159,7 +164,8 @@ export const domainEventsRegisterLoader: MicroframeworkLoader = async (
       waiver,
       payer,
       publishInvoicePaid,
-      loggerService
+      loggerService,
+      commsEmailService
     );
 
     // tslint:disable-next-line: no-unused-expression

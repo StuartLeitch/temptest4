@@ -19,7 +19,8 @@ import * as Errors from './publishInvoiceCreated.errors';
 const INVOICE_CREATED = 'InvoiceCreated';
 
 export class PublishInvoiceCreatedUsecase
-  implements UseCase<DTO, Promise<Response>, Context> {
+  implements UseCase<DTO, Promise<Response>, Context>
+{
   constructor(private publishService: SQSPublishServiceContract) {}
 
   public async execute(request: DTO, context?: Context): Promise<Response> {
