@@ -57,20 +57,3 @@ export const graphqlLoader: MicroframeworkLoader = async (
     });
   }
 };
-
-function configureKeycloak(app, memoryStore, graphqlPath) {
-  const keycloakConfig = env.app.keycloakConfig;
-
-  const keycloak = new Keycloak(
-    {
-      store: memoryStore,
-    },
-    keycloakConfig
-  );
-
-  // Protect the main route for all graphql services
-  // Disable unauthenticated access
-  app.use(graphqlPath, keycloak.middleware());
-
-  return { keycloak };
-}
