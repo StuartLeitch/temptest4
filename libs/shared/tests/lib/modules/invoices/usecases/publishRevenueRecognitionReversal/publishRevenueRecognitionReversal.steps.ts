@@ -17,7 +17,6 @@ import { PublisherMap } from '../../../../../../src/lib/modules/publishers/mappe
 import { MockPublisherRepo } from '../../../../../../src/lib/modules/publishers/repos/mocks/mockPublisherRepo';
 import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
 import { MockLogger } from './../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
-import { setupVatService } from '../../../../../../src/lib/domain/services/mocks/VatSoapClient';
 import {
   AddressMap,
   ArticleMap,
@@ -77,8 +76,6 @@ Before({ tags: '@ValidatePublishRevRecReversalToErp' }, function () {
   mockNetsuiteService = new MockErpService();
   mockLogger = new MockLogger();
   mockInvoiceRepo = new MockInvoiceRepo(null, null, mockErpReferenceRepo);
-
-  setupVatService();
 
   useCase = new PublishRevenueRecognitionReversalUsecase(
     mockInvoiceRepo,
@@ -213,7 +210,7 @@ Given(/A regular invoice/, async function () {
     invoiceId: invoice.invoiceId.id.toValue(),
     dateCreated: new Date(),
     vat: 20,
-    price: -2000
+    price: -2000,
   });
 
   if (maybeCreditNote.isLeft()) {

@@ -92,7 +92,6 @@ export class ConfirmInvoiceUsecase
     this.createAddress = this.createAddress.bind(this);
     this.savePayerData = this.savePayerData.bind(this);
     this.createPayer = this.createPayer.bind(this);
-    this.checkVatId = this.checkVatId.bind(this);
   }
 
   @Authorize('invoice:confirm')
@@ -106,8 +105,6 @@ export class ConfirmInvoiceUsecase
     this.senderEmail = sanctionedCountryNotificationSender;
 
     try {
-      await this.checkVatId(payerInput);
-
       const maybePayer = await new AsyncEither(payerInput)
         .then(this.savePayerData(context))
         .then(this.applyVatToInvoice(context))
@@ -377,22 +374,6 @@ export class ConfirmInvoiceUsecase
         .map((address) => ({ ...payerData, address }))
         .execute();
     };
-  }
-
-  private async checkVatId(payer: PayerInput) {
-    this.loggerService.info(`Check VAT for ${payer.name}`);
-    if (payer.type === PayerType.INSTITUTION) {
-      const vatResult = await this.vatService.checkVAT({
-        countryCode: payer.address.country,
-        vatNumber: payer.vatId,
-      });
-
-      if (!(vatResult instanceof Error)) {
-        if (!vatResult.valid) {
-          this.loggerService.info(`VAT ${payer.vatId} is not valid.`);
-        }
-      }
-    }
   }
 
   private async markInvoiceAsPending(

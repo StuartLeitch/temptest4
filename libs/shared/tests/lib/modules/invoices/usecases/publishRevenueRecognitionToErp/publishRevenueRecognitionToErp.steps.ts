@@ -21,7 +21,6 @@ import {
   MockLogger,
   MockLoggerBuilder,
 } from './../../../../../../src/lib/infrastructure/logging/mocks/MockLogger';
-import { setupVatService } from '../../../../../../src/lib/domain/services/mocks/VatSoapClient';
 import {
   AddressMap,
   ArticleMap,
@@ -81,8 +80,6 @@ Before({ tags: '@ValidatePublishRevRecToErp' }, function () {
     mockErpReferenceRepo
   );
   mockCreditNoteRepo = new MockCreditNoteRepo();
-
-  setupVatService();
 
   useCase = new PublishRevenueRecognitionToErpUsecase(
     mockInvoiceRepo,

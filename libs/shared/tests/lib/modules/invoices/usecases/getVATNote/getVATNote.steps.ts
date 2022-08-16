@@ -3,8 +3,6 @@ import { Given, When, Then, Before, After } from '@cucumber/cucumber';
 
 import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
 
-import { setupVatService } from '../../../../../../src/lib/domain/services/mocks/VatSoapClient';
-
 import { InvoiceStatus } from '../../../../../../src/lib/modules/invoices/domain/Invoice';
 
 import { PayerType } from '../../../../../../src/lib/modules/payers/domain/Payer';
@@ -116,7 +114,6 @@ Before(() => {
     manuscriptId: 'test-manuscript',
   }).value;
   policiesRegister = new PoliciesRegister();
-  setupVatService();
 });
 
 Given(/^The Payer is from (\w+)$/, (country: string) => {

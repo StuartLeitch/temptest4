@@ -21,7 +21,6 @@ import {
 import { PublisherMap } from '../../../../../../src/lib/modules/publishers/mappers/PublisherMap';
 import { MockPublisherRepo } from '../../../../../../src/lib/modules/publishers/repos/mocks/mockPublisherRepo';
 import { MockWaiverRepo } from '../../../../../../src/lib/modules/waivers/repos/mocks/mockWaiverRepo';
-import { setupVatService } from '../../../../../../src/lib/domain/services/mocks/VatSoapClient';
 import { MockExchangeRateService } from '../../../../../../src/lib/modules/exchange-rate/services/mocks';
 import { ExchangeRateServiceContract } from '../../../../../../src/lib/modules/exchange-rate/services/';
 import {
@@ -83,8 +82,6 @@ Before({ tags: '@ValidatePublishInvoiceToErp' }, function () {
   exchangeRateService = new MockExchangeRateService();
 
   mockInvoiceRepo = new MockInvoiceRepo(undefined, undefined, mockErpReferenceRepo);
-
-  setupVatService();
 
   useCase = new PublishInvoiceToErpUsecase(
     mockInvoiceRepo,
