@@ -1,3 +1,5 @@
+import { AbstractEventView } from '../views/contracts/EventViewContract';
+
 import * as add_acceptance_rates_table from './migrations/20200610141941_add_acceptance_rates_table';
 import * as add_deleted_manuscripts_table from './migrations/20200703082115_add_deleted_manuscripts_table';
 import * as add_preprint_value_to_submission_data from './migrations/20200831162115_add_preprint_value_to_submission_data';
@@ -23,6 +25,10 @@ import * as fix_submission_data_version from './migrations/20210204150015_fix_su
 import * as move_article_events from './migrations/20201012162115_move_article_events';
 import * as move_peer_review_events from './migrations/20210112142215_move_peer_review_events';
 import * as remove_submission_data_dates from './migrations/20200304113458_remove_wrong_dates_from_submission_data';
+
+import * as fix_manuscripts_editorial_assistant_data_order_issue from './migrations/20220503115016_fix_manuscripts_editorial_assistant_data_order_issue';
+import * as fix_materialization_lock_performance_issue from './migrations/20220529161600_fix_materialization_lock_performance_issue';
+import * as fix_missing_journal_apc from './migrations/20220803124000_fix_missing_journal_apc';
 
 import Knex from 'knex';
 
@@ -59,6 +65,19 @@ export function rebuild_materialized_views(name: string, skip = false): any {
       }
     },
     down: create_materialized_views.down,
+    name,
+  };
+}
+
+export function rebuild_materialized_views_list(name: string, skip = false, viewsList: AbstractEventView[]): any {
+  return {
+    up: async (knex: any) => {
+      if (!skip) {
+        await create_materialized_views.down_filtered_views(knex, viewsList);
+        return create_materialized_views.up_filtered_views(knex, viewsList);
+      }
+    },
+    down: create_materialized_views.down_filtered_views,
     name,
   };
 }
@@ -251,6 +270,16 @@ class KnexMigrationSource {
     apollo1_table_explosion_create,
     apollo1_views_triggers_functions_create,
     apollo1_views_triggers_functions_execute,
+    // Apollo1 Fixes
+    fix_manuscripts_editorial_assistant_data_order_issue,
+    fix_materialization_lock_performance_issue,
+
+    fix_missing_journal_apc,
+    rebuild_materialized_views_list(
+      '20220803124000_fix_missing_journal_apc_rebuild_views',
+      false,
+      fix_missing_journal_apc.updatedMaterializedViews
+    ),
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {

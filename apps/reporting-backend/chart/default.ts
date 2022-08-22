@@ -12,6 +12,7 @@ const defaultValues: WithSopsSecretsServiceProps = {
       tag: 'latest',
     },
     replicaCount: 1,
+    containerPort: 3000,
     labels: {
       owner: 'belzebuth',
       tier: 'backend',

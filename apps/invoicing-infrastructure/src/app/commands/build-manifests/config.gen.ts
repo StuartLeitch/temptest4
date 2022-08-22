@@ -8,7 +8,7 @@ import { values as qaImportManuscriptWeb } from 'apps/import-manuscript-web/char
 import { values as qaInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/hindawi/qa';
 import { values as qaInvoicingAdminValues } from 'apps/invoicing-admin/chart/hindawi/qa';
 import { values as qaInvoicingWebValues } from 'apps/invoicing-web/chart/hindawi/qa';
-// import { values as qaReportingBackendValues } from 'apps/reporting-backend/chart/hindawi/qa';
+import { values as qaReportingBackendValues } from 'apps/reporting-backend/chart/hindawi/qa';
 
 import { values as demoInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/hindawi/demo';
 import { values as demoInvoicingAdminValues } from 'apps/invoicing-admin/chart/hindawi/demo';
@@ -39,7 +39,7 @@ import { values as hindawiProdInvoicingWebValues } from 'apps/invoicing-web/char
 // import { values as hindawiProdImportManuscriptValidation } from 'apps/import-manuscript-validation/chart/hindawi/prod';
 // import { values as hindawiProdImportManuscriptBackend } from 'apps/import-manuscript-backend/chart/hindawi/prod';
 // import { values as hindawiProdImportManuscriptWeb } from 'apps/import-manuscript-web/chart/hindawi/prod';
-// import { values as hindawiProdReportingValues } from 'apps/reporting-backend/chart/hindawi/prod';
+import { values as hindawiProdReportingValues } from 'apps/reporting-backend/chart/hindawi/prod';
 
 import { values as automationInvoicingGraphqlValues } from 'apps/invoicing-graphql/chart/hindawi/automation';
 import { values as automationInvoicingAdminValues } from 'apps/invoicing-admin/chart/hindawi/automation';
@@ -62,7 +62,7 @@ const masterConfig: {
       // [App.importManuscriptValidation]: hindawiProdImportManuscriptValidation,
       // [App.importManuscriptBackend]: hindawiProdImportManuscriptBackend,
       // [App.importManuscriptWeb]: hindawiProdImportManuscriptWeb,,
-      // [App.reporting]: hindawiProdReportingValues,
+      [App.reporting]: hindawiProdReportingValues,
     },
     demo: {
       [App.graphql]: demoInvoicingGraphqlValues,
@@ -87,7 +87,7 @@ const masterConfig: {
       [App.importManuscriptValidation]: qaImportManuscriptValidation,
       [App.importManuscriptBackend]: qaImportManuscriptBackend,
       [App.importManuscriptWeb]: qaImportManuscriptWeb,
-      // [App.reporting]: qaReportingBackendValues,
+      [App.reporting]: qaReportingBackendValues,
     },
     automation: {
       [App.graphql]: automationInvoicingGraphqlValues,
