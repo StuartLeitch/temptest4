@@ -55,7 +55,6 @@ variables:
   BT_MERCHANT_ID: 'test-merchant-id'
   BT_PUBLIC_KEY: 'test-public-key'
   BT_PRIVATE_KEY: 'test-private-key'
-  VAT_VALIDATION_SERVICE_ENDPOINT: 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl'
   AFFECTED_COMMAND: ''
   AFFECTED_ARGS: '--base=remotes/origin/develop'
   AFFECTED_APPS: 'shared,invoicing-admin,invoicing-graphql,invoicing-web,reporting-backend,import-manuscript-web,import-manuscript-validation,import-manuscript-backend'
@@ -407,25 +406,25 @@ Deploy:automation-invoicing:
     KUBERNETES_CPU_REQUEST: 2
 
 Deploy:automation-import:
-   stage: deploy-import
-   tags:
-     - 'cluster:hindawi-dev'
-   dependencies:
-     - Package Images:dev
-   <<: *script_deploy
-   interruptible: true
-   when: on_success
-   allow_failure: true
-   variables:
-     TENANT: hindawi
-     NODE_ENV: automation
-     NAMESPACE: automation
-     CLUSTER: hindawi-dev
-     AWS_REGISTRY: $AWS_DEV_REGISTRY
-     COMMAND: build-manifests
-     REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
-     KUBERNETES_MEMORY_REQUEST: 3Gi
-     KUBERNETES_CPU_REQUEST: 2
+  stage: deploy-import
+  tags:
+    - 'cluster:hindawi-dev'
+  dependencies:
+    - Package Images:dev
+  <<: *script_deploy
+  interruptible: true
+  when: on_success
+  allow_failure: true
+  variables:
+    TENANT: hindawi
+    NODE_ENV: automation
+    NAMESPACE: automation
+    CLUSTER: hindawi-dev
+    AWS_REGISTRY: $AWS_DEV_REGISTRY
+    COMMAND: build-manifests
+    REQUIRED_APPS: 'import-manuscript-backend,import-manuscript-validation,import-manuscript-web'
+    KUBERNETES_MEMORY_REQUEST: 3Gi
+    KUBERNETES_CPU_REQUEST: 2
 
 # Deploy:automation-reporting:
 #   stage: deploy-reporting
