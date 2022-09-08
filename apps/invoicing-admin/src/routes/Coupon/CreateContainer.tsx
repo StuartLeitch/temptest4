@@ -79,11 +79,9 @@ const ViewEditContainer: React.FC = () => {
 
     setSaveInProgress(false);
   };
-
   const cancelCreate = () => {
     navigate('/coupons/list');
   };
-
   return (
     <Container fluid={true} className='mb-5'>
       <Link

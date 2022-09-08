@@ -23,6 +23,9 @@ import {
   CatalogMap,
   Roles,
   left,
+  CreateCouponUsecase,
+  GenerateCouponCodeUsecase,
+  DeleteBulkCouponsUsecase,
   AbstractApiExchangeRateService,
   LoggerBuilderContract,
   PdfGeneratorService,
@@ -33,6 +36,10 @@ import {
 import { PayPalWebhookResponse, PayPalPaymentCapture } from '../services/paypal/types/webhooks';
 import { Context, Repos } from '../builders';
 import { env } from '../env';
+import {
+  CouponStatus,
+  CouponType,
+} from '../../../../libs/shared/src/lib/modules/coupons/domain/Coupon';
 
 type JournalJson = {
   journalId?: string;
@@ -368,6 +375,104 @@ export const expressLoader: MicroframeworkLoader = (settings: MicroframeworkSett
       res.set('Content-Type', 'text/csv');
       res.status(200).send(csv);
     });
+
+    app.post(
+      '/api/coupons/multiple',
+      upload.single('file'),
+      keycloak.protect(
+        protectMultiRole(
+          Roles.ADMIN,
+          Roles.SUPER_ADMIN,
+          Roles.FINANCIAL_CONTROLLER,
+          Roles.MARKETING
+        )
+      ),
+      async (req, res) => {
+        const { repos, loggerBuilder, auditLoggerServiceProvider } = context;
+        const logger = loggerBuilder.getLogger('create-multiple-coupons');
+        logger.info(
+          `Received multiple coupon request for file: '${req.file.originalname}'`
+        );
+        const authContext = { roles: extractRoles(req) };
+
+        const auditLoggerService = auditLoggerServiceProvider({
+          email: extractEmail(req),
+        });
+
+        const createCouponUseCase = new CreateCouponUsecase(
+          repos.coupon,
+          auditLoggerService
+        );
+
+        const couponCodeGenerator = new GenerateCouponCodeUsecase(repos.coupon);
+        const bulkCouponDelete = new DeleteBulkCouponsUsecase(repos.coupon);
+
+        let generatedCodes: string[] = [];
+
+        try {
+          const jsonResult = await parseCsvToJson(req.file.path);
+
+          if (jsonResult.length === 0) {
+            logger.error(
+              `The file you uploaded is empty: ${req.file.originalname}`
+            );
+            res
+              .status(400)
+              .send('The file you uploaded is empty or has invalid data.');
+          }
+
+          for (const element of jsonResult) {
+            const maybeCouponCode = await couponCodeGenerator.execute(
+              null,
+              authContext
+            );
+            if (maybeCouponCode.isRight()) {
+              element['CouponCode'] = maybeCouponCode.value.value;
+            } else {
+              return res.status(400).send(maybeCouponCode.value.message);
+            }
+            generatedCodes.push(element['CouponCode']);
+            const maybeCreateCoupons = await createCouponUseCase.execute(
+              {
+                code: element['CouponCode'],
+                status: req.body.status,
+                expirationDate: req.body.expirationDate,
+                type: CouponType.SINGLE_USE,
+                invoiceItemType: 'APC',
+                name: req.body.name,
+                reduction: req.body.reduction,
+              },
+              authContext
+            );
+
+            if (maybeCreateCoupons.isLeft()) {
+              return res.status(400).send(maybeCreateCoupons.value.message);
+            }
+          }
+
+          const csvConverter = new Parser();
+          const result = csvConverter.parse(jsonResult);
+          res.setHeader(
+            'Content-disposition',
+            `attachment; filename=${req.file.filename}`
+          );
+          res.set('Content-Type', 'text/csv');
+          res.status(200).send(result);
+        } catch (error) {
+          bulkCouponDelete.execute(
+            { couponCodes: generatedCodes },
+            authContext
+          );
+          logger.error(
+            `An error while creating bulk coupons occurred {${
+              error.message
+            }}. \nEvent had body {${JSON.stringify(req.body, null, 2)}}`,
+            error
+          );
+          res.status(500).send();
+        }
+      }
+    );
 
     app.post(
       '/api/apc/upload-csv',

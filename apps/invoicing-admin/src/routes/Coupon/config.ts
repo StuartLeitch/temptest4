@@ -20,3 +20,4 @@ export const couponStatusOptions = [
 export const VIEW: CouponMode = 'VIEW';
 export const EDIT: CouponMode = 'EDIT';
 export const CREATE: CouponMode = 'CREATE';
+export const CREATE_MULTIPLE: CouponMode = 'CREATE_MULTIPLE';

@@ -1,4 +1,4 @@
-export type CouponMode = 'EDIT' | 'VIEW' | 'CREATE';
+export type CouponMode = 'EDIT' | 'VIEW' | 'CREATE' | 'CREATE_MULTIPLE';
 
 export interface CouponType {
   name: string;

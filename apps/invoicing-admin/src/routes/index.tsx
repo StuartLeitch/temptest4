@@ -6,7 +6,11 @@ import { useAuth } from '../contexts/Auth';
 
 // Invoicing Admin App
 import CreditNoteDetails from './CreditNote/CreditNote';
-import { CouponDetails, CouponCreate } from './Coupon';
+import {
+  CouponDetails,
+  CouponCreate,
+  CreateMultipleCouponPage,
+} from './Coupon';
 import InvoiceSearchPage from './InvoiceSearchPage';
 import SplitInvoice from './Invoice/SplitInvoice';
 import CreditNotesList from './CreditNotes/List';
@@ -104,6 +108,15 @@ export const RoutedContent = () => {
         element={
           <PrivateRoute>
             <CouponCreate />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path='/coupons/bulk-create'
+        element={
+          <PrivateRoute>
+            <CreateMultipleCouponPage />
           </PrivateRoute>
         }
       />

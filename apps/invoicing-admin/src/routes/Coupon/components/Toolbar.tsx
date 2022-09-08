@@ -4,11 +4,15 @@ import { Button, IconEdit } from '@hindawi/phenom-ui';
 import { ButtonToolbar } from '../../../components';
 import Restricted from '../../../contexts/Restricted';
 
-import { CouponEditContext, CouponCreateContext } from '../Context';
+import {
+  CouponEditContext,
+  CouponCreateContext,
+  MultipleCouponCreateContext,
+} from '../Context';
 
 import { CouponMode } from '../types';
 
-import { VIEW, EDIT, CREATE } from '../config';
+import { VIEW, EDIT, CREATE, CREATE_MULTIPLE } from '../config';
 
 const Toolbar: React.FC<ToolbarProps> = ({
   mode,
@@ -20,17 +24,19 @@ const Toolbar: React.FC<ToolbarProps> = ({
   const isViewModeOn = mode === VIEW;
   const isEditModeOn = mode === EDIT;
   const isCreateModeOn = mode === CREATE;
-  const canBeSaved = isEditModeOn || isCreateModeOn;
-
+  const isMultipleCreateModeOn = mode === CREATE_MULTIPLE;
+  const canBeSaved = isEditModeOn || isCreateModeOn || isMultipleCreateModeOn;
   const chosenContext = isCreateModeOn
     ? CouponCreateContext
     : CouponEditContext;
+
+  const multipleCouponContext = MultipleCouponCreateContext;
+  const { multipleCouponState } = useContext(multipleCouponContext);
   const { couponState } = useContext(chosenContext);
 
-  const hasFormErrors = Object.values(couponState).some(
-    (field) => !field.isValid
-  );
-
+  const hasFormErrors = Object.values(
+    isMultipleCreateModeOn ? multipleCouponState : couponState
+  ).some((field) => !field.isValid);
   return (
     <Restricted to='edit.coupon'>
       <ButtonToolbar className='ml-auto'>

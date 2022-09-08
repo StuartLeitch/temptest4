@@ -115,6 +115,7 @@ accessControl
   .action('apply')
   .resource('coupons')
   .action('read')
+  .action('bulkDelete')
   .resource('invoices')
   .action('read')
   .resource('payer')

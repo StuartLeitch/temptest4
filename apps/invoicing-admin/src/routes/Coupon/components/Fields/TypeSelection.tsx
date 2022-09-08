@@ -1,10 +1,14 @@
 import React, { useEffect, useContext } from 'react';
 
-import { CouponEditContext, CouponCreateContext } from '../../Context';
+import {
+  CouponEditContext,
+  CouponCreateContext,
+  MultipleCouponCreateContext,
+} from '../../Context';
 
 import { CouponMode } from '../../types';
 
-import { CREATE } from '../../config';
+import { CREATE, CREATE_MULTIPLE, EDIT, VIEW } from '../../config';
 
 import {
   FormGroup,
@@ -25,12 +29,27 @@ const TypeSelection: React.FC<TypeSelectionProps> = ({
   id,
   mode,
 }) => {
-  const chosenContext =
-    mode === CREATE ? CouponCreateContext : CouponEditContext;
-  const { couponState, update } = useContext(chosenContext);
+  function chosenContext(mode) {
+    if (mode === CREATE) {
+      const { couponState, update } = useContext(CouponCreateContext);
+      return { couponState, update };
+    } else if (mode === CREATE_MULTIPLE) {
+      const { multipleCouponState, update } = useContext(
+        MultipleCouponCreateContext
+      );
+      return { multipleCouponState, update };
+    } else {
+      const { couponState, update } = useContext(CouponEditContext);
+      return { couponState, update };
+    }
+  }
+
+  const chosenContextType = chosenContext(mode);
+
+  const { couponState, multipleCouponState } = chosenContextType;
 
   useEffect(() => {
-    update(id, { value, isValid: true });
+    chosenContextType.update(id, { value, isValid: true });
   }, []);
 
   return (
@@ -50,8 +69,17 @@ const TypeSelection: React.FC<TypeSelectionProps> = ({
               name={name}
               label={option.label}
               inline
-              checked={option.id === couponState[id].value}
-              onChange={() => update(id, { value: option.id, isValid: true })}
+              checked={
+                mode === CREATE_MULTIPLE
+                  ? option.id === multipleCouponState[id].value
+                  : option.id === couponState[id].value
+              }
+              onChange={() =>
+                chosenContextType.update(id, {
+                  value: option.id,
+                  isValid: true,
+                })
+              }
             />
           ))}
         </InputGroup>

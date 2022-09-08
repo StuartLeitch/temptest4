@@ -2,6 +2,7 @@ import React, { useEffect, useCallback } from 'react';
 import { useManualQuery } from 'graphql-hooks';
 import { useQueryState } from 'react-router-use-location-state';
 import { Link } from 'react-router-dom';
+import moment from 'moment';
 
 import { formatDate } from '../../../utils/date';
 import { COUPONS_QUERY } from '../graphql';
@@ -64,7 +65,7 @@ const CouponsContainer: React.FC = () => {
     INACTIVE: <Tag label='INACTIVE' status='error' />,
   };
 
-  const dateRenderer = (date) => date && formatDate(new Date(date));
+  const dateRenderer = (date) => date && moment(date).format('DD MMM YYYY');
 
   const columns = [
     {
@@ -190,6 +191,11 @@ const CouponsContainer: React.FC = () => {
                 <Link to={`/coupons/create`}>
                   <Button type='secondary' className='mr-2'>
                     Create Coupon
+                  </Button>
+                </Link>
+                <Link to={`/coupons/bulk-create`}>
+                  <Button type='secondary' className='mr-2'>
+                    Create Multiple Coupons
                   </Button>
                 </Link>
               </ButtonToolbar>

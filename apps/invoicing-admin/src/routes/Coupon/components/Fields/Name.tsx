@@ -9,9 +9,13 @@ import {
   InputGroup,
 } from '../../../../components';
 
-import { CouponEditContext, CouponCreateContext } from '../../Context';
+import {
+  CouponEditContext,
+  CouponCreateContext,
+  MultipleCouponCreateContext,
+} from '../../Context';
 
-import { CREATE } from '../../config';
+import { CREATE, CREATE_MULTIPLE, VIEW } from '../../config';
 
 import { CouponMode } from '../../types';
 
@@ -21,15 +25,33 @@ const Name: React.FC<NameProps> = ({
   helper = '',
   mode,
 }) => {
-  const chosenContext =
-    mode === CREATE ? CouponCreateContext : CouponEditContext;
-  const {
-    couponState: { name },
-    update,
-  } = useContext(chosenContext);
+  function chosenContext(mode) {
+    if (mode === CREATE) {
+      const {
+        couponState: { name },
+        update,
+      } = useContext(CouponCreateContext);
+      return { name, update };
+    } else if (mode === CREATE_MULTIPLE) {
+      const {
+        multipleCouponState: { name },
+        update,
+      } = useContext(MultipleCouponCreateContext);
+
+      return { name, update };
+    } else {
+      const {
+        couponState: { name },
+        update,
+      } = useContext(CouponEditContext);
+      return { name, update };
+    }
+  }
+
+  const chosenContextName = chosenContext(mode);
 
   useEffect(() => {
-    update('name', { value, isValid: true });
+    chosenContextName.update('name', { value, isValid: true });
   }, []);
 
   return (
@@ -41,12 +63,15 @@ const Name: React.FC<NameProps> = ({
         <InputGroup>
           <Input
             type='textarea'
-            value={name.value}
+            value={chosenContextName.name.value}
             disabled={disabled}
             placeholder='Coupon description'
             id='couponName'
             onChange={(e) =>
-              update('name', { value: e.target.value, isValid: true })
+              chosenContextName.update('name', {
+                value: e.target.value,
+                isValid: true,
+              })
             }
             maxLength={255}
           />

@@ -18,7 +18,10 @@ import { GetRecentCouponsSuccessResponse } from './../../usecases/getRecentCoupo
 
 export class MockCouponRepo
   extends BaseMockRepo<Coupon>
-  implements CouponRepoContract {
+  implements CouponRepoContract
+{
+  deletedCoupons: string[] = [];
+
   private invoiceItemToCouponMapper: {
     [key: string]: string[];
   } = {};
@@ -58,9 +61,8 @@ export class MockCouponRepo
   async getCouponsByInvoiceItemId(
     invoiceItemId: InvoiceItemId
   ): Promise<Either<GuardFailure | RepoError, CouponAssignedCollection>> {
-    const couponIds = this.invoiceItemToCouponMapper[
-      invoiceItemId.id.toString()
-    ];
+    const couponIds =
+      this.invoiceItemToCouponMapper[invoiceItemId.id.toString()];
     if (!couponIds) {
       return right(CouponAssignedCollection.create());
     }
@@ -200,6 +202,12 @@ export class MockCouponRepo
     return right(found.length !== 0);
   }
 
+  public async bulkDelete(
+    couponCodes: string[]
+  ): Promise<Either<GuardFailure | RepoError, void>> {
+    this.deletedCoupons.push(...couponCodes);
+    return right(null);
+  }
   public compareMockItems(a: Coupon, b: Coupon): boolean {
     return a.id.equals(b.id);
   }

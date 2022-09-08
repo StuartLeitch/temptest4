@@ -2,14 +2,19 @@ import React, { useContext, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import { noop } from 'lodash';
 
-import { CouponEditContext, CouponCreateContext } from '../../Context';
+import {
+  CouponEditContext,
+  CouponCreateContext,
+  MultipleCouponCreateContext,
+} from '../../Context';
 
 import { Button, Label, Col, FormGroup } from '../../../../components';
 
 import { CouponMode } from '../../types';
 
-import { CREATE, VIEW } from '../../config';
-const Date: React.FC<DateProps> = ({
+import { CREATE, CREATE_MULTIPLE, EDIT, VIEW } from '../../config';
+
+const DateField: React.FC<DateProps> = ({
   stringValue = '',
   label,
   disabled = false,
@@ -17,21 +22,39 @@ const Date: React.FC<DateProps> = ({
   filter = noop(),
   mode,
 }) => {
-  const chosenContext =
-    mode === CREATE ? CouponCreateContext : CouponEditContext;
-  const { couponState, update } = useContext(chosenContext);
+  function currentContext(mode) {
+    if (mode === CREATE) {
+      const { couponState, update } = useContext(CouponCreateContext);
+      return { couponState, update };
+    } else if (mode === CREATE_MULTIPLE) {
+      const { multipleCouponState, update } = useContext(
+        MultipleCouponCreateContext
+      );
+      return { multipleCouponState, update };
+    } else {
+      const { couponState, update } = useContext(CouponEditContext);
+      return { couponState, update };
+    }
+  }
+
+  const currentContextType = currentContext(mode);
+
+  const { couponState, multipleCouponState } = currentContextType;
 
   useEffect(() => {
-    if (mode !== CREATE) {
-      update(id, {
-        value: stringValue ? new window.Date(stringValue).toISOString() : null,
+    if ([EDIT, VIEW].includes(mode)) {
+      currentContextType.update(id, {
+        value: stringValue ? convertLocalToUTCDate(stringValue) : null,
         isValid: true,
       });
     }
   }, []);
 
   const onChange = (newDate) => {
-    update(id, { value: newDate.toISOString(), isValid: true });
+    currentContextType.update(id, {
+      value: convertLocalToUTCDate(newDate),
+      isValid: true,
+    });
   };
 
   const hasValue = stringValue && couponState[id];
@@ -49,9 +72,9 @@ const Date: React.FC<DateProps> = ({
             disabled={disabled}
             customInput={<Pick />}
             selected={
-              couponState[id].value === null
-                ? null
-                : new window.Date(couponState[id].value)
+              mode === CREATE_MULTIPLE
+                ? multipleCouponDate(multipleCouponState, id)
+                : couponDate(couponState, id)
             }
             onChange={onChange}
             filterDate={filter}
@@ -61,6 +84,30 @@ const Date: React.FC<DateProps> = ({
     </FormGroup>
   );
 };
+
+function convertUTCToLocalDate(date) {
+  if (!date) {
+    return date;
+  }
+  date = new window.Date(date);
+  date = new window.Date(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate()
+  );
+  return date;
+}
+
+function convertLocalToUTCDate(date) {
+  if (!date) {
+    return date;
+  }
+  date = new window.Date(date);
+  date = new window.Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+  );
+  return date.toDateString();
+}
 
 const Pick = ({ value = '', onClick = noop }: PickProps) => {
   return (
@@ -86,4 +133,16 @@ interface DateProps {
   mode: CouponMode;
 }
 
-export default Date;
+export default DateField;
+
+function couponDate(couponState, id: string) {
+  return couponState[id].value === null
+    ? null
+    : new window.Date(couponState[id].value);
+}
+
+function multipleCouponDate(multipleCouponState, id: string) {
+  return multipleCouponState[id].value === null
+    ? null
+    : new window.Date(multipleCouponState[id].value);
+}

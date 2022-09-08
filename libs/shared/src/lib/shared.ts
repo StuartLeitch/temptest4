@@ -227,6 +227,7 @@ export * from './modules/coupons/usecases/getCouponDetailsByCode/getCouponDetail
 export * from './modules/coupons/usecases/getCouponDetailsByCode/getCouponDetailsByCodeDTO';
 export * from './modules/coupons/usecases/generateCouponCode/generateCouponCode';
 export * from './modules/coupons/usecases/applyCouponToInvoice/applyCouponToInvoice';
+export * from './modules/coupons/usecases/deleteBulkCoupons';
 
 export * from './modules/waivers/repos';
 

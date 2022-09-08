@@ -21,7 +21,8 @@ import {
 
 export class KnexCouponRepo
   extends AbstractBaseDBRepo<Knex, Coupon>
-  implements CouponRepoContract {
+  implements CouponRepoContract
+{
   async getCouponsByInvoiceItemId(
     invoiceItemId: InvoiceItemId
   ): Promise<Either<GuardFailure | RepoError, CouponAssignedCollection>> {
@@ -187,6 +188,26 @@ export class KnexCouponRepo
     await db(TABLES.COUPONS).insert(data);
 
     return this.getCouponById(coupon.couponId);
+  }
+
+  async bulkDelete(
+    couponCodes: string[]
+  ): Promise<Either<GuardFailure | RepoError, void>> {
+    const { db } = this;
+    const trx = await db.transaction();
+    try {
+      const deleteCoupons = couponCodes.map((couponCode) => {
+        return trx(TABLES.COUPONS).del().where('code', couponCode);
+      });
+
+      await Promise.all(deleteCoupons);
+
+      await trx.commit();
+      right(null);
+    } catch (error) {
+      await trx.rollback();
+      return left(RepoError.fromDBError(error));
+    }
   }
 
   async isCodeUsed(

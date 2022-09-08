@@ -1,8 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react';
 
-import { CouponEditContext, CouponCreateContext } from '../../Context';
+import {
+  CouponEditContext,
+  CouponCreateContext,
+  MultipleCouponCreateContext,
+} from '../../Context';
 
-import { CREATE } from '../../config';
+import { CREATE, CREATE_MULTIPLE, EDIT, VIEW } from '../../config';
 
 import {
   FormGroup,
@@ -24,17 +28,33 @@ const Reduction: React.FC<ReductionProps> = ({
   mode,
 }) => {
   const [isTouched, setTouched] = useState(false);
+  function chosenContext(mode) {
+    if (mode === CREATE) {
+      const {
+        couponState: { reduction },
+        update,
+      } = useContext(CouponCreateContext);
+      return { reduction, update };
+    } else if (mode === CREATE_MULTIPLE) {
+      const {
+        multipleCouponState: { reduction },
+        update,
+      } = useContext(MultipleCouponCreateContext);
+      return { reduction, update };
+    } else {
+      const {
+        couponState: { reduction },
+        update,
+      } = useContext(CouponEditContext);
+      return { reduction, update };
+    }
+  }
 
-  const chosenContext =
-    mode === CREATE ? CouponCreateContext : CouponEditContext;
-  const {
-    couponState: { reduction },
-    update,
-  } = useContext(chosenContext);
+  const chosenContextReduction = chosenContext(mode);
 
   useEffect(() => {
-    if (mode !== CREATE) {
-      update('reduction', { value, isValid: true });
+    if ([EDIT, VIEW].includes(mode)) {
+      chosenContextReduction.update('reduction', { value, isValid: true });
     }
   }, []);
 
@@ -46,7 +66,7 @@ const Reduction: React.FC<ReductionProps> = ({
 
     const isValid = validation.test(inputValue);
 
-    update('reduction', { value: inputValue, isValid });
+    chosenContextReduction.update('reduction', { value: inputValue, isValid });
   };
 
   return (
@@ -60,11 +80,11 @@ const Reduction: React.FC<ReductionProps> = ({
             className='rounded-right'
             disabled={disabled}
             placeholder='Reduction percentage'
-            value={reduction.value}
+            value={chosenContextReduction.reduction.value}
             id='reduction'
             onChange={onChange}
-            valid={isTouched && reduction.isValid}
-            invalid={isTouched && !reduction.isValid}
+            valid={isTouched && chosenContextReduction.reduction.isValid}
+            invalid={isTouched && !chosenContextReduction.reduction.isValid}
           />
 
           <FormFeedback>

@@ -29,13 +29,24 @@ export interface CouponRepoContract extends Repo<Coupon> {
   getCouponsByInvoiceItemId(
     invoiceItemId: InvoiceItemId
   ): Promise<Either<GuardFailure | RepoError, CouponAssignedCollection>>;
-  getCouponById(couponId: CouponId): Promise<Either<GuardFailure | RepoError, Coupon>>;
-  getCouponByCode(code: CouponCode): Promise<Either<GuardFailure | RepoError, Coupon>>;
-  incrementRedeemedCount(coupon: Coupon): Promise<Either<GuardFailure | RepoError, Coupon>>;
+  getCouponById(
+    couponId: CouponId
+  ): Promise<Either<GuardFailure | RepoError, Coupon>>;
+  getCouponByCode(
+    code: CouponCode
+  ): Promise<Either<GuardFailure | RepoError, Coupon>>;
+  incrementRedeemedCount(
+    coupon: Coupon
+  ): Promise<Either<GuardFailure | RepoError, Coupon>>;
   assignCouponToInvoiceItem(
     coupon: Coupon,
     invoiceItemId: InvoiceItemId
   ): Promise<Either<GuardFailure | RepoError, Coupon>>;
   update(coupon: Coupon): Promise<Either<GuardFailure | RepoError, Coupon>>;
-  isCodeUsed(code: CouponCode | string): Promise<Either<GuardFailure | RepoError, boolean>>;
+  isCodeUsed(
+    code: CouponCode | string
+  ): Promise<Either<GuardFailure | RepoError, boolean>>;
+  bulkDelete(
+    couponCodes: string[]
+  ): Promise<Either<GuardFailure | RepoError, void>>;
 }
