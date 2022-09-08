@@ -29,6 +29,7 @@ export const env = {
     FERoot: getOsEnv('FE_ROOT'),
     eventNamespace: getOsEnv('EVENT_NAMESPACE'),
     publisherName: getOsEnv('PUBLISHER_NAME'),
+    companyName: getOsEnv('COMPANY_NAME'),
     defaultMessageAttributes: getOsEnv('DEFAULT_MESSAGE_ATTRIBUTES'),
     vatValidationServiceEndpoint: getOsEnv('VAT_VALIDATION_SERVICE_ENDPOINT'),
     failedErpCronRetryTimeMinutes: toFloat(

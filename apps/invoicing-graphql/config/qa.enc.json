@@ -25,6 +25,7 @@
 	"APP_BANNER": "ENC[AES256_GCM,data:L/rUAA==,iv:vGZrdwMzQ0U+LlQ9bgLKm5K8C+05xjdTXMAzsi4AcyE=,tag:7138zkdR79NF5KPIoLZSRg==,type:str]",
 	"PUBLISHER_NAME": "ENC[AES256_GCM,data:mUr9b1uJag==,iv:bbX6MAk6Kj2qNJ+xHefMME0GYf5HJUEbRo+Ycob3JMM=,tag:ozr0MLXw0KQHce2man15uQ==,type:str]",
 	"TENANT_NAME": "ENC[AES256_GCM,data:ItSQ+gMWCg==,iv:C9lGVRjAEPk4qgDDriU8Ru7ZOCVdxlDr7BOO8hC6FVs=,tag:Nlychr/rHY+YIKY7v8mv/Q==,type:str]",
+	"COMPANY_NAME": "ENC[AES256_GCM,data:adcj7J3T2coz+Ok3cg8m,iv:iDcB+b0KTYI6XybKYXmKBOzgDo28bBcahz+72uLnsKs=,tag:l4vFwFdRYtodeNVQgzG7Zw==,type:str]",
 	"TENANT_ADDRESS": "ENC[AES256_GCM,data:bZ6eiJzSdeb7mvqAXOh2Or3js0ktPUmvdCiMNKmfhdevUb2t0e/6cWZU3PNwHjSoOMXwc0c1+qfMW+tRtut5sg==,iv:9n837oWOEmrcNhEU2zqY9/xcrUPYsC5G8urLoaE5uv4=,tag:LI5G6Esb+5l/ke0Tn73hkw==,type:str]",
 	"TENANT_COUNTRY": "ENC[AES256_GCM,data:6oU=,iv:rJjAlqlGwrz/VZxMS7rvJVkoMM9J4SksMZ7bq9REeEE=,tag:L2W+a3ytNy1SkML+MnGDDQ==,type:str]",
 	"DOI_NUMBER": "ENC[AES256_GCM,data:DZCo74pXoQ==,iv:1F33ECQYU3OSXqV7Ys3pM8nzarfAACQeagmtV86dbz4=,tag:m/eTDG/xswdCBn/gXZtMfA==,type:str]",
@@ -143,8 +144,8 @@
 		"azure_kv": null,
 		"hc_vault": null,
 		"age": null,
-		"lastmodified": "2022-09-06T07:14:07Z",
-		"mac": "ENC[AES256_GCM,data:jNy7DW0KuN0QjEk59TztAfTfeXX8UEWt34+ghNqUhsnRkSksKdpLfnR/acqHFHtdz1rhp25Psh2Gwle0S/iCeCPfhNm0Oe5JcorZhlbI0msDzfRPhExRKF7NeACQpk+P+zHZ27YCpwXK0SrfTGVXMGG8AWdA5xwc6+Tg+Jiw2JQ=,iv:yS8ndTWciKmMB3ZELQxCSMEoUcd4t/TXM8fH2g1Q2qA=,tag:tCbyxA1ov2C782NEwSGg8g==,type:str]",
+		"lastmodified": "2022-09-08T08:28:23Z",
+		"mac": "ENC[AES256_GCM,data:vqPosL8yNWRz0St5f+1uLIocYbCTjlWlEAm3PUtj0iZ//mdqnHX7BbsTG9h1ugCNl0AfQ8Kokij+dWMK18ymfaxKjMPMntsreblxfNKyRyGDKAc6U6L6RQCi8LJjgiEg4/r3mC4/qhzfpuoSID34LR2Ey3dvlwzvURaXpPXOwxk=,iv:P5UCGBCwp/Ud27ncUZo/ksz0mkPqGqN8qjBJRWs9a/Y=,tag:fuYAKro4SIaGKiCjtFQZlQ==,type:str]",
 		"pgp": null,
 		"unencrypted_suffix": "_unencrypted",
 		"version": "3.7.3"

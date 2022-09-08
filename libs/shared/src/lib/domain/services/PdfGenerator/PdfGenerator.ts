@@ -63,6 +63,7 @@ export class PdfGeneratorService {
       vatNumber: process.env.COMPANY_VAT_NUMBER,
       assistanceEmail: process.env.ASSISTANCE_EMAIL,
       tenantAddress: process.env.TENANT_ADDRESS,
+      companyName: process.env.COMPANY_NAME,
       logo: `data:image/${imgType};base64, ${logoData}`,
     };
 
