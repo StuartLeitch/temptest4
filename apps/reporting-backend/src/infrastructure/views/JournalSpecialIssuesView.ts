@@ -56,7 +56,7 @@ AS SELECT si_data.journal_id,
             jeb.user_id
            FROM ${journalEditorialBoardView.getViewName()} jeb
           WHERE jeb.special_issue_id = si_data.special_issue_id AND jeb.role_type = 'triageEditor'::text
-          ORDER BY jeb.invited_date DESC NULLS LAST
+          ORDER BY jeb.assigned_date DESC NULLS LAST
          LIMIT 1) lead_guest_editor ON lead_guest_editor.special_issue_id = si_data.special_issue_id
 WITH NO DATA;
     `;

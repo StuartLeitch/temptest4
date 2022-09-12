@@ -29,6 +29,7 @@ import * as remove_submission_data_dates from './migrations/20200304113458_remov
 import * as fix_manuscripts_editorial_assistant_data_order_issue from './migrations/20220503115016_fix_manuscripts_editorial_assistant_data_order_issue';
 import * as fix_materialization_lock_performance_issue from './migrations/20220529161600_fix_materialization_lock_performance_issue';
 import * as fix_missing_journal_apc from './migrations/20220803124000_fix_missing_journal_apc';
+import * as fix_random_fields_values from './migrations/20220816133600_fix_random_fields_values';
 
 import Knex from 'knex';
 
@@ -280,6 +281,14 @@ class KnexMigrationSource {
       false,
       fix_missing_journal_apc.updatedMaterializedViews
     ),
+    
+    fix_random_fields_values,
+    rebuild_materialized_views_list(
+      '20220816133600_fix_random_fields_values',
+      false,
+      fix_random_fields_values.updatedMaterializedViews
+    ),
+
   ].map(makeViewObject);
 
   getMigrations(): Promise<KnexMigration[]> {
