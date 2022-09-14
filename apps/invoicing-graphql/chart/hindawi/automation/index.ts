@@ -1,7 +1,6 @@
 import {
   WithSopsSecretsServiceProps,
   ConfigurationMountType,
-  IngressOptionsSpec,
 } from '@hindawi/phenom-charts';
 import { defaultValues } from '../../default';
 

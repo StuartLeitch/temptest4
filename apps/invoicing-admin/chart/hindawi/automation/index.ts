@@ -8,8 +8,6 @@ const values: WithSopsSecretsServiceProps = {
     ...defaultValues.serviceProps,
     envVars: {
       ...defaultValues.serviceProps.envVars,
-      AUTH_SERVER_REALM: 'Phenom',
-      APP_NAME: 'Invoicing',
     },
     ingressOptions: {
       rules: [
