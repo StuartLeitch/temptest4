@@ -8,9 +8,7 @@ const PayerDetailsTab: React.FC<PayerDetailsTabProps> = ({ invoice }) => (
     <CardBody>
       <CardTitle tag='h6' className='mb-4'>
         Payer: Details
-        <span className='small ml-1 text-muted'>
-          #{invoice?.payer?.id}
-        </span>
+        <span className='small ml-1 text-muted'>#{invoice?.payer?.id}</span>
       </CardTitle>
       <div className='mt-4 mb-2'>
         <span className='small'>Contact</span>
@@ -25,9 +23,7 @@ const PayerDetailsTab: React.FC<PayerDetailsTabProps> = ({ invoice }) => (
       </div>
       <dl className='row'>
         {' '}
-        <dt className={`col-sm-3 text-lg-right`}>
-          Address Line 1
-        </dt>
+        <dt className={`col-sm-3 text-lg-right`}>Address Line 1</dt>
         <dd className={`col-sm-9 text-inverse`}>
           {invoice?.payer?.address?.addressLine1}
         </dd>
@@ -43,16 +39,14 @@ const PayerDetailsTab: React.FC<PayerDetailsTabProps> = ({ invoice }) => (
         <dd className={`col-sm-9 text-inverse`}>
           {invoice?.payer?.address?.state}
         </dd>
-        <dt className={`col-sm-3 text-lg-right`}>
-          Postal Code
-        </dt>
+        <dt className={`col-sm-3 text-lg-right`}>Postal Code</dt>
         <dd className={`col-sm-9 text-inverse`}>
           {invoice?.payer?.address?.postalCode}
         </dd>
       </dl>
     </CardBody>
   </Card>
-)
+);
 
 interface PayerDetailsTabProps {
   invoice: Invoice;

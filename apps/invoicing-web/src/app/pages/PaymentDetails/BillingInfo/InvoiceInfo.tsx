@@ -1,6 +1,7 @@
 import React, { Fragment } from "react";
 import countryList from "country-list";
 import stateList from "state-list";
+import { COUNTRY_CODES, PAYMENT_TYPES } from "./types";
 import { Flex, Text, Label } from "@hindawi/react-components";
 
 interface Props {
@@ -8,7 +9,7 @@ interface Props {
   email: string;
   vatId: string;
   organization: string;
-  type: "INSTITUTION" | "INDIVIDUAL";
+  type: string;
   address: {
     city: string;
     state: string;
@@ -25,6 +26,7 @@ const InvoiceInfo: React.FunctionComponent<Props> = ({
   address,
   organization,
 }: any) => {
+  console.log(address);
   return (
     <Fragment>
       <Flex>
@@ -48,26 +50,33 @@ const InvoiceInfo: React.FunctionComponent<Props> = ({
         </Flex>
         <Flex vertical flex={1}>
           <Label>Country</Label>
-          <Text>
-            {`${countryList.getName((address && address.country) || "")}${
-              address && address.country === "US" && address.state
-                ? `, ${stateList.name[address.state]}`
-                : ""
-            }
+
+          {isNonISOCompatibleCountryCode(address) ? (
+            <Text>{countryList.getName(COUNTRY_CODES.GB)}</Text>
+          ) : (
+            <Text>
+              {`${countryList.getName((address && address.country) || "")}${
+                address && address.country === COUNTRY_CODES.US && address.state
+                  ? `, ${stateList.name[address.state]}`
+                  : ""
+              }
               ${
-                address && address.country === "US" && address.postalCode
+                address &&
+                address.country === COUNTRY_CODES.US &&
+                address.postalCode
                   ? `, ${address.postalCode}`
                   : ""
               }
               `}
-          </Text>
+            </Text>
+          )}
         </Flex>
         <Flex vertical flex={1}>
           <Label>Address</Label>
           <Text>{address && address.addressLine1}</Text>
         </Flex>
       </Flex>
-      {type === "INSTITUTION" && (
+      {type === PAYMENT_TYPES.institution && (
         <Flex mt={2}>
           <Flex vertical flex={1}>
             <Label>Institution name</Label>
@@ -85,3 +94,7 @@ const InvoiceInfo: React.FunctionComponent<Props> = ({
 };
 
 export default InvoiceInfo;
+
+function isNonISOCompatibleCountryCode(address: any) {
+  return address?.country === COUNTRY_CODES.UK;
+}

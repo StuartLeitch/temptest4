@@ -11,7 +11,7 @@ import {
 } from "@hindawi/react-components";
 
 import { Modal, useModalActions } from "../../../providers/modal";
-import { PAYMENT_TYPES } from "./types";
+import { PAYMENT_TYPES, COUNTRY_CODES } from "./types";
 import CountryField from "./CountryField";
 import StateField from "./StateField";
 import IconRadioButton from "./IconRadioButton";
@@ -62,32 +62,31 @@ const imperativeValidation = (formFns, showModal) => () => {
     if (isEmpty(errorFields)) {
       showModal();
     } else {
-     formFns.setTouched(errorFields);
+      formFns.setTouched(errorFields);
     }
   });
 };
 
 const emailRegex = new RegExp(
-  /^(([^<>()\[\]\\.,;:\s@"“”]+(\.[^<>()\[\]\\.,;:\s@"“”]+)*))@(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})$/i
+  /^(([^<>()\[\]\\.,;:\s@"“”]+(\.[^<>()\[\]\\.,;:\s@"“”]+)*))@(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})$/i,
 );
 
 const validateFn = (values: any) => {
   const errors: any = {};
 
   if (values.name) {
-    if (!(values.name.trim())) {
+    if (!values.name.trim()) {
       errors.name = "Blank value is forbidden.";
     }
 
     if (/^[!@#$%^&*()+=_\[\]{};:\\|,.<>\/?]*$/.test(values.name)) {
-      errors.name = 'Special characters only are not permitted';
+      errors.name = "Special characters only are not permitted";
     }
-
   } else {
     errors.name = "Required";
   }
 
-  if(!emailRegex.test(values.email)) {
+  if (!emailRegex.test(values.email)) {
     errors.email = "Invalid email address";
   }
 
@@ -100,13 +99,13 @@ const validateFn = (values: any) => {
   }
 
   if (values.address.country) {
-    if (!(values.address.country.trim())) {
+    if (!values.address.country.trim()) {
       set(errors, "address.country", "Blank value is forbidden.");
     }
 
-    if (values.address.country === "US") {
+    if (values.address.country === COUNTRY_CODES.US) {
       if (values.address.state) {
-        if (!(values.address.state.trim())) {
+        if (!values.address.state.trim()) {
           set(errors, "address.state", "Blank value is forbidden.");
         }
       } else {
@@ -114,7 +113,7 @@ const validateFn = (values: any) => {
       }
 
       if (values.address.postalCode) {
-        if (!(values.address.postalCode.trim())) {
+        if (!values.address.postalCode.trim()) {
           set(errors, "address.postalCode", "Blank value is forbidden.");
         }
       } else {
@@ -134,7 +133,7 @@ const validateFn = (values: any) => {
   }
 
   if (values.address.city) {
-    if (!(values.address.city.trim())) {
+    if (!values.address.city.trim()) {
       set(errors, "address.city", "Blank value is forbidden.");
     }
   } else {
@@ -142,7 +141,7 @@ const validateFn = (values: any) => {
   }
 
   if (values.address.addressLine1) {
-    if (!(values.address.addressLine1.trim())) {
+    if (!values.address.addressLine1.trim()) {
       set(errors, "address.addressLine1", "Blank value is forbidden.");
     }
   } else {
@@ -151,14 +150,13 @@ const validateFn = (values: any) => {
 
   if (values.type === PAYMENT_TYPES.institution) {
     if (values.organization) {
-      if (!(values.organization.trim())) {
+      if (!values.organization.trim()) {
         errors.organization = "Blank value is forbidden.";
       }
 
       if (/^[!@#$%^&*()+=_\[\]{};:\\|,.<>\/?]*$/.test(values.organization)) {
-        errors.organization = 'Special characters only are not permitted';
+        errors.organization = "Special characters only are not permitted";
       }
-
     } else {
       errors.organization = "Required";
     }
@@ -285,7 +283,7 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
                         label="Address"
                         component={FormTextarea}
                       />
-                      {values.address.country === "US" && (
+                      {values.address.country === COUNTRY_CODES.US && (
                         <FormField
                           required
                           label="State"
@@ -301,7 +299,7 @@ const InvoiceForm: React.FunctionComponent<Props> = ({
                         name="address.country"
                         component={CountryField}
                       />
-                      {values.address.country === "US" && (
+                      {values.address.country === COUNTRY_CODES.US && (
                         <FormField
                           flex={1}
                           required

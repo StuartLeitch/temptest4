@@ -16,6 +16,7 @@ import { Address } from '../../../modules/addresses/domain/Address';
 import { Invoice } from '../../../modules/invoices/domain/Invoice';
 import { Author } from '../../../modules/authors/domain/Author';
 import { Payer } from '../../../modules/payers/domain/Payer';
+import { COUNTRY_CODES } from './types';
 
 import { FormatUtils } from '../../../utils/FormatUtils';
 import { Payment } from '../../../modules/payments/domain/Payment';
@@ -53,11 +54,16 @@ export class PdfGeneratorService {
     const { page, browser } = await createNewPage();
 
     const template = this.getTemplate('receipt');
+
+    const {
+      address: { country },
+    } = payload;
+
     const data = {
       formatPriceFn: FormatUtils.formatPrice,
       dateFormatFn: format,
       ...payload,
-      addressCountry: countryList.getName(payload.address.country),
+      addressCountry: getCountry(country),
       addressState: stateList.name[payload.address.state],
       companyNumber: process.env.COMPANY_REGISTRATION_NUMBER,
       vatNumber: process.env.COMPANY_VAT_NUMBER,
@@ -90,11 +96,15 @@ export class PdfGeneratorService {
         ? [process.env.BANK_ADDRESS_STATE || process.env.BANK_ADDRESS_COUNTY]
         : [];
 
+    const {
+      address: { country },
+    } = payload;
+
     const data = {
       formatPriceFn: FormatUtils.formatPrice,
       dateFormatFn: format,
       ...payload,
-      addressCountry: countryList.getName(payload.address.country),
+      addressCountry: getCountry(country),
       addressState: stateList.name[payload.address.state],
       companyNumber: process.env.COMPANY_REGISTRATION_NUMBER,
       vatNumber: process.env.COMPANY_VAT_NUMBER,
@@ -162,6 +172,12 @@ export class PdfGeneratorService {
     return template.compile;
   }
 }
+function getCountry(country: string) {
+  return country === COUNTRY_CODES.UK
+    ? countryList.getName(COUNTRY_CODES.GB)
+    : countryList.getName(country);
+}
+
 async function createNewPage() {
   const browser = await puppeteer.launch({
     headless: true,
