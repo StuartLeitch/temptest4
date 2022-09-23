@@ -415,16 +415,14 @@
                       <h1><%=companyName%></h1>
                       <table class="data">
                         <tr>
-                          <td>The Atrium, Southern Gate,</td>
+                          <td><%= bankDetails.beneficiaryAddress %></td>
                         </tr>
-                        <tr>
-                          <td>Chichester, West Sussex, PO19 85Q, UK</td>
-                        </tr>
+                        
                       </table>
                     </td>
                   </tr>
                 </table>
-                <h1>www.hindawi.com</h1>
+                <h1><%= companyWebsite%></h1>
               </td>
             </tr>
           </table>
@@ -666,7 +664,7 @@
                 <td>
                   <div id="pageFooter">
                     <p>
-                     The Atrium, Southern Gate, Chichester, West Sussex, PO19 85Q, UK •
+                      <%= bankDetails.beneficiaryAddress %> •
                      Company Reg. No.: <%= companyNumber %> VAT Reg. No.: <%= vatNumber %>
                     </p>
                     </br>

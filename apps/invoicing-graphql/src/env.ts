@@ -30,6 +30,7 @@ export const env = {
     eventNamespace: getOsEnv('EVENT_NAMESPACE'),
     publisherName: getOsEnv('PUBLISHER_NAME'),
     companyName: getOsEnv('COMPANY_NAME'),
+    companyWebsite: getOsEnv('COMPANY_WEBSITE'),
     defaultMessageAttributes: getOsEnv('DEFAULT_MESSAGE_ATTRIBUTES'),
     vatValidationServiceEndpoint: getOsEnv('VAT_VALIDATION_SERVICE_ENDPOINT'),
     failedErpCronRetryTimeMinutes: toFloat(

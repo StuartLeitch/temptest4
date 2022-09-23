@@ -70,7 +70,17 @@ export class PdfGeneratorService {
       assistanceEmail: process.env.ASSISTANCE_EMAIL,
       tenantAddress: process.env.TENANT_ADDRESS,
       companyName: process.env.COMPANY_NAME,
+      companyWebsite: process.env.COMPANY_WEBSITE,
       logo: `data:image/${imgType};base64, ${logoData}`,
+      bankDetails: {
+        beneficiaryAddress: [
+          process.env.BANK_BENEFICIARY_ADDRESS_LINE_1,
+          process.env.BANK_BENEFICIARY_ADDRESS_LINE_2,
+          process.env.BANK_BENEFICIARY_ADDRESS_CITY,
+          process.env.BANK_BENEFICIARY_ADDRESS_POSTCODE,
+          process.env.BANK_BENEFICIARY_ADDRESS_STATE,
+        ].join(', '),
+      },
     };
 
     const htmlTemplate = template(data);
@@ -173,9 +183,7 @@ export class PdfGeneratorService {
   }
 }
 function getCountry(country: string) {
-  return country === COUNTRY_CODES.UK
-    ? countryList.getName(COUNTRY_CODES.GB)
-    : countryList.getName(country);
+  return country === COUNTRY_CODES.UK ? countryList.getName(COUNTRY_CODES.GB) : countryList.getName(country);
 }
 
 async function createNewPage() {
@@ -211,10 +219,7 @@ function convertTypeToBase64(url: any) {
   return Buffer.from(imgType).toString('base64');
 }
 
-async function generatePdf(
-  page: puppeteer.Page,
-  htmlTemplate: string
-): Promise<Readable> {
+async function generatePdf(page: puppeteer.Page, htmlTemplate: string): Promise<Readable> {
   await page.setContent(htmlTemplate, {
     waitUntil: 'domcontentloaded',
     args: ['--disable-dev-shm-usage'],
