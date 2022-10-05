@@ -11,38 +11,6 @@ stages:
   - acceptance
   - deploy-prod
 
-include:
-  - template: License-Scanning.gitlab-ci.yml
-  - template: Dependency-Scanning.gitlab-ci.yml
-
-license_scanning:
-  tags:
-    - 'cluster:hindawi-dev'
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop"
-      when: always
-  stage: package
-
-gemnasium-dependency_scanning:
-  tags:
-    - 'cluster:hindawi-dev'
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "develop"
-      when: always
-  stage: package
-
-gemnasium-maven-dependency_scanning:
-  tags:
-    - 'cluster:hindawi-dev'
-  rules:
-    - when: never
-
-gemnasium-python-dependency_scanning:
-  tags:
-    - 'cluster:hindawi-dev'
-  rules:
-    - when: never
-
 variables:
   # https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#docker-in-docker-with-tls-disabled
   DOCKER_HOST: tcp://docker:2375
@@ -89,6 +57,7 @@ Prepare Docker Runner:
 
 Build:
   image: $BUILD_IMAGE
+  stage: build
   variables:
     KUBERNETES_MEMORY_REQUEST: 5Gi
     KUBERNETES_CPU_REQUEST: 2
@@ -114,7 +83,6 @@ Build:
       when: always
   interruptible: true
   allow_failure: false
-  stage: build
   before_script:
     - echo $CI_COMMIT_BRANCH
     - echo $CI_COMMIT_REF_NAME
@@ -258,11 +226,11 @@ Validate Schema:qa:
 
 Package Images:dev:
   image: $PACKAGE_IMAGE
+  stage: package
+  needs: [Build, Build Production Dependencies]
   tags:
     - 'cluster:hindawi-dev'
   interruptible: true
-  stage: package
-  needs: [Build, Build Production Dependencies]
   cache:
     key: node-modules-production-cache-$CI_COMMIT_REF_SLUG
     paths:
@@ -295,6 +263,20 @@ Package Images:dev:
     paths:
       - .ci_status
       - dist
+
+Fossa:
+  stage: package
+  needs: [Build, Build Production Dependencies]
+  tags:
+    - "cluster:hindawi-dev"
+  image: alpine:latest
+  before_script:
+    - apk add --update curl bash
+  variables:
+    FOSSA_API_KEY: $FOSSA_API_KEY
+  script:
+    - 'curl -H "Cache-Control: no-cache" https://raw.githubusercontent.com/fossas/fossa-cli/master/install-latest.sh | bash'
+    - fossa analyze
 
 Trigger Acceptance Tests:
   stage: acceptance

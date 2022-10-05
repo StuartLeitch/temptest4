@@ -1,0 +1,6 @@
+version: 3
+
+project:
+  id: phenom/phenom
+  team: system-phenom
+  url: https://gitlab.com/hindawi/phenom
