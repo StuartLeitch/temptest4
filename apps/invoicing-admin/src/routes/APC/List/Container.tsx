@@ -388,7 +388,7 @@ const ApcContainer: React.FC = () => {
         onError({ err });
         setHasFile(false);
         setHasSucceed(false);
-        setModalError(err.response.data);
+        setModalError(err.response.data as string);
       }
       setIsUploadModalVisible(true);
     },

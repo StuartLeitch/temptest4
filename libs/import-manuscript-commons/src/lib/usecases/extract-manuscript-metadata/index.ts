@@ -1,5 +1,0 @@
-export * from './meca/manuscriptInformationExtractor'
-export * from './meca/manifestInformationExtractor'
-export * from './extract-manuscript-metadata'
-export * from './extract-manuscript-metadata-dto'
-export * from './extract-manuscript-metadata-response'

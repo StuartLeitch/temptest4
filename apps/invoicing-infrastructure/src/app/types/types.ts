@@ -4,9 +4,6 @@ export enum App {
   web = 'invoicing-web',
   reporting = 'reporting-backend',
   invoicingErpInvoiceRegistration = 'invoicing-erp-invoice-registration',
-  importManuscriptBackend = 'import-manuscript-backend',
-  importManuscriptValidation = 'import-manuscript-validation',
-  importManuscriptWeb = 'import-manuscript-web',
 }
 
 export enum Tenant {

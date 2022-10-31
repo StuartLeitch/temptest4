@@ -30,18 +30,7 @@
       "@hindawi/domain": ["libs/shared/src/lib/domain/index.ts"],
       "@hindawi/env-utils": ["libs/env-utils/src/index.ts"],
       "@hindawi/eve": ["libs/eve/src/index.ts"],
-      "@hindawi/import-manuscript-backend/*": [
-        "apps/import-manuscript-backend/src/*"
-      ],
-      "@hindawi/import-manuscript-commons": [
-        "libs/import-manuscript-commons/src/index.ts"
-      ],
-      "@hindawi/import-manuscript-validation/*": [
-        "apps/import-manuscript-validation/src/*"
-      ],
-      "@hindawi/infrastructure": [
-        "libs/shared/src/lib/infrastructure/index.ts"
-      ],
+      "@hindawi/infrastructure": ["libs/shared/src/lib/infrastructure/index.ts"],
       "@hindawi/invoicing-graphql/*": ["apps/invoicing-graphql/src/*"],
       "@hindawi/invoicing-web/*": ["apps/invoicing-web/src/*"],
       "@hindawi/queue-utils": ["libs/queue-utils/src/index.ts"],

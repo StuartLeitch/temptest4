@@ -1,8 +1,5 @@
-import {
-  HindawiServiceChart, WithSopsSecretsServiceProps,
-} from '@hindawi/phenom-charts';
+import { HindawiServiceChart, WithSopsSecretsServiceProps } from '@hindawi/phenom-charts';
 import { App as Cdk8sApp } from 'cdk8s';
-import url from 'url';
 
 import { Command } from '../../contracts';
 import { getOsEnv } from '../../env';
@@ -15,10 +12,7 @@ function makeAppEnum(app: string): App | null {
     case App.graphql:
     case App.web:
     case App.reporting:
-    case App.importManuscriptBackend:
-    case App.importManuscriptValidation:
     case App.invoicingErpInvoiceRegistration:
-    case App.importManuscriptWeb:
       return app as App;
 
     default:
@@ -42,7 +36,7 @@ export class BuildManifestsCommand implements Command {
     const environment: string = getOsEnv('NODE_ENV');
     const tag: string = getOsEnv('CI_COMMIT_SHA');
     const awsRegistry: string = getOsEnv('AWS_REGISTRY');
-    const apps: App[] = getOsEnv('AFFECTED_APPS', "")
+    const apps: App[] = getOsEnv('AFFECTED_APPS', '')
       .split(/[\s,]/)
       .map((a) => a.trim())
       .map(makeAppEnum)
@@ -72,19 +66,17 @@ export class BuildManifestsCommand implements Command {
         appProps = masterConfig[env.tenant][env.environment][app];
         appProps.serviceProps.image.repository = `${env.awsRegistry}/${app}`;
         //if one of the required apps for the deployment hasn't been affected by changes then we deploy latest
-        if(env.affectedApps.some(affectedApp => affectedApp === app)) {
+        if (env.affectedApps.some((affectedApp) => affectedApp === app)) {
           appProps.serviceProps.image.tag = env.tag;
-        } else{
-          appProps.serviceProps.image.tag = 'latest'
+        } else {
+          appProps.serviceProps.image.tag = 'latest';
         }
         if (!appProps) {
           throw new Error('Not found configuration for app');
         }
       } catch (error) {
         // maybe throw
-        console.error(
-          `Did not find configuration for ${app}, tenant: ${env.tenant}, environment: ${env.environment}`
-        );
+        console.error(`Did not find configuration for ${app}, tenant: ${env.tenant}, environment: ${env.environment}`);
         // todo delete contiune, this should exit with error
         continue;
       }

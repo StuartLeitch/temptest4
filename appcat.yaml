@@ -18,8 +18,7 @@ appCode: 'phenom-invoicing-graphql'
 atlasId: 'APP-9722'
 name: 'Phenom Invoicing Backend Service'
 appType: 'Built'
-description:
-  "Invoicing graphql backend. Alse includes express endpoints, event listener,\
+description: "Invoicing graphql backend. Alse includes express endpoints, event listener,\
   \ erp scheduler, internal scheduling system - sisif, etc."
 state: 'Active'
 systemId: 'c4465d6e-55de-4e9f-89a3-79ce6476df2d'
@@ -44,21 +43,8 @@ appCode: 'phenom-reporting-backend'
 atlasId: 'APP-9724'
 name: 'Phenom Reporting Backend'
 appType: 'Built'
-description:
-  "Reporting backend listens to phenom events and saves them in a database\
+description: "Reporting backend listens to phenom events and saves them in a database\
   \ used by Superset and external consumers."
 state: 'Active'
 systemId: '6a243b92-d277-47a8-b670-19fc631ae882'
 shortCode: 'phenom-rprtngb'
----
-!<Application>
-id: 'd3efc813-c9c9-4424-a0ec-af74a2204899'
-modelType: 'Application'
-appCode: 'phenom-import-manuscript'
-name: 'Phenom Import Manuscript'
-appType: 'Built'
-description: 'Facilitates transferring manuscripts from external systems/journals'
-state: 'Active'
-documentationUrl: https://confluence.wiley.com/display/PPT/Manuscript+transfer+-+Solution+Document
-issueTrackerUrl: https://jira.wiley.com/secure/RapidBoard.jspa?projectKey=PPBK
-systemId: '318c5bb2-ffff-4ee5-b536-1df0dfe4d59c'

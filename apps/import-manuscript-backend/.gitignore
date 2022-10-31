@@ -1,4 +1,0 @@
-**/__snapshots__/*.diff.*
-**/__snapshots__/*.actual.*
-/src/environments/**/*
-!/src/environments/.gitkeep
