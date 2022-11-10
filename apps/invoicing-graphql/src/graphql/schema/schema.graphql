@@ -24,6 +24,7 @@ enum CreditNoteReason {
   CHANGE_PAYER_DETAILS
   BAD_DEBT
   OTHER
+  TA_LATE_APPROVAL
 }
 
 type InvoicingArticle @model(id: "articles") {
@@ -76,6 +77,7 @@ type InvoiceItem @model(id: "invoice_items") {
   price: Float
   rate: Float
   vat: Float
+  taDiscount: Float
   vatnote: String
   article: InvoicingArticle
   dateCreated: Date

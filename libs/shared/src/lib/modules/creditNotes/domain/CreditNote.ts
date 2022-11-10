@@ -17,6 +17,7 @@ export enum CreationReason {
   CHANGE_PAYER_DETAILS = 'change-payer-details',
   BAD_DEBT = 'bad-debt',
   OTHER = 'other',
+  TA_LATE_APPROVAL = 'ta-late-approval',
 }
 interface CreditNoteProps {
   invoiceId: InvoiceId;

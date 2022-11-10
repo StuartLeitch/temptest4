@@ -35,6 +35,7 @@ import {DomainEvents} from "../../../../core/domain/events/DomainEvents";
 export enum Actions {
   Activate = 'Activate',
   Delete = 'Delete',
+  Ignore = 'Ignore',
 }
 
 export class UpdateTransactionOnTAUtils {
@@ -115,15 +116,14 @@ export class UpdateTransactionOnTAUtils {
   ): Actions {
     const isAccepted = Boolean(dateAccepted);
     const isPublished = Boolean(datePublished);
-
     if (!taEligible && isAccepted) {
       return Actions.Activate;
+    } else if(taEligible && !isAccepted && !taApproved) {
+      return Actions.Ignore;
     } else if (taEligible && isAccepted && !taApproved) {
       return Actions.Activate;
     } else if (taEligible && isAccepted && !taApproved && isPublished) {
       return Actions.Activate;
-    } else if (!isAccepted) {
-      return Actions.Delete;
     } else if (taEligible && isAccepted && taApproved) {
       return Actions.Delete;
     }

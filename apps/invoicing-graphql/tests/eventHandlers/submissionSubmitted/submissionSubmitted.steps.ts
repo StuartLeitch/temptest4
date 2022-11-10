@@ -29,7 +29,7 @@ import {
   EditorMap,
   WaiverMap,
   GetInvoiceIdByManuscriptCustomIdUsecase,
-  SoftDeleteDraftTransactionUsecase,
+  SoftDeleteDraftInvoiceUsecase,
   GetItemsForInvoiceUsecase,
   GetInvoiceDetailsUsecase,
 } from '@hindawi/shared';
@@ -301,7 +301,7 @@ Then(/^The invoice for CustomId "([\w\d]+)" is deleted$/, async (customId: strin
 });
 
 Given(/^Article with CustomId "([\w\d]+)" is deleted$/, async (customId: string) => {
-  const usecase = new SoftDeleteDraftTransactionUsecase(
+  const usecase = new SoftDeleteDraftInvoiceUsecase(
     context.repos.transaction,
     context.repos.invoiceItem,
     context.repos.invoice,

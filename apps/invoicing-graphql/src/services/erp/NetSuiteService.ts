@@ -878,6 +878,9 @@ export class NetSuiteService implements ErpServiceContract {
       case 'change-payer-details':
         memo = 'Change Payer Details';
         break;
+      case 'ta-late-approval':
+        memo = 'TA Late Approval';
+        break;
       case 'bad-debt':
         memo = 'Bad Debt';
         break;

@@ -17,6 +17,8 @@ function renderSwitch(reason) {
       return 'Waived Manuscript';
     case 'change-payer-details':
       return 'Change Payer Details';
+    case 'ta-late-approval':
+      return 'TA Late Approval'
     case 'bad-debt':
       return 'Bad Debt';
     default:

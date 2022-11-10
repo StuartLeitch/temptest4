@@ -13,7 +13,7 @@ import {
   GetJournalUsecase,
   Manuscript,
   RestoreSoftDeleteDraftTransactionUsecase,
-  SoftDeleteDraftTransactionUsecase,
+  SoftDeleteDraftInvoiceUsecase,
   CreateManuscriptDTO,
   CreateTransactionUsecase,
   Transaction,
@@ -214,7 +214,7 @@ async function softDelete(submissionId: string, context: Context): Promise<void>
 
   const logger = loggerBuilder.getLogger('softDeleteDraftTransactionUsecase');
 
-  const maybeDelete = await new SoftDeleteDraftTransactionUsecase(
+  const maybeDelete = await new SoftDeleteDraftInvoiceUsecase(
     transaction,
     invoiceItem,
     invoice,

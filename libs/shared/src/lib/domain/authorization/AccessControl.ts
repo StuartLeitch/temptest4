@@ -197,7 +197,12 @@ accessControl
   .resource('journals')
   .action('read')
   .resource('publishers')
-  .action('read');
+  .action('read')
+  .resource('payments')
+  .action('read')
+  .resource('creditNote')
+  .action('create')
+  .action('read')
 
 accessControl
   .grant(Roles.SERVICE)

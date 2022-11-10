@@ -62,7 +62,7 @@ const Details: React.FC = (props) => {
 
   // * -> Net and total charges computing
 
-  const { vat, coupons, waivers, price } = invoice?.invoiceItem;
+  const { vat, coupons, waivers, price, taDiscount } = invoice?.invoiceItem;
   const reductions = [...coupons, ...waivers];
   let totalDiscountFromReductions = reductions.reduce(
     (acc, curr) => acc + curr.reduction,
@@ -72,7 +72,7 @@ const Details: React.FC = (props) => {
     totalDiscountFromReductions > 100 ? 100 : totalDiscountFromReductions;
   const netCharges = price - (price * totalDiscountFromReductions) / 100;
   const vatAmount = (netCharges * vat) / 100;
-  const totalCharges = netCharges + vatAmount;
+  const totalCharges = netCharges + vatAmount - taDiscount;
   // * <-
 
   let statusClassName = 'warning';

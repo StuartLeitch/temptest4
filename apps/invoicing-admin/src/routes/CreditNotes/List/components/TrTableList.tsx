@@ -5,16 +5,7 @@ import numeral from 'numeral';
 
 import { formatDate } from '../../../../utils/date';
 import { Badge } from '../../../../components';
-
-/*eslint-disable */
-const CREATION_REASON = {
-  'withdrawn-manuscript': 'Withdrawn Manuscript',
-  'reduction-applied': 'Reduction Applied',
-  'waived-manuscript': 'Waived Manuscript',
-  'change-payer-details': 'Change Payer Details',
-  'bad-debt': 'Bad Debt',
-  other: 'Other',
-};
+import {CREATION_REASON} from "../componentUtils";
 
 const TrTableCreditNotesList = ({ creditNotes }) => {
   let tabularData = creditNotes.creditNotes.map((i) => {
@@ -45,11 +36,8 @@ const TrTableCreditNotesList = ({ creditNotes }) => {
           id,
           creationReason,
           invoice,
-          price,
-          vat,
           total,
           dateIssued,
-          dateCreated,
           persistentReferenceNumber,
         }) => (
           <tr key={id}>

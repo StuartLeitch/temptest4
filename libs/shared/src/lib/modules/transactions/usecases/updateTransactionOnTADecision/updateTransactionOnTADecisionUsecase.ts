@@ -1,48 +1,45 @@
-import { DomainEvents } from '../../../../core/domain/events/DomainEvents';
-import { UniqueEntityID } from '../../../../core/domain/UniqueEntityID';
-import { UseCase } from '../../../../core/domain/UseCase';
+import {DomainEvents} from '../../../../core/domain/events/DomainEvents';
+import {UniqueEntityID} from '../../../../core/domain/UniqueEntityID';
+import {UseCase} from '../../../../core/domain/UseCase';
 
-import { right, left } from '../../../../core/logic/Either';
-import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
-import { UnexpectedError } from '../../../../core/logic/AppError';
-import { AccessControlledUsecase, AccessControlContext, Authorize } from '../../../../domain/authorization';
+import {left, right} from '../../../../core/logic/Either';
+import type {UsecaseAuthorizationContext as Context} from '../../../../domain/authorization';
+import {AccessControlContext, AccessControlledUsecase, Authorize} from '../../../../domain/authorization';
+import {UnexpectedError} from '../../../../core/logic/AppError';
 
-import { LoggerContract } from '../../../../infrastructure/logging';
+import {LoggerContract} from '../../../../infrastructure/logging';
 
-import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
-import { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
-import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
-import { TransactionRepoContract } from '../../repos/transactionRepo';
-import { CatalogRepoContract } from '../../../journals/repos';
-import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
-import { CouponRepoContract } from '../../../coupons/repos';
-import { WaiverRepoContract } from '../../../waivers/repos';
-import { PayerRepoContract } from '../../../payers/repos/payerRepo';
-import { VATService } from '../../../../domain/services/VATService';
-import { EmailService } from '../../../../infrastructure/communication-channels';
+import {InvoiceItemRepoContract} from '../../../invoices/repos/invoiceItemRepo';
+import {ArticleRepoContract} from '../../../manuscripts/repos/articleRepo';
+import {InvoiceRepoContract} from '../../../invoices/repos/invoiceRepo';
+import {TransactionRepoContract} from '../../repos/transactionRepo';
+import {CatalogRepoContract} from '../../../journals/repos';
+import {AddressRepoContract} from '../../../addresses/repos/addressRepo';
+import {CouponRepoContract} from '../../../coupons/repos';
+import {WaiverRepoContract} from '../../../waivers/repos';
+import {PayerRepoContract} from '../../../payers/repos/payerRepo';
+import {VATService} from '../../../../domain/services/VATService';
+import {EmailService} from '../../../../infrastructure/communication-channels';
 
-import { JournalId } from '../../../journals/domain/JournalId';
-import { GetManuscriptByInvoiceIdUsecase } from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
+import {JournalId} from '../../../journals/domain/JournalId';
+import {GetManuscriptByInvoiceIdUsecase} from '../../../manuscripts/usecases/getManuscriptByInvoiceId';
 
-import { GetInvoiceDetailsUsecase } from '../../../invoices/usecases/getInvoiceDetails';
-import { SetTransactionStatusToActiveUsecase } from '../setTransactionStatusToActiveUsecase/setTransactionStatusToActiveUsecase';
-import { SoftDeleteDraftTransactionUsecase } from '../softDeleteDraftTransaction';
-import { UpdateTransactionOnTADecisionResponse as Response } from './updateTransactionOnTADecisionResponse';
-import type { UpdateTransactionOnTADecisionDTO as DTO } from './updateTransactionOnTADecisionDTO';
-import { UpdateTransactionOnTAUtils, Actions } from './ta-utils';
+import {GetInvoiceDetailsUsecase} from '../../../invoices/usecases/getInvoiceDetails';
+import {SetTransactionStatusToActiveUsecase} from '../setTransactionStatusToActiveUsecase/setTransactionStatusToActiveUsecase';
+import {SoftDeleteDraftInvoiceUsecase} from '../softDeleteDraftTransaction';
+import {UpdateTransactionOnTADecisionResponse as Response} from './updateTransactionOnTADecisionResponse';
+import type {UpdateTransactionOnTADecisionDTO as DTO} from './updateTransactionOnTADecisionDTO';
+import {Actions, UpdateTransactionOnTAUtils} from './ta-utils';
 import * as Errors from './updateTransactionOnTADecisionErrors';
-import { VError } from 'verror';
-import { ManuscriptId } from '../../../manuscripts/domain/ManuscriptId';
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { Article } from '../../../manuscripts/domain/Article';
+import {VError} from 'verror';
+import {ManuscriptId} from '../../../manuscripts/domain/ManuscriptId';
 
 export class UpdateTransactionOnTADecisionUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
-  implements UseCase<DTO, Promise<Response>, Context>
-{
+  implements UseCase<DTO, Promise<Response>, Context> {
   private manuscriptDetailsUsecase: GetManuscriptByInvoiceIdUsecase;
   private setTransactionStatusToActiveUsecase: SetTransactionStatusToActiveUsecase;
-  private softDeleteDraftTransactionUsecase: SoftDeleteDraftTransactionUsecase;
+  private softDeleteDraftInvoiceUsecase: SoftDeleteDraftInvoiceUsecase;
   private taUsecaseUtils: UpdateTransactionOnTAUtils;
   private invoiceDetailsUsecase: GetInvoiceDetailsUsecase;
 
@@ -64,7 +61,7 @@ export class UpdateTransactionOnTADecisionUsecase
 
     this.manuscriptDetailsUsecase = new GetManuscriptByInvoiceIdUsecase(this.articleRepo, this.invoiceItemRepo);
 
-    this.softDeleteDraftTransactionUsecase = new SoftDeleteDraftTransactionUsecase(
+    this.softDeleteDraftInvoiceUsecase = new SoftDeleteDraftInvoiceUsecase(
       this.transactionRepo,
       this.invoiceItemRepo,
       this.invoiceRepo,
@@ -111,12 +108,15 @@ export class UpdateTransactionOnTADecisionUsecase
         invoiceDetails.dateAccepted,
         manuscriptDetails.datePublished
       );
-
       // Update or Delete transaction based on TA combinations
-      if (this.isActionToActivate(actionResult)) {
+
+      if (this.isActionToIgnore(actionResult)) {
+        this.logger.info(`Ignoring transaction for invoice with id: ${invoiceDetails.invoiceId.toString()}`)
+        return right(null)
+      } else if (this.isActionToActivate(actionResult)) {
         this.logger.info('Attempting to update transaction.');
         const maybeUpdate = await this.setTransactionStatusToActiveUsecase.execute(
-          { manuscriptId: request.manuscriptId },
+          {manuscriptId: request.manuscriptId},
           context
         );
 
@@ -128,31 +128,27 @@ export class UpdateTransactionOnTADecisionUsecase
         invoiceDetails.generateCreatedEvent();
         DomainEvents.dispatchEventsForAggregate(invoiceDetails.id);
 
-        // * If funds send a percentage, recalculate the amount
+        // * If funds send a percentage, calculate the discounted price
         if (request.discount) {
-          invoiceItem.price = invoiceItem.calculateTADiscountedPrice(request.discount);
+          invoiceItem.taDiscount = invoiceItem.calculateTADiscountedPrice(request.discount.percentageDiscount.value);
+          await this.invoiceItemRepo.update(invoiceItem)
           invoiceDetails.generateInvoiceDraftAmountUpdatedEvent();
           DomainEvents.dispatchEventsForAggregate(invoiceDetails.id);
         }
 
-        // *  Confirm Invoice
-        await this.taUsecaseUtils.confirmInvoice(manuscriptDetails, invoiceDetails, context);
-
         // * Send emails
         await this.taUsecaseUtils.sendEmail(manuscriptDetails, invoiceDetails, journal, invoiceItem, request);
-      }
-
-      if (this.isActionToDelete(actionResult)) {
+        return right(null)
+      } else if (this.isActionToDelete(actionResult)) {
         this.logger.info(`Soft deleting invoice for ${request.submissionId}`);
-        await this.softDeleteDraftTransactionUsecase.execute(
+        await this.softDeleteDraftInvoiceUsecase.execute(
           {
             manuscriptId: request.submissionId,
           },
           context
         );
+        return right(null);
       }
-
-      return right(null);
     } catch (err) {
       return left(new UnexpectedError(err));
     }
@@ -164,6 +160,10 @@ export class UpdateTransactionOnTADecisionUsecase
 
   private isActionToActivate(actionResult: Actions) {
     return actionResult === Actions.Activate;
+  }
+
+  private isActionToIgnore(actionResult: Actions) {
+    return actionResult === Actions.Ignore
   }
 
   private async getJournal(manuscriptDetails) {
@@ -187,7 +187,7 @@ export class UpdateTransactionOnTADecisionUsecase
 
   private async getInvoiceDetails(request, context) {
     try {
-      const maybeInvoiceDetails = await this.invoiceDetailsUsecase.execute({ invoiceId: request.invoiceId }, context);
+      const maybeInvoiceDetails = await this.invoiceDetailsUsecase.execute({invoiceId: request.invoiceId}, context);
       if (maybeInvoiceDetails.isLeft()) {
         this.logger.error(maybeInvoiceDetails.value.message, maybeInvoiceDetails.value);
         throw maybeInvoiceDetails.value;

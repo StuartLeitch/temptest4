@@ -9,7 +9,7 @@ import {
   Roles,
   GetInvoiceDetailsUsecase,
   UpdateInvoiceDateAcceptedUsecase,
-  SoftDeleteDraftTransactionUsecase,
+  SoftDeleteDraftInvoiceUsecase,
   AsyncEither,
   right,
   InvoiceId,
@@ -59,7 +59,7 @@ export const SubmissionQualityCheckPassed: EventHandler<SQCP> = {
     );
     const updateInvoiceDateAcceptedUsecase = new UpdateInvoiceDateAcceptedUsecase(invoiceRepo);
 
-    const softDeleteDraftTransactionUsecase = new SoftDeleteDraftTransactionUsecase(
+    const softDeleteDraftTransactionUsecase = new SoftDeleteDraftInvoiceUsecase(
       transactionRepo,
       invoiceItemRepo,
       invoiceRepo,
@@ -178,7 +178,7 @@ export const SubmissionQualityCheckPassed: EventHandler<SQCP> = {
     }
 
     async function updateInvoiceTADateAccepted(invoiceId: InvoiceId, dateAccepted: string) {
-      logger.info('The article is TA Eligible and funding was approved.');
+      logger.info(`Invoice with id ${invoiceId.toString()} has been approved. Updating date accepted.`);
 
       const maybeInvoiceDateAcceptedUpdated = await updateInvoiceDateAcceptedUsecase.execute(
         {

@@ -82,6 +82,7 @@ export class KnexInvoiceItemRepo
         invoiceId: invoiceItem.invoiceId.id.toString(),
         vat: invoiceItem.vat,
         price: invoiceItem.price,
+        taDiscount: invoiceItem.taDiscount,
       });
 
     if (!updated) {

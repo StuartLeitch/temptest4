@@ -5,6 +5,11 @@ export interface UpdateTransactionOnTADecisionDTO {
     name?: string;
   };
   bankTransferCopyReceiver?: string;
-  discount?: number;
+  discount?: {
+    percentageDiscount?: {
+      value: number;
+    };
+  };
   submissionId?: string;
+  invoiceId?: string;
 }

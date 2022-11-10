@@ -92,6 +92,7 @@ export function applyFilters(src: QueryBuilder, filters: Filters) {
           'WAIVED_MANUSCRIPT': 'waived-manuscript',
           'CHANGE_PAYER_DETAILS': 'change-payer-details',
           'BAD_DEBT': 'bad-debt',
+          'TA_LATE_APPROVAL': 'ta-late-approval',
           'OTHER': 'other'
         }
         const filtr = filter.map((filter) => lookup[filter]);

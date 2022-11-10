@@ -13,8 +13,7 @@ import { SubmissionEditedHandler } from './submission-events/SubmissionEdited';
 import { SubmissionRevisionSubmittedHandler } from './submission-events/SubmissionRevisionSubmitted';
 import { JournalSectionEditorAssignedHandler, JournalEditorAssignedHandler } from './JournalEditorAssigned';
 import { JournalSectionEditorRemovedHandler, JournalEditorRemovedHandler } from './JournalEditorRemoved';
-import { TaAuthorEligibilityDecidedHandler } from './ta-events/TaAuthorEligibleHandler';
-import { TaFundingRequestApprovedHandler } from './ta-events/TaFundingRequestedHandler';
+import { ManuscriptTAEligibilityUpdatedHandler } from './ta-events/ManuscriptTAEligibilityUpdated'
 
 export {
   SubmissionPeerReviewCycleCheckPassed,
@@ -34,6 +33,5 @@ export {
   SubmissionEditedHandler,
   SubmissionRevisionSubmittedHandler,
   SubmissionSubmittedHandler,
-  TaAuthorEligibilityDecidedHandler,
-  TaFundingRequestApprovedHandler,
+  ManuscriptTAEligibilityUpdatedHandler
 };

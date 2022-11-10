@@ -1,7 +1,7 @@
 import { SubmissionQualityCheckRTCd as SubmissionQualityCheckRTCdEvent } from '@hindawi/phenom-events';
 
 import {
-  SoftDeleteDraftTransactionUsecase,
+  SoftDeleteDraftInvoiceUsecase,
   ManuscriptTypeNotInvoiceable,
   UsecaseAuthorizationContext,
   Roles,
@@ -51,8 +51,8 @@ export const SubmissionQualityCheckRTCd: EventHandler<SubmissionQualityCheckRTCd
           return;
         }
 
-        const softDeleteDraftTransactionUsecase: SoftDeleteDraftTransactionUsecase =
-          new SoftDeleteDraftTransactionUsecase(
+        const softDeleteDraftTransactionUsecase: SoftDeleteDraftInvoiceUsecase =
+          new SoftDeleteDraftInvoiceUsecase(
             transactionRepo,
             invoiceItemRepo,
             invoiceRepo,

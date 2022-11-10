@@ -1,2 +1,1 @@
-export * from './TaAuthorEligibleHandler';
-export * from './TaFundingRequestedHandler';
+export * from './ManuscriptTAEligibilityUpdated';

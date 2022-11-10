@@ -22,7 +22,6 @@ export class AuditLoggerService implements AuditLoggerServiceContract {
         userAccount: this.userData.email,
         ...args
       }).value;
-
       this.auditLogRepo.save(log);
     }
   }

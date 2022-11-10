@@ -15,6 +15,7 @@ import { formatDate } from '../../../utils/date';
 import { Loading } from '../../components';
 
 import { CREDIT_NOTES_QUERY } from './graphql';
+import {CREATION_REASON} from "./componentUtils";
 
 const defaultPaginationSettings = { page: 1, offset: 0, limit: 10 };
 
@@ -61,15 +62,6 @@ const RecentCreditNotesList: React.FC<RecentCreditNotesListProps> = (props) => {
 
   if (loading) return <Loading />;
   if (error) return <Error data={error as any} />;
-
-  const CREATION_REASON = {
-    'withdrawn-manuscript': 'Withdrawn Manuscript',
-    'reduction-applied': 'Reduction Applied',
-    'waived-manuscript': 'Waived Manuscript',
-    'change-payer-details': 'Change Payer Details',
-    'bad-debt': 'Bad Debt',
-    other: 'Other',
-  };
 
   const columns = [
     {

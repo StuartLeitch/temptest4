@@ -30,6 +30,7 @@ fragment invoiceFragment on Invoice {
     vat
     vatnote
     dateCreated
+    taDiscount
     coupons {
       ...couponFragment
     }
@@ -122,6 +123,7 @@ fragment invoiceFragment on Invoice {
     rate
     vat
     vatnote
+    taDiscount
     dateCreated
     coupons {
       ...couponFragment

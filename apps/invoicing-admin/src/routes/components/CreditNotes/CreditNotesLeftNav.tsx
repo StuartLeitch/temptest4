@@ -89,6 +89,16 @@ const CreditNotesLeftNav = (props) => {
             Other
           </Checkbox>
         </NavItem>
+        <NavItem className='d-flex px-2 mb-2'>
+          <Checkbox
+            name='reason.TA_LATE_APPROVAL'
+            onChange={(evt: any) => onFilterHandler.callback(evt.target)}
+            checked={reason.includes('TA_LATE_APPROVAL')}
+            id='creditnote-reason-ta-late-approval'
+          >
+            TA Late Approval
+          </Checkbox>
+        </NavItem>
       </Nav>
       {/* END Reason */}
     </React.Fragment>

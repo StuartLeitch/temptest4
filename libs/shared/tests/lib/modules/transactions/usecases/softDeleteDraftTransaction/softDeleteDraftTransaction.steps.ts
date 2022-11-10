@@ -12,7 +12,7 @@ import { InvoiceStatus } from '../../../../../../src/lib/modules/invoices/domain
 import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 import { InvoiceItemMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceItemMap';
 import { Manuscript } from '../../../../../../src/lib/modules/manuscripts/domain/Manuscript';
-import { SoftDeleteDraftTransactionUsecase } from '../../../../../../src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
+import { SoftDeleteDraftInvoiceUsecase } from '../../../../../../src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
 import {
   Transaction,
   TransactionStatus,
@@ -36,7 +36,7 @@ const mockInvoiceRepo: MockInvoiceRepo = new MockInvoiceRepo();
 const mockInvoiceItemRepo: MockInvoiceItemRepo = new MockInvoiceItemRepo();
 const mockArticleRepo: ArticleRepoContract = new MockArticleRepo();
 
-const usecase: SoftDeleteDraftTransactionUsecase = new SoftDeleteDraftTransactionUsecase(
+const usecase: SoftDeleteDraftInvoiceUsecase = new SoftDeleteDraftInvoiceUsecase(
   mockTransactionRepo,
   mockInvoiceItemRepo,
   mockInvoiceRepo,
@@ -118,7 +118,7 @@ Given(
 );
 
 When(
-  /^SoftDeleteDraftTransactionUsecase is executed for manuscript "([\w-]+)"$/,
+  /^SoftDeleteDraftInvoiceUsecase is executed for manuscript "([\w-]+)"$/,
   async (manuscriptTestId: string) => {
     await usecase.execute(
       {

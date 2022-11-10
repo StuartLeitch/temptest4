@@ -7,6 +7,16 @@ const defaultContext: UsecaseAuthorizationContext = {
   roles: [Roles.QUEUE_EVENT_HANDLER],
 };
 
+export interface TaDiscounts {
+  absoluteDiscount?: {
+    currency: string;
+    value: number
+  },
+  percentageDiscount?: {
+    value: number
+  }
+}
+
 export class TAEventHandlerHelpers {
   constructor(private context: Context) {}
 

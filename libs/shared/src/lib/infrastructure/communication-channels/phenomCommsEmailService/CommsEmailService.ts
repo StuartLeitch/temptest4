@@ -17,12 +17,14 @@ export class CommsEmailService {
     private readonly basePath: string,
     private readonly senderAddress: string,
     private readonly senderName: string,
-    private readonly mailingDisabled: boolean
+    private readonly mailingDisabled: boolean,
+    private readonly creditControlReminderSenderEmail: string,
   ) {}
 
   private createURL(path: string) {
     return `${this.basePath}${path}`;
   }
+
   public async sendInvoiceReceiptNotification(
     payer: Payer,
     invoice: Invoice,
@@ -47,6 +49,76 @@ export class CommsEmailService {
       sender: { email: this.senderAddress, name: this.senderName },
       recipient: { email: payer.email.toString(), name: payer.name.toString() },
       usecase: 'DownloadReceiptEmail',
+      templatePlaceholders,
+    };
+
+    try {
+      await this.publishService.publishMessage({
+        timestamp: messageTimestamp?.toISOString(),
+        event: EMAIL_REQUESTED,
+        data,
+      });
+      return right(null);
+    } catch (err) {
+      return left(new UnexpectedError(err.toString()));
+    }
+  }
+
+  public async sendRefundEmailForLateTaApproval(
+    invoiceNumber: string,
+    customId: string,
+    creditNoteNumber: string,
+    messageTimestamp?: Date
+  ) {
+    if (this.mailingDisabled) {
+      return right(null);
+    }
+    const templatePlaceholders = {
+      INVOICE_NUMBER: invoiceNumber,
+      MANUSCRIPT_NUMBER: customId,
+      CREDIT_NOTE_NUMBER: creditNoteNumber,
+    };
+
+    const data: EmailRequestedEvent = {
+      ...EventUtils.createEventObject(),
+      sender: { email: this.senderAddress, name: this.senderName },
+      recipient: { email: this.creditControlReminderSenderEmail, name: '' },
+      usecase: 'TaLateApprovalRefundEmail',
+      templatePlaceholders,
+    };
+
+    try {
+      await this.publishService.publishMessage({
+        timestamp: messageTimestamp?.toISOString(),
+        event: EMAIL_REQUESTED,
+        data,
+      });
+      return right(null);
+    } catch (err) {
+      return left(new UnexpectedError(err.toString()));
+    }
+  }
+
+  public async sendRefundEmailForWithdrawnManuscripts(
+    invoiceNumber: string,
+    customId: string,
+    creditNoteNumber: string,
+    messageTimestamp?: Date
+  ) {
+    if (this.mailingDisabled) {
+      return right(null);
+    }
+    const templatePlaceholders = {
+      INVOICE_NUMBER: invoiceNumber,
+      MANUSCRIPT_NUMBER: customId,
+      CREDIT_NOTE_NUMBER: creditNoteNumber
+    };
+
+    const data: EmailRequestedEvent = {
+      ...EventUtils.createEventObject(),
+      sender: { email: this.senderAddress, name: this.senderName },
+      recipient: { email: this.creditControlReminderSenderEmail, name: '' },
+      usecase: 'WithdrawnManuscriptRefundEmail',
       templatePlaceholders,
     };
 

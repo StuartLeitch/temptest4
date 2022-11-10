@@ -128,7 +128,7 @@ const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
         const netCharges =
           record.invoiceItem.price * (1 - (coupons + waivers) / 100) * 100;
         const total = netCharges + (netCharges * record.invoiceItem.vat) / 100;
-        record.total = Math.round(total) / 100;
+        record.total = Math.round(total) / 100 -  record.invoiceItem.taDiscount;
 
         return (
           <Tag

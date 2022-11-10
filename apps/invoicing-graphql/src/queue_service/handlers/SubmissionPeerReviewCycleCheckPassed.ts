@@ -8,7 +8,7 @@ import {
   ManuscriptTypeNotInvoiceable,
   right,
   Roles,
-  SoftDeleteDraftTransactionUsecase,
+  SoftDeleteDraftInvoiceUsecase,
   TransactionStatus,
   UpdateInvoiceDateAcceptedUsecase,
   UpdateTransactionOnAcceptManuscriptUsecase,
@@ -58,7 +58,7 @@ export const SubmissionPeerReviewCycleCheckPassed: EventHandler<SPRCCP> = {
     );
     const updateInvoiceDateAcceptedUsecase = new UpdateInvoiceDateAcceptedUsecase(invoiceRepo);
 
-    const softDeleteDraftTransactionUsecase = new SoftDeleteDraftTransactionUsecase(
+    const softDeleteDraftTransactionUsecase = new SoftDeleteDraftInvoiceUsecase(
       transactionRepo,
       invoiceItemRepo,
       invoiceRepo,
@@ -177,7 +177,7 @@ export const SubmissionPeerReviewCycleCheckPassed: EventHandler<SPRCCP> = {
     }
 
     async function updateInvoiceTADateAccepted(invoiceId: InvoiceId, dateAccepted: string) {
-      logger.info('The article is TA Eligible and funding was approved.');
+      logger.info(`Invoice with id: ${invoiceId.toString} passed PRCC. Updating date accepted.`);
 
       const maybeInvoiceDateAcceptedUpdated = await updateInvoiceDateAcceptedUsecase.execute(
         {

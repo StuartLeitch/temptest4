@@ -29,7 +29,7 @@ import { SoftDeleteDraftTransactionResponse as Response } from './softDeleteDraf
 import * as Errors from './softDeleteDraftTransactionErrors';
 import { LoggerContract } from '../../../../infrastructure/logging';
 
-export class SoftDeleteDraftTransactionUsecase
+export class SoftDeleteDraftInvoiceUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
   implements UseCase<DTO, Promise<Response>, Context>
 {
@@ -61,7 +61,6 @@ export class SoftDeleteDraftTransactionUsecase
         const maybeManuscript = await this.manuscriptRepo.findById(
           manuscriptId
         );
-
         if (maybeManuscript.isLeft()) {
           return left(
             new UnexpectedError(new Error(maybeManuscript.value.message))

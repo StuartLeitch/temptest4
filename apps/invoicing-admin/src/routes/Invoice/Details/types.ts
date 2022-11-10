@@ -68,6 +68,7 @@ export interface InvoiceItem {
   price: number;
   type: string;
   vat: number;
+  taDiscount: number;
   waivers: Waiver[];
 }
 

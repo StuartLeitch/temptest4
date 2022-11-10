@@ -23,6 +23,7 @@ export interface InvoiceItemProps {
   type?: InvoiceItemType;
   vat?: number;
   price?: number;
+  taDiscount?: number;
   dateCreated: Date;
   name?: string;
   assignedCoupons?: CouponAssignedCollection;
@@ -80,6 +81,14 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
 
   get assignedWaivers(): WaiverAssignedCollection {
     return this.props.assignedWaivers;
+  }
+
+  set taDiscount(taDiscount: number) {
+    this.props.taDiscount = taDiscount;
+  }
+
+  get taDiscount(): number {
+    return this.props.taDiscount || 0;
   }
 
   public static create(
@@ -158,18 +167,18 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
   public calculateDiscount(
     withAdditionalReductions?: Reduction<unknown>[]
   ): number {
+
+    const taPercentage = this.taDiscount / this.price * 100
     const totalDiscount = this.calculateTotalDiscountPercentage(
       withAdditionalReductions
-    );
-
+    ) + taPercentage
     if (totalDiscount >= 100) return this.price;
 
     return (totalDiscount * this.price) / 100;
   }
 
   public calculateTADiscountedPrice(discount: number): number {
-    const discountSum = this.price * (discount / 100);
-    return this.price - discountSum;
+    return this.price * (discount / 100);
   }
 
   public calculateVat(withAdditionalReductions?: Reduction<unknown>[]): number {
@@ -182,7 +191,6 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
     withAdditionalReductions?: Reduction<unknown>[]
   ): number {
     const net = this.calculateNetPrice(withAdditionalReductions);
-
     return net + (net * this.vat) / 100;
   }
 

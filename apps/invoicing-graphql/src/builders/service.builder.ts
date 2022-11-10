@@ -153,7 +153,8 @@ export async function buildServices(
       env.app.FERoot,
       env.app.invoicePaymentEmailSenderAddress,
       env.app.invoicePaymentEmailSenderName,
-      env.app.mailingDisabled
+      env.app.mailingDisabled,
+      env.app.creditControlReminderSenderEmail,
     ),
     schedulingService: sisifEnabled
       ? new BullScheduler(bullData, loggerBuilder.getLogger(BullScheduler.name))

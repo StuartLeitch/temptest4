@@ -34,6 +34,7 @@ export const INVOICE_QUERY = `
       type
       rate
       vat
+      taDiscount
       vatnote
       dateCreated
       coupons {

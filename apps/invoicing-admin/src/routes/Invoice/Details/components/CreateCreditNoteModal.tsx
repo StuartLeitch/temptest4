@@ -126,6 +126,7 @@ const CreateCreditNoteModal: React.FC<CreateCreditNoteModalProps> = ({
                     'reduction-applied': true,
                     'waived-manuscript': false,
                     'change-payer-details': true,
+                    'ta-late-approval': false,
                     'bad-debt': false,
                     'other': true,
                   }
@@ -143,6 +144,7 @@ const CreateCreditNoteModal: React.FC<CreateCreditNoteModalProps> = ({
                 <option value='reduction-applied'>Reduction Applied</option>
                 <option value='waived-manuscript'>Waived Manuscript</option>
                 <option value='change-payer-details'>Change Payer Details</option>
+                <option value='ta-late-approval'>TA Late Approval</option>
                 <option value='bad-debt'>Bad Debt</option>
                 <option value='other'>Other</option>
               </Input>

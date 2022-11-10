@@ -23,7 +23,7 @@ import { ArticleMap } from '../../../../../../src/lib/modules/manuscripts/mapper
 import { InvoiceMap } from '../../../../../../src/lib/modules/invoices/mappers/InvoiceMap';
 
 import { RestoreSoftDeleteDraftTransactionUsecase } from '../../../../../../src/lib/modules/transactions/usecases/restoreSoftDeleteDraftTransaction/restoreSoftDeleteDraftTransaction';
-import { SoftDeleteDraftTransactionUsecase } from '../../../../../../src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
+import { SoftDeleteDraftInvoiceUsecase } from '../../../../../../src/lib/modules/transactions/usecases/softDeleteDraftTransaction/softDeleteDraftTransaction';
 import {MockLogger} from "../../../../../../src/lib/infrastructure/logging/mocks/MockLogger";
 
 let manuscript: Manuscript;
@@ -126,7 +126,7 @@ Given(
 Given(
   /^The manuscript with id "([\w-]+)" is withdrawn$/,
   async (manuscriptId: string) => {
-    const usecase = new SoftDeleteDraftTransactionUsecase(
+    const usecase = new SoftDeleteDraftInvoiceUsecase(
       mockTransactionRepo,
       mockInvoiceItemRepo,
       mockInvoiceRepo,
