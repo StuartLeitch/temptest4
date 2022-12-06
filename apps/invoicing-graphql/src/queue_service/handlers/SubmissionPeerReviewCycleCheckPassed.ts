@@ -91,7 +91,7 @@ export const SubmissionPeerReviewCycleCheckPassed: EventHandler<SPRCCP> = {
 
       const isDeleted = await eventHelpers.checkIsInvoiceDeleted(invoiceId.id.toString());
       if (isDeleted) {
-        logger.info(`PeerReviewCheckedMessage invoice with id: ${invoiceId} is deleted.`);
+        logger.info(`PeerReviewCheckedMessage invoice with id: ${invoiceId.id.toString()} is deleted.`);
         return;
       }
 
