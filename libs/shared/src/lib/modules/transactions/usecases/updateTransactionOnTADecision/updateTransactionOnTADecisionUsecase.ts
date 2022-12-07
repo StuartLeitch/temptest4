@@ -106,7 +106,8 @@ export class UpdateTransactionOnTADecisionUsecase
         manuscriptDetails.taEligible,
         manuscriptDetails.taFundingApproved,
         invoiceDetails.dateAccepted,
-        manuscriptDetails.datePublished
+        manuscriptDetails.datePublished,
+        invoiceDetails.status
       );
       // Update or Delete transaction based on TA combinations
 
