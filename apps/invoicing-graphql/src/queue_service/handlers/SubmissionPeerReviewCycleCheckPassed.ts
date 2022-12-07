@@ -177,7 +177,7 @@ export const SubmissionPeerReviewCycleCheckPassed: EventHandler<SPRCCP> = {
     }
 
     async function updateInvoiceTADateAccepted(invoiceId: InvoiceId, dateAccepted: string) {
-      logger.info(`Invoice with id: ${invoiceId.toString} passed PRCC. Updating date accepted.`);
+      logger.info(`Invoice with id: ${invoiceId.toString()} passed PRCC. Updating date accepted.`);
 
       const maybeInvoiceDateAcceptedUpdated = await updateInvoiceDateAcceptedUsecase.execute(
         {
