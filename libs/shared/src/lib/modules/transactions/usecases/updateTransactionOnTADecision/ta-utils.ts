@@ -118,11 +118,15 @@ export class UpdateTransactionOnTAUtils {
     } else if(taEligible && !isAccepted && !taApproved) {
       return Actions.Ignore;
     } else if (taEligible && isAccepted && !taApproved) {
-      return Actions.Activate;
+      if(invoiceStatus !== InvoiceStatus.ACTIVE)
+        return Actions.Activate;
+      else
+        return Actions.Ignore;
     } else if (taEligible && isAccepted && !taApproved && isPublished) {
       if(invoiceStatus !== InvoiceStatus.ACTIVE)
         return Actions.Activate;
-      return Actions.Ignore;
+      else
+        return Actions.Ignore;
     } else if (taEligible && isAccepted && taApproved) {
       return Actions.Delete;
     }
