@@ -403,7 +403,8 @@
         "serve": {
           "builder": "@nrwl/web:dev-server",
           "options": {
-            "buildTarget": "invoicing-web:build"
+            "buildTarget": "invoicing-web:build",
+            "port": 4201
           },
           "configurations": {
             "production": {

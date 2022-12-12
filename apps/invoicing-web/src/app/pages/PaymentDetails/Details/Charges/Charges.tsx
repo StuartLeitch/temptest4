@@ -26,8 +26,14 @@ const showInfo = (info: string) => {
   }
 };
 
+function renderTaDiscount(invoiceItem, taDiscount, price) {
+  return invoiceItem?.taDiscount !== 0 &&
+      <ChargeItem price={-taDiscount} name="TA Discount" description={`${-Math.round((taDiscount / price) * 100)}%`} mt="2"/>
+}
+
 const Charges: React.FC<Props> = ({ invoiceItem, ...rest }: any) => {
-  const { vat, rate, vatnote, price, coupons = [], waivers = [] } = invoiceItem;
+  const { vat, rate, vatnote, price, coupons = [], waivers = [], taDiscount } = invoiceItem;
+  console.log(invoiceItem)
   const reductions = [...coupons, ...waivers];
   let totalDiscountFromReductions = reductions.reduce(
     (acc, curr) => acc + curr.reduction,
@@ -35,7 +41,7 @@ const Charges: React.FC<Props> = ({ invoiceItem, ...rest }: any) => {
   );
   totalDiscountFromReductions =
     totalDiscountFromReductions > 100 ? 100 : totalDiscountFromReductions;
-  const finalPrice = price - (price * totalDiscountFromReductions) / 100; // net charges
+  const finalPrice = price - (price * totalDiscountFromReductions) / 100 - taDiscount; // net charges
   const vatNote = vatnote
     .replace(
       "{Vat/Rate}",
@@ -73,7 +79,7 @@ const Charges: React.FC<Props> = ({ invoiceItem, ...rest }: any) => {
 
   return (
     <Root {...rest}>
-      <Separator direction="horizontal" fraction="auto" mx={-4} />
+      <Separator direction="horizontal" fraction="auto" mx={-4}/>
       <Title type="small" mt="4">
         Charges
       </Title>
@@ -82,10 +88,12 @@ const Charges: React.FC<Props> = ({ invoiceItem, ...rest }: any) => {
         price={invoiceItem.price}
         name="Article Processing Charges"
       />
+      {renderTaDiscount(invoiceItem, taDiscount, price)}
       {waiverItems}
       {invoiceItem.coupons &&
         invoiceItem.coupons.map((coupon) => (
           <ChargeItem
+
             key={coupon.code}
             price={-(coupon.reduction * invoiceItem.price) / 100}
             name="Coupon"
@@ -94,17 +102,17 @@ const Charges: React.FC<Props> = ({ invoiceItem, ...rest }: any) => {
           />
         ))}
       <Flex justifyContent="flex-end" mt="2">
-        <Separator direction="horizontal" fraction={20} />
+        <Separator direction="horizontal" fraction={20}/>
       </Flex>
-      <ChargeItem price={finalPrice} name="Net Charges" mt="2" />
+      <ChargeItem price={finalPrice} name="Net Charges" mt="2"/>
       <VatCharge
         tenant={config.tenantName}
         vat={invoiceItem.vat}
         price={finalPrice}
         rate={invoiceItem.rate}
       />
-      <Separator direction="horizontal" fraction="auto" mx={-2} mt={2} />
-      <TotalCharges price={finalPrice} vat={invoiceItem.vat} mt="2" />
+      <Separator direction="horizontal" fraction="auto" mx={-2} mt={2}/>
+      <TotalCharges price={finalPrice} vat={invoiceItem.vat} mt="2"/>
       {vatNote !== " " ? showInfo(vatNote) : null}
     </Root>
   );

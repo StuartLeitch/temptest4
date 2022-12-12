@@ -70,9 +70,9 @@ const Details: React.FC = (props) => {
   );
   totalDiscountFromReductions =
     totalDiscountFromReductions > 100 ? 100 : totalDiscountFromReductions;
-  const netCharges = price - (price * totalDiscountFromReductions) / 100;
+  const netCharges = price - ((price * totalDiscountFromReductions) / 100) - taDiscount;
   const vatAmount = (netCharges * vat) / 100;
-  const totalCharges = netCharges + vatAmount - taDiscount;
+  const totalCharges = netCharges + vatAmount;
   // * <-
 
   let statusClassName = 'warning';

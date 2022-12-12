@@ -221,6 +221,22 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
                 </td>
               </tr>
             ))}
+          {invoice?.invoiceItem?.taDiscount > 0 &&
+            <tr>
+              <td colSpan={3} style={{borderTop: 'none'}}></td>
+              <td className='align-middle'>
+              <span className='text-uppercase text-muted font-weight-bold'>
+                TA Discount
+              </span>
+                <span className='text-muted px-2'>
+                (-{Math.round((invoice?.invoiceItem?.taDiscount / invoice?.invoiceItem.price) * 100)}%)
+              </span>
+              </td>
+              <td className='align-middle text-right text-dark font-weight-bold'>
+                {numeral(invoice?.invoiceItem?.taDiscount * -1).format('$0.00')}
+              </td>
+            </tr>
+          }
           <tr>
             <td colSpan={3} style={{ borderTop: 'none' }}></td>
             <td className='align-middle text-uppercase text-muted font-weight-bold'>
@@ -244,22 +260,6 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
               {numeral(vatAmount.toFixed(2)).format('$0.00')}
             </td>
           </tr>
-          {invoice?.invoiceItem?.taDiscount > 0 &&
-            <tr>
-              <td colSpan={3} style={{borderTop: 'none'}}></td>
-              <td className='align-middle'>
-              <span className='text-uppercase text-muted font-weight-bold'>
-                TA Discount
-              </span>
-                <span className='text-muted px-2'>
-                (-{(invoice?.invoiceItem?.taDiscount / invoice?.invoiceItem.price) * 100}%)
-              </span>
-              </td>
-              <td className='align-middle text-right text-dark font-weight-bold'>
-                {numeral(invoice?.invoiceItem?.taDiscount * -1).format('$0.00')}
-              </td>
-            </tr>
-          }
           <tr>
             <td colSpan={3} style={{ borderTop: 'none' }}></td>
             <td className='align-middle h4 text-uppercase text-dark font-weight-bold'>

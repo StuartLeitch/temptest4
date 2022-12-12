@@ -106,6 +106,7 @@ export const invoiceFragment = gql`
       vat
       vatnote
       dateCreated
+      taDiscount
       coupons {
         ...couponFragment
       }

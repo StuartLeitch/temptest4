@@ -512,7 +512,9 @@
                   <% let item = invoice.invoiceItems.currentItems[0] %>
                   <% let price = invoice.invoiceNetTotal %>
                   <% let vat = invoice.invoiceVatTotal %>
-                  <% let discount = invoice.invoiceDiscountTotal %>
+                  <% let taDiscount = item.taDiscount %>
+                  <% let discount = invoice.invoiceDiscountTotal - taDiscount %>
+                  <% let taDiscountPercentage = Math.round((taDiscount / item.price) * 100)  %>
                   <% let discountPercentage = invoice.invoiceDiscountPercentageTotal %>
                   <% if(discount!== 0) { %>
                 <tr>
@@ -521,6 +523,14 @@
                     -$<%= formatPriceFn(discount) %>
                   </td>
                 </tr>
+                <% } %>
+                <% if(taDiscount !== 0) { %>
+                  <tr>
+                    <th>TA Discount (-<%= taDiscountPercentage %>%)</th>
+                    <td>
+                      -$ <%= formatPriceFn(item.taDiscount) %>
+                    </td>
+                  </tr>
                 <% } %>
                 <tr>
                   <th>Net Charges</th>
