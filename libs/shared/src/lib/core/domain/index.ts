@@ -5,7 +5,7 @@ export * from './Identifier';
 export * from './NoOpQueueService';
 export * from './NoOpQueueService';
 export * from './UniqueEntityID';
-export * from './UnitOfWork';
+export * from '../../infrastructure/unit_of_work/UnitOfWork';
 export * from './UseCase';
 export * from './ValueObject';
 export * from './WatchedList';

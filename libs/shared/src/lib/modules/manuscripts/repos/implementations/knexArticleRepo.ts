@@ -6,26 +6,17 @@ import { TABLES } from '../../../../infrastructure/database/knex';
 import { RepoError } from '../../../../infrastructure/RepoError';
 
 import { ManuscriptId } from '../../../manuscripts/domain/ManuscriptId';
-import { InvoiceId } from '../../../invoices/domain/InvoiceId';
 import { Manuscript } from '../../domain/Manuscript';
 import { Article } from '../../domain/Article';
 
 import { ManuscriptMap } from '../../mappers/ManuscriptMap';
 import { ArticleMap } from '../../mappers/ArticleMap';
 
-import { InvoiceRepoContract } from './../../../invoices/repos/invoiceRepo';
 import { ArticleRepoContract } from '../articleRepo';
 import Knex from 'knex';
-import { Guard } from '@hindawi/shared';
-import { VError } from 'verror';
 
 export class KnexArticleRepo extends AbstractBaseDBRepo<Knex, Article | Manuscript> implements ArticleRepoContract {
-  constructor(
-    protected db: Knex,
-    protected logger?: any,
-    private models?: any,
-    private invoiceRepo?: InvoiceRepoContract
-  ) {
+  constructor(protected db: Knex, protected logger?: any) {
     super(db, logger);
   }
 
@@ -68,31 +59,6 @@ export class KnexArticleRepo extends AbstractBaseDBRepo<Knex, Article | Manuscri
     return ArticleMap.toDomain(articleData);
   }
 
-  private createInvoiceDetailsQuery(): any {
-    const { db } = this;
-
-    return db(TABLES.ARTICLES)
-      .select('articles.*', 'invoices.id as invoiceId')
-      .leftJoin(TABLES.INVOICE_ITEMS, 'invoice_items.manuscriptId', 'articles.id')
-      .leftJoin(TABLES.INVOICES, 'invoice_items.invoiceId', 'invoices.id');
-  }
-
-  async findByInvoiceId(invoiceId: InvoiceId): Promise<Either<GuardFailure | RepoError, Article | Manuscript>> {
-    const { logger } = this;
-
-    const detailsQuery = this.createInvoiceDetailsQuery();
-
-    const filterInvoicesById: any = this.invoiceRepo.filterByInvoiceId(invoiceId);
-    const sql = filterInvoicesById(detailsQuery);
-
-    logger.debug('select', {
-      sql: sql.toString(),
-    });
-
-    const articleData = await sql;
-    return ArticleMap.toDomain(articleData);
-  }
-
   async exists(article: Article): Promise<Either<GuardFailure | RepoError, boolean>> {
     return right(true);
   }
@@ -107,7 +73,10 @@ export class KnexArticleRepo extends AbstractBaseDBRepo<Knex, Article | Manuscri
     return this.findById(article.manuscriptId);
   }
 
-  async updateManuscriptTAEligibility(manuscriptId: ManuscriptId, isEligible: boolean): Promise<Either<GuardFailure | RepoError, Manuscript>>{
+  async updateManuscriptTAEligibility(
+    manuscriptId: ManuscriptId,
+    isEligible: boolean
+  ): Promise<Either<GuardFailure | RepoError, Manuscript>> {
     const updateEligibility = await this.db(TABLES.ARTICLES)
       .where({ id: manuscriptId.id.toString() })
       .update({ taEligible: isEligible });
@@ -119,7 +88,10 @@ export class KnexArticleRepo extends AbstractBaseDBRepo<Knex, Article | Manuscri
     }
   }
 
-  async updateManuscriptTAApproval(manuscriptId: ManuscriptId, isApproved: boolean): Promise<Either<GuardFailure | RepoError, Manuscript>>{
+  async updateManuscriptTAApproval(
+    manuscriptId: ManuscriptId,
+    isApproved: boolean
+  ): Promise<Either<GuardFailure | RepoError, Manuscript>> {
     const updateFundingApproved = await this.db(TABLES.ARTICLES)
       .where({ id: manuscriptId.id.toString() })
       .update({ taFundingApproved: isApproved });

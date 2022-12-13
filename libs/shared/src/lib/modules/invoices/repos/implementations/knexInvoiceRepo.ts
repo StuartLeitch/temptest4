@@ -19,22 +19,13 @@ import { Invoice } from '../../domain/Invoice';
 import { InvoiceMap } from '../../mappers/InvoiceMap';
 
 import type { ArticleRepoContract } from '../../../manuscripts/repos/articleRepo';
-import { ErpReferenceRepoContract } from './../../../vendors/repos';
-import { InvoiceItemRepoContract } from '../invoiceItemRepo';
 import { InvoiceRepoContract } from '../invoiceRepo';
 
 import { calculateFiscalYearDateRange } from './fiscal-year-utils';
 import { applyFilters } from './utils';
 
 export class KnexInvoiceRepo extends AbstractBaseDBRepo<Knex, Invoice> implements InvoiceRepoContract {
-  constructor(
-    protected db: Knex,
-    protected logger?: any,
-    private models?: any,
-    private articleRepo?: ArticleRepoContract,
-    private invoiceItemRepo?: InvoiceItemRepoContract,
-    private erpReferenceRepo?: ErpReferenceRepoContract
-  ) {
+  constructor(protected db: Knex, protected logger?: any, private articleRepo?: ArticleRepoContract) {
     super(db, logger);
   }
 
