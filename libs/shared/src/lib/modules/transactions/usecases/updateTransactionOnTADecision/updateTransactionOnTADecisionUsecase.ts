@@ -106,7 +106,8 @@ export class UpdateTransactionOnTADecisionUsecase
         manuscriptDetails.taEligible,
         manuscriptDetails.taFundingApproved,
         invoiceDetails.dateAccepted,
-        manuscriptDetails.datePublished
+        manuscriptDetails.datePublished,
+        invoiceDetails.status
       );
       // Update or Delete transaction based on TA combinations
 
@@ -129,7 +130,7 @@ export class UpdateTransactionOnTADecisionUsecase
         DomainEvents.dispatchEventsForAggregate(invoiceDetails.id);
 
         // * If funds send a percentage, calculate the discounted price
-        if (request.discount) {
+        if (request.discount && request.discount.percentageDiscount) {
           invoiceItem.taDiscount = invoiceItem.calculateTADiscountedPrice(request.discount.percentageDiscount.value);
           await this.invoiceItemRepo.update(invoiceItem)
           invoiceDetails.generateInvoiceDraftAmountUpdatedEvent();

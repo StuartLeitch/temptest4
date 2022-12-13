@@ -1,36 +1,32 @@
-import type { UsecaseAuthorizationContext as Context } from '../../../../domain/authorization';
+import type {UsecaseAuthorizationContext as Context} from '../../../../domain/authorization';
 
-import { Manuscript } from '../../../manuscripts/domain/Manuscript';
-import { Address } from '../../../addresses/domain/Address';
-import { AddressMap } from '../../../addresses/mappers/AddressMap';
-import { Invoice } from '../../../invoices/domain/Invoice';
-import { CatalogItem } from '../../../journals/domain/CatalogItem';
-import { Payer, PayerType } from '../../../payers/domain/Payer';
-import { PayerMap } from '../../../payers/mapper/Payer';
-import { InvoiceItem } from '../../../invoices/domain/InvoiceItem';
+import {Manuscript} from '../../../manuscripts/domain/Manuscript';
+import {Address} from '../../../addresses/domain/Address';
+import {AddressMap} from '../../../addresses/mappers/AddressMap';
+import {Invoice, InvoiceStatus} from '../../../invoices/domain/Invoice';
+import {CatalogItem} from '../../../journals/domain/CatalogItem';
+import {Payer, PayerType} from '../../../payers/domain/Payer';
+import {PayerMap} from '../../../payers/mapper/Payer';
+import {InvoiceItem} from '../../../invoices/domain/InvoiceItem';
 
-import { Either, right, left } from '../../../../core/logic/Either';
-import { UnexpectedError } from '../../../../core/logic/AppError';
+import {Either, left, right} from '../../../../core/logic/Either';
+import {UnexpectedError} from '../../../../core/logic/AppError';
 
-import { LoggerContract } from '../../../../infrastructure/logging';
-import { EmailService } from '../../../../infrastructure/communication-channels';
-import { VATService } from '../../../../domain/services/VATService';
+import {LoggerContract} from '../../../../infrastructure/logging';
+import {EmailService} from '../../../../infrastructure/communication-channels';
+import {VATService} from '../../../../domain/services/VATService';
 
-import { InvoiceItemRepoContract } from '../../../invoices/repos/invoiceItemRepo';
-import { AddressRepoContract } from '../../../addresses/repos/addressRepo';
-import { InvoiceRepoContract } from '../../../invoices/repos/invoiceRepo';
-import { TransactionRepoContract } from '../../repos/transactionRepo';
-import { PayerRepoContract } from '../../../payers/repos/payerRepo';
-import { CouponRepoContract } from '../../../coupons/repos';
-import { WaiverRepoContract } from '../../../waivers/repos';
+import {InvoiceItemRepoContract} from '../../../invoices/repos/invoiceItemRepo';
+import {AddressRepoContract} from '../../../addresses/repos/addressRepo';
+import {InvoiceRepoContract} from '../../../invoices/repos/invoiceRepo';
+import {TransactionRepoContract} from '../../repos/transactionRepo';
+import {PayerRepoContract} from '../../../payers/repos/payerRepo';
+import {CouponRepoContract} from '../../../coupons/repos';
+import {WaiverRepoContract} from '../../../waivers/repos';
 
-import type { UpdateTransactionOnTADecisionDTO as DTO } from './updateTransactionOnTADecisionDTO';
+import type {UpdateTransactionOnTADecisionDTO as DTO} from './updateTransactionOnTADecisionDTO';
 
-import {
-  ConfirmInvoiceUsecase,
-  ConfirmInvoiceDTO,
-} from '../../../invoices/usecases/confirmInvoice';
-import {DomainEvents} from "../../../../core/domain/events/DomainEvents";
+import {ConfirmInvoiceDTO, ConfirmInvoiceUsecase,} from '../../../invoices/usecases/confirmInvoice';
 
 export enum Actions {
   Activate = 'Activate',
@@ -112,7 +108,8 @@ export class UpdateTransactionOnTAUtils {
     taEligible: boolean,
     taApproved: boolean,
     dateAccepted: Date,
-    datePublished: Date
+    datePublished: Date,
+    invoiceStatus: InvoiceStatus
   ): Actions {
     const isAccepted = Boolean(dateAccepted);
     const isPublished = Boolean(datePublished);
@@ -121,9 +118,15 @@ export class UpdateTransactionOnTAUtils {
     } else if(taEligible && !isAccepted && !taApproved) {
       return Actions.Ignore;
     } else if (taEligible && isAccepted && !taApproved) {
-      return Actions.Activate;
+      if(invoiceStatus !== InvoiceStatus.ACTIVE)
+        return Actions.Activate;
+      else
+        return Actions.Ignore;
     } else if (taEligible && isAccepted && !taApproved && isPublished) {
-      return Actions.Activate;
+      if(invoiceStatus !== InvoiceStatus.ACTIVE)
+        return Actions.Activate;
+      else
+        return Actions.Ignore;
     } else if (taEligible && isAccepted && taApproved) {
       return Actions.Delete;
     }
