@@ -130,7 +130,7 @@ export class UpdateTransactionOnTADecisionUsecase
         DomainEvents.dispatchEventsForAggregate(invoiceDetails.id);
 
         // * If funds send a percentage, calculate the discounted price
-        if (request.discount && request.discount.percentageDiscount) {
+        if (request.discount && request.discount?.percentageDiscount) {
           invoiceItem.taDiscount = invoiceItem.calculateTADiscountedPrice(request.discount.percentageDiscount.value);
           await this.invoiceItemRepo.update(invoiceItem)
           invoiceDetails.generateInvoiceDraftAmountUpdatedEvent();
