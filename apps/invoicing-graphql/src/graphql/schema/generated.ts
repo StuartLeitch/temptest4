@@ -174,6 +174,8 @@ export type InvoiceItem = {
   manuscriptId?: Maybe<Scalars['ID']>;
   price?: Maybe<Scalars['Float']>;
   rate?: Maybe<Scalars['Float']>;
+  taCode?: Maybe<Scalars['String']>;
+  taDiscount?: Maybe<Scalars['Float']>;
   type?: Maybe<Scalars['String']>;
   vat?: Maybe<Scalars['Float']>;
   vatnote?: Maybe<Scalars['String']>;
@@ -984,6 +986,8 @@ export type InvoiceItemResolvers<ContextType = any, ParentType extends Resolvers
   manuscriptId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   rate?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  taCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  taDiscount?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   vat?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   vatnote?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;

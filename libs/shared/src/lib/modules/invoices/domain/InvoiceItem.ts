@@ -24,6 +24,7 @@ export interface InvoiceItemProps {
   vat?: number;
   price?: number;
   taDiscount?: number;
+  taCode?: string;
   dateCreated: Date;
   name?: string;
   assignedCoupons?: CouponAssignedCollection;
@@ -89,6 +90,14 @@ export class InvoiceItem extends AggregateRoot<InvoiceItemProps> {
 
   get taDiscount(): number {
     return this.props.taDiscount || 0;
+  }
+
+  set taCode(taCode: string) {
+    this.props.taCode = taCode;
+  }
+
+  get taCode(): string {
+    return this.props.taCode || '';
   }
 
   public static create(

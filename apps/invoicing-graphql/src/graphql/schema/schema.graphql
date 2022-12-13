@@ -78,6 +78,7 @@ type InvoiceItem @model(id: "invoice_items") {
   rate: Float
   vat: Float
   taDiscount: Float
+  taCode: String
   vatnote: String
   article: InvoicingArticle
   dateCreated: Date

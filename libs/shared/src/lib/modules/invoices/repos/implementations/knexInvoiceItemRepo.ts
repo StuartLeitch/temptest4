@@ -83,6 +83,7 @@ export class KnexInvoiceItemRepo
         vat: invoiceItem.vat,
         price: invoiceItem.price,
         taDiscount: invoiceItem.taDiscount,
+        taCode: invoiceItem.taCode,
       });
 
     if (!updated) {

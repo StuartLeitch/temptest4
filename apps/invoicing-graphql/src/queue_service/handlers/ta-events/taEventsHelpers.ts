@@ -8,14 +8,11 @@ const defaultContext: UsecaseAuthorizationContext = {
 };
 
 export interface TaDiscounts {
-  absoluteDiscount?: {
     currency: string;
-    value: number
-  },
-  percentageDiscount?: {
-    value: number
-  }
+    value: number;
+    taCode: string;
 }
+
 
 export class TAEventHandlerHelpers {
   constructor(private context: Context) {}

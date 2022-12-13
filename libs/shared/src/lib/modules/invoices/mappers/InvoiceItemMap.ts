@@ -15,6 +15,7 @@ export interface InvoiceItemPersistenceDTO {
   price?: number;
   vat?: number;
   taDiscount?: number;
+  taCode?: string;
   dateCreated?: Date;
 }
 
@@ -30,6 +31,7 @@ export class InvoiceItemMap extends Mapper<InvoiceItem> {
         price: raw.price,
         vat: raw.vat,
         taDiscount: raw.taDiscount,
+        taCode: raw.taCode,
         dateCreated: new Date(raw.dateCreated),
       },
       new UniqueEntityID(raw.id)
@@ -47,6 +49,7 @@ export class InvoiceItemMap extends Mapper<InvoiceItem> {
       price: invoiceItem.price,
       vat: invoiceItem.vat,
       taDiscount: invoiceItem.taDiscount,
+      taCode: invoiceItem.taCode,
       dateCreated: invoiceItem.dateCreated,
     };
   }

@@ -133,6 +133,8 @@ export function formatInvoiceItems(
     type: invoiceItem.type as PhenomInvoiceItemType,
     price: invoiceItem.price,
     vatPercentage: invoiceItem.vat,
+    taCode: invoiceItem.taCode,
+    taDiscount: invoiceItem.taDiscount,
     coupons: formatCoupons(invoiceItem.assignedCoupons.coupons),
     waivers: formatWaiver(invoiceItem.assignedWaivers.waivers),
   }));
