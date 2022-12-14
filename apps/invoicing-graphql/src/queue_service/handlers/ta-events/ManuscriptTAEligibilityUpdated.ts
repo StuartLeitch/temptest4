@@ -141,7 +141,7 @@ export const ManuscriptTAEligibilityUpdatedHandler: EventHandler<ManuscriptTaEli
       const {invoice, payments} = await getInvoiceWithPayments(customId);
       await updateTaEligible(manuscriptDetails, eligibilityType);
       await updateTaFundingApproved(manuscriptDetails, eligibilityStatus, eligibilityType);
-      if(invoice.status === InvoiceStatus.ACTIVE && payload.data.eligibilityStatus === EligibilityStatus.Resolved && payload.data.eligibilityType === EligibilityType.FullCoverage) {
+      if((invoice.status === InvoiceStatus.ACTIVE || invoice.status === InvoiceStatus.FINAL) && payload.data.eligibilityStatus === EligibilityStatus.Resolved && payload.data.eligibilityType === EligibilityType.FullCoverage) {
         await createCreditNoteOnLateApproval(payments, invoice, customId);
       } else {
         await activateSoftDeleteOrIgnoreInvoice(manuscriptDetails, discounts, submissionId, invoice.invoiceId.toString());
