@@ -6,6 +6,7 @@ export class InvoiceMappingPolicy implements EventMappingPolicyContract {
     return REPORTING_TABLES.INVOICE;
   }
   includesEvent(eventName: string): boolean {
-    return eventName.startsWith('Invoice');
+    return eventName.startsWith('Invoice') 
+      || (eventName == "ManuscriptTAEligibilityUpdated");
   }
 }

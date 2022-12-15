@@ -30,6 +30,7 @@ import * as fix_manuscripts_editorial_assistant_data_order_issue from './migrati
 import * as fix_materialization_lock_performance_issue from './migrations/20220529161600_fix_materialization_lock_performance_issue';
 import * as fix_missing_journal_apc from './migrations/20220803124000_fix_missing_journal_apc';
 import * as fix_random_fields_values from './migrations/20220816133600_fix_random_fields_values';
+import * as add_ta_data from './migrations/20221214172600_add_ta_data';
 
 import Knex from 'knex';
 
@@ -288,6 +289,13 @@ class KnexMigrationSource {
       false,
       fix_random_fields_values.updatedMaterializedViews
     ),
+
+    add_ta_data,
+    rebuild_materialized_views_list(
+      '20221214172600_add_ta_data_rebuild_views',
+      false,
+      add_ta_data.updatedMaterializedViews
+    ),    
 
   ].map(makeViewObject);
 

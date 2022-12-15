@@ -26,6 +26,7 @@ import peerReviewDataView from './PeerReviewDataView';
 import submissionDataView from './SubmissionDataView';
 import submissionsView from './SubmissionsView';
 import usersDataView from './UsersDataView';
+import manuscriptsTAElegibilityView from './ManuscriptsTAElegibilityView';
 
 export const materializedViewList: AbstractEventView[] = OrderUtils.orderDependencies(
   [
@@ -55,6 +56,7 @@ export const materializedViewList: AbstractEventView[] = OrderUtils.orderDepende
     manuscriptVendorsFullAccessView,
     ManuscriptsUsersView,
     peerReviewDataView,
+    manuscriptsTAElegibilityView,
   ]
 ) as AbstractEventView[];
 
