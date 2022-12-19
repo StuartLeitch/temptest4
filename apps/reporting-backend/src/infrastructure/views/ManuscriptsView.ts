@@ -198,6 +198,8 @@ WITH NO DATA;
     `create index on ${this.getViewName()} (publisher_name)`,
     `create index on ${this.getViewName()} (preprint_value)`,
     `create index on ${this.getViewName()} (source_journal)`,
+    `create index on ${this.getViewName()} (screener_email)`,
+
   ];
 
   getRefreshQuery() {

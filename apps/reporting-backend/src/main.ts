@@ -32,11 +32,12 @@ bootstrapMicroframework({
    * bootstrap process. All loaders are executed one by one in a sequential order.
    */
   loaders: [
+    //Moved expess loader to the top to avoid pod restarts due to failed health check during long running deployments that include data refresh!
+    expressLoader,
     knexLoader,
     contextLoader,
     handlerLoader,
     queueServiceLoader,
-    expressLoader,
     cronLoader,
   ],
 })
