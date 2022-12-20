@@ -301,11 +301,12 @@ export class Invoice extends AggregateRoot<InvoiceProps> {
       );
     }
 
+    const total = this.invoiceItems.reduce(
+      (acc, item) => acc + item.calculateTotalPrice(),
+      0
+    );
     return twoDigitPrecision(
-      this.invoiceItems.reduce(
-        (acc, item) => acc + item.calculateTotalPrice(),
-        0
-      )
+      total < 0 ? 0 : total
     );
   }
 

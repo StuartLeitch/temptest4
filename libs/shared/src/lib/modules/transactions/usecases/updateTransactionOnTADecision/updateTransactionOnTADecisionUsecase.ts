@@ -105,11 +105,6 @@ export class UpdateTransactionOnTADecisionUsecase
       invoiceItem.taCode = request.discount?.taCode
       await this.invoiceItemRepo.update(invoiceItem)
 
-      //auto confirm invoice if the TA discounts have driven the price below 0
-      if(invoiceDetails.invoiceTotal <= 0){
-        await this.taUsecaseUtils.confirmInvoice(manuscriptDetails, invoiceDetails, context)
-      }
-
       const actionResult = this.taUsecaseUtils.decideHowTheNextSubmissionStatusShouldChangeAccordingToCurrentFlags(
         manuscriptDetails.taEligible,
         manuscriptDetails.taFundingApproved,
@@ -124,18 +119,6 @@ export class UpdateTransactionOnTADecisionUsecase
         return right(null)
       } else if (this.isActionToActivate(actionResult)) {
         this.logger.info('Attempting to update transaction.');
-        const maybeUpdate = await this.setTransactionStatusToActiveUsecase.execute(
-          {manuscriptId: request.manuscriptId},
-          context
-        );
-
-        if (maybeUpdate.isLeft()) {
-          return left(new Errors.TransactionNotUpdatedError());
-        }
-
-        // * Dispatch domain events
-        invoiceDetails.generateCreatedEvent();
-        DomainEvents.dispatchEventsForAggregate(invoiceDetails.id);
 
         // * If funds send a percentage, calculate the discounted price
         if (request.discount?.value) {
@@ -145,9 +128,27 @@ export class UpdateTransactionOnTADecisionUsecase
           DomainEvents.dispatchEventsForAggregate(invoiceDetails.id);
         }
 
-        // * Send emails
-        await this.taUsecaseUtils.sendEmail(manuscriptDetails, invoiceDetails, journal, invoiceItem, request);
-        return right(null)
+        //auto confirm invoice if the TA discounts have driven the price below 0
+        if(invoiceDetails.invoiceTotal <= 0){
+          await this.taUsecaseUtils.confirmInvoice(manuscriptDetails, invoiceDetails, context)
+        } else {
+          const maybeUpdate = await this.setTransactionStatusToActiveUsecase.execute(
+            {manuscriptId: request.manuscriptId},
+            context
+          );
+
+          if (maybeUpdate.isLeft()) {
+            return left(new Errors.TransactionNotUpdatedError());
+          }
+
+          // * Dispatch domain events
+          invoiceDetails.generateCreatedEvent();
+          DomainEvents.dispatchEventsForAggregate(invoiceDetails.id);
+
+          // * Send emails
+          await this.taUsecaseUtils.sendEmail(manuscriptDetails, invoiceDetails, journal, invoiceItem, request);
+          return right(null)
+        }
       } else if (this.isActionToDelete(actionResult)) {
         this.logger.info(`Soft deleting invoice for ${request.submissionId}`);
         await this.softDeleteDraftInvoiceUsecase.execute(
