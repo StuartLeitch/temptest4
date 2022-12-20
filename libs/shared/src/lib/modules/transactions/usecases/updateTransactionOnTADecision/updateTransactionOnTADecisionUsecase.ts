@@ -105,6 +105,11 @@ export class UpdateTransactionOnTADecisionUsecase
       invoiceItem.taCode = request.discount?.taCode
       await this.invoiceItemRepo.update(invoiceItem)
 
+      //auto confirm invoice if the TA discounts have driven the price below 0
+      if(invoiceDetails.invoiceTotal <= 0){
+        await this.taUsecaseUtils.confirmInvoice(manuscriptDetails, invoiceDetails, context)
+      }
+
       const actionResult = this.taUsecaseUtils.decideHowTheNextSubmissionStatusShouldChangeAccordingToCurrentFlags(
         manuscriptDetails.taEligible,
         manuscriptDetails.taFundingApproved,
