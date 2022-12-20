@@ -100,9 +100,6 @@ export class UpdateTransactionOnTADecisionUsecase
       const journal = await this.getJournal(manuscriptDetails);
       const invoiceDetails = await this.getInvoiceDetails(request, context);
       //TODO maybe we should add a mapper which returns a populated invoice
-      invoiceDetails.addInvoiceItem(invoiceItem);
-
-      invoiceItem.taCode = request.discount?.taCode
       await this.invoiceItemRepo.update(invoiceItem)
 
       const actionResult = this.taUsecaseUtils.decideHowTheNextSubmissionStatusShouldChangeAccordingToCurrentFlags(
@@ -123,13 +120,14 @@ export class UpdateTransactionOnTADecisionUsecase
         // * If funds send a percentage, calculate the discounted price
         if (request.discount?.value) {
           invoiceItem.taDiscount = invoiceItem.calculateTADiscountedPrice(request.discount.value);
+          invoiceItem.taCode = request.discount.taCode
           await this.invoiceItemRepo.update(invoiceItem)
+          invoiceDetails.addInvoiceItem(invoiceItem);
           invoiceDetails.generateInvoiceDraftAmountUpdatedEvent();
           DomainEvents.dispatchEventsForAggregate(invoiceDetails.id);
         }
 
         //auto confirm invoice if the TA discounts have driven the price below 0
-
         const invoiceTotal = invoiceDetails.invoiceTotal;
         this.logger.info(`Total price for ${request.submissionId} is ${invoiceTotal}`)
         if(invoiceTotal <= 0){
