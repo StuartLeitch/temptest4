@@ -215,7 +215,7 @@ export class ConfirmInvoiceUsecase
     invoice: Invoice,
     address: Address
   ): InvoiceStatus | 'Default' {
-    if (invoice.getInvoiceTotal() === 0) {
+    if (invoice.getInvoiceTotal() <= 0) {
       return InvoiceStatus.FINAL;
     } else if (this.isFromSanctionedCountry(address)) {
       return InvoiceStatus.PENDING;

@@ -129,7 +129,10 @@ export class UpdateTransactionOnTADecisionUsecase
         }
 
         //auto confirm invoice if the TA discounts have driven the price below 0
-        if(invoiceDetails.invoiceTotal <= 0){
+
+        const invoiceTotal = invoiceDetails.invoiceTotal;
+        this.logger.info(`Total price for ${request.submissionId} is ${invoiceTotal}`)
+        if(invoiceTotal <= 0){
           await this.taUsecaseUtils.confirmInvoice(manuscriptDetails, invoiceDetails, context)
         } else {
           const maybeUpdate = await this.setTransactionStatusToActiveUsecase.execute(
