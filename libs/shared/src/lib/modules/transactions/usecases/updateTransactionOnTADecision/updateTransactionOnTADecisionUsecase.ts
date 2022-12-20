@@ -132,6 +132,7 @@ export class UpdateTransactionOnTADecisionUsecase
         this.logger.info(`Total price for ${request.submissionId} is ${invoiceTotal}`)
         if(invoiceTotal <= 0){
           await this.taUsecaseUtils.confirmInvoice(manuscriptDetails, invoiceDetails, context)
+          return right(null)
         } else {
           const maybeUpdate = await this.setTransactionStatusToActiveUsecase.execute(
             {manuscriptId: request.manuscriptId},
