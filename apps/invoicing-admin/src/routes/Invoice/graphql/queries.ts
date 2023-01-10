@@ -15,6 +15,9 @@ export const INVOICE_QUERY = `
     dateAccepted
     dateMovedToFinal
     referenceNumber
+    totalPrice
+    vatAmount
+    netCharges
     erpReferences {
       ...erpReferenceFragment
     }

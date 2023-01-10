@@ -97,6 +97,7 @@ export type CreditNote = {
   invoiceId?: Maybe<Scalars['ID']>;
   persistentReferenceNumber?: Maybe<Scalars['ReferenceNumber']>;
   price?: Maybe<Scalars['Float']>;
+  totalPrice?: Maybe<Scalars['Float']>;
   vat?: Maybe<Scalars['Float']>;
 };
 
@@ -138,6 +139,7 @@ export type Invoice = {
   erpReferences?: Maybe<Array<Maybe<ErpReference>>>;
   invoiceId?: Maybe<Scalars['ID']>;
   invoiceItem?: Maybe<InvoiceItem>;
+  netCharges?: Maybe<Scalars['Float']>;
   payer?: Maybe<Payer>;
   payment?: Maybe<Payment>;
   payments?: Maybe<Array<Maybe<Payment>>>;
@@ -146,9 +148,11 @@ export type Invoice = {
   revenueRecognitionReference?: Maybe<Scalars['String']>;
   status?: Maybe<InvoiceStatus>;
   title?: Maybe<Scalars['String']>;
+  totalPrice?: Maybe<Scalars['Float']>;
   transaction?: Maybe<Transaction>;
   type?: Maybe<Scalars['String']>;
   vat?: Maybe<Scalars['Float']>;
+  vatAmount?: Maybe<Scalars['Float']>;
 };
 
 export type InvoiceFilters = {
@@ -923,6 +927,7 @@ export type CreditNoteResolvers<ContextType = any, ParentType extends ResolversP
   invoiceId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   persistentReferenceNumber?: Resolver<Maybe<ResolversTypes['ReferenceNumber']>, ParentType, ContextType>;
   price?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  totalPrice?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   vat?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -958,6 +963,7 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
   erpReferences?: Resolver<Maybe<Array<Maybe<ResolversTypes['ErpReference']>>>, ParentType, ContextType>;
   invoiceId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   invoiceItem?: Resolver<Maybe<ResolversTypes['InvoiceItem']>, ParentType, ContextType>;
+  netCharges?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   payer?: Resolver<Maybe<ResolversTypes['Payer']>, ParentType, ContextType>;
   payment?: Resolver<Maybe<ResolversTypes['Payment']>, ParentType, ContextType>;
   payments?: Resolver<Maybe<Array<Maybe<ResolversTypes['Payment']>>>, ParentType, ContextType>;
@@ -966,9 +972,11 @@ export type InvoiceResolvers<ContextType = any, ParentType extends ResolversPare
   revenueRecognitionReference?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   status?: Resolver<Maybe<ResolversTypes['InvoiceStatus']>, ParentType, ContextType>;
   title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  totalPrice?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   transaction?: Resolver<Maybe<ResolversTypes['Transaction']>, ParentType, ContextType>;
   type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   vat?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  vatAmount?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

@@ -235,6 +235,7 @@ export * from './modules/coupons/mappers/CouponMap';
 export * from './modules/waivers/mappers/WaiverMap';
 export * from './modules/coupons/repos';
 export * from './modules/waivers/domain/Waiver';
+export * from './modules/coupons/domain/Coupon'
 
 // * Export Notifications Subdomain
 export * from './modules/notifications/domain/Notification';

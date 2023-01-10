@@ -93,6 +93,9 @@ type Invoice @model(id: "invoices") {
   dateIssued: String
   dateAccepted: String
   dateMovedToFinal: String
+  totalPrice: Float
+  netCharges: Float
+  vatAmount: Float
   vat: Float
   charge: Float
   status: InvoiceStatus @filter(key: "invoiceStatus")
@@ -124,6 +127,7 @@ type CreditNote @model(id: "credit_notes") {
   dateUpdated: Date
   erpReference: ErpReference
   invoice: Invoice
+  totalPrice: Float
 }
 
 type InvoiceVat {

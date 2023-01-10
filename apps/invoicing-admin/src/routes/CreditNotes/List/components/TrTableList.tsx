@@ -8,35 +8,14 @@ import { Badge } from '../../../../components';
 import {CREATION_REASON} from "../componentUtils";
 
 const TrTableCreditNotesList = ({ creditNotes }) => {
-  let tabularData = creditNotes.creditNotes.map((i) => {
-    // * applied coupons
-    let coupons = 0;
-    i.invoice.invoiceItem.coupons.forEach((c) => {
-      coupons += c.reduction;
-    });
-
-    // * applied waivers
-    let waivers = 0;
-    i.invoice.invoiceItem.waivers.forEach((w) => {
-      waivers += w.reduction;
-    });
-
-    const netCharges =
-      i.invoice.invoiceItem.price * (1 - (coupons + waivers) / 100) * 100;
-    const total = netCharges + (netCharges * i.invoice.invoiceItem.vat) / 100;
-    i.total = -(Math.round(total) / 100);
-
-    return i;
-  });
-
   return (
     <React.Fragment>
-      {tabularData.map(
+      {creditNotes.creditNotes.map(
         ({
           id,
           creationReason,
           invoice,
-          total,
+          totalPrice,
           dateIssued,
           persistentReferenceNumber,
         }) => (
@@ -69,7 +48,7 @@ const TrTableCreditNotesList = ({ creditNotes }) => {
 
             <td className='align-middle'>
               <strong className='text-danger'>
-                {numeral(total).format('$0.00')}
+                {numeral(totalPrice).format('$0.00')}
               </strong>
             </td>
           </tr>

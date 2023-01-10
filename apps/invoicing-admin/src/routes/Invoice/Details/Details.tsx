@@ -57,23 +57,7 @@ const Details: React.FC = (props) => {
     return <div>Something Bad Happened</div>;
 
   const { invoiceWithAuthorization:invoice, getPaymentMethods } = data;
-  const { status, id: invoiceId, transaction } = invoice;
-
-
-  // * -> Net and total charges computing
-
-  const { vat, coupons, waivers, price, taDiscount } = invoice?.invoiceItem;
-  const reductions = [...coupons, ...waivers];
-  let totalDiscountFromReductions = reductions.reduce(
-    (acc, curr) => acc + curr.reduction,
-    0
-  );
-  totalDiscountFromReductions =
-    totalDiscountFromReductions > 100 ? 100 : totalDiscountFromReductions;
-  const netCharges = price - ((price * totalDiscountFromReductions) / 100) - taDiscount;
-  const vatAmount = (netCharges * vat) / 100;
-  const totalCharges = netCharges + vatAmount;
-  // * <-
+  const { status, id: invoiceId, transaction, totalPrice, vatAmount, netCharges } = invoice;
 
   let statusClassName = 'warning';
   if (status === 'ACTIVE') {
@@ -147,7 +131,7 @@ const Details: React.FC = (props) => {
                         invoiceItem={invoice?.invoiceItem}
                         invoiceId={invoiceId}
                         target={CREATE_CREDIT_NOTE_MODAL_TARGET}
-                        total={totalCharges}
+                        total={totalPrice}
                         onSaveCallback={invoiceQueryRefetch}
                       />
                     </Restricted>
@@ -216,7 +200,7 @@ const Details: React.FC = (props) => {
                     creditNote={invoice.creditNote}
                     netCharges={netCharges}
                     vatAmount={vatAmount}
-                    totalCharges={totalCharges}
+                    totalCharges={totalPrice}
                   />
                 </TabPane>
                 <TabPane tabId='article'>

@@ -51,6 +51,7 @@ export interface InvoiceProps {
   dateIssued?: Date;
   dateMovedToFinal?: Date;
   totalNumInvoiceItems?: number;
+  totalPrice?: number;
   vatnote?: string;
   erpReferences?: InvoiceErpReferences;
   persistentReferenceNumber?: string;

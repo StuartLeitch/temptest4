@@ -132,7 +132,7 @@ const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
             </td>
             {/* <td>Really?</td> */}
             <td className='align-middle text-right text-dark font-weight-bold'>
-              {numeral(netCharges).format('$0.00')}
+              {`-${numeral(netCharges).format('$0.00')}`}
             </td>
           </tr>
           <tr>
@@ -142,12 +142,12 @@ const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
                 VAT
               </span>
               <span className='text-muted px-2'>
-                (+{invoice?.invoiceItem?.vat}%)
+                ({invoice?.invoiceItem?.vat}%)
               </span>
             </td>
             {/* <td>Really?</td> */}
             <td className='align-middle text-right text-dark font-weight-bold'>
-              {numeral(vat.toFixed(2)).format('$0.00')}
+              {`-${numeral(vat.toFixed(2)).format('$0.00')}`}
             </td>
           </tr>
           <tr>
@@ -157,7 +157,7 @@ const CreditNoteDetailsTab: React.FC<CreditNoteDetailsTabProps> = ({
             </td>
             {/* <td>Really?</td> */}
             <td className='align-middle text-right h2 text-uppercase text-success font-weight-bold'>
-              {numeral(total.toFixed(2)).format('$0.00')}
+              {numeral(`-${total.toFixed(2)}`).format('$0.00')}
             </td>
           </tr>
         </tbody>

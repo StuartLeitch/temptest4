@@ -108,31 +108,14 @@ const RecentInvoicesList: React.FC<RecentInvoicesListProps> = (props) => {
     },
     {
       title: 'Total',
-      dataIndex: 'price',
-      key: 'price',
+      dataIndex: 'totalPrice',
+      key: 'totalPrice',
       align: 'right' as const,
       width: '15%',
-      render: (price, record) => {
-        // * applied coupons
-        let coupons = 0;
-        record.invoiceItem.coupons.forEach((c) => {
-          coupons += c.reduction;
-        });
-
-        // * applied waivers
-        let waivers = 0;
-        record.invoiceItem.waivers.forEach((w) => {
-          waivers += w.reduction;
-        });
-
-        const netCharges =
-          record.invoiceItem.price * (1 - (coupons + waivers) / 100) * 100;
-        const total = netCharges + (netCharges * record.invoiceItem.vat) / 100;
-        record.total = Math.round(total) / 100 -  record.invoiceItem.taDiscount;
-
+      render: (totalPrice) => {
         return (
           <Tag
-            label={numeral(record.total).format('$0.00')}
+            label={numeral(totalPrice).format('$0.00')}
             status='success'
             large
           />

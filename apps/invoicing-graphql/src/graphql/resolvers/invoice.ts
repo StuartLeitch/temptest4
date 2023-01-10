@@ -38,8 +38,9 @@ import { env } from '../../env';
 import {
   handleForbiddenUsecase,
   getOptionalAuthRoles,
-  getAuthRoles,
+  getAuthRoles, invoiceChargingDetails, getCouponsAndWaivers,
 } from './utils';
+
 
 export const invoice: Resolvers<Context> = {
   Query: {
@@ -161,12 +162,41 @@ export const invoice: Resolvers<Context> = {
 
       const erpPaymentReferences = maybeErpPaymentReferences.value;
 
+      const getItemsUseCase = new GetItemsForInvoiceUsecase(
+        repos.invoiceItem,
+        repos.coupon,
+        repos.waiver,
+      );
+
+      const maybeInvoiceItems = await getItemsUseCase.execute(
+        {
+          invoiceId: invoiceDetails.id.toString(),
+        },
+        usecaseContext
+      );
+
+      let invoiceItem;
+      if (maybeInvoiceItems.isLeft()) {
+        invoiceItem = null;
+      } else {
+        const [item] = maybeInvoiceItems.value;
+        invoiceItem = item
+      }
+
+      const {coupons, waivers} = await getCouponsAndWaivers(context, invoiceItem);
+      const { vat, price, taDiscount } = invoiceItem;
+
+      const invoiceCharges = invoiceChargingDetails(coupons, waivers, price, taDiscount, vat);
+
       return {
         invoiceId: invoiceDetails.id.toString(),
         status: invoiceDetails.status,
         dateCreated: invoiceDetails?.dateCreated?.toISOString(),
         dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
         dateMovedToFinal: invoiceDetails?.dateMovedToFinal?.toISOString(),
+        totalPrice: invoiceCharges.totalCharges,
+        vatAmount: invoiceCharges.vatAmount,
+        netCharges: invoiceCharges.netCharges,
         erpReferences: invoiceDetails
           .getErpReferences()
           .getItems()
@@ -183,6 +213,12 @@ export const invoice: Resolvers<Context> = {
       const { repos } = context;
 
       const usecase = new GetRecentInvoicesUsecase(repos.invoice);
+      const getItemsUseCase = new GetItemsForInvoiceUsecase(
+        repos.invoiceItem,
+        repos.coupon,
+        repos.waiver,
+      );
+
       const usecaseContext = {
         roles: contextRoles,
       };
@@ -201,19 +237,41 @@ export const invoice: Resolvers<Context> = {
           invoicesList.invoices.map(async (invoiceDetails: any) => {
             const assocInvoice = null;
 
+            const maybeInvoiceItems = await getItemsUseCase.execute(
+              {
+                invoiceId: invoiceDetails.invoiceId,
+              },
+              usecaseContext
+            );
+
+            let invoiceItem;
+            if (maybeInvoiceItems.isLeft()) {
+              invoiceItem = null;
+            } else {
+              const [item] = maybeInvoiceItems.value;
+              invoiceItem = item
+            }
+
+            const {coupons, waivers} = await getCouponsAndWaivers(context, invoiceItem);
+            const { vat, price, taDiscount } = invoiceItem;
+
+            const invoiceCharges = invoiceChargingDetails(coupons, waivers, price, taDiscount, vat);
+
             return {
               ...InvoiceMap.toPersistence(invoiceDetails),
               invoiceId: invoiceDetails.id.toString(),
               dateCreated: invoiceDetails?.dateCreated?.toISOString(),
               dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
               dateIssued: invoiceDetails?.dateIssued?.toISOString(),
+              totalPrice: invoiceCharges.totalCharges,
+              vatAmount: invoiceCharges.vatAmount,
+              netCharges: invoiceCharges.netCharges,
               referenceNumber: assocInvoice
                 ? assocInvoice.persistentReferenceNumber
                 : invoiceDetails.persistentReferenceNumber,
             };
           })
         );
-
       return {
         totalCount: invoicesList.totalCount,
         invoices: await getInvoices(),

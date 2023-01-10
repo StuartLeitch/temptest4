@@ -27,35 +27,14 @@ const INVOICE_STATUS = {
 };
 
 const TrTableInvoicesList = ({ invoices }) => {
-  let tabularData = invoices.map((i) => {
-    // * applied coupons
-    let coupons = 0;
-    i.invoiceItem.coupons.forEach((c) => {
-      coupons += c.reduction;
-    });
-
-    // * applied waivers
-    let waivers = 0;
-    i.invoiceItem.waivers.forEach((w) => {
-      waivers += w.reduction;
-    });
-
-    const netCharges =
-      i.invoiceItem.price * (1 - (coupons + waivers) / 100) * 100;
-    const total = netCharges + (netCharges * i.invoiceItem.vat) / 100;
-    i.total = Math.round(total) / 100 - i.invoiceItem.taDiscount;
-
-    return i;
-  });
-
   return (
     <React.Fragment>
-      {tabularData.map(
+      {invoices.map(
         ({
           id,
           status,
           referenceNumber,
-          total,
+          totalPrice,
 
           invoiceItem,
           dateIssued,
@@ -98,7 +77,7 @@ const TrTableInvoicesList = ({ invoices }) => {
                   invoiceItem?.price < 0 ? 'text-danger' : 'text-success'
                 }
               >
-                {numeral(total).format('$0.00')}
+                {numeral(totalPrice).format('$0.00')}
               </strong>
             </td>
             <td className='align-middle text-nowrap'>

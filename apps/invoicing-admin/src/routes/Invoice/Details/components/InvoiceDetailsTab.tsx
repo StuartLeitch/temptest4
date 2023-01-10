@@ -30,7 +30,6 @@ const InvoiceDetailsTab: React.FC<InvoiceDetailsTabProps> = ({
   vatAmount,
   totalCharges,
 }) => {
-
   function renderTaLateCnReason() {
     return <>
       {

@@ -20,6 +20,9 @@ fragment invoiceFragment on Invoice {
   dateIssued
   dateAccepted
   referenceNumber
+  totalPrice
+  vatAmount
+  netCharges
   payer {
     ...payerFragment
   }
@@ -114,6 +117,7 @@ fragment invoiceFragment on Invoice {
   dateIssued
   dateAccepted
   referenceNumber
+  totalPrice
   payer {
     ...payerFragment
   }
@@ -184,6 +188,7 @@ fragment creditNoteFragment on CreditNote {
   dateUpdated
   persistentReferenceNumber
   creationReason
+  totalPrice
   invoice {
     invoiceItem {
       id

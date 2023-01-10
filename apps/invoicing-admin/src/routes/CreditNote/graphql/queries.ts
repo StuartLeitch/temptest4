@@ -24,6 +24,9 @@ export const CREDIT_NOTE_QUERY = `
   fragment invoiceFragment on Invoice {
     id: invoiceId
     referenceNumber
+    totalPrice
+    vatAmount
+    netCharges
     erpReferences {
       ...erpReferenceFragment
     }
@@ -51,7 +54,7 @@ export const CREDIT_NOTE_QUERY = `
         ...articleFragment
       }
     }
-  
+
   }
   fragment payerFragment on Payer {
     id

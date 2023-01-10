@@ -16,10 +16,10 @@ import {
   GetCreditNoteByIdDTO,
   GetInvoiceDetailsDTO,
   CreditNoteMap,
-  InvoiceMap,
+  InvoiceMap, GetItemsForInvoiceUsecase, CreditNote,
 } from '@hindawi/shared';
 
-import { handleForbiddenUsecase, getAuthRoles } from './utils';
+import {handleForbiddenUsecase, getAuthRoles, getCouponsAndWaivers, invoiceChargingDetails} from './utils';
 
 export const creditNote: Resolvers<Context> = {
   Query: {
@@ -54,6 +54,7 @@ export const creditNote: Resolvers<Context> = {
       if (invoiceResult.isLeft()) {
         throw new Error(invoiceResult.value.message);
       }
+
       return {
         ...CreditNoteMap.toPersistence(result.value),
         invoice: {
@@ -104,12 +105,45 @@ export const creditNote: Resolvers<Context> = {
       }
 
       const creditNotesList = result.value;
+      const getItemsUseCase = new GetItemsForInvoiceUsecase(
+        repos.invoiceItem,
+        repos.coupon,
+        repos.waiver
+      );
+
+      const getCreditNotes = async () =>
+        Promise.all(
+          creditNotesList.creditNotes.map(async (creditNoteDetails: any) => {
+            const maybeInvoiceItems = await getItemsUseCase.execute(
+              {
+                invoiceId: creditNoteDetails.invoiceId.toString(),
+              },
+              usecaseContext
+            );
+
+            let invoiceItem;
+            if (maybeInvoiceItems.isLeft()) {
+              invoiceItem = null;
+            } else {
+              const [item] = maybeInvoiceItems.value;
+              invoiceItem = item
+            }
+            const {coupons, waivers} = await getCouponsAndWaivers(context, invoiceItem);
+            const { vat, price, taDiscount } = invoiceItem;
+
+            const invoiceCharges = invoiceChargingDetails(coupons, waivers, price, taDiscount, vat);
+
+            return {
+              ...CreditNoteMap.toPersistence(creditNoteDetails),
+              totalPrice: invoiceCharges.totalCharges
+            }
+          })
+        )
+
 
       return {
         totalCount: +creditNotesList.totalCount,
-        creditNotes: creditNotesList.creditNotes.map(
-          CreditNoteMap.toPersistence
-        ),
+        creditNotes: await getCreditNotes()
       };
     },
 
@@ -142,7 +176,7 @@ export const creditNote: Resolvers<Context> = {
       const contextRoles = getAuthRoles(context);
 
       const {
-        repos: { invoice: invoiceRepo },
+        repos: { invoice: invoiceRepo, invoiceItem: invoiceItemRepo, coupon: couponRepo, waiver: waiverRepo  },
       } = context;
 
       const usecaseContext = {
@@ -171,6 +205,31 @@ export const creditNote: Resolvers<Context> = {
 
       const invoiceDetails = result.value;
 
+      const getItemsUseCase = new GetItemsForInvoiceUsecase(
+        invoiceItemRepo,
+        couponRepo,
+        waiverRepo
+      );
+
+      const maybeInvoiceItems = await getItemsUseCase.execute(
+        {
+          invoiceId: invoiceDetails.id.toString(),
+        },
+        usecaseContext
+      );
+
+      let invoiceItem;
+      if (maybeInvoiceItems.isLeft()) {
+        invoiceItem = null;
+      } else {
+        const [item] = maybeInvoiceItems.value;
+        invoiceItem = item
+      }
+      const {coupons, waivers} = await getCouponsAndWaivers(context, invoiceItem);
+      const { vat, price, taDiscount } = invoiceItem;
+
+      const invoiceCharges = invoiceChargingDetails(coupons, waivers, price, taDiscount, vat);
+
       return {
         invoiceId: invoiceDetails.id.toString(),
         status: invoiceDetails.status,
@@ -178,6 +237,9 @@ export const creditNote: Resolvers<Context> = {
         dateAccepted: invoiceDetails?.dateAccepted?.toISOString(),
         dateMovedToFinal: invoiceDetails?.dateMovedToFinal?.toISOString(),
         dateIssued: invoiceDetails?.dateIssued?.toISOString(),
+        totalPrice: invoiceCharges.totalCharges,
+        vatAmount: invoiceCharges.vatAmount,
+        netCharges: invoiceCharges.netCharges,
         referenceNumber: invoiceDetails.persistentReferenceNumber,
       };
     },
