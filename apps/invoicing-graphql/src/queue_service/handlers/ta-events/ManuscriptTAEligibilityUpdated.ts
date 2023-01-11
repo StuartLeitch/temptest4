@@ -55,7 +55,8 @@ export const ManuscriptTAEligibilityUpdatedHandler: EventHandler<ManuscriptTaEli
       services: {
         emailService,
         commsEmailService,
-        vatService
+        vatService,
+        waiverService
       },
       loggerBuilder,
       auditLoggerServiceProvider,
@@ -105,6 +106,7 @@ export const ManuscriptTAEligibilityUpdatedHandler: EventHandler<ManuscriptTaEli
       invoiceRepo,
       manuscriptRepo,
       waiverRepo,
+      waiverService,
       payerRepo,
       couponRepo,
       emailService,
@@ -184,6 +186,7 @@ export const ManuscriptTAEligibilityUpdatedHandler: EventHandler<ManuscriptTaEli
     async function activateSoftDeleteOrIgnoreInvoice(manuscriptDetails: Manuscript, discounts: TaDiscounts, submissionId: string, invoiceId: string) {
       const updateTransactionResult = await updateTransactionOnTADecisionUsecase.execute(
         {
+          authorEmails: [manuscriptDetails.authorEmail],
           manuscriptId: manuscriptDetails.manuscriptId.id.toString(),
           emailSenderInfo: {
             address: env.app.invoicePaymentEmailSenderAddress,

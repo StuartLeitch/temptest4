@@ -33,6 +33,18 @@ import {Actions, UpdateTransactionOnTAUtils} from './ta-utils';
 import * as Errors from './updateTransactionOnTADecisionErrors';
 import {VError} from 'verror';
 import {ManuscriptId} from '../../../manuscripts/domain/ManuscriptId';
+import {InvoiceItem} from "../../../invoices/domain/InvoiceItem";
+import {Invoice} from "../../../invoices/domain/Invoice";
+import {Manuscript} from "../../../manuscripts/domain/Manuscript";
+import {WaiverService} from '../../../../domain/services/WaiverService';
+import {UpdateTransactionOnTADecisionDTO} from "./updateTransactionOnTADecisionDTO";
+import {GetItemsForInvoiceUsecase} from "../../../invoices/usecases/getItemsForInvoice";
+import {AddressMap} from "../../../addresses/mappers/AddressMap";
+import {PayerMap} from "../../../payers/mapper/Payer";
+import {PayerType} from "../../../payers/domain/Payer";
+import {ConfirmInvoiceDTO, ConfirmInvoiceUsecase} from "../../../invoices/usecases/confirmInvoice";
+
+;
 
 export class UpdateTransactionOnTADecisionUsecase
   extends AccessControlledUsecase<DTO, Context, AccessControlContext>
@@ -42,6 +54,8 @@ export class UpdateTransactionOnTADecisionUsecase
   private softDeleteDraftInvoiceUsecase: SoftDeleteDraftInvoiceUsecase;
   private taUsecaseUtils: UpdateTransactionOnTAUtils;
   private invoiceDetailsUsecase: GetInvoiceDetailsUsecase;
+  private invoiceItemsUsecase: GetItemsForInvoiceUsecase;
+  private confirmInvoiceUsecase: ConfirmInvoiceUsecase;
 
   constructor(
     private addressRepo: AddressRepoContract,
@@ -51,6 +65,7 @@ export class UpdateTransactionOnTADecisionUsecase
     private invoiceRepo: InvoiceRepoContract,
     private articleRepo: ArticleRepoContract,
     private waiverRepo: WaiverRepoContract,
+    private waiverService: WaiverService,
     private payerRepo: PayerRepoContract,
     private couponRepo: CouponRepoContract,
     private emailService: EmailService,
@@ -60,6 +75,19 @@ export class UpdateTransactionOnTADecisionUsecase
     super();
 
     this.manuscriptDetailsUsecase = new GetManuscriptByInvoiceIdUsecase(this.articleRepo, this.invoiceItemRepo);
+    this.invoiceItemsUsecase = new GetItemsForInvoiceUsecase(this.invoiceItemRepo, this.couponRepo, this.waiverRepo);
+
+    this.confirmInvoiceUsecase = new ConfirmInvoiceUsecase(
+      this.invoiceItemRepo,
+      this.transactionRepo,
+      this.addressRepo,
+      this.invoiceRepo,
+      this.couponRepo,
+      this.waiverRepo,
+      this.payerRepo,
+      this.logger,
+      this.vatService
+    );
 
     this.softDeleteDraftInvoiceUsecase = new SoftDeleteDraftInvoiceUsecase(
       this.transactionRepo,
@@ -95,6 +123,8 @@ export class UpdateTransactionOnTADecisionUsecase
   @Authorize('transaction:update')
   public async execute(request: DTO, context?: Context): Promise<Response> {
     try {
+      const { sanctionedCountryNotificationReceiver, sanctionedCountryNotificationSender } = request;
+
       const manuscriptDetails = await this.getManuscriptDetails(request);
       const invoiceItem = await this.getInvoiceItems(manuscriptDetails, request);
       const journal = await this.getJournal(manuscriptDetails);
@@ -136,8 +166,67 @@ export class UpdateTransactionOnTADecisionUsecase
         if (request.discount?.value) {
           invoiceItem.taDiscount = invoiceItem.calculateTADiscountedPrice(request.discount.value);
           await this.invoiceItemRepo.update(invoiceItem)
+
+          await this.calculateWaivers(invoiceItem, invoiceDetails, request, manuscriptDetails);
+
+          const itemsWithReductions = await this.invoiceItemsUsecase.execute({ invoiceId: invoiceDetails.id.toString() }, context);
+
+          if (itemsWithReductions.isLeft()) {
+            return itemsWithReductions.map(() => null);
+          }
+
+          invoiceDetails.addItems(itemsWithReductions.value);
+
           invoiceDetails.generateInvoiceDraftAmountUpdatedEvent();
           DomainEvents.dispatchEventsForAggregate(invoiceDetails.id);
+
+          const total = invoiceDetails.invoiceTotal;
+          // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
+          if (total <= 0) {
+            // * but we can auto-confirm it
+            // * create new address
+            const maybeNewAddress = AddressMap.toDomain({
+              country: manuscriptDetails.authorCountry,
+            });
+
+            if (maybeNewAddress.isLeft()) {
+              return left(new UnexpectedError(new Error(maybeNewAddress.value.message)));
+            }
+
+            // * create new payer
+            const maybeNewPayer = PayerMap.toDomain({
+              invoiceId: invoiceDetails.invoiceId.id.toString(),
+              name: `${manuscriptDetails.authorFirstName} ${manuscriptDetails.authorSurname}`,
+              addressId: maybeNewAddress.value.addressId.id.toString(),
+              email: manuscriptDetails.authorEmail,
+              type: PayerType.INDIVIDUAL,
+              organization: ' ',
+            });
+
+            if (maybeNewPayer.isLeft()) {
+              return left(new UnexpectedError(new Error(maybeNewPayer.value.message)));
+            }
+
+            const confirmInvoiceArgs: ConfirmInvoiceDTO = {
+              payer: {
+                ...PayerMap.toPersistence(maybeNewPayer.value),
+                address: AddressMap.toPersistence(maybeNewAddress.value),
+              },
+              sanctionedCountryNotificationReceiver,
+              sanctionedCountryNotificationSender,
+            };
+
+            // * Confirm the invoice automagically
+            try {
+              const maybeConfirmed = await this.confirmInvoiceUsecase.execute(confirmInvoiceArgs, context);
+              if (maybeConfirmed.isLeft()) {
+                return maybeConfirmed.map(() => null);
+              }
+            } catch (err) {
+              return left(new UnexpectedError(err));
+            }
+            return right(null);
+          }
         }
 
         // * Send emails
@@ -240,6 +329,27 @@ export class UpdateTransactionOnTADecisionUsecase
     } catch (err) {
       const manuscriptNotFoundError = new Errors.ManuscriptNotFoundError(request.invoiceId);
       throw new VError(manuscriptNotFoundError, 'Original error %s, %s', err.message, manuscriptNotFoundError.message);
+    }
+  }
+
+  private async calculateWaivers(
+    invoiceItem: InvoiceItem,
+    invoice: Invoice,
+    request: UpdateTransactionOnTADecisionDTO,
+    manuscript: Manuscript
+  ) {
+    try {
+      await this.waiverRepo.removeInvoiceItemWaivers(invoiceItem.invoiceItemId);
+      await this.waiverService.applyWaiver({
+        invoiceId: invoice.invoiceId.id.toString(),
+        allAuthorsEmails: request.authorEmails,
+        country: manuscript.authorCountry,
+        journalId: manuscript.journalId,
+      });
+    } catch (error) {
+      return left(
+        new UnexpectedError(new Error(`Failed to save waiver due to error: ${error.message}: ${error.stack}`))
+      );
     }
   }
 }

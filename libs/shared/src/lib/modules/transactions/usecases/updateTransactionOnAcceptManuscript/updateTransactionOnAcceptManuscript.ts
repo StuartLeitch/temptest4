@@ -118,7 +118,6 @@ export class UpdateTransactionOnAcceptManuscriptUsecase
 
       invoice.addItems(itemsWithReductions.value);
       const total = invoice.invoiceTotal;
-
       // * Check if invoice amount is zero or less - in this case, we don't need to send to ERP
       if (total <= 0) {
         // * but we can auto-confirm it

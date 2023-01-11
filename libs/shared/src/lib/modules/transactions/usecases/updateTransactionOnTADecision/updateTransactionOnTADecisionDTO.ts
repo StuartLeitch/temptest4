@@ -1,4 +1,5 @@
 export interface UpdateTransactionOnTADecisionDTO {
+  authorEmails: string[];
   manuscriptId: string;
   emailSenderInfo?: {
     address?: string;
@@ -12,4 +13,6 @@ export interface UpdateTransactionOnTADecisionDTO {
   };
   submissionId?: string;
   invoiceId?: string;
+  sanctionedCountryNotificationReceiver?: string;
+  sanctionedCountryNotificationSender?: string;
 }
